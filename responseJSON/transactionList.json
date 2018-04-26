@@ -1,0 +1,34 @@
+{
+	"transactionListData": {
+		"action": "TransactionList",
+		"data": {
+			"SearchComponent": "Entity",
+			"TransactionList": [
+				{
+					"TransactionID": "131313",
+					"BlockChainAddress": "1231313131313",
+					"DEGTransactionNo": "9900000226905064",
+					"SPTransactionNo": "E3100000086E090115092556B",
+					"ServiceProvider": "Road Transport & Authority",
+					"Service": "Unified Automated Fare Collection",
+					"TransactionRequestedDate": "09/01/2015",
+					"TranStatus":{
+                        "value": "SUCCESS",
+                        "type": "INFO"
+                    },
+					
+					"Amount": "100",
+					"actions": [
+                        {
+                            "name": "View",
+                            "actionURI": "#modelWindows",
+                            "params": "?batchId=2520",
+                            "icon": "icon-docs",
+							"type": "modal"
+                        }
+                    ]
+				}
+			]
+		}
+	}
+}

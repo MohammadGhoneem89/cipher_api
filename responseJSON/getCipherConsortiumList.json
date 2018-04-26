@@ -1,0 +1,112 @@
+{
+  "consortiumList": {
+    "action": "consortiumList",
+    "pageData": {
+      "currentPageNo": 1,
+      "pageSize": 10,
+      "totalRecords": 2
+    },
+    "data": {
+      "searchResult": [
+        {
+          "_id": "59b646c4212297005d466c7b",
+          "consortiumName": "DSG Recon & Settlement",
+          "consortiumType": "Hyperledger",
+          "actions": [
+            {
+              "value": "40122",
+              "type": "componentAction",
+              "label": "Deploy",
+              "params": "",
+              "iconName": "fa fa-gear",
+              "URI": [
+                "/smartContracts/deploy/"
+              ]
+            },
+            {
+              "value": "4014",
+              "type": "componentAction",
+              "label": "View",
+              "params": "",
+              "iconName": "fa fa-eye",
+              "URI": [
+                "/cipher/blockchainSetup/view/"
+              ]
+            },
+            {
+              "value": "4015",
+              "type": "componentAction",
+              "label": "Edit",
+              "params": "",
+              "iconName": "fa fa-edit",
+              "URI": [
+                "/cipher/blockchainSetup/view/"
+              ]
+            }
+          ]
+        },
+        {
+          "_id": "59b646c4212297005d466c7c",
+          "consortiumName": "State Bank Of Pakistan",
+          "consortiumType": "Ethereum",
+          "actions": [
+            {
+              "value": "4014",
+              "type": "componentAction",
+              "label": "View",
+              "params": "",
+              "iconName": "fa fa-eye",
+              "URI": [
+                "/cipher/blockchainSetup/view/"
+              ]
+            },
+            {
+              "value": "4015",
+              "type": "componentAction",
+              "label": "Edit",
+              "params": "",
+              "iconName": "fa fa-edit",
+              "URI": [
+                "/cipher/blockchainSetup/edit/"
+              ]
+            }
+          ]
+        }
+      ],
+      "typeData": {
+        "consortiumNames": [
+          {
+            "label": "DSG Recon & Settlement",
+            "value": "SDG"
+          },
+          {
+            "label": "State Bank Of Pakistan",
+            "value": "SBP"
+          }
+        ],
+        "Cipher_blockchainType": [
+          {
+            "label": "Hyperledger",
+            "value": "Hyperledger"
+          },
+          {
+            "label": "Ethereum",
+            "value": "Ethereum"
+          }
+        ]
+      },
+      "actions": [
+        {
+          "value": "4016",
+          "type": "pageAction",
+          "label": "ADD",
+          "labelName": "COM_AB_Add",
+          "actionType": "PORTLET_LINK",
+          "iconName": "fa fa-plus",
+          "URI": "/cipher/blockchainSetup",
+          "children": []
+        }
+      ]
+    }
+  }
+}

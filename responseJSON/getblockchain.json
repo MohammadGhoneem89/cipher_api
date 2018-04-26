@@ -1,0 +1,146 @@
+{
+    "blockchainWorkboardData": {
+        "action": "blockchainWorkboardData",
+        "data": {
+            "dashboardTiles": [
+                {
+                    "id": 1,
+                    "title": "Peers",
+                    "percentage": "0",
+                    "value": 6,
+                    "actionURI": "",
+                    "overDue": "",
+                    "fontClass": "green-steel"
+                },
+                {
+                    "id": 1,
+                    "title": "Channels",
+                    "percentage": "0",
+                    "value": 7,
+                    "actionURI": "",
+                    "overDue": "",
+                    "fontClass": "green-turquoise"
+                },
+                {
+                    "id": 1,
+                    "title": "Block Height",
+                    "percentage": "0",
+                    "value": 53,
+                    "actionURI": "",
+                    "overDue": "",
+                    "fontClass": "green-meadow"
+                },
+                {
+                    "id": 1,
+                    "title": "Deployed Contracts",
+                    "percentage": "0",
+                    "value": 1,
+                    "actionURI": "",
+                    "overDue": "",
+                    "fontClass": "green-jungle"
+                }
+            ],
+            "workboardData": {
+			"pageData":{"totalRecords":1},
+			"rows":[
+                {
+					"number":"54",
+					"size":"789",
+					"hash":"0x672f453825e403Fc2034aF89D9eF2366C2d02A8E",
+					"nonce":"0x672f453825",
+					"timestamp": 1562525520,
+                    "actions": [
+							{
+								"value": "1003",
+								"type": "componentAction",
+								"label": "View",
+								"params": "",
+								"iconName": "icon-docs",
+								"URI": [
+									"/BlockTransactionList/"
+								]
+							}
+						]
+                },
+				 {
+                        "number": "53",
+                        "size": "709",
+                        "hash": "0x672f4538asd5e403Fc2034aF89D9eF2366C2d02A8E",
+                        "nonce": "0x67a42f453825",
+                        "timestamp": 1562525520,
+                       "actions": [
+							{
+								"value": "1003",
+								"type": "componentAction",
+								"label": "View",
+								"params": "",
+								"iconName": "icon-docs",
+								"URI": [
+									"/BlockTransactionList/"
+								]
+							}
+						]
+                    },
+					 {
+                        "number": "52",
+                        "size": "700",
+                        "hash": "0x670f453825e403Fc2034aF89D9eF2366C2d02A8E",
+                        "nonce": "0x692f453825",
+                        "timestamp": 1562525520,
+                        "actions": [
+							{
+								"value": "1003",
+								"type": "componentAction",
+								"label": "View",
+								"params": "",
+								"iconName": "icon-docs",
+								"URI": [
+									"/BlockTransactionList/"
+								]
+							}
+						]
+                    },
+					 {
+                        "number": "51",
+                        "size": "609",
+                        "hash": "0x602f453825e403Fc2034aF89D9eF2366C2d02A8E",
+                        "nonce": "0x612f453825",
+                        "timestamp": 1562525520,
+                        "actions": [
+							{
+								"value": "1003",
+								"type": "componentAction",
+								"label": "View",
+								"params": "",
+								"iconName": "icon-docs",
+								"URI": [
+									"/BlockTransactionList/"
+								]
+							}
+						]
+                    },
+					 {
+                        "number": "50",
+                        "size": "589",
+                        "hash": "0x902f453825e403Fc2034aF89D9eF2366C2d02A8E",
+                        "nonce": "0x902f453825",
+                        "timestamp": 1562525520,
+                        "actions": [
+							{
+								"value": "1003",
+								"type": "componentAction",
+								"label": "View",
+								"params": "",
+								"iconName": "icon-docs",
+								"URI": [
+									"/BlockTransactionList/"
+								]
+							}
+						]
+                    }
+            ]
+			},
+			"chartData":{"fromDate":"01/13/2018","toDate":"02/12/2018","tranCountData":[0,1,2,3,4,5,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28],"durationData":[0,1,2,3,4,5,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28]}
+        }
+    }
+}

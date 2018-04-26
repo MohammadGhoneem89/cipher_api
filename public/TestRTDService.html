@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script lang="javascript">
+
+
+var ws;
+
+
+function openSocketAgain(host){
+	        host = host.replace('http://','ws://')
+		console.log("starting web socket connection");
+		ws = new WebSocket( host +'/Socket' );
+		ws.onopen= function(event){
+		   var gd="test";
+		   //gd=guid();
+		   var msg = {"username":"alisafri","page":"", "Args" : ""}
+                   ws.send(JSON.stringify(msg));
+                   obj = document.getElementById("btn");
+                   if (obj){ obj.disabled = false;} 
+		}
+		ws.onclose = function(event){
+		   console.log("web socket connection closed re-establising connection");
+                   obj = document.getElementById("btn");
+                   if (obj){ obj.disabled = true;} 
+		   setTimeout(function() { openSocketAgain(host)}, 10000);
+                }
+		ws.onmessage = function (event) {
+		   console.log("web socket received message from server");
+		   console.log(JSON.parse(event.data));
+                  
+                   
+		};
+	
+}
+
+var host = "http://192.168.232.150:9000"
+$(document).ready(function () {
+       openSocketAgain(host);
+       
+})
+
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
+
+function CHOO(){
+  
+  var params =
+  {
+	  "fromDate":"10/21/2017",
+	  "toDate":"10/25/2017",
+	  "orgID":"",
+	  "orgType":"DSG"
+  }
+
+  
+  gd=guid();
+  var msg = {"username":gd,"action":"subscribe", "eventname" : "EntityWorkBoard","params": params }
+  ws.send (JSON.stringify(msg)); 
+
+}
+-->
+
+
+</script>
+
+
+</head>
+
+<body>
+   <div>
+      <input type="button" value="chain reaction" onclick="CHOO()" id="btn" disabled="true"/>
+   </div>
+   <textarea id="myarea" rows="40" cols="100">
+   </textarea>
+
+</body>
+
+
+
+</html>

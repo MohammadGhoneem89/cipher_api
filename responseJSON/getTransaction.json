@@ -1,0 +1,10 @@
+{
+    "getTransactions": {
+        "action": "getTransactions",
+        "data": {
+            "monthList":["Jan","Feb","March","Apr","May","June","July","Aug"], 
+            "amountList":[100.00,200.00,300.00,0.0,0.0,0.0,0.0],
+            "countList":[100,200,300,0,0,0,0,0]   
+         }
+    }
+}

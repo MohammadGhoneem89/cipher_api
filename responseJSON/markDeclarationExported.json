@@ -1,0 +1,14 @@
+{
+	"responseMessage":{
+							"action":"ResponseMessage",
+							"data":{ 
+								"message":{
+										                "status":"OK",
+										                "errorDescription":"Export Declaration Exported Successfully", 
+										                "newPageURL":"/exportDeclarationList", 
+										                "displayToUser":true 
+                                   }
+							}
+						}
+						
+}

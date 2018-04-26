@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Entity Transaction Summary</title>
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}css/reportLayout.css">
+    {{/if}}
+</head>
+<body dir="rtl">
+<div class="row">
+     <span class="pull-left margin-left">
+        <h4>كيان : {{:criteria.Entity}}</h4>
+        <h4>المستحوذ : {{:criteria.Acquirer}}</h4>
+        <h4>طريقة الدفع او السداد : {{:criteria.paymentMethod}}</h4>
+        <h4>نوع البطاقة : {{:criteria.cardType}}</h4>
+       <h4>حالة ريكون : {{:criteria.reconStatusValues}}</h4>
+   <h4>بوابة الدفع : {{:criteria.paymentGatewayValues}}</h4>
+         <h4>حالة السداد : {{:criteria.paymentStatus}}</h4>
+    </span>
+   <span class="pull-right margin-right">
+        <h4>ان يذهب في موعد : {{:criteria.toDate}}</h4>
+        <h4>من التاريخ : {{:criteria.fromDate}}</h4>
+
+        </span>
+
+    <div class="clearfix"></div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">ملخص إنتيتي رياكتيونس</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>كيان</th>
+                            <th>اسم الخدمة</th>
+                            <th>الحالة</th>
+                            <th>رقم ال المعاملات</th>
+                            <th>المبلغ الإجمالي (AED)</th>
+                        </tr>
+                        {^{for searchResult}}
+                        <tr>
+                            <td class="{{:spCodeUpperLine}} border-right border-left">{{:spCode}}</td>
+                            <td class="{{:serviceCodeUpperLine}} border-left">{{:serviceCode}}</td>
+                            <td class="border-left">{{:status}}</td>
+                            <td class="border-left text-left">{{:transCount}}</td>
+                            <td class="border-left text-left">{{:totalAmount}}</td>
+                        </tr>
+                        {{/for}}
+                        <tr>
+                            <td align="right" class="border-right thick-line text-right">المبلغ الإجمالي :
+                                {{:total.total}}
+                            </td>
+                            <td class="thick-line text-right border-left" colspan="3"></td>
+                            <td align="right" class="border-right thick-line text-left"> إجمالي المعاملات :
+                                {{:total.tranTotal}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="display:none">
+        <img src="{{:images.sdg}}"/>
+        <img src="{{:images.dof}}"/>
+    </span>
+</body>
+</html>

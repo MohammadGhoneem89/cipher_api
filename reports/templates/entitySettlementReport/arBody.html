@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Entity Settlement Report</title>
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}css/reportLayout.css">
+    {{/if}}
+</head>
+<body dir="rtl">
+<div class="row">
+      <span class="pull-left margin-left">
+        <h4>كيان : {{:criteria.Entity}}</h4>
+    </span>
+     <span class="pull-right margin-right">
+        <h4>ان يذهب في موعد : {{:criteria.toDate}}</h4>
+        <h4>من التاريخ : {{:criteria.fromDate}}</h4>
+        </span>
+    <div class="clearfix"></div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">تقرير تسوية الكيان</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <tr>
+                            <th/>No.</th>
+                            <th>اسم الكيان</th>
+                            <th>تاريخ التسوية</th>
+                            <th>معاملات الفترة الحالية(AED)</th>
+                            <th>مجموع مبلغ اللجنة(AED)</th>
+                            <th>تمت معالجة المبلغ السابق(AED)</th>
+                            <th>صافي المبلغ الإجمالي(AED)</th>
+                            <th>حالة التسوية</th>
+                            <th>التي بدأها</th>
+                            <th>تمت الموافقة عليه من قبل</th>
+                            <th>تاريخ التحويل</th>
+                            <th>حالة نقل</th>
+                            <th>معرف الدفعة</th>
+                        </tr>
+                        {^{for searchResult}}
+                        <tr>
+                            <td>{{: #index + 1}}</td>
+                            <td class="border-right border-left">{{:entityName}}</td>
+                            <td class="border-right">{{:settlementDate}}</td>
+                            <td class="border-right text-left">{{:totalGrossAmount}}</td>
+                            <td class="border-right text-left">{{:commission}}</td>
+                            <td class="border-right text-left">{{:refunds}}</td>
+                            <td class="border-right text-left">{{:netSettlement}}</td>
+                            <td class="border-right">{{:settlementStatus}}</td>
+                            <td class="border-right">{{:initiatedBy}}</td>
+                            <td class="border-right">{{:approvedBy}}</td>
+                            <td class="border-right">{{:transferDate}}</td>
+                            <td class="border-right border-left">{{:transferStatus}}</td>
+                            <td class="border-right border-left">{{:batchID}}</td>
+                        </tr>
+                        {{/for}}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="display:none">
+        <img src="{{:images.sdg}}"/>
+        <img src="{{:images.dof}}"/>
+    </span>
+</body>
+</html>

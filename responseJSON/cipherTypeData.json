@@ -1,0 +1,17 @@
+{
+	"typeData": {
+		"action": "TypeData",
+		"data": {
+			"blockchainTypes": [
+				{
+					"label": "Hyperledger",
+					"value": "Hyperledger"
+				},
+				{
+					"label": "Ethereum",
+					"value": "Ethereum"
+				}
+			]
+		}
+	}
+}

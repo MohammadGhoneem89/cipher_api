@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}css/reportLayout.css">
+    {{/if}}
+
+</head>
+<body dir="rtl">
+
+<br/>
+<div class="row">
+       <span class="pull-left margin-left">
+        <h4>كيان : {{:criteria.Entity}}</h4>
+        <h4>المستحوذ : {{:criteria.Acquirer}}</h4>
+        <h4>خدمة الكيان : {{:criteria.entityService}}</h4>
+        <h4>طريقة الدفع او السداد : {{:criteria.paymentMethod}}</h4>
+        <h4>نوع البطاقة : {{:criteria.cardType}}</h4>
+        <h4>حالة النزاع : {{:criteria.DisputeStatus}}</h4>
+    </span>
+     <span class="pull-right margin-right">
+        <h4>ان يذهب في موعد : {{:criteria.toDate}}</h4>
+        <h4>من التاريخ : {{:criteria.fromDate}}</h4>
+        </span>
+    <div class="clearfix"></div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">تفاصيل المعاملات المصرفية</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>No.</th>
+                            <th>مقدم الخدمة</th>
+                            <th>رمز الخدمة</th>
+                            <th>ديغ ترن</th>
+                            <th>تاريخ النقل</th>
+                            <th>كمية</th>
+                            <th>النزاع رقم</th>
+                            <th>تاريخ النزاع</th>
+                            <th>حالة النزاع</th>
+                            <th>رد رقم لا</th>
+                            <th>تاريخ رد الأموال</th>
+                            <th>حالة رد الأموال</th>
+                        </tr>
+                        {^{for searchResult}}
+                        <tr>
+                            <td>{{: #index + 1}}</td>
+                            <td class="border-right border-left">{{:spCode}}</td>
+                            <td class="border-right">{{:service}}</td>
+                            <td class="border-right">{{:degTran}}</td>
+                            <td class="border-right">{{:transDate}}</td>
+                            <td class="border-right">{{:amount}}</td>
+                            <td class="border-right">{{:disputeNo}}</td>
+                            <td class="border-right">{{:disputeDate}}</td>
+                            <td class="border-right">{{:status}}</td>
+                            <td class="border-right">-</td>
+                            <td class="border-right">-</td>
+                            <td class="border-right">-</td>
+                        </tr>
+                        {{/for}}
+                        <tr>
+                                <td class="thick-line text-center border-left border-left" colspan="3"> إجمالي المعاملات : {{:total}}</td>
+                            <td class="thick-line text-center border-right border-left" colspan="9"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<span style="display:none">
+        <img src="{{:images.sdg}}"/>
+        <img src="{{:images.dof}}"/>
+    </span>
+</body>
+</html>

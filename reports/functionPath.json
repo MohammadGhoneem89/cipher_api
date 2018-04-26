@@ -1,0 +1,30 @@
+{
+  "entityTransactionDetail": "./query/entityTransactionDetail",
+  "bankTransactionDetail": "./query/bankTransactionDetail",
+  "entityTransactionSummary": "./query/entityTransactionSummary",
+  "bankTransactionSummary": "./query/bankTransactionSummary",
+  "refundReport": "./query/refundReport",
+  "bankCommissionReport": "./query/bankCommissionReport",
+  "refundAndDisputeStatistics": "./query/refundAndDisputeStatistics",
+  "entitySettlementReport": "./query/entitySettlementReport",
+  "disputeReport": "./query/disputeReport",
+  "entityReconStatus": "./query/entityReconStatus",
+  "bankReconStatus": "./query/bankReconStatus",
+  "reconciliationReport": "./query/reconciliationReport",
+  "entityMonthWiseSummary": "./query/entityMonthWiseSummary",
+  "costAnalysis": "./query/costAnalysis",
+  "transactions": [
+    {
+      "count": 0,
+      "amount": 0,
+      "acquirer": "Acquirer Name 1",
+      "cardType": "Card Type 1"
+    },
+    {
+      "count": 0,
+      "amount": 0,
+      "acquirer": "Acquirer Name 2",
+      "cardType": "Card Type 2"
+    }
+  ]
+}

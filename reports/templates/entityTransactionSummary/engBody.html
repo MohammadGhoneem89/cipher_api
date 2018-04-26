@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Entity Transaction Summary</title>
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}css/reportLayout.css">
+    {{/if}}
+</head>
+<body>
+<div class="row">
+    <span class="pull-left margin-left">
+            <h4>Entity : {{:criteria.Entity}}</h4>
+            <h4>Acquirer : {{:criteria.Acquirer}}</h4>
+            <h4>Payment Method : {{:criteria.paymentMethod}}</h4>
+            <h4>Card Type : {{:criteria.cardType}}</h4>
+          <h4>Recon Status : {{:criteria.reconStatusValues}}</h4>
+   <h4>Payment Gateway : {{:criteria.paymentGatewayValues}}</h4>
+            <h4>Payment Status : {{:criteria.paymentStatus}}</h4>
+    </span>
+    <span class="pull-right margin-right">
+
+            <h4>From Date : {{:criteria.fromDate}} </h4>
+            <h4>To Date :  {{:criteria.toDate}} </h4>
+
+        </span>
+    <div class="clearfix"></div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">ENTITY TRANSACTIONS SUMMARY</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                            <tr>
+                                <th>Entity</th>
+                                <th>Service Name </th>
+                                <th>Status </th>
+                                <th>Number Of Transactions</th>
+                                <th>Total Amount (AED)</th>
+                            </tr>
+                        {^{for searchResult}}
+                        <tr>
+                            <td class="{{:spCodeUpperLine}} border-right border-left">{{:spCode}}</td>
+                            <td class="{{:serviceCodeUpperLine}} border-right">{{:serviceCode}}</td>
+                            <td class="border-right">{{:status}}</td>
+                            <td class="border-right text-right">{{:transCount}}</td>
+                            <td class="border-right text-right">{{:totalAmount}}</td>
+                        </tr>
+                        {{/for}}
+                        <tr>
+                            <td  align="right" class="border-right thick-line text-right"> Total Transactions : {{:total.tranTotal}}</td>
+                            <td class="thick-line text-right border-left" colspan="3"></td>
+                            <td align="right" class="border-right thick-line text-right">Grand Total : {{:total.total}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="display:none">
+        <img src="{{:images.sdg}}"/>
+        <img src="{{:images.dof}}"/>
+    </span>
+</body>
+</html>

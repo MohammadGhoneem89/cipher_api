@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}css/reportLayout.css">
+    {{/if}}
+
+</head>
+<body dir="ltr">
+
+<br/>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Group List</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>No.</th>
+                            <th>Name</th>
+                            <th>Organization</th>
+                            <th>Group Type</th>
+                        </tr>
+                        {^{for searchResult}}
+                        <tr>
+                            <td>{{: #index + 1}}</td>
+                            <td>{{:name}}</td>
+                            <td>{{:description}}</td>
+                            <td>{{:type}}</td>
+                        </tr>
+                        {{/for}}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <span style="display:none">
+        <img src="{{:images.sdg}}"/>
+        <img src="{{:images.dof}}"/>
+    </span>
+</body>
+</html>

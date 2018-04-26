@@ -1,0 +1,120 @@
+{
+    "viewRefundData": {
+        "action": "getRefundDataById",
+        "data": {
+            "statusList": [
+                "Initiated",
+                "Approved",
+                "Processed"
+            ],
+            "RRN": "ES56465412542",
+            "selectedStatus": "Approved",
+            "allowUpload": true,
+            "allowComment": true,
+            "actionButtons": [
+                {
+                    "actionType": "SERVER_ACTION",
+                    "actionID": 23,
+                    "labelName": "COM_AB_Process",
+		    "label" : "Process",
+                    "URI": ["/SIMU/processInitiatedRefund"],
+                    "iconName": "icon-docs"
+                },
+                {
+                    "actionType": "UI_ACTION",
+                    "actionID": 24,
+		    "label" : "Back",
+                    "labelName": "COM_Back",
+                    "URI": ["/viewRefundBatch/REF512613"],
+                    "iconName": "icon-docs"
+                }
+            ],
+            "refundData": {
+                "PGRefNo": "ES56465412542",
+                "DEGRefNo": "234234DFADF",
+                "RefundRefNo": "RFND892347324",
+                "RefNo": "6543632532",
+                "PGAmount": "AED. 500",
+                "DEGAmount": "AED. 300",
+                "TransactionDate": "01/01/2017 12:03:55",
+                "IPAddress": "192.168.1.1",
+                "customerEmail": "QA@avanzasolutions.com",
+                "cardType": "Debit Card",
+                "customerMobile": "05522545745"
+            },
+            "documents": [
+                {
+                    "_id": "5a08d2c5dfccd61cab2dd477",
+                    "path": "/home/cipher/AvanzaCipherServices/RestInterface/document/12-11-2017/689d92e0-c7fd-11e7-a441-d3517d6fec97.png",
+                    "ext": "png",
+                    "name": "AAEAAQAAAAAAAAT9AAAAJDdmOTNjOGJhLTMyNjktNGYxYS05MDMzLWYzZjE2MzE5ZWQzOA.png",
+                    "UUID": "689d92e0-c7fd-11e7-a441-d3517d6fec97",
+                    "context": "7cac4147-9aaf-b769-0924-be47e3c62b25",
+                    "fileDetail": {
+                        "name": "AAEAAQAAAAAAAAT9AAAAJDdmOTNjOGJhLTMyNjktNGYxYS05MDMzLWYzZjE2MzE5ZWQzOA.png",
+                        "UUID": "689d92e0-c7fd-11e7-a441-d3517d6fec97"
+                    }
+                },
+                {
+                    "_id": "5a08d6da694a701cf6d514bd",
+                    "path": "/home/cipher/AvanzaCipherServices/RestInterface/document/12-11-2017/d76d6c70-c7ff-11e7-af76-efabf3109add.jpg",
+                    "ext": "jpg",
+                    "name": "freepik.jpg",
+                    "UUID": "d76d6c70-c7ff-11e7-af76-efabf3109add",
+                    "context": "66aa335f-3010-e4c0-6ac3-c13e71626a6e",
+                    "fileDetail": {
+                        "name": "freepik.jpg",
+                        "UUID": "d76d6c70-c7ff-11e7-af76-efabf3109add"
+                    }
+                },
+                {
+                    "_id": "5a0a1cbb58e5256fcddb5cc8",
+                    "path": "/home/cipher/AvanzaCipherServices/RestInterface/document/13-11-2017/14e7b6b0-c8c2-11e7-80e8-0d824c5eb65e.xlsx",
+                    "ext": "xlsx",
+                    "name": "row-oriented.xlsx",
+                    "UUID": "14e7b6b0-c8c2-11e7-80e8-0d824c5eb65e",
+                    "context": "11a5a4c0-c902-051f-0e00-ad601bbdc06b",
+                    "fileDetail": {
+                        "name": "row-oriented.xlsx",
+                        "UUID": "14e7b6b0-c8c2-11e7-80e8-0d824c5eb65e"
+                    }
+                }
+            ],
+            "comments": [
+                {
+                    "date": "01/01/2017 00:12:00",
+                    "userId": "Bilal Mahroof",
+                    "org": "DSG",
+                    "comment": "Refunded invalid Payment"
+                },
+                {
+                    "date": "01/02/2017 00:12:00",
+                    "userId": "Sandeep Kumar",
+                    "org": "DOF",
+                    "comment": "Refund verified"
+                }
+            ],
+            "counter": {
+                "SLA": 5,
+                "overDue": 3
+            },
+            "typeData": {
+                "reasonData": [
+                    {
+                        "key": "IT",
+                        "value": "Invalid Transaction"
+                    },
+                    {
+                        "key": "FD",
+                        "value": "Fraud Detection",
+                        "flag": "selected"
+                    },
+                    {
+                        "key": "BT",
+                        "value": "Bad Transaction"
+                    }
+                ]
+            }
+        }
+    }
+}

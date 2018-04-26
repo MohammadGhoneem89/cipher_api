@@ -1,0 +1,37 @@
+{
+    "declarationDetail": {
+        "action": "declarationDetail",
+        "data": {
+            "owner": "0x97d18E9cBd12Ff74D851605168ea9Bb9649EF927",
+            "status": "2",
+            "declarationNumber": "ddfgsdf",
+            "declarationType": "Export",
+            "exporterName": "Sony",
+            "exporterCountry": "UAE",
+            "destinationCountry": "UAE",
+            "portOfDischarge": "0x97d18E9cBd12Ff74D851605168ea9Bb9649EF927",
+            "nextPortOfDischarge": "0xed9d02e382b34818e88B88a309c7fe71E65f419d",
+            "weight": "23",
+            "etd": "1520147641",
+            "invoiceValue": "32425",
+            "deposit": "45",
+			"address" : "0x548EF0238BF22919784990Bb6410dD37A9958880",
+            "modeOfPayment": "Cheque",
+            "items": [
+                {
+                    "hs_code": 1,
+                    "description": "Nothing here",
+                    "qty": 345,
+                    "value": 1000,
+                    "actions": []
+                }
+            ],
+            "containers": [
+                {
+                    "container": "1dfg",
+                    "actions": []
+                }
+            ]
+        }
+    }
+}

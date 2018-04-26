@@ -1,0 +1,11 @@
+{
+	"processActionResponseData": {
+		"action": "ProcessAction",
+		"data": {
+			"success": true,
+			"message": "Settlement batch successfully processed.",
+			"redirectTo" : "settlementBatchProcessed"
+
+		}
+	}
+}

@@ -1,0 +1,62 @@
+{
+    "reportFilters": {
+        "action": "reportFilters",
+        "data": [
+            {
+                "id": "107",
+                "reportName": "Entity Transaction Detail",
+                "content": "EntityTranDetail_Content.html",
+                "recipe": "phantom-pdf",
+                "header": "EntityTranDetail_Header.html",
+                "headerHeight": "150px",
+                "footer": "EntityTranDetail_Footer.html",
+                "footerHeight": "150px",
+                "filters": [
+                    {
+                        "type": "textbox",
+                        "label": "ePay Ref No",
+                        "id": "ePayRefNo",
+                        "typeData": "",
+                        "isMultiSelection": false
+                    },
+                    {
+                        "type": "textbox",
+                        "label": "SP Ref No",
+                        "id": "SPRefNo",
+                        "typeData": "",
+                        "isMultiSelection": false
+                    },
+                    
+                    {
+                        "type": "dropdown",
+                        "label": "Entity",
+                        "id": "entity",
+                        "typeData": "Entity",
+                        "isMultiSelection": true
+                    },
+                    {
+                        "type": "dropdown",
+                        "label": "Acquirer",
+                        "id": "acquirer",
+                        "typeData": "Acquirer",
+                        "isMultiSelection": true
+                    },
+                    {
+                        "type": "dropdown",
+                        "label": "Status",
+                        "id": "tranStatus",
+                        "typeData": "tranStatus",
+                        "isMultiSelection": false
+                    },
+                    {
+                        "type": "datetime",
+                        "label": "From Date",
+                        "id": "fromDate",
+                        "typeData": "",
+                        "isMultiSelection": false
+                    }
+                ]
+            }
+        ]
+    }
+}

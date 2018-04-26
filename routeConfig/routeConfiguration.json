@@ -1,0 +1,479 @@
+{
+  "UI": {
+    "permission": {
+      "customMapping": true,
+      "MappingfunctionName": "getList",
+      "CustomMappingFile": "getPermissions.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "permissionURI": {
+      "customMapping": true,
+      "MappingfunctionName": "get",
+      "CustomMappingFile": "permissionURI.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "userList": {
+      "customMapping": true,
+      "MappingfunctionName": "userListOut",
+      "CustomMappingFile": "user/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "user": {
+      "customMapping": true,
+      "MappingfunctionName": "detail",
+      "CustomMappingFile": "user/detail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "userCreate": {
+      "customMapping": true,
+      "MappingfunctionName": "userCreate",
+      "CustomMappingFile": "user/create.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "userUpdate": {
+      "customMapping": true,
+      "MappingfunctionName": "userUpdate",
+      "CustomMappingFile": "user/update.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "userDetails": {
+      "customMapping": true,
+      "MappingfunctionName": "get",
+      "CustomMappingFile": "user/details.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "typeData": {
+      "customMapping": true,
+      "MappingfunctionName": "typeDataOut",
+      "CustomMappingFile": "typeData.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "logTransactions": {
+      "customMapping": true,
+      "MappingfunctionName": "logTransactionsInsert",
+      "CustomMappingFile": "logTransactions/insert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "emailTemplateList": {
+      "customMapping": true,
+      "MappingfunctionName": "emailTemplateListOut",
+      "CustomMappingFile": "emailTemplate/emailTemplateList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "emailTemplateDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "get",
+      "CustomMappingFile": "emailTemplate/emailTemplateDetail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "emailTemplateInsert": {
+      "customMapping": true,
+      "MappingfunctionName": "emailTemplateInsertOut",
+      "CustomMappingFile": "emailTemplate/emailTemplateInsert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "emailTemplateUpdate": {
+      "customMapping": true,
+      "MappingfunctionName": "emailTemplateUpdateOut",
+      "CustomMappingFile": "emailTemplate/emailTemplateUpdate.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "groupInsert": {
+      "customMapping": true,
+      "MappingfunctionName": "insert",
+      "CustomMappingFile": "group/insert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "groupUpdate": {
+      "customMapping": true,
+      "MappingfunctionName": "update",
+      "CustomMappingFile": "group/update.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "groupDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "detail",
+      "CustomMappingFile": "group/detail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "groupList": {
+      "customMapping": true,
+      "MappingfunctionName": "list",
+      "CustomMappingFile": "group/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "workingCalendarList": {
+      "customMapping": true,
+      "MappingfunctionName": "workingCalendarListOut",
+      "CustomMappingFile": "workingCalendar/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "workingCalendarDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "get",
+      "CustomMappingFile": "workingCalendar/detail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "workingCalendarInsert": {
+      "customMapping": true,
+      "MappingfunctionName": "workingCalendarInsertOut",
+      "CustomMappingFile": "workingCalendar/insert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "workingCalendarUpdate": {
+      "customMapping": true,
+      "MappingfunctionName": "workingCalendarUpdateOut",
+      "CustomMappingFile": "workingCalendar/update.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "auditLogList": {
+      "customMapping": true,
+      "MappingfunctionName": "list",
+      "CustomMappingFile": "auditLog/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "auditLogDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "detail",
+      "CustomMappingFile": "auditLog/detail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "notificationList": {
+      "customMapping": true,
+      "MappingfunctionName": "list",
+      "CustomMappingFile": "notification/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "notificationInsert": {
+      "customMapping": true,
+      "MappingfunctionName": "insert",
+      "CustomMappingFile": "notification/create.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "notificationViewed": {
+      "customMapping": true,
+      "MappingfunctionName": "viewed",
+      "CustomMappingFile": "notification/viewed.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "passwordChange": {
+      "customMapping": true,
+      "MappingfunctionName": "change",
+      "CustomMappingFile": "password/change.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "passwordReset": {
+      "customMapping": true,
+      "MappingfunctionName": "reset",
+      "CustomMappingFile": "password/reset.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "setPassword": {
+      "customMapping": true,
+      "MappingfunctionName": "password",
+      "CustomMappingFile": "password/set.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "APIPayLoadList": {
+      "customMapping": true,
+      "MappingfunctionName": "list",
+      "CustomMappingFile": "apiPayload/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "APIPayLoadDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "detail",
+      "CustomMappingFile": "apiPayload/detail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "APIPayLoadReplay": {
+      "customMapping": true,
+      "MappingfunctionName": "replay",
+      "CustomMappingFile": "apiPayload/replay.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "tranBlockChainId": {
+      "customMapping": true,
+      "MappingfunctionName": "getBlockChainId",
+      "CustomMappingFile": "logTransactions/getDetail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "serverStatsList": {
+      "customMapping": true,
+      "MappingfunctionName": "getList",
+      "CustomMappingFile": "serverStats/getAll.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getBlockchainMonitoringData": {
+      "customMapping": true,
+      "MappingfunctionName": "blockchainMonitoring",
+      "CustomMappingFile": "blockchain/blockchainMonitoring.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "userAdd": {
+      "customMapping": true,
+      "MappingfunctionName": "userAdd",
+      "CustomMappingFile": "sso/userAdd.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "authenticateUser": {
+      "customMapping": true,
+      "MappingfunctionName": "authenticate",
+      "CustomMappingFile": "sso/authenticateUser.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "activateUser": {
+      "customMapping": true,
+      "MappingfunctionName": "activate",
+      "CustomMappingFile": "sso/activateUser.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "deActivateUser": {
+      "customMapping": true,
+      "MappingfunctionName": "deActivate",
+      "CustomMappingFile": "sso/deActivateUser.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "isUserCodeAvailable": {
+      "customMapping": true,
+      "MappingfunctionName": "isAvailable",
+      "CustomMappingFile": "sso/isUserCodeAvailable.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getUserById": {
+      "customMapping": true,
+      "MappingfunctionName": "getById",
+      "CustomMappingFile": "sso/getUserById.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "resetPassword": {
+      "customMapping": true,
+      "MappingfunctionName": "resetPassword",
+      "CustomMappingFile": "sso/resetPassword.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateUser": {
+      "customMapping": true,
+      "MappingfunctionName": "updateUser",
+      "CustomMappingFile": "sso/updateUser.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "searchUsers": {
+      "customMapping": true,
+      "MappingfunctionName": "searchUsers",
+      "CustomMappingFile": "sso/searchUsers.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAllCountries": {
+      "customMapping": true,
+      "MappingfunctionName": "getAllCountries",
+      "CustomMappingFile": "sso/getAllCountries.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAllUserTypes": {
+      "customMapping": true,
+      "MappingfunctionName": "getAllUserTypes",
+      "CustomMappingFile": "sso/getAllUserTypes.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAllTitles": {
+      "customMapping": true,
+      "MappingfunctionName": "getAllTitles",
+      "CustomMappingFile": "sso/getAllTitles.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAllRoles": {
+      "customMapping": true,
+      "MappingfunctionName": "getAllRoles",
+      "CustomMappingFile": "sso/getAllRoles.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAllServiceProviders": {
+      "customMapping": true,
+      "MappingfunctionName": "getAllServiceProviders",
+      "CustomMappingFile": "sso/getAllServiceProviders.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAllUserSubtypesByUserType": {
+      "customMapping": true,
+      "MappingfunctionName": "getAllUserSubtypesByUserType",
+      "CustomMappingFile": "sso/getAllUserSubtypesByUserType.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getFilter": {
+      "customMapping": true,
+      "MappingfunctionName": "getFilterData",
+      "CustomMappingFile": "getFilterData.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "consortiumSearch": {
+      "customMapping": true,
+      "MappingfunctionName": "consortiumList",
+      "CustomMappingFile": "consortium/consortiumList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "consortiumDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "consortiumDetail",
+      "CustomMappingFile": "consortium/consortiumDetail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "consortiumInsert": {
+      "customMapping": true,
+      "MappingfunctionName": "consortiumInsert",
+      "CustomMappingFile": "consortium/consortiumInsert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "consortiumUpdate": {
+      "customMapping": true,
+      "MappingfunctionName": "consortiumUpdate",
+      "CustomMappingFile": "consortium/consortiumUpdate.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "smartContractCompile": {
+      "customMapping": true,
+      "MappingfunctionName": "smartContractCompile",
+      "CustomMappingFile": "consortium/smartContractCompile.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "smartContractDeploy": {
+      "customMapping": true,
+      "MappingfunctionName": "smartContractDeploy",
+      "CustomMappingFile": "consortium/smartContractDeploy.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getSmartContractDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "contractStructFetcher",
+      "CustomMappingFile": "consortium/contractStructFetcher.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "smartContractFiles": {
+      "customMapping": true,
+      "MappingfunctionName": "smartContractFileViewer",
+      "CustomMappingFile": "consortium/smartContractFileViewer.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
+  "Cipher": {
+    "health":{
+      "customMapping": true,
+      "MappingfunctionName": "health",
+      "CustomMappingFile": "healthService/health.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
+  "Quorum": {
+    "getLogs": {
+      "customMapping": true,
+      "MappingfunctionName": "getLogs",
+      "CustomMappingFile": "quorum/getLogs.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "info": {
+      "customMapping": true,
+      "MappingfunctionName": "info",
+      "CustomMappingFile": "quorum/chainInfo.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "txCount": {
+      "customMapping": true,
+      "MappingfunctionName": "txCount",
+      "CustomMappingFile": "quorum/txCount.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "blockContent": {
+      "customMapping": true,
+      "MappingfunctionName": "blockContent",
+      "CustomMappingFile": "quorum/blockContent.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTxByHash": {
+      "customMapping": true,
+      "MappingfunctionName": "getTxByHash",
+      "CustomMappingFile": "quorum/txFromHash.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "txReceiptFromHash": {
+      "customMapping": true,
+      "MappingfunctionName": "receiptFromHash",
+      "CustomMappingFile": "quorum/receiptFromHash.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTxByBlock": {
+      "customMapping": true,
+      "MappingfunctionName": "txFromBlockAndIndex",
+      "CustomMappingFile": "quorum/getTxByBlock.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "deployContract": {
+      "customMapping": true,
+      "MappingfunctionName": "deployContract",
+      "CustomMappingFile": "quorum/deployContract.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "contractSetter":{
+      "customMapping": true,
+      "MappingfunctionName": "contractSetter",
+      "CustomMappingFile": "quorum/contractSetter.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "contractGetter":{
+      "customMapping": true,
+      "MappingfunctionName": "contractGetter",
+      "CustomMappingFile": "quorum/contractGetter.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getCode":{
+      "customMapping": true,
+      "MappingfunctionName": "getCode",
+      "CustomMappingFile": "quorum/getCode.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAccounts":{
+      "customMapping": true,
+      "MappingfunctionName": "getAccounts",
+      "CustomMappingFile": "quorum/getAccounts.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAccountBalance": {
+      "customMapping": true,
+      "MappingfunctionName": "getAccountBalance",
+      "CustomMappingFile": "quorum/getAccountBalance.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
+  "HyperLedger":{
+    "fetchCollectionValueByKey": {
+      "protoFile": "Rest.proto",
+      "GRPCServiceIP": "0.0.0.0",
+      "GRPCServicePort": "9051",
+      "isAsync": false,
+      "customMapping": false,
+      "mappingConfigFile": "InvokeMapping"
+    },
+    "delete": {
+      "protoFile": "Rest.proto",
+      "GRPCServiceIP": "0.0.0.0",
+      "GRPCServicePort": "9051",
+      "isAsync": false,
+      "customMapping": false,
+      "mappingConfigFile": "InvokeMapping"
+    },
+    "getTransactions": {
+      "customMapping": true,
+      "MappingfunctionName": "getTransactions",
+      "CustomMappingFile": "couch/getTransactions.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "couchQuery": {
+      "customMapping": true,
+      "MappingfunctionName": "couchQuery",
+      "CustomMappingFile": "couchQuery.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
+  "Consortium": {
+
+  }
+}

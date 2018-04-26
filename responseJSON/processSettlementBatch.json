@@ -1,0 +1,14 @@
+{
+	"responseMessage":{
+							"action":"ResponseMessage",
+							"data":{ 
+								"message":{
+										                "status":"OK",
+										                "errorDescription":"Batch Sucessfully Processed", 
+										                "newPageURL":"/settlementbatchProcessed?batchID=ADB21278654", 
+										                "displayToUser":true 
+                                   }
+							}
+						}
+						
+}

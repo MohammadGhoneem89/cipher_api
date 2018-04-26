@@ -1,0 +1,14 @@
+{
+	"responseMessage":{
+							"action":"responseMessage",
+							"data":{ 
+								"message":{
+										                "status":"OK",
+										                "errorDescription":"Batch Sucessfully Processed", 
+										                "newPageURL":"/commissionbatchProcessed?batchID=ADB21278654", 
+										                "displayToUser":true 
+                                   }
+							}
+						}
+						
+}

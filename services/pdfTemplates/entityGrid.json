@@ -1,0 +1,54 @@
+[
+  {
+    "id": "_id",
+    "header": "_id",
+    "align": "center",
+    "width": 100,
+    "border" : "LTBR",
+    "valign" : "center",
+    "direction" : "horizontal"
+
+  },
+  {
+    "id": "entityName",
+    "header": "entityName",
+    "align": "center",
+    "width": 110,
+    "border" : "LTBR",
+    "valign" : "center",
+    "direction" : "horizontal"
+  },
+  {
+    "id": "arabicName",
+    "header": "arabicName",
+    "align": "center",
+    "width": 110,
+    "border" : "LTBR",
+    "valign" : "center"
+
+  },
+  {
+    "id": "spCode",
+    "header": "spCode",
+    "align": "center",
+    "width": 50,
+    "border" : "LTBR",
+    "valign" : "center"
+  },
+  {
+    "id": "shortCode",
+    "header": "shortCode",
+    "align": "center",
+    "width": 70,
+    "border" : "LTBR",
+    "valign" : "center"
+  },
+  {
+    "id": "legacyCode",
+    "header": "legacyCode",
+    "align": "center",
+    "width": 70,
+    "border" : "LTBR",
+    "valign" : "center"
+  }
+]

@@ -1,0 +1,15 @@
+{
+    "settlementBatchProcessedData": {
+        "action": "SettlementBatchProcessed",
+        "data": {
+            "BatchID": "ADB21278654",
+            "BlockChainAddress": "1231313131313",
+            "StatusID": 2,
+            "CurrentStatus": "Processed",
+            "StatusList": [
+                "Pending",
+                "Processed"
+            ]
+        }
+    }
+}

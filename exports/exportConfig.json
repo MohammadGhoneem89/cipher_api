@@ -1,0 +1,34 @@
+{
+    "exportConfiguration": {
+        "auditLogList": {
+            "exportTitle": "Audit Log Setup",
+            "header": "./exports/commonTemplates/header.html",
+            "footer": "./exports/commonTemplates/footer.html",
+            "body": "./exports/templates/AuditLogs_Body.html",
+            "functionName": "transactionSearch",
+            "headerHeight": "150px",
+            "footerHeight": "150px",
+            "orientation": "landscape"
+        },
+        "userList": {
+            "exportTitle": "Users",
+            "header": "./exports/commonTemplates/header.html",
+            "footer": "./exports/commonTemplates/footer.html",
+            "body": "./exports/templates/Users_Body.html",
+            "functionName": "users",
+            "headerHeight": "150px",
+            "footerHeight": "150px",
+            "orientation": "landscape"
+        },
+        "groupList": {
+            "exportTitle": "Group List",
+            "header": "./exports/commonTemplates/header.html",
+            "footer": "./exports/commonTemplates/footer.html",
+            "body": "./exports/templates/UserGroups_Body.html",
+            "functionName": "userGroups",
+            "headerHeight": "150px",
+            "footerHeight": "150px",
+            "orientation": "landscape"
+        }
+    }
+}

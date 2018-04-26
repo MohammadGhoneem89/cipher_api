@@ -1,0 +1,16 @@
+{
+		"loginResponse":{
+							"action":"login",
+							"data":{ 
+										"message" : {
+														"status" : "OK",
+														"errorDescription" : "Successfully Logged In",
+														"routeTo" : "routeToUser",
+														"displayToUser" : true
+													},
+										"success" : true,
+										"token" : "uaiskdjhjkshdnmasjdknm"
+									}
+						}
+
+}

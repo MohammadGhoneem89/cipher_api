@@ -1,0 +1,65 @@
+{
+    "auditLogDetail": {
+        "action": "auditLogDetail",
+        "data": {
+            "searchResult": [
+                {
+                    "_id": "5a043cd961b5b31d97c5ba45",
+                    "event": "GROUP_UPDATE",
+                    "collectionName": "Group",
+                    "ipAddress": "::ffff:192.168.1.120",
+                    "current": {
+                        "_id": "59b6431d212297005d466560",
+                        "firstName": "SDG",
+                        "email": "acquirer@acquirer.com",
+                        "orgType": "SDG",
+                        "lastName": "",
+                        "userID": "sdg",
+                        "userType": "Human",
+                        "isActive": true,
+                        "password": "e99a18c428cb38d5f260853678922e03",
+                        "profilePic": "sdg_profile.jpg",
+                        "firstScreen": "",
+                        "passwordRetries": 0,
+                        "lastLoginTime": "2017/9/4 10:19:38",
+                        "entityID": null,
+                        "acquirerID": "59b64ae0212297005d466d20",
+                        "allowedIPRange": [
+                            "*.*.*.*"
+                        ],
+                        "passwordPolicy": "59b7c297212297005d4682ef",
+                        "groups": [
+                            "59b642f8212297005d466343"
+                        ],
+                        "orgCode": ""
+                    },
+                    "previous": {
+                        "_id": "59b6431d212297005d466560",
+                        "firstName": "SDG",
+                        "email": "SDG@acquirer.com",
+                        "orgType": "SDG",
+                        "lastName": "",
+                        "userID": "sdg",
+                        "userType": "Human",
+                        "isActive": true,
+                        "password": "e99a18c428cb38d5f260853678922e03",
+                        "profilePic": "sdg_profile.jpg",
+                        "firstScreen": "",
+                        "passwordRetries": 0,
+                        "lastLoginTime": "2017/9/4 10:19:38",
+                        "entityID": null,
+                        "acquirerID": "59b64ae0212297005d466d20",
+                        "allowedIPRange": [
+                            "*.*.*.*"
+                        ],
+                        "passwordPolicy": "59b7c297212297005d4682ef",
+                        "groups": [
+                            "59b642f8212297005d466343"
+                        ],
+                        "orgCode": ""
+                    }
+                }
+            ]
+        }
+    }
+}

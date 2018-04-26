@@ -1,0 +1,72 @@
+<html >
+<head>
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}css/reportLayout.css">
+    {{/if}}
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+</head>
+<body dir="rtl">
+<div class="row">
+    <span class="pull-left margin-left">
+        <h4>كيان : {{:criteria.Entity}}</h4>
+        <h4>{{:criteria.Acquirer}} : المستحوذ</h4>
+        <h4>طريقة الدفع او السداد : {{:criteria.paymentMethod}}</h4>
+        <h4>{{:criteria.cardType}} : نوع البطاقة</h4>
+    </span>
+   <span class="pull-right margin-right">
+
+        <h4>من التاريخ : {{:criteria.fromDate}} </h4>
+        <h4>ان يذهب في موعد : {{:criteria.toDate}} </h4>
+        </span>
+    <div class="clearfix"></div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">إحصاءات رد الأموال والمنازعات</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>اسم الكيان</th>
+                            <th>خدمة الكيان</th>
+                            <th>طريقة الدفع او السداد</th>
+                            <th>قناة الدفع</th>
+                            <th>إجمالي المعاملات</th>
+                            <th>إجمالي عمليات رد الأموال</th>
+                            <th>مجموع النزاعات</th>
+                            <th>نسبة رد الدفعة</th>
+                            <th>نسبة النزاع</th>
+                        </tr>
+                        {^{for searchResult}}
+                        <tr>
+                            <td class="{{:spCodeUpperLine}} border-right border-left">{{:spCode}}</td>
+                            <td class="{{:serviceCodeUpperLine}} border-left">{{:serviceCode}}</td>
+                            <td class="border-left">{{:paymentMethod}}</td>
+                            <td class="border-left">{{:paymentChannel}}</td>
+                            <td class="border-left text-left">{{:totalCount}}</td>
+                            <td class="border-left text-left">{{:refundCnt}}</td>
+                            <td class="border-left text-left">{{:disputeCnt}}</td>
+                            <td class="border-left text-left">{{:refundPer}}</td>
+                            <td class="border-left text-left">{{:disputePer}}</td>
+                        </tr>
+                        {{/for}}
+                        <tr>
+                            <td class="thick-line border-right text-right" colspan="3"></td>
+                            <td class="thick-line text-center" colspan="3"></td>
+                            <td class="thick-line border-left text-left" colspan="3">إجمالي المعاملات : {{:total}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="display:none">
+        <img src="{{:images.sdg}}"/>
+        <img src="{{:images.dof}}"/>
+    </span>
+</body>
+</html>

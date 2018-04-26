@@ -1,0 +1,24 @@
+{
+	"Reconciliation": {
+		"ServiceProviderDetails": {
+			"SPCODE": "DEWA",
+			"SERVCODE": "Service2"
+		},
+		"TransactionSummary": {
+			"TotalAmount": 3126.44,
+			"TotalTransaction": 1
+		},
+		"TransactionDetails": {
+			"Transaction": [
+				{
+					"SPTRN": "MWBB0000000009262801",
+					"TransDate": "01/10/2016 02:41:19",
+					"Amount": "1089.40",
+					"DEGTRN": "0000000013",
+					"Status": "0",
+					"PaymentMethod": "Credit Card"
+				}
+			]
+		}
+	}
+}

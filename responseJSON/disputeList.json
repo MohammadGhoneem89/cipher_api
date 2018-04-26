@@ -1,0 +1,99 @@
+{
+    "disputeListData": {
+        "action": "permission",
+        "data": {
+			"allowUpload":true,
+			"allowComment":true,
+            "actionButtons": [
+                {
+                    "type": "SERVER_ACTION",
+                    "actionID": 23,
+                    "name": "COM_AB_Process",
+                    "actionURI": "/processDispute",
+                    "params": "",
+                    "icon": "icon-docs",
+					"confirm":true,
+					"confirmTitle":"Refund!",
+					"confirmText":"Do you want to initiate Refund automatically!"
+					
+                },
+                {
+                    "type": "UI_ACTION",
+                    "actionID": 24,
+                    "name": "btn_cancel",
+                    "actionURI": "/disputeList",
+                    "params": "",
+                    "icon": "icon-docs"
+                }
+            ],
+			"typeData": {
+                "reasonData": [
+                    {
+                        "key": "IT",
+                        "value": "Invalid Transaction"
+                    },
+                    {
+                        "key": "FD",
+                        "value": "Fraud Detection"
+                    },
+                    {
+                        "key": "BT",
+                        "value": "Bad Transaction"
+                    }
+                ]
+            },
+            "disputeData": {
+                "pageData": {
+                    "PageSize": 10,
+                    "currentPage": 1,
+                    "totalRecords": 20
+                },
+                "rows": [
+                    {
+						"refNo": "512613",
+                        "date": "25/10/2010",
+						"entity":{
+                            "name": "RTA",
+                            "imageURL": "../assets/Resources/RTA.jpg"
+                        },
+						"status": {
+                            "value": "Initiated",
+                            "type": "SUCCESS"
+                        },
+						"action": [
+                            {
+                                "name": "View",
+                                "actionURI": "/viewDispute",
+                                "params": "?disputeID=250",
+                                "icon": "icon-docs"
+                            }
+                        ]
+						
+                    },
+					{
+                        "refNo": "512613",
+                        "date": "25/10/2010",
+						"entity":{
+                            "name": "RTA",
+                            "imageURL": "../assets/Resources/RTA.jpg"
+                        },
+						"status": {
+                            "value": "Initiated",
+                            "type": "SUCCESS"
+                        },
+						"action": [
+                            {
+                                "name": "View",
+                                "actionURI": "/viewDispute",
+                                "params": "?disputeID=250",
+                                "icon": "icon-docs"
+                            }
+                        ] 
+                    }
+                ]
+            }
+        }
+    }
+    
+}
+    

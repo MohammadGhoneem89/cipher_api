@@ -1,0 +1,81 @@
+{
+    "initiateRefundData": {
+        "action": "getRefundDataById",
+        "data": {
+            "statusList": [
+                "Initiated",
+                "Approved",
+                "Processed"
+            ],
+            "selectedStatus": "Initiated",
+            "actionButtons": [
+                {
+                    "type": "SERVER_ACTION",
+                    "actionID": 23,
+                    "name": "COM_AB_Process",
+                    "actionURI": "/SIMU/processRefund",
+                    "params": "",
+                    "icon": "icon-docs"
+                },
+                {
+                    "type": "UI_ACTION",
+                    "actionID": 24,
+                    "name": "btn_cancel",
+                    "actionURI": "/transactionList",
+                    "params": "",
+                    "icon": "icon-docs"
+                }
+            ],
+            "refundData": {
+                "PGRefNo": "ES56465412542",
+                "DEGRefNo": "234234DFADF",
+                "RefundRefNo": "RFND892347324",
+                "RefNo": "6543632532",
+                "PGAmount": "AED. 500",
+                "DEGAmount": "AED. 300",
+                "TransactionDate": "01/01/2017 12:03:55",
+                "IPAddress": "192.168.1.1",
+                "customerEmail": "QA@avanzasolutions.com",
+                "cardType": "Debit Card",
+                "customerMobile": "05522545745"
+            },
+            "attachmentList": [
+                {
+                    "name": "RefundDetails.txt",
+                    "action": [
+                        {
+                            "name": "Download",
+                            "actionURI": "/manualRecon",
+                            "params": "?typeID=2520",
+                            "icon": "icon-docs"
+                        }
+                    ]
+                }
+            ],
+            "comments": [
+                {
+                    "date": "01/01/2017 00:12:00",
+                    "userId": "Bilal Mahroof",
+                    "org": "DSG",
+                    "comment": "Refunded invalid Payment"
+                }
+            ],
+            "typeData": {
+                "reasonData": [
+                    {
+                        "key": "IT",
+                        "value": "Invalid Transaction"
+                    },
+                    {
+                        "key": "FD",
+                        "value": "Fraud Detection"
+                    },
+                    {
+                        "key": "BT",
+                        "value": "Bad Transaction"
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,71 @@
+<html >
+<head>
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}css/reportLayout.css">
+    {{/if}}
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+</head>
+<body>
+<div class="row">
+   <span class="pull-left margin-left">
+        <h4>Entity : {{:criteria.Entity}}</h4>
+        <h4>From Date : {{:criteria.Acquirer}} </h4>
+        <h4>Payment Method : {{:criteria.paymentMethod}}</h4>
+        <h4>CardType : {{:criteria.cardType}}</h4>
+    </span>
+    <span class="pull-right margin-right">
+        <h4>From Date : {{:criteria.fromDate}} </h4>
+        <h4>To Date :  {{:criteria.toDate}} </h4>
+        </span>
+    <div class="clearfix"></div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Refund and Dispute Statistics</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>Entity Name</th>
+                            <th>Entity Service</th>
+                            <th>Payment Method</th>
+                            <th>Payment Channel</th>
+                            <th>Total Transactions</th>
+                            <th>Total Refund</th>
+                            <th>Total Dispute</th>
+                            <th>Refund Percentage</th>
+                            <th>Dispute Percentage</th>
+                        </tr>
+                        {^{for searchResult}}
+                        <tr>
+                            <td class="{{:spCodeUpperLine}} border-right border-left">{{:spCode}}</td>
+                            <td class="{{:serviceCodeUpperLine}} border-right">{{:serviceCode}}</td>
+                            <td class="border-right">{{:paymentMethod}}</td>
+                            <td class="border-right">{{:paymentChannel}}</td>
+                            <td class="border-right text-right">{{:totalCount}}</td>
+                            <td class="border-right text-right">{{:refundCnt}}</td>
+                            <td class="border-right text-right">{{:disputeCnt}}</td>
+                            <td class="border-right text-right">{{:refundPer}}</td>
+                            <td class="border-right text-right">{{:disputePer}}</td>
+                        </tr>
+                        {{/for}}
+                        <tr>
+                            <td class="thick-line text-center border-left text-left" colspan="3"></td>
+                            <td class="thick-line text-center" colspan="3"></td>
+                            <td class="thick-line text-center border-right text-right" colspan="3">Total Transactions: {{:total}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="display:none">
+        <img src="{{:images.sdg}}"/>
+        <img src="{{:images.dof}}"/>
+    </span>
+</body>
+</html>

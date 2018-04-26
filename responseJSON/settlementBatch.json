@@ -1,0 +1,161 @@
+{
+    "settlementBatchData": {
+        "action": "NewSettlementBatch",
+        "data": {
+            "BatchID": "ADB21278654",
+            "Entity": {
+                "EntityID": 1,
+                "EntityName": "DEWA",
+                "ArabicName": "DEWA",
+                "Services": [
+                    {
+                        "ServiceName": "Serices 1"
+                    },
+                    {
+                        "ServiceName": "Serices 2"
+                    }
+                ],
+                "EntityLogo": {
+                    "SizeSmall": "../assets/resources/images/DEWA.png",
+                    "SizeMedium": "../assets/resources/images/DEWA.png"
+                }
+            },
+            "SettlementSchedule": {
+                "LastSettlementDate": "01/01/2017",
+                "ToDate": "01/01/2017",
+                "CounterDays": 5
+            },
+            "SettlementSummary": {
+                "PreviousResolvedExceptions": {
+                    "Amount": "12K",
+                    "TranCount": 500
+                },
+                "CurrentPeriodTrans": {
+                    "Amount": "50K",
+                    "TranCount": 80000
+                },
+                "ProcessedPastRefund": {
+                    "Amount": "5K",
+                    "TranCount": 75000
+                },
+                "TotalPayable": {
+                    "Amount": "57K",
+                    "TranCount": 500
+                }
+            },
+            "CommissionBreakUp": {
+                "TotalAmount": "57,000",
+                "Commission": 1,
+                "AppliedCommission": 57,
+                "RefundCommission": 10,
+                "TotalCommission": 47,
+                "TotalCommissionAmount": 47,
+                "NetTotalAmount": "56,953"
+            },
+            "CommissionBreakUpDetail": [
+                {
+                    "paymentMode": "Credit Card",
+                    "cardType": "Visa",
+                    "settledAmount": "100",
+                    "totalTran": "44",
+                    "invoiceAmount": "1.5%",
+                    "refundedAmount": "1000",
+                    "refundedTransaction": "1000",
+                    "refundedCharges": "200",
+                    "finalInvoiceAmount": "300"
+                },
+                {
+                    "paymentMode": "Credit Card",
+                    "cardType": "Master",
+                    "settledAmount": "100",
+                    "totalTran": "44",
+                    "invoiceAmount": "1.5%",
+                    "refundedAmount": "1000",
+                    "refundedTransaction": "1000",
+                    "refundedCharges": "200",
+                    "finalInvoiceAmount": "300"
+                },
+                {
+                    "paymentMode": "Credit Card",
+                    "cardType": "JCB",
+                    "settledAmount": "100",
+                    "totalTran": "44",
+                    "invoiceAmount": "1.5%",
+                    "refundedAmount": "1000",
+                    "refundedTransaction": "1000",
+                    "refundedCharges": "200",
+                    "finalInvoiceAmount": "300"
+                },
+                {
+                    "paymentMode": "Credit Card",
+                    "cardType": "Amex",
+                    "settledAmount": "100",
+                    "totalTran": "44",
+                    "invoiceAmount": "1.5%",
+                    "refundedAmount": "1000",
+                    "refundedTransaction": "1000",
+                    "refundedCharges": "200",
+                    "finalInvoiceAmount": "300"
+                },
+                {
+                    "paymentMode": "Direct Debit",
+                    "cardType": "CBD",
+                    "settledAmount": "100",
+                    "totalTran": "44",
+                    "invoiceAmount": "1.5%",
+                    "refundedAmount": "1000",
+                    "refundedTransaction": "1000",
+                    "refundedCharges": "200",
+                    "finalInvoiceAmount": "300"
+                },
+                {
+                    "paymentMode": "Direct Debit",
+                    "cardType": "UNB",
+                    "settledAmount": "100",
+                    "totalTran": "44",
+                    "invoiceAmount": "1.5%",
+                    "refundedAmount": "1000",
+                    "refundedTransaction": "1000",
+                    "refundedCharges": "200",
+                    "finalInvoiceAmount": "300"
+                },
+                {
+                    "paymentMode": "Direct Debit",
+                    "cardType": "ADCB",
+                    "settledAmount": "100",
+                    "totalTran": "44",
+                    "invoiceAmount": "1.5%",
+                    "refundedAmount": "1000",
+                    "refundedTransaction": "1000",
+                    "refundedCharges": "200",
+                    "finalInvoiceAmount": "300"
+                },
+                {
+                    "paymentMode": "eDirham",
+                    "cardType": "eDirham",
+                    "settledAmount": "100",
+                    "totalTran": "44",
+                    "invoiceAmount": "1.5%",
+                    "refundedAmount": "1000",
+                    "refundedTransaction": "1000",
+                    "refundedCharges": "200",
+                    "finalInvoiceAmount": "300"
+                }
+            ],
+            "CurrentStatus": "Pending",
+            "StatusList": [
+                "Pending",
+                "Processed"
+            ],
+            "actions": [
+                {
+                    "actionID": 23,
+                    "name": "COM_AB_Process",
+                    "actionURI": "/processSettlementBatch",
+                    "params": "",
+                    "icon": "icon-docs"
+                }
+            ]
+        }
+    }
+}

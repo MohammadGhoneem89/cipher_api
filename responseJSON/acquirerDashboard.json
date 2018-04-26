@@ -1,0 +1,164 @@
+{
+    "acquirerDashboardData": {
+        "action": "acquirerDashboard",
+        "data": {
+            "dashboardTiles": [
+                {
+                    "id": 1,
+                    "title": "Commission Batches",
+                    "percentage": "100",
+                    "value": "50",
+                    "actionURI": "/UI",
+                    "overDue": "5",
+					"fontClass":"green"
+                },
+                {
+                    "id": 1,
+                    "title": "Recon Files",
+                    "percentage": "70",
+                    "value": "30",
+                    "actionURI": "/UI",
+                    "overDue": "5",
+					"fontClass":"green"
+                },
+                {
+                    "id": 1,
+                    "title": "Refund Cases",
+                    "percentage": "70",
+                    "value": "20",
+                    "actionURI": "/UI",
+                    "overDue": "5",
+					"fontClass":"green"
+                },
+                {
+                    "id": 1,
+                    "title": "Dispute Cases",
+                    "percentage": "70",
+                    "value": "10",
+                    "actionURI": "/UI",
+                    "overDue": "5",
+					"fontClass":"green"
+                }
+            ],
+            "workboardData": {
+					"pageData":{
+						"PageSize":10,
+						"currentPage":1,
+						"totalRecords":20
+					},
+					"rows": [
+                {
+                    "name": {"name":"ENBD", "imageURL":"../assets/Resources/NBD.jpg"},
+                    "lastReconDate": "25-02-2016",
+                    "overDue": {
+                        "value": "(-5) Days",
+                        "type": "ERROR"
+                    },
+                    "lastCommissionDisbusal": "25-02-2016",
+                    "totalTransaction": "50",
+		    "commissions":"5",
+                    "pendingExceptions": "2",
+                    "refundFiled": "1000",
+                    "refunded": "3",
+                    "actions": [
+                        {
+                            "name": "Recon",
+                            "actionURI": "/UI/Recon",
+                            "params": "?batchId=2520",
+                            "icon": "icon-docs"
+                        },
+                        {
+                            "name": "Settle",
+                            "actionURI": "/UI/CommisionBatch",
+                            "params": "?batchId=2520",
+                            "icon": "icon-docs"
+                        }
+                    ]
+                },
+				{
+                    "name": {"name":"CBD", "imageURL":"../assets/Resources/CBD.jpg"},
+                    "lastReconDate": "25-02-2016",
+                    "overDue": {
+                        "value": "(-5) Days",
+                        "type": "WARNING"
+                    },
+                    "lastCommissionDisbusal": "25-02-2016",
+                    "totalTransaction": "50",
+		    "commissions":"5",
+                    "pendingExceptions": "2",
+                    "refundFiled": "1000",
+                    "refunded": "3",
+                    "actions": [
+                        {
+                            "name": "Recon",
+                            "actionURI": "/UI/Recon",
+                            "params": "?batchId=2520",
+                            "icon": "icon-docs"
+                        },
+                        {
+                            "name": "Settle",
+                            "actionURI": "/UI/CommisionBatch",
+                            "params": "?batchId=2520",
+                            "icon": "icon-docs"
+                        }
+                    ]
+                }
+            ]
+			
+			},
+
+
+			"collectionData":{
+			"pageData":{
+						"PageSize":10,
+						"currentPage":1,
+						"totalRecords":20
+					},
+					"rows":[
+					{
+					"acquirer": "CBD",
+					"position": "500 Excess Funds"
+					},
+					{
+					"acquirer": "ENBD",
+					"position": "500 Excess Funds"
+					}
+					]
+			
+            }			
+,
+            "exceptionData": {
+                "exceptionSummary": {
+                    "id": 1,
+                    "title": "Dispute Cases",
+                    "percentage": "70",
+                    "value": "10",
+                    "overDue": "5",
+					"URI":"/exceptionList"
+                },
+                "chartData": {
+                    "fromDate": "2/2/2012",
+                    "toDate": "1/1/2012",
+                    "reconciledData": [
+                        1,
+                        5,
+                        5,
+                        6,
+                        6,
+                        5,
+                        4
+                    ],
+                    "expData": [
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1
+                    ]
+                }
+            }
+        }
+    }
+}

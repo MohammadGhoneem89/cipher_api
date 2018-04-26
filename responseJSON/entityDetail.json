@@ -1,0 +1,107 @@
+{
+	"entityDetail": {
+		"action": "EntityDetail",
+		"data": {
+			"_id": "59b646c4212297005d466c7b",
+			"entityName": "Dar Al Ber Society",
+			"arabicName": "Dar Al Ber Society",
+			"spCode": "DABS",
+			"shortCode": "DABS",
+			"legacyCode": "999999",
+			"services": [
+				{
+					"serviceName": "Service Name 1",
+					"serviceCode": "Service Code 1",
+					"actions": [
+						{
+							"name": "Edit",
+							"icon": "fa fa-edit",
+							"type": "COMPONENT_FUNCTION"
+						}
+					]
+				},
+				{
+					"serviceName": "Service Name 2",
+					"serviceCode": "Service Code 1",
+					"actions": [
+						{
+							"name": "Edit",
+							"icon": "fa fa-edit",
+							"type": "COMPONENT_FUNCTION"
+						}
+					]
+				}
+			],
+			"isActive": true,
+			"entityLogo": {
+				"sizeMedium": "/images/05a29de0-b9d7-11e7-8e40-4914fe72b15d.png",
+				"sizeSmall": "/images/05a29de0-b9d7-11e7-8e40-4914fe72b15d.png"
+			},
+			"parentEntity": "",
+			"accounting": {
+				"GISAccountNo": "abc-123-xyz",
+				"exemptedTillDate": "2017-11-13",
+				"notifyBeforeMonth": "Sep"
+			},
+			"commissionTemplate": "59b6487f212297005d466c9f",
+			"recon": {
+				"integrationType": "File",
+				"fileFormatTemplate": "5a06d1712745a9307c97af02",
+				"noOfDays": "3",
+				"serverDetails": {
+					"sFTPServer": "",
+					"fileFormatTemplate": "File",
+					"port": "2202",
+					"username": "Sandeep",
+					"password": "abc123",
+					"certificate": "",
+					"serverIP": "192.168.0.22",
+					"URL": "https://www.google.com"
+				}
+			},
+			"settlement": {
+				"settlementCriteria": "2WAY",
+				"settlementType": "Manual",
+				"autoPeriod": "4",
+				"escalationAfter": "2"
+			},
+			"contacts": [
+				{
+					"contactName": "kashan",
+					"email": "kashan@abc.com",
+					"mobile": "9235698955655",
+					"actions": [
+						{
+							"name": "Edit",
+							"icon": "fa fa-edit",
+							"type": "COMPONENT_FUNCTION"
+						}
+					]
+				},
+				{
+					"contactName": "safwan",
+					"email": "safwan@abc.com",
+					"mobile": "9235698955655",
+					"actions": [
+						{
+							"name": "Edit",
+							"icon": "fa fa-edit",
+							"type": "COMPONENT_FUNCTION"
+						}
+					]
+				}
+			],
+			"documents": [],
+			"actions": [],
+			"dateCreated": "Sept 16, 2016, 10:15",
+			"createdBy": "Abdullah",
+			"dateUpdated": "2017-11-12T17:19:01.249Z",
+			"updatedBy": "admin",
+			"status": {
+				"value": "Pending",
+				"type": "Info"
+			},
+			"lastReconDate": "10/25/2017"
+		}
+	}
+}

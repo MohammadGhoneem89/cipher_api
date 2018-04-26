@@ -1,0 +1,62 @@
+{
+    "settlementListData": {
+        "action": "permission",
+        "data": {
+            "settlementData": {
+                "pageData": {
+                    "PageSize": 10,
+                    "currentPage": 1,
+                    "totalRecords": 20
+                },
+                "rows": [
+                    {
+                        "entityName": {
+                            "name": "CBD",
+                            "imageURL": "../assets/Resources/CBD.png"
+                        },
+                        "batchNo": "512613",
+                        "dateInitiated": "25/10/2010",
+                        "amount": "500",
+                        "commission": "25",
+                        "status": {
+                            "value": "initiated",
+                            "type": "WARNING"
+                        },
+                        "action": [
+                            {
+                                "name": "View",
+                                "actionURI": "/settlementBatch",
+                                "params": "?entityID=250",
+                                "icon": "icon-docs"
+                            }
+                        ]
+                    },
+					{
+                        "entityName": {
+                            "name": "CBD",
+                            "imageURL": "../assets/Resources/CBD.png"
+                        },
+                        "batchNo": "512613",
+                        "dateInitiated": "25/10/2010",
+                        "amount": "500",
+                        "commission": "25",
+                        "status": {
+                            "value": "Approved",
+                            "type": "SUCCESS"
+                        },
+                        "action": [
+                            {
+                                "name": "View",
+                                "actionURI": "/settlementBatch",
+                                "params": "?entityID=250",
+                                "icon": "icon-docs"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+    
+}
+    

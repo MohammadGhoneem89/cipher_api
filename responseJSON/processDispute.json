@@ -1,0 +1,14 @@
+{
+	"responseMessage":{
+							"action":"ResponseMessage",
+							"data":{ 
+								"message":{
+										                "status":"OK",
+										                "errorDescription":"Dispute Sucessfully Processed", 
+										                "newPageURL":"/disputeList", 
+										                "displayToUser":true 
+                                   }
+							}
+						}
+						
+}

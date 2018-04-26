@@ -1,0 +1,32 @@
+{
+	"commissionTemplateDetails": {
+		"action": "commissionTemplateDetail",
+		"data": {
+			"_id": "59b648ea212297005d466ca5",
+			"templateName": "Least Commission Template",
+			"commissionDetails": [
+				{
+					"cardType": "VISA",
+					"feeType": "Percentage",
+					"startDate": "2017-10-17",
+					"endDate": "2017-10-17",
+					"minVal": "25",
+					"maxVal": "100",
+					"percentageRate": "25",
+					"flatRate": "22",
+					"actions": [
+						{
+							"name": "Delete",
+							"icon": "fa fa-trash",
+							"type": "COMPONENT_FUNCTION"
+						}
+					]
+				}
+			],
+			"datecreated": "",
+			"createdby": "",
+			"dateupdated": "",
+			"updatedby": ""
+		}
+	}
+}

@@ -1,0 +1,18 @@
+[
+  {
+    " ePayRefNumber": "123",
+    "transactionAmount": 5001,
+    "transactionStatus": "SUCCESS"
+
+  },
+  {
+    " ePayRefNumber": "345",
+    "transactionAmount": 5002,
+    "transactionStatus": "SUCCESS"
+  },
+  {
+    " ePayRefNumber": "678",
+    "transactionAmount": 5003,
+    "transactionStatus": "SUCCESS"
+  }
+]

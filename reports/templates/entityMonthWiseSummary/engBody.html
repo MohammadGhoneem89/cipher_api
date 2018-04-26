@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Entity Transaction Detail</title>
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}css/reportLayout.css">
+    {{/if}}
+</head>
+<body>
+<div class="row">
+    <span class="pull-left margin-left">
+        <h4>Entity : {{:criteria.Entity}}</h4>
+        <h4>Acquirer : {{:criteria.Acquirer}}</h4>
+        <h4>Card Type : {{:criteria.cardType}}</h4>
+        <h4>Payment Gateway : {{:criteria.paymentGateway}}</h4>
+    </span>
+    <span class="pull-right margin-right">
+        <h4>From Date : {{:criteria.fromDate}} </h4>
+        <h4>To Date :  {{:criteria.toDate}} </h4>
+        </span>
+    <div class="clearfix"></div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <tr><td class="no-upper-line text-left heading" colspan="4">Entity Month Wise Summary</td></tr>
+                        <tr>
+                            <th>Date</th>
+                            <th>Status </th>
+                            <th>Number Of Transactions</th>
+                            <th>Total Amount(AED)</th>
+                        </tr>
+                        {^{for searchResult.transactions}}
+                        <tr>
+                            <td class="{{:spCodeUpperLine}} border-right border-left">{{:date}}</td>
+                            <td class="border-right">{{:status}}</td>
+                            <td class="border-right text-right">{{:transCount}}</td>
+                            <td class="border-right text-right text-right">{{:totalAmount}}</td>
+                        </tr>
+                        {{/for}}
+                        <tr>
+                            <td align="right" class="border-right thick-line text-right">Grand Total : {{:total.cTotalAmount}}</td>
+                            <td class="thick-line text-right border-left" colspan="2"></td>
+                            <td align="right" class="border-right thick-line text-right">Grand Total : {{:total.gTotalAmount}}</td>
+                        </tr>
+                        <tr><td class="no-upper-line" colspan="3"></td></tr>
+                        <tr><td class="no-upper-line" colspan="3"></td></tr>
+                        <tr><td class="no-upper-line text-left heading" colspan="3">Overall All</td></tr>
+                        <tr>
+                            <th>Status </th>
+                            <th>Number Of Transactions</th>
+                            <th>Total Amount(AED)</th>
+                        </tr>
+                        {^{for searchResult.overall}}
+                        <tr>
+                            <td class="border-right border-left">{{:status}}</td>
+                            <td class="border-right text-right">{{:transCount}}</td>
+                            <td class="border-right text-right text-right">{{:totalAmount}}</td>
+                        </tr>
+                        {{/for}}
+                        <tr>
+                            <td align="right" class="border-right thick-line text-right">Grand Total : {{:total.cTotalAmount}}</td>
+                            <td class="thick-line text-right border-left" colspan="1"></td>
+                            <td align="right" class="border-right thick-line text-right">Grand Total : {{:total.gTotalAmount}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="display:none">
+        <img src="{{:images.sdg}}"/>
+        <img src="{{:images.dof}}"/>
+    </span>
+</body>
+</html>

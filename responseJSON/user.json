@@ -1,0 +1,14 @@
+{
+	"userData": {
+				"action":"user",
+				"data":{
+						"userId"    : 12,
+						"firstName" : "Bilal",
+						"lastName"  : "Mahroof",
+						"userType"  : "Entity",  
+						"userGroups" : ["Group1","Group2","Group3"],
+						"lang":"EN"
+				}
+				
+			}
+}

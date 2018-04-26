@@ -1,0 +1,76 @@
+<html >
+<head>
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}css/reportLayout.css">
+    {{/if}}
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+</head>
+<body dir="rtl">
+<div class="row">
+    <span class="pull-left margin-left">
+        <h4>كيان : {{:criteria.Entity}}</h4>
+        <h4>المستحوذ : {{:criteria.Acquirer}}</h4>
+        <h4>طريقة الدفع او السداد : {{:criteria.paymentMethod}}</h4>
+        <h4>نوع البطاقة : {{:criteria.cardType}}</h4>
+    </span>
+   <span class="pull-right margin-right">
+        <h4>من التاريخ : {{:criteria.fromDate}}</h4>
+        <h4>ان يذهب في موعد : {{:criteria.toDate}}</h4>
+
+        </span>
+    <div class="clearfix"></div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">تقرير رد الأموال</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>No.</th>
+                            <th>تاريخ بدء رد الأموال</th>
+                            <th>كيان</th>
+                            <th>الخدمات</th>
+                            <th>ديغ ترن</th>
+                            <th>تاريخ الصفقة</th>
+                            <th>(AED)كمية</th>
+                            <th>طريقة الدفع او السداد</th>
+                            <th>نوع البطاقة</th>
+                            <th>رد رقم لا</th>
+                            <th>حالة رد الأموال</th>
+                        </tr>
+                        {^{for searchResult}}
+                        <tr>
+                            <td>{{: #index + 1}}</td>
+                            <td class="border-right">{{:REFUNDINITTS}}</td>
+                            <td class="border-right border-left">{{:SPCode}}</td>
+                            <td class="border-right">{{:ServiceCode}}</td>
+                            <td class="border-right">{{:PayRef}}</td>
+                            <td class="border-right">{{:TimeStamp}}</td>
+                            <td class="border-right text-left">{{:TotalBillAmount}}</td>
+                            <td class="border-right">{{:PaymentMethod}}</td>
+                            <td class="border-right">{{:CardType}}</td>
+                            <td class="border-right">{{:RefundRef}}</td>
+                            <td class="border-right border-left">{{:Status}}</td>
+                        </tr>
+                        {{/for}}
+                        <tr>
+                            <td class="thick-line text-left border-right" colspan="2">إجمالي المعاملات : {{:total.count}}</td>
+                            <td class="thick-line text-left border-right" colspan="7"></td>
+                            <td align="right" class="border-left thick-line text-center text-right" colspan="2">المبلغ الإجمالي : {{:total.amount}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="display:none">
+        <img src="{{:images.sdg}}"/>
+        <img src="{{:images.dof}}"/>
+    </span>
+</body>
+</html>

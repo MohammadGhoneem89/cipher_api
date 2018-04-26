@@ -1,0 +1,93 @@
+{
+    "commissionBatchData": {
+        "action": "commissionBatchData",
+        "data": {
+            "batchID": "ADB21278655",
+            "acquirer": {
+                "acquirerID": 1,
+                "acquirerName": "Network International",
+                "arabicName": "Network International",
+                "logo": {
+                    "sizeSmall": "../assets/resources/images/NI.jpg",
+                    "sizeMedium": "../assets/resources/images/NI.jpg"
+                }
+            },
+            "lastCommissionDate": "07/03/2017",
+            "toDate": "01/05/2017",
+            "counterSLA": 5,
+            "commissionOverdue": 2,
+            "commissionTiles": [
+                {
+                    "id": 1,
+                    "title": "Previous Resolved Exceptions",
+                    "percentage": "100",
+                    "value": "10K",
+                    "actionURI": "",
+                    "overDue": "5"
+                },
+                {
+                    "id": 2,
+                    "title": "Current Period Trans",
+                    "percentage": "100",
+                    "value": "5K",
+                    "actionURI": "",
+                    "overDue": "5"
+                },
+                {
+                    "id": 3,
+                    "title": "Processed Past Refund",
+                    "percentage": "100",
+                    "value": "8K",
+                    "actionURI": "",
+                    "overDue": "5"
+                },
+                {
+                    "id": 4,
+                    "title": "Total Payable Commission",
+                    "percentage": "100",
+                    "value": "7K",
+                    "actionURI": "",
+                    "overDue": "5"
+                }
+            ],
+            "commissionSummaryData": {
+                "pageData": {
+                    "PageSize": 10,
+                    "currentPage": 1,
+                    "totalRecords": 20
+                },
+                "rows": [
+                    {
+                        "summary": "Visa",
+                        "amount": "500",
+                        "count": "10"
+                    },
+                    {
+                        "summary": "Master",
+                        "amount": "10000",
+                        "count": "50"
+                    },
+                    {
+                        "summary": "Reversed",
+                        "amount": "(-8000)",
+                        "count": "-55"
+                    }
+                ]
+            },
+            "currentStatus": "Commission",
+            "statusList": [
+                "Commission",
+                "Receipt"
+            ],
+            "actions": [
+                {
+                    "actionID": 24,
+                    "name": "CB_BAT_Process",
+                    "actionURI": "/processCommissionBatch",
+                    "params": "",
+                    "icon": "icon-docs"
+                }
+            ]
+        }
+    }
+}

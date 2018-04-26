@@ -1,0 +1,98 @@
+{
+    "commissionListData": {
+        "action": "permission",
+        "data": {
+            "commissionData": {
+                "pageData": {
+                    "PageSize": 10,
+                    "currentPage": 1,
+                    "totalRecords": 20
+                },
+                "rows": [
+                    {
+                        "acquirerName": {
+                            "name": "NI",
+                            "imageURL": "../assets/Resources/NI_Icon.jpg"
+                        },
+                        "batchNo": "512613",
+                        "dateInitiated": "01/01/2015",
+                        "amount": "100000",
+                        "commission": "1000",
+                        "userID": "Admin",
+                        "action": [
+                            {
+                                "name": "View",
+                                "actionURI": "#modelWindows",
+                                "params": "?acquirerID=250",
+                                "icon": "icon-docs",
+								"type": "modal"
+                            }
+                        ]
+                    },
+					{
+                        "acquirerName": {
+                            "name": "CBD",
+                            "imageURL": "../assets/Resources/cbd.jpg"
+                        },
+                        "batchNo": "512614",
+                        "dateInitiated": "01/02/2016",
+                        "amount": "600000",
+                        "commission": "6000",
+                        "userID": "Admin",
+                        "action": [
+                            {
+                                "name": "View",
+                                "actionURI": "#modelWindows",
+                                "params": "?acquirerID=251",
+                                "icon": "icon-docs",
+								"type": "modal"
+                            }
+                        ]
+                    },
+                    {
+                        "acquirerName": {
+                            "name": "ENBD",
+                            "imageURL": "../assets/Resources/nbd.jpg"
+                        },
+                        "batchNo": "512615",
+                        "dateInitiated": "01/05/2016",
+                        "amount": "800000",
+                        "commission": "8000",
+                        "userID": "Admin",
+                        "action": [
+                            {
+                                "name": "View",
+                                "actionURI": "#modelWindows",
+                                "params": "?acquirerID=252",
+                                "icon": "icon-docs",
+								"type": "modal"
+                            }
+                        ]
+                    },
+                    {
+                        "acquirerName": {
+                            "name": "E-Islamic",
+                            "imageURL": "../assets/Resources/emirate_islamic_s.jpg"
+                        },
+                        "batchNo": "512616",
+                        "dateInitiated": "01/01/2017",
+                        "amount": "150000",
+                        "commission": "15000",
+                        "userID": "Admin",
+                        "action": [
+                            {
+                                "name": "View",
+                                "actionURI": "#modelWindows",
+                                "params": "?acquirerID=253",
+                                "icon": "icon-docs",
+								"type": "modal"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+    
+}
+    

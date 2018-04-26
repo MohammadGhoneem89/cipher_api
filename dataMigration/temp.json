@@ -1,0 +1,84 @@
+{
+  "_id": "reconChain\u0000DSPTDE00000000065941517228640",
+  "_rev": "3-176ed5c2c5c4c5783834926d54f63128",
+  "chaincodeid": "reconChain",
+  "data": {
+    "DocumentName": "DisputeView",
+    "DisputeRef": "DSPTDE00000000065941517228640",
+    "PayRef": "E00000 00006594",
+    "Status": "Approved",
+    "TimeStamp": 1517219474,
+    "SPCode": "ZFND",
+    "ServiceCode": "zakat",
+    "BillNumbers": "ZFND_001",
+    "BillAmounts": "500",
+    "TotalBillAmount": 500,
+    "AuthorizedAmount": 500,
+    "BillerRefNo": "S0000000006594",
+    "paymentChannel": "100",
+    "IPAddress": "zakat",
+    "PaymentMetho d": "Credit Card",
+    "TransactionCaptureDate": 1517219474,
+    "CardType": "MASTER",
+    "CustomerEmail": "ahmad.shobaki@dsg.gov.ae",
+    "CustomerMobile": "971551696153",
+    "AcquirerId": "NI",
+    "PGRefNumber": "P0000000006594",
+    "DisputeBatchID": "DISPBATCH-ZFND1517829196",
+    "BatchID": "",
+    "CommissionBat chID": "",
+    "ISDISPUTEINIT": true,
+    "ISDISPUTEFRWD": true,
+    "ISDISPUTEAPRV": true,
+    "ISDISPUTECNCL": false,
+    "DISPUTEINITTS": 1517228640,
+    "DISPUTEFRWDTS": 1517829196,
+    "DISPUTEAPRVTS": 1517830024,
+    "DISPUTECNCLTS": 0,
+    "DISPUTEAPRVBY": "admin",
+    "DISPUTEINITBY": "atif.niaz_NI",
+    "DISPUTEFRWDBY": "adm in",
+    "DISPUTECNCLBY": "",
+    "CreatedBy": "atif.niaz_NI",
+    "Comment": [
+      {
+        "Text": "ePay Ref No:\n\nE0000000006594",
+        "User": "atif.niaz_NI",
+        "Reason": "Customer Complain",
+        "Time": 1517228640,
+        "Status": "Initiate Dispute"
+      },
+      {
+        "Text": "aa",
+        "User": "admin",
+        "Reason": "Customer Complain",
+        "Time": 1517829196,
+        "Status": "Forward"
+      },
+      {
+        "Text": "approving dispute",
+        "User": "admin",
+        "Reason": "Customer Complain",
+        "Time": 1517830024,
+        "Status": "Approved"
+      }
+    ],
+    "Document": [
+      {
+        "Name": [
+          "Lighthouse.jpg"
+        ],
+        "Hash": [
+          "/epayqanfs/uploadPublic/document/29-1-2018/489158e0-04ef-11e8-a041-9f821c32ee6d.j pg"
+        ],
+        "IDList": [
+          "489158e0-04ef-11e8-a041-9f821c32ee6d"
+        ],
+        "Time": 1517228640,
+        "Status": "Initiate Dispute",
+        "User": "atif.niaz_NI"
+      }
+    ]
+  },
+  "version": "6896:0"
+}

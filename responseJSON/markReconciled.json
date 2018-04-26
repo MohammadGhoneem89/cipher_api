@@ -1,0 +1,12 @@
+{
+	"responseMessage": {
+		"data": {
+			"message": {
+				"displayToUser": true,
+				"Success": false,
+				"errorDescription": "Reconciled Processed !!"
+			}
+		},
+		"action": "markReconciled"
+	}
+}

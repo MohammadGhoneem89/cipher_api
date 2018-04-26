@@ -1,0 +1,92 @@
+{
+    "APIPayloadDetail": {
+        "action": "APIPayloadDetail",
+        "data": {
+            "_id": "5a3f515e28404c40156fd7c5",
+            "channel": "Cipher",
+            "action": "UpdateTranStatus",
+            "payload": {
+                "JWToken": "a73a46b29c9c644e2777d354dfae710c555f2c46a77dcb3654240f7fef15eb2a94cf57cfc563689eebb63fcd2c1d4e49497e7d90c91c4c5a26c1a490b86f4c847a671b4779fbbf1901bf56826142c41de89227865708866ec47c5c3d2d65f58432317a7384bf478993",
+                "body": {
+                    "additionalParams": null,
+			"servicesInformation": [
+                        {
+                            "beneficiaryInfos": [
+                                {
+                                    "companyInfo": {
+                                        "licenseIssuingAuthority": null,
+                                        "tradeLicenseNumber": null,
+                                        "companyNameAr": null,
+                                        "companyNameEn": "DFM"
+                                    },
+                                    "type": "Individual",
+                                    "emiratesId": null,
+                                    "email": null,
+                                    "mobileNo": null,
+                                    "fullNameAr": null,
+                                    "fullNameEn": null,
+                                    "txnAmount": "105",
+                                    "accountId": "459520"
+                                }
+                            ],
+                            "gessServiceId": null,
+                            "serviceId": "1",
+                            "serviceNameAr": null,
+                            "serviceNameEn": "Dubai Financial Market"
+                        }
+                    ],
+                    "userInfomation": {
+                        "pobox": "12345",
+                        "emirateCode": "DXB",
+                        "emiratesId": "123456789012345",
+                        "nationalityCode": "ARE",
+                        "email": "sandeep.kumar@avanzasolutions.com",
+                        "mobileNo": "971551234567",
+                        "fullNameAr": "Sandeep Kumar",
+                        "fullNameEn": "Sandeep",
+                        "userName": "user_name",
+                        "userId": "user_id",
+                        "isAuthenticated": "true"
+                    },
+                    "acquirerId": null,
+                    "ipaddress": "83.110.153.188",
+                    "customerMobile": "971551234567",
+                    "customerEmail": "test@test.com",
+                    "approvalCode": null,
+                    "maskedCardNo": null,
+                    "cardType": null,
+                    "transactionCaptureDate": "24-12-2017 18:12:08.428",
+                    "paymentMethod": "Credit Card",
+                    "timestamp": "24-12-2017 18:11:50.000",
+                    "ePayStatus": "PENDING",
+                    "totalBillAmount": "10.0",
+                    "paymentChannel": "100",
+                    "sptrn": "1514124710099",
+                    "currency": "AED",
+                    "pgTrn": null,
+                    "pgCode": "200147",
+                    "degCaptureStatus": "",
+                    "serviceCode": "zakat",
+                    "spCode": "ZFND",
+                    "message": "",
+                    "transactionStatus": "RECEIVED",
+                    "ePayRefNumber": "99000022801555"
+                },
+                "header": {
+                    "content-length": "1071",
+                    "connection": "Keep-Alive",
+                    "x-forwarded-server": "localhost",
+                    "x-forwarded-host": "api.qa.dubaipay.gov.ae",
+                    "user-agent": "Synapse-PT-HttpComponents-NIO",
+                    "content-type": "application/json",
+                    "x-forwarded-for": "10.22.46.11, 213.42.49.219",
+                    "accept": "application/json",
+                    "authorization": "Basic ZXBheTpFUEFZdWF0MTIz",
+                    "host": "10.65.10.16:10051",
+                    "password": "78440a05edab6a3e55632ece0832f48535533c701e0200760e8a72e78103655fb329a87ccce66acef2f24c2cf5c03beaefcc214be74f3736303f5ded1e3074be",
+                    "username": "epay"
+                }
+            }
+        }
+    }
+}
