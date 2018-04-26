@@ -2,7 +2,7 @@
 
 var rp = require('request-promise');
 var fs = require("fs");
-const config = require('../cipher-api/config');
+const config = require('./config');
 const crypto = require('./lib/helpers/crypto');
 const logger = require('./lib/helpers/logger')().app;
 
