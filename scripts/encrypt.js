@@ -1,14 +1,18 @@
 'use strict';
 
-const crypto = require('../lib/helpers/crypto');
-const logger = require('../api/bootstrap/logger');
+const crypto = require('crypto');
 const _ = require('lodash');
 
-function decrypt() {
+function encrypt() {
   const str = _.get(process, 'argv[2]', 'hello world');
-  const encryptStr = crypto.encrypt(str);
-  logger.app.info({ encrypt: encryptStr }, 'encrypted string');
+  const encryptStr = _encrypt(str);
   console.log({ encrypt: encryptStr }); //eslint-disable-line
 }
 
-decrypt();
+function _encrypt(crypt = ''){
+  crypt = _.isObject(crypt) ? JSON.stringify(crypt) : crypt;
+  const cipher = crypto.createCipher('aes-256-ctr', 'abcdefg1234567890!@#$%^&*()');
+  return cipher.update(crypt, 'utf8', 'hex');
+}
+
+encrypt();
