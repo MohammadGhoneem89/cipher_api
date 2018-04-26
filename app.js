@@ -7,7 +7,7 @@ global.config = {};
 const config = require('./config');
 const crypto = require('./lib/helpers/crypto');
 const dbURL = crypto.decrypt(config.get('mongodb.url'));
-console.log(dbURL, "YAHOOOOOOO");
+console.log(dbURL, "NOOOOOOOOOOOOOOO");
 
 
 tryConnection();
