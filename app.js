@@ -4,13 +4,6 @@ const dbConfig = require('./dbConfig');
 
 global.config = {};
 
-
-const config = require('./config');
-const crypto = require('./lib/helpers/crypto');
-const dbURL = crypto.decrypt("b17777bc97da3c563d398d5fdefb7c010a4d6c45f57ec93353390f72ac44bb6fe4aa");
-console.log(dbURL, config.get('mongodb.url'), "NOOOOOOOOOOOOOOO");
-
-
 tryConnection();
 
 function tryConnection() {

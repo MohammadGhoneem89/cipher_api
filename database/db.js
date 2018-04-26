@@ -8,7 +8,8 @@ const crypto = require('../lib/helpers/crypto');
 const logger = require('../api/bootstrap/logger');
 
 module.exports = function (callback) {
-  const dbURL = crypto.decrypt(config.get('mongodb.url'));
+  // const dbURL = crypto.decrypt(config.get('mongodb.url'));
+  const dbURL = "mongodb://localhost:10050/cipherRI";
 
   MongoClient.connect(dbURL, function (err, db) {
     if (err) {
