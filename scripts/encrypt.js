@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const _ = require('lodash');
 
 function encrypt() {
-  const str = _.get(process, 'argv[2]', 'abcdefg1234567890!@#$%^&*()');
+  const str = _.get(process, 'argv[2]', 'hello world');
   const encryptStr = _encrypt(str);
   console.log({ encrypt: encryptStr }); //eslint-disable-line
 }

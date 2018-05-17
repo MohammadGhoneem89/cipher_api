@@ -1,7 +1,7 @@
 {
   "port": 10051,
   "mongodb": {
-    "url": "b17777bc97da3c563d39d00089b4225854102947fd60c833532c5d2bec19ee32d58a05d2d374489e"
+    "url": "b17777bc97da3c563d39d40193ab245d4b0f2a4aea7ccb3259275c2be91cf17edf931ddfc45453"
   },
   "URLRestInterface": "http://104.211.198.150:10051/",
   "amqp": {

@@ -5,6 +5,6 @@
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
     },
-    "url": "http://localhost:9019/keyVault"
+    "url": "http://51.144.125.224:9009/keyVault"
   }
 }
