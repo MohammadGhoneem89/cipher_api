@@ -1,5 +1,5 @@
 {
-    "host": "http://51.144.125.224:8080",
+    "host": "http://localhost:8080",
     "isLogged": 0,
     "isLoggerAvailable":""
 }
