@@ -1,14 +1,14 @@
 FROM node:6.9.5
 
 # Create app directory
-WORKDIR /epayqanfs/application/cipher-api
+WORKDIR /cipher/application/api
 
 # Install app dependencies
 COPY package.json .
 
 
 # Create app directory
-WORKDIR /epayqanfs/application/cipher-api
+WORKDIR /cipher/application/api
 
 # Install app dependencies
 # COPY package.json.
