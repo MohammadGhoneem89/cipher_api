@@ -518,6 +518,12 @@
       "MappingfunctionName": "viewTransactions",
       "CustomMappingFile": "smiles/viewTransactions.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getProviderCards": {
+      "customMapping": true,
+      "MappingfunctionName": "getProviderCards",
+      "CustomMappingFile": "smiles/getProviderCards.js",
+      "mappingConfigFile": "ePayMapping"
     }
   }
 }
