@@ -475,5 +475,37 @@
   },
   "Consortium": {
 
+  },
+  "Smiles":{
+    "getMerchantInfo": {
+      "customMapping": true,
+      "MappingfunctionName": "getMerchantCards",
+      "CustomMappingFile": "smiles/getMerchantCards.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewOrders": {
+      "customMapping": true,
+      "MappingfunctionName": "viewOrders",
+      "CustomMappingFile": "smiles/viewOrders.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewPendingOrders": {
+      "customMapping": true,
+      "MappingfunctionName": "viewPendingOrders",
+      "CustomMappingFile": "smiles/viewPendingOrders.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewCatalogue": {
+      "customMapping": true,
+      "MappingfunctionName": "viewCatalogue",
+      "CustomMappingFile": "smiles/viewCatalogue.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewPoints": {
+      "customMapping": true,
+      "MappingfunctionName": "viewPoints",
+      "CustomMappingFile": "smiles/viewPoints.js",
+      "mappingConfigFile": "ePayMapping"
+    }
   }
 }
