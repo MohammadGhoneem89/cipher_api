@@ -506,6 +506,18 @@
       "MappingfunctionName": "viewPoints",
       "CustomMappingFile": "smiles/viewPoints.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "viewSettlements": {
+      "customMapping": true,
+      "MappingfunctionName": "viewSettlements",
+      "CustomMappingFile": "smiles/viewSettlements.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewTransactions": {
+      "customMapping": true,
+      "MappingfunctionName": "viewTransactions",
+      "CustomMappingFile": "smiles/viewTransactions.js",
+      "mappingConfigFile": "ePayMapping"
     }
   }
 }
