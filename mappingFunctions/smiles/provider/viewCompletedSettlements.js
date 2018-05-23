@@ -8,7 +8,8 @@ function format(data) {
             actionType: "COMPONENT_FUNCTION",
             iconName: "fa fa-cogs",
             label: "View Transactions"
-        }]
+        }];
+
         return value
     })
     return {
@@ -17,8 +18,8 @@ function format(data) {
     }
 }
 
-module.viewSettlements = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/completedSettlements';
+module.viewCompletedSettlements = function (payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/pendingSettlements';
     var options = {
         method: 'POST',
         uri: URL,

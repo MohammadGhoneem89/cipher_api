@@ -4,11 +4,19 @@ const rp = require('request-promise');
 const logger = require('../../lib/helpers/logger')().app;
 function format(data) {
     data.data = data.data.map(value => {
+        const status = parseInt(value.status) || 0;
         value['actions'] = [{
             actionType: "COMPONENT_FUNCTION",
             iconName: "fa fa-cogs",
             label: "View Transactions"
-        }]
+        }];
+        if (status === 0) {
+            value['actions'].push({
+                actionType: "COMPONENT_FUNCTION",
+                iconName: "fa fa-check",
+                label: "Settle"
+            })
+        }
         return value
     })
     return {
@@ -17,8 +25,8 @@ function format(data) {
     }
 }
 
-module.viewSettlements = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/completedSettlements';
+module.viewPendingSettlements = function (payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/provider/pendingSettlements';
     var options = {
         method: 'POST',
         uri: URL,

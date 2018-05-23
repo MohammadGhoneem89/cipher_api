@@ -2,23 +2,18 @@
 var config = require('../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../lib/helpers/logger')().app;
+
 function format(data) {
-    data.data = data.data.map(value => {
-        value['actions'] = [{
-            actionType: "COMPONENT_FUNCTION",
-            iconName: "fa fa-cogs",
-            label: "View Transactions"
-        }]
-        return value
-    })
     return {
-        action: 'Settlements',
-        settlements: data
+        txInfo: {
+            action: 'txInfo',
+            data: data
+        }
     }
 }
 
-module.viewSettlements = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/completedSettlements';
+module.getTxCard = function (payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/provider/getTxCard';
     var options = {
         method: 'POST',
         uri: URL,

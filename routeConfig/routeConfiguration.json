@@ -356,7 +356,7 @@
     }
   },
   "Cipher": {
-    "health":{
+    "health": {
       "customMapping": true,
       "MappingfunctionName": "health",
       "CustomMappingFile": "healthService/health.js",
@@ -412,25 +412,25 @@
       "CustomMappingFile": "quorum/deployContract.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "contractSetter":{
+    "contractSetter": {
       "customMapping": true,
       "MappingfunctionName": "contractSetter",
       "CustomMappingFile": "quorum/contractSetter.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "contractGetter":{
+    "contractGetter": {
       "customMapping": true,
       "MappingfunctionName": "contractGetter",
       "CustomMappingFile": "quorum/contractGetter.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getCode":{
+    "getCode": {
       "customMapping": true,
       "MappingfunctionName": "getCode",
       "CustomMappingFile": "quorum/getCode.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getAccounts":{
+    "getAccounts": {
       "customMapping": true,
       "MappingfunctionName": "getAccounts",
       "CustomMappingFile": "quorum/getAccounts.js",
@@ -443,7 +443,7 @@
       "mappingConfigFile": "ePayMapping"
     }
   },
-  "HyperLedger":{
+  "HyperLedger": {
     "fetchCollectionValueByKey": {
       "protoFile": "Rest.proto",
       "GRPCServiceIP": "0.0.0.0",
@@ -473,56 +473,78 @@
       "mappingConfigFile": "ePayMapping"
     }
   },
-  "Consortium": {
-
-  },
-  "Smiles":{
+  "Consortium": {},
+  "Smiles": {
     "getMerchantInfo": {
       "customMapping": true,
       "MappingfunctionName": "getMerchantCards",
-      "CustomMappingFile": "smiles/getMerchantCards.js",
+      "CustomMappingFile": "smiles/merchant/getMerchantCards.js",
       "mappingConfigFile": "ePayMapping"
     },
     "viewOrders": {
       "customMapping": true,
       "MappingfunctionName": "viewOrders",
-      "CustomMappingFile": "smiles/viewOrders.js",
+      "CustomMappingFile": "smiles/merchant/viewOrders.js",
       "mappingConfigFile": "ePayMapping"
     },
     "viewPendingOrders": {
       "customMapping": true,
       "MappingfunctionName": "viewPendingOrders",
-      "CustomMappingFile": "smiles/viewPendingOrders.js",
+      "CustomMappingFile": "smiles/merchant/viewPendingOrders.js",
       "mappingConfigFile": "ePayMapping"
     },
     "viewCatalogue": {
       "customMapping": true,
       "MappingfunctionName": "viewCatalogue",
-      "CustomMappingFile": "smiles/viewCatalogue.js",
+      "CustomMappingFile": "smiles/general/viewCatalogue.js",
       "mappingConfigFile": "ePayMapping"
     },
     "viewPoints": {
       "customMapping": true,
       "MappingfunctionName": "viewPoints",
-      "CustomMappingFile": "smiles/viewPoints.js",
+      "CustomMappingFile": "smiles/merchant/viewPoints.js",
       "mappingConfigFile": "ePayMapping"
     },
     "viewSettlements": {
       "customMapping": true,
       "MappingfunctionName": "viewSettlements",
-      "CustomMappingFile": "smiles/viewSettlements.js",
+      "CustomMappingFile": "smiles/provider/viewSettlements.js",
       "mappingConfigFile": "ePayMapping"
     },
     "viewTransactions": {
       "customMapping": true,
       "MappingfunctionName": "viewTransactions",
-      "CustomMappingFile": "smiles/viewTransactions.js",
+      "CustomMappingFile": "smiles/provider/viewTransactions.js",
       "mappingConfigFile": "ePayMapping"
     },
     "getProviderCards": {
       "customMapping": true,
       "MappingfunctionName": "getProviderCards",
-      "CustomMappingFile": "smiles/getProviderCards.js",
+      "CustomMappingFile": "smiles/provider/getProviderCards.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTxCard": {
+      "customMapping": true,
+      "MappingfunctionName": "getTxCard",
+      "CustomMappingFile": "smiles/provider/getTxCard.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewCompletedSettlements": {
+      "customMapping": true,
+      "MappingfunctionName": "viewCompletedSettlements",
+      "CustomMappingFile": "smiles/provider/viewCompletedSettlements.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewPendingSettlements": {
+      "customMapping": true,
+      "MappingfunctionName": "viewPendingSettlements",
+      "CustomMappingFile": "smiles/provider/viewPendingSettlements.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "placeOrder": {
+      "customMapping": true,
+      "MappingfunctionName": "placeOrder",
+      "CustomMappingFile": "smiles/provider/placeOrder.js",
       "mappingConfigFile": "ePayMapping"
     }
   }
