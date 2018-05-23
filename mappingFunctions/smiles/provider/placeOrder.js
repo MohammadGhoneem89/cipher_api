@@ -4,7 +4,7 @@ const rp = require('request-promise');
 const logger = require('../../lib/helpers/logger')().app;
 
 
-module.viewSettlements = function (payload, UUIDKey, route, callback, JWToken) {
+module.placeOrder = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/provider/placeOrder';
     var options = {
         method: 'POST',

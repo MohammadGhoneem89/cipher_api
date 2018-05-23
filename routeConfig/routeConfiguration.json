@@ -546,6 +546,12 @@
       "MappingfunctionName": "placeOrder",
       "CustomMappingFile": "smiles/provider/placeOrder.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "addItem": {
+      "customMapping": true,
+      "MappingfunctionName": "addItem",
+      "CustomMappingFile": "smiles/provider/addItem.js",
+      "mappingConfigFile": "ePayMapping"
     }
   }
 }
