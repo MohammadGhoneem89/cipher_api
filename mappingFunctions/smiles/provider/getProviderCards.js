@@ -3,7 +3,15 @@ var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
-module.getProviderCards = function(payload, UUIDKey, route, callback, JWToken) {
+exports.getProviderCards = function(payload, UUIDKey, route, callback, JWToken) {
+
+    return callback({
+        providerInfo: {
+            action: 'providerInfo',
+            data: "YAHOOOO"
+        }
+    });
+
     let URL = config['host'] + '/provider/info';
     var options = {
         method: 'POST',
