@@ -9,7 +9,7 @@ function format(data) {
             iconName: "fa fa-cogs",
             label: "View Transactions"
         }];
-        if (status === false || status===0) {
+        if (value.status === false || value.status===0) {
             value['actions'].push({
                 actionType: "COMPONENT_FUNCTION",
                 iconName: "fa fa-check",
