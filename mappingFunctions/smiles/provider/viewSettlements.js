@@ -17,7 +17,7 @@ function format(data) {
     }
 }
 
-module.viewSettlements = function (payload, UUIDKey, route, callback, JWToken) {
+exports.viewSettlements = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/completedSettlements';
     var options = {
         method: 'POST',

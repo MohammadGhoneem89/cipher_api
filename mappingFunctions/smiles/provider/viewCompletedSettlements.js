@@ -18,7 +18,7 @@ function format(data) {
     }
 }
 
-module.viewCompletedSettlements = function (payload, UUIDKey, route, callback, JWToken) {
+exports.viewCompletedSettlements = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/pendingSettlements';
     var options = {
         method: 'POST',

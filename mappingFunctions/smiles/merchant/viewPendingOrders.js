@@ -22,7 +22,7 @@ function format(data) {
     }
 }
 
-module.viewPendingOrders = function (payload, UUIDKey, route, callback, JWToken) {
+exports.viewPendingOrders = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/merchant/pendingOrders';
     var options = {
         method: 'POST',

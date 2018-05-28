@@ -10,7 +10,7 @@ function format(data){
     }
 }
 
-module.viewCatalogue = function(payload, UUIDKey, route, callback, JWToken) {
+exports.viewCatalogue = function(payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/catalogue';
     var options = {
         method: 'POST',

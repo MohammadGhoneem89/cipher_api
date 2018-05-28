@@ -12,7 +12,7 @@ function format(data) {
     }
 }
 
-module.getMerchantCards = function(payload, UUIDKey, route, callback, JWToken) {
+exports.getMerchantCards = function(payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/merchant/info';
     var options = {
         method: 'POST',

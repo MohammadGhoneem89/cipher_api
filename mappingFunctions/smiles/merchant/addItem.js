@@ -4,7 +4,7 @@ const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
 
-module.addItem = function (payload, UUIDKey, route, callback, JWToken) {
+exports.addItem = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/merchant/item';
     var options = {
         method: 'POST',

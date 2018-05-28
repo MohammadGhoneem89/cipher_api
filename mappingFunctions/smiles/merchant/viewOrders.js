@@ -31,7 +31,7 @@ function format(data){
     }
 }
 
-module.viewOrders = function(payload, UUIDKey, route, callback, JWToken) {
+exports.viewOrders = function(payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/merchant/orders';
     var options = {
         method: 'POST',

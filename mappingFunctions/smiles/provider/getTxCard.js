@@ -12,7 +12,7 @@ function format(data) {
     }
 }
 
-module.getTxCard = function (payload, UUIDKey, route, callback, JWToken) {
+exports.getTxCard = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/provider/getTxCard';
     var options = {
         method: 'POST',

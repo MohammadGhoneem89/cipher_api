@@ -25,7 +25,7 @@ function format(data) {
     }
 }
 
-module.viewPendingSettlements = function (payload, UUIDKey, route, callback, JWToken) {
+exports.viewPendingSettlements = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/provider/pendingSettlements';
     var options = {
         method: 'POST',

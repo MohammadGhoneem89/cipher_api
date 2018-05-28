@@ -3,7 +3,7 @@ var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
-module.placeOrder = function (payload, UUIDKey, route, callback, JWToken) {
+exports.placeOrder = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/provider/placeOrder';
     var options = {
         method: 'POST',

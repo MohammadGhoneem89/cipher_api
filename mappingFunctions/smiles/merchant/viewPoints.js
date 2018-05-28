@@ -16,7 +16,7 @@ function format(data){
     }
 }
 
-module.viewPoints = function(payload, UUIDKey, route, callback, JWToken) {
+exports.viewPoints = function(payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/points';
     var options = {
         method: 'POST',

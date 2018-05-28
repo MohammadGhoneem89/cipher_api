@@ -18,7 +18,7 @@ function format(data){
     }
 }
 
-module.viewTransactions = function (payload, UUIDKey, route, callback, JWToken) {
+exports.viewTransactions = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/getSettlementTransactions';
     var options = {
         method: 'POST',
