@@ -3,7 +3,7 @@ var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 function format(data) {
-    /*data.data = data.data.map(value => {
+    data.data = data.data.map(value => {
         value['actions'] = [{
             actionType: "COMPONENT_FUNCTION",
             iconName: "fa fa-cogs",
@@ -17,7 +17,7 @@ function format(data) {
             })
         }
         return value
-    })*/
+    })
     return {
         action: 'pendingSettlements',
         pendingSettlements: data
@@ -38,8 +38,8 @@ exports.viewPendingSettlements = function (payload, UUIDKey, route, callback, JW
         .then(function (parsedBody) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
-            //const formattedData = format(parsedBody);
-            callback(parsedBody);
+            const formattedData = format(parsedBody);
+            callback(formattedData);
         })
         .catch(function (err) {
             // POST failed...
