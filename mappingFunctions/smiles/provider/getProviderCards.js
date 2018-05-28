@@ -3,15 +3,6 @@ var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
-function format(data) {
-    return {
-        providerInfo: {
-            action: 'providerInfo',
-            data: data
-        }
-    }
-}
-
 module.getProviderCards = function(payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/provider/info';
     var options = {
@@ -27,7 +18,12 @@ module.getProviderCards = function(payload, UUIDKey, route, callback, JWToken) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
             const formattedData = format(parsedBody);
-            callback(formattedData);
+            callback({
+                providerInfo: {
+                    action: 'providerInfo',
+                    data: parsedBody
+                }
+            });
         })
         .catch(function (err) {
             // POST failed...
