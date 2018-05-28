@@ -5,13 +5,6 @@ const logger = require('../../../lib/helpers/logger')().app;
 
 exports.getProviderCards = function(payload, UUIDKey, route, callback, JWToken) {
 
-    return callback({
-        providerInfo: {
-            action: 'providerInfo',
-            data: "YAHOOOO"
-        }
-    });
-
     let URL = config['host'] + '/provider/info';
     var options = {
         method: 'POST',
