@@ -559,6 +559,18 @@
       "CustomMappingFile": "smiles/provider/addItem.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "addMultipleItems": {
+      "customMapping": true,
+      "MappingfunctionName": "addMultipleItems",
+      "CustomMappingFile": "smiles/provider/addMultipleItems.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "addFromExcel": {
+      "customMapping": true,
+      "MappingfunctionName": "addFromExcel",
+      "CustomMappingFile": "smiles/provider/addFromExcel.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "requestForSettlement": {
       "customMapping": true,
       "MappingfunctionName": "requestForSettlement",
