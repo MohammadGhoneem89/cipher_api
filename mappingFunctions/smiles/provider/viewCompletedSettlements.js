@@ -13,8 +13,8 @@ function format(data) {
         return value
     })
     return {
-        action: 'Settlements',
-        settlements: data
+        action: 'completedSettlements',
+        completedSettlements: data
     }
 }
 

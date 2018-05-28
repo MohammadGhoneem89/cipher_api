@@ -4,13 +4,12 @@ const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 function format(data) {
     data.data = data.data.map(value => {
-        const status = parseInt(value.status) || 0;
         value['actions'] = [{
             actionType: "COMPONENT_FUNCTION",
             iconName: "fa fa-cogs",
             label: "View Transactions"
         }];
-        if (status === 0) {
+        if (status === false || status===0) {
             value['actions'].push({
                 actionType: "COMPONENT_FUNCTION",
                 iconName: "fa fa-check",
@@ -20,8 +19,8 @@ function format(data) {
         return value
     })
     return {
-        action: 'Settlements',
-        settlements: data
+        action: 'pendingSettlements',
+        pendingSettlements: data
     }
 }
 
