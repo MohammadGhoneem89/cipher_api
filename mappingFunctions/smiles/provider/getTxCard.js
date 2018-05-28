@@ -1,5 +1,5 @@
 'use strict';
-var config = require('../../api/bootstrap/smiles.json')
+var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../lib/helpers/logger')().app;
 
