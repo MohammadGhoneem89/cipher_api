@@ -18,7 +18,6 @@ exports.getProviderCards = function(payload, UUIDKey, route, callback, JWToken) 
         .then(function (parsedBody) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
-            const formattedData = format(parsedBody);
             callback({
                 providerInfo: {
                     action: 'providerInfo',
