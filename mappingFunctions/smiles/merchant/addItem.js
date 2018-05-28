@@ -1,7 +1,7 @@
 'use strict';
 var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
-const logger = require('../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 
 
 module.addItem = function (payload, UUIDKey, route, callback, JWToken) {

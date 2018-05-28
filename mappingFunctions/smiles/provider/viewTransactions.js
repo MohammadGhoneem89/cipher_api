@@ -1,8 +1,7 @@
 'use strict';
 var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
-const logger = console;
-//const logger = require('../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 function format(data){
     data.data = data.data.map(value=>{
         const status = parseInt(value.status)||0;
