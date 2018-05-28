@@ -38,8 +38,8 @@ exports.viewPendingSettlements = function (payload, UUIDKey, route, callback, JW
         .then(function (parsedBody) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
-            const formattedData = format(parsedBody);
-            callback(formattedData);
+            //const formattedData = format(parsedBody);
+            callback(parsedBody);
         })
         .catch(function (err) {
             // POST failed...
