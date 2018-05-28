@@ -547,10 +547,22 @@
       "CustomMappingFile": "smiles/provider/placeOrder.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "settle": {
+      "customMapping": true,
+      "MappingfunctionName": "settle",
+      "CustomMappingFile": "smiles/provider/settle.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "addItem": {
       "customMapping": true,
       "MappingfunctionName": "addItem",
       "CustomMappingFile": "smiles/provider/addItem.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "requestForSettlement": {
+      "customMapping": true,
+      "MappingfunctionName": "requestForSettlement",
+      "CustomMappingFile": "smiles/merchant/requestForSettlement.js",
       "mappingConfigFile": "ePayMapping"
     }
   }
