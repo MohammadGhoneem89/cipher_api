@@ -27,6 +27,7 @@ function formatData(parsedBody) {
             }
         };
     }
+    return response;
 
 }
 
