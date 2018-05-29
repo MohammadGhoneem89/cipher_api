@@ -19,7 +19,7 @@ function format(data) {
 }
 
 exports.viewCompletedSettlements = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/pendingSettlements';
+    let URL = config['host'] + '/provider/completedSettlements';
     var options = {
         method: 'POST',
         uri: URL,
