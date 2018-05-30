@@ -8,6 +8,7 @@ function format(data){
         const status = parseInt(value.status)||0;
         value.paymentDetails = JSON.parse(value.paymentDetails);
         if(status===0){
+            value.completed = {type: "ERROR", value: "INCOMPLETE"}
             value.status={
                 type: "ERROR",
                 value: "PENDING"
@@ -18,6 +19,7 @@ function format(data){
                 label: "Complete Order"
             }]
         } else {
+            value.completed = {type: "OK", value: "COMPLETE"}
             value.status={
                 type: "SUCCESS",
                 value: "COMPLETED"

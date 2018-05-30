@@ -18,7 +18,7 @@ function format(data) {
     })
     return {
         action: 'PendingOrders',
-        orders: data
+        pendingOrders: data
     }
 }
 
