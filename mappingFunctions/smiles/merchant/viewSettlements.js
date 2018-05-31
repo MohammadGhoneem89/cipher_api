@@ -18,7 +18,7 @@ function format(data) {
 }
 
 exports.viewSettlements = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/completedSettlements';
+    let URL = config['host'] + '/getSettlementHistory';
     var options = {
         method: 'POST',
         uri: URL,

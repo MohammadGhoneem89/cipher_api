@@ -508,7 +508,7 @@
     "viewSettlements": {
       "customMapping": true,
       "MappingfunctionName": "viewSettlements",
-      "CustomMappingFile": "smiles/provider/viewSettlements.js",
+      "CustomMappingFile": "smiles/merchant/viewSettlements.js",
       "mappingConfigFile": "ePayMapping"
     },
     "viewTransactions": {
