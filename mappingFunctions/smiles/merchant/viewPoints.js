@@ -3,14 +3,14 @@ var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
-function format(data){
+function format(data, contractAddress){
     data.data.points['actions']=[{
         actionType: "COMPONENT_FUNCTION",
         iconName: "fa fa-cogs",
         label: "Request Settlement"
     }];
     data.data.points['name']='Smiles';
-    data.data.points['contractAddress'] = payload['contractAddress'];
+    data.data.points['contractAddress'] = contractAddress;
     return {
         action: 'Points',
         count:1,
