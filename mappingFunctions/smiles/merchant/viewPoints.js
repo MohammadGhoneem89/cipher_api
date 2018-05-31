@@ -13,8 +13,8 @@ function format(data, contractAddress){
     data.data.points['contractAddress'] = contractAddress;
     return {
         action: 'Points',
-        count:1,
-        points: [data.data.points]
+        points:{ data:[data.data.points]
+        }
     }
 }
 
