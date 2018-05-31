@@ -21,7 +21,7 @@ function formatData(parsedBody) {
     } else {
         response.SettlementResponse.data = {
             "message": {
-                "status": "OK",
+                "status": "ERROR",
                 "errorDescription": "Settlement Failed",
                 "displayToUser": true
             }

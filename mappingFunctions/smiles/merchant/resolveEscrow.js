@@ -14,15 +14,15 @@ function formatData(parsedBody) {
         response.Resolve.data = {
             "message": {
                 "status": "OK",
-                "errorDescription": "Settlement Successfull",
+                "errorDescription": "Resolving Successfull",
                 "displayToUser": true
             }
         };
     } else {
         response.Resolve.data = {
             "message": {
-                "status": "OK",
-                "errorDescription": "Settlement Failed",
+                "status": "ERROR",
+                "errorDescription": "Resolving Failed",
                 "displayToUser": true
             }
         };

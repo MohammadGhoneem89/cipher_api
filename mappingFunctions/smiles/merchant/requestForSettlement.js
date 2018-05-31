@@ -14,15 +14,15 @@ function formatData(parsedBody) {
         response.SettlementResponse.data = {
             "message": {
                 "status": "OK",
-                "errorDescription": "Settlement Successfull",
+                "errorDescription": "Request Successfull",
                 "displayToUser": true
             }
         };
     } else {
         response.SettlementResponse.data = {
             "message": {
-                "status": "OK",
-                "errorDescription": "Settlement Failed",
+                "status": "ERROR",
+                "errorDescription": "Request Failed",
                 "displayToUser": true
             }
         };
