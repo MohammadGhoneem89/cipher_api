@@ -576,6 +576,12 @@
       "MappingfunctionName": "requestForSettlement",
       "CustomMappingFile": "smiles/merchant/requestForSettlement.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "resolveEscrow": {
+      "customMapping": true,
+      "MappingfunctionName": "resolveEscrow",
+      "CustomMappingFile": "smiles/merchant/resolveEscrow.js",
+      "mappingConfigFile": "ePayMapping"
     }
   }
 }
