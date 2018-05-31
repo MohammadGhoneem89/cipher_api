@@ -9,6 +9,8 @@ function format(data){
         iconName: "fa fa-cogs",
         label: "Request Settlement"
     }];
+    data.data.points['name']='Smiles';
+    data.data.points['contractAddress'] = payload['contractAddress'];
     return {
         action: 'Points',
         count:1,
@@ -30,7 +32,7 @@ exports.viewPoints = function(payload, UUIDKey, route, callback, JWToken) {
         .then(function (parsedBody) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
-            const formattedData = format(parsedBody);
+            const formattedData = format(parsedBody, payload['contractAddress']);
             callback(formattedData);
         })
         .catch(function (err) {
