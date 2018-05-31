@@ -3,6 +3,34 @@ var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
+function formatData(parsedBody) {
+    let response = {
+        SettlementResponse: {
+            data: {}
+        }
+    }
+
+    if (parsedBody.success == true) {
+        response.SettlementResponse.data = {
+            "message": {
+                "status": "OK",
+                "errorDescription": "Settlement Successfull",
+                "displayToUser": true
+            }
+        };
+    } else {
+        response.SettlementResponse.data = {
+            "message": {
+                "status": "OK",
+                "errorDescription": "Settlement Failed",
+                "displayToUser": true
+            }
+        };
+    }
+    return response;
+
+}
+
 exports.requestForSettlement = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/merchant/requestForSettlement';
     var options = {
@@ -17,7 +45,8 @@ exports.requestForSettlement = function (payload, UUIDKey, route, callback, JWTo
         .then(function (parsedBody) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
-            callback(parsedBody);
+            let formattedData = formatData(parsedBody);
+            callback(formattedData);
         })
         .catch(function (err) {
             // POST failed...
