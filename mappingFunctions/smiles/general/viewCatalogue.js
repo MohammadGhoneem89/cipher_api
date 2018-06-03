@@ -4,6 +4,19 @@ const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
 function format(data){
+    data.data = data.data.map(value=>{
+        if(value.status===false){
+            value.status = {type: "ERROR", value: "INACTIVE"};
+        } else {
+            value.completed = {type: "OK", value: "ACTIVE"}
+        }
+        value['actions'] = [{
+            actionType: "COMPONENT_FUNCTION",
+            iconName: "fa fa-cogs",
+            label: "View More"
+        }]
+        return value;
+    });
     return {
         action: 'Catalogue',
         catalogue: data
