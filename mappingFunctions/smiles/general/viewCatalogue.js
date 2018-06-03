@@ -11,9 +11,13 @@ function format(data){
             value.status = {type: "OK", value: "ACTIVE"}
         }
         value['actions'] = [{
-            actionType: "COMPONENT_FUNCTION",
-            iconName: "fa fa-eye",
-            label: "View More"
+            "type": "componentAction",
+            "label": "View More",
+            "params": "",
+            "iconName": "fa fa-eye",
+            "URI": [
+                "catalogueDetail/"
+            ]
         }]
         return value;
     });
