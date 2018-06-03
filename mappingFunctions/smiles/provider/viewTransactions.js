@@ -7,8 +7,8 @@ function format(data){
         const status = parseInt(value.status)||0;
             value['actions'] = [{
                 actionType: "COMPONENT_FUNCTION",
-                iconName: "fa fa-cogs",
-                label: "View Transactions"
+                iconName: "fa fa-eye",
+                label: "View Item"
             }];
         return value
     })
