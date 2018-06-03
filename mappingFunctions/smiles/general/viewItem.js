@@ -5,8 +5,8 @@ const logger = require('../../../lib/helpers/logger')().app;
 
 function format(data){
     return {
-        action: 'CatalogueItem',
-        catalogueItem: data
+        action: 'viewItem',
+        viewItem: data
     }
 }
 
