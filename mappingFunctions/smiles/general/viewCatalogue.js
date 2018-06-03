@@ -12,7 +12,7 @@ function format(data){
         }
         value['actions'] = [{
             actionType: "COMPONENT_FUNCTION",
-            iconName: "fa fa-cogs",
+            iconName: "fa fa-eye",
             label: "View More"
         }]
         return value;
