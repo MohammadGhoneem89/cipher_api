@@ -2,11 +2,12 @@
 var config = require('../../api/bootstrap/quorum.json')
 const rp = require('request-promise');
 const logger = require('../../lib/helpers/logger')().app;
+const consortium = require('../../lib/services/consortium');
 
 exports.deployContract = function (payload, UUIDKey, route, callback, JWToken) {
     const URL = config['host'] + '/contract/deploy';
 
-    var options = {
+    /*var options = {
         method: 'POST',
         uri: URL,
         body: payload,
@@ -23,7 +24,8 @@ exports.deployContract = function (payload, UUIDKey, route, callback, JWToken) {
         .catch(function (err) {
             // POST failed...
             logger.debug('==================== Request Failed==================' + err);
-        });
+        });*/
+        return consortium.smartContractDeploy(payload);
 }
 
 
