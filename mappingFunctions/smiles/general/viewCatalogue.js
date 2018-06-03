@@ -8,7 +8,7 @@ function format(data){
         if(value.status===false){
             value.status = {type: "ERROR", value: "INACTIVE"};
         } else {
-            value.completed = {type: "OK", value: "ACTIVE"}
+            value.status = {type: "OK", value: "ACTIVE"}
         }
         value['actions'] = [{
             actionType: "COMPONENT_FUNCTION",
