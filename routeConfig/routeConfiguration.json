@@ -499,6 +499,12 @@
       "CustomMappingFile": "smiles/general/viewCatalogue.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "viewItem": {
+      "customMapping": true,
+      "MappingfunctionName": "viewItem",
+      "CustomMappingFile": "smiles/general/viewItem.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "viewPoints": {
       "customMapping": true,
       "MappingfunctionName": "viewPoints",
