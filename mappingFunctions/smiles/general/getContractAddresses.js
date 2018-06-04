@@ -4,8 +4,8 @@ const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
 const contractAddresses = [{
-    name: 'Sharaf DG',
-    value: '0xfAD8CcA0aB96c0048AeC12f259514BA54D8b1e36'
+    name: 'Merchant',
+    value: '0x25fD7831ccc5F4d7124e0579e89495420d82b5E0'
 }]
 exports.getContractAddresses = function (payload, UUIDKey, route, callback, JWToken) {
 
