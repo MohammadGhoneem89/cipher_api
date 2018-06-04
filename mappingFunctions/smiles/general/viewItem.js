@@ -2,15 +2,29 @@
 var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
+const category = [
+    "New Offers",
+    "Trending Offers",
+    "Shopping Offers",
+    "Dining Offers",
+    "Entertainment Offers",
+    "Wellness Offers",
+    "Travel Offers",
+    "Etisalat Services",
+    "Financial",
+    "Other",
+    "Shopping"
+];
 
-function format(data){
+function format(data) {
+    data.category = category[data.category];
     return {
         action: 'viewItem',
         viewItem: data
     }
 }
 
-exports.viewItem = function(payload, UUIDKey, route, callback, JWToken) {
+exports.viewItem = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] + '/item';
     var options = {
         method: 'POST',
