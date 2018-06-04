@@ -3,15 +3,13 @@ var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 const category = ["None", "New Offers", "Trending Offers", "Shopping Offers", "Dining Offers", "Entertainment Offers", "Wellness Offers", "Travel Offers", "Etisalat Services", "Financial", "Other", "Shopping"];
-const subcategory = { "3": { "31": "Malls & Hypermarkets", "32": "Fashion & Jewellery", "33": "Home & Lifestyle", "34": "Services", "35": "Gifts", "36": "Services" }, "4": { "41": "Cafes", "42": "Family & Casual", "43": "Fine Dining" }, "5": { "51": "SEE", "52": "DO", "53": "Family & Casual", "54": "Sports and Leisure", "55": "Theme Parks" }, "6": { "61": "Health", "62": "Grooming", "63": "Beauty", "64": "Training", "65": "Charity", "66": "Learning" }, "7": { "71": "Airlines", "72": "Hotels", "73": "Holidays", "74": "Car Hire", "75": "Hotel" }, "8": { "81": "Voice Package", "82": "Data Package", "83": "Roaming Package", "86": "SMS Package", "87": "Free Credit", "88": "Free Minutes", "90": "Recharge Credit", "91": "Etisalat Bundle", "92": "Smiles Offer", "93": "Data Offer", "94": "International Minutes", "95": "Local Minutes", "96": "Combo Pack", "97": "Local/International Minutes", "98": "SMS Offer Object", "99": "Free International Minutes", "100": "Free SMS Offer", "101": "Data Deal", "102": "Minutes Deal", "103": "SMS Deal", "104": "Combo Offer", "105": "National Minutes", "106": "Internet Calling Plan" }, "11": { "111": "Fashion & Jewellery" } };
-
+const subcategory = {"3c":{"31s":"Malls & Hypermarkets","32s":"Fashion & Jewellery","33s":"Home & Lifestyle","34s":"Services","35s":"Gifts","36s":"Services"},"4c":{"41s":"Cafes","42s":"Family & Casual","43s":"Fine Dining"},"5c":{"51s":"SEE","52s":"DO","53s":"Family & Casual","54s":"Sports and Leisure","55s":"Theme Parks"},"6c":{"61s":"Health","62s":"Grooming","63s":"Beauty","64s":"Training","65s":"Charity","66s":"Learning"},"7c":{"71s":"Airlines","72s":"Hotels","73s":"Holidays","74s":"Car Hire","75s":"Hotel"},"8c":{"81s":"Voice Package","82s":"Data Package","83s":"Roaming Package","86s":"SMS Package","87s":"Free Credit","88s":"Free Minutes","90s":"Recharge Credit","91s":"Etisalat Bundle","92s":"Smiles Offer","93s":"Data Offer","94s":"International Minutes","95s":"Local Minutes","96s":"Combo Pack","97s":"Local/International Minutes","98s":"SMS Offer Object","99s":"Free International Minutes","100s":"Free SMS Offer","101s":"Data Deal","102s":"Minutes Deal","103s":"SMS Deal","104s":"Combo Offer","105s":"National Minutes","106s":"Internet Calling Plan"},"11c":{"111s":"Fashion & Jewellery"}};
 
 function format(data) {
     const categoryID = data.data.CATEGORY_ID.toString();
     data.data.CATEGORY_ID = category[categoryID] || "Not Defined";
     if (categoryID) {
-        console.log(subcategory[category])
-        data.data.SUB_CATEGORY_ID = ((subcategory[data.data.CATEGORY_ID])[data.data.SUB_CATEGORY_ID]) || "Not Defined";
+        data.data.SUB_CATEGORY_ID = ((subcategory[categoryID+'c'])[data.data.SUB_CATEGORY_ID+'s']) || "Not Defined";
     }
 
 
@@ -35,7 +33,7 @@ exports.viewItem = function (payload, UUIDKey, route, callback, JWToken) {
         .then(function (parsedBody) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
-            const formattedData = format(parsedBody);
+            let formattedData = format(parsedBody);
             callback(formattedData);
         })
         .catch(function (err) {
