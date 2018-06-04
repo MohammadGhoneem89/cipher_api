@@ -2,7 +2,7 @@
 var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
-const smilesContract = require('../../lib/services/smilesContracts');
+const smilesContract = require('../../../lib/services/smilesContracts');
 
 const contractAddresses = [{
     name: 'Merchant',
