@@ -3,12 +3,16 @@ var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
-function formatData(data){
-    data = data.map(value=>{
+function formatData(data) {
+    data = data.map(value => {
         value.value = value.contractAddress;
         return value;
     });
-    return data;
+    return {
+        "contracts": {
+            "data": contractAddresses
+        }
+    };
 }
 
 exports.getContractAddresses = function (payload, UUIDKey, route, callback, JWToken) {
@@ -33,7 +37,7 @@ exports.getContractAddresses = function (payload, UUIDKey, route, callback, JWTo
             logger.debug('==================== Request Failed==================' + err);
         });
 
-   
+
 }
 
 
