@@ -592,7 +592,7 @@
     "getContractAddresses": {
       "customMapping": true,
       "MappingfunctionName": "getContractAddresses",
-      "CustomMappingFile": "smiles/merchant/getContractAddresses.js",
+      "CustomMappingFile": "smiles/general/getContractAddresses.js",
       "mappingConfigFile": "ePayMapping"
     },
     "getContractInformation":{
