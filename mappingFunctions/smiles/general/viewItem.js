@@ -9,7 +9,7 @@ const subcategory = { "3": { "31": "Malls & Hypermarkets", "32": "Fashion & Jewe
 function format(data) {
     const categoryID = data.data.CATEGORY_ID.toString();
     data.data.CATEGORY_ID = category[categoryID] || "Not Defined";
-    if (categoryID && subcategory[categoryID]) {
+    if (categoryID) {
         console.log(categoryID)
         data.data.SUB_CATEGORY_ID = ((subcategory[data.data.CATEGORY_ID])[data.data.SUB_CATEGORY_ID]) || "Not Defined";
     }
