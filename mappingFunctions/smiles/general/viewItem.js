@@ -18,6 +18,7 @@ const category = [
 
 function format(data) {
     data.CATEGORY_ID = category[data.CATEGORY_ID];
+    console.log(data)
     return {
         action: 'viewItem',
         viewItem: data
