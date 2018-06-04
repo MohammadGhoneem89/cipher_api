@@ -2,23 +2,36 @@
 var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
-const smilesContract = require('../../../lib/services/smilesContracts');
 
-const contractAddresses = [{
-    name: 'Merchant',
-    value: '0x25fD7831ccc5F4d7124e0579e89495420d82b5E0'
-}]
+function formatData(data){
+    data = data.map(value=>{
+        data.value = value.contractAddress;
+        return data;
+    });
+    return data;
+}
 
 exports.getContractAddresses = function (payload, UUIDKey, route, callback, JWToken) {
-
+    let URL = config['host'] + '/other/getAll';
+    var options = {
+        method: 'POST',
+        uri: URL,
+        body: payload,
+        json: true // Automatically stringifies the body to JSON
+    };
     logger.info("The notification going is as follows" + JSON.stringify(payload))
-    smilesContract.getAll().then(data=>{
-        callback({
-            "contracts": {
-                "data": data
-            }
+
+    rp(options)
+        .then(function (parsedBody) {
+            logger.debug(JSON.stringify(parsedBody));
+            logger.debug('==================== Sent Successfully==================');
+            const formattedData = formatData(parsedBody);
+            callback(formattedData);
+        })
+        .catch(function (err) {
+            // POST failed...
+            logger.debug('==================== Request Failed==================' + err);
         });
-    })
 
    
 }
