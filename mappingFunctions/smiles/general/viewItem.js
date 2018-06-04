@@ -3,10 +3,12 @@ var config = require('../../../api/bootstrap/smiles.json')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 const category = [ "None", "New Offers", "Trending Offers", "Shopping Offers", "Dining Offers", "Entertainment Offers", "Wellness Offers", "Travel Offers", "Etisalat Services", "Financial", "Other", "Shopping" ];
-const subcategory = ["Free Credit", "Free Minutes", "Recharge Credit", "Etisalat Bundle", "Smiles Offer", "Data Offer", "International Minutes", "Local Minutes", "Combo Pack", "Local/International Minutes", "SMS Offer Object", "Free International Minutes", "Free SMS Offer", "Services", "Malls & Hypermarkets", "Fashion & Jewellery", "Home & Lifestyle", "Cafes", "Family & Casual", "SEE", "DO", "Health", "Grooming", "Airlines", "Hotels", "Holidays", "Voice Package", "Data Package", "Roaming Package", "Beauty", "Minutes Deal", "Data Deal", "Car Hire", "Fine Dining", "SMS Deal", "Internet Calling Plan", "SMS Package", "National Minutes", "Training", "Combo Offer", "Hotel", "Gifts", "Family & Casual", "Charity", "Services", "Theme Parks", "Sports and Leisure", "Learning", "Fashion & Jewellery"];
+const subcategory = {"3":{"31":"Malls & Hypermarkets","32":"Fashion & Jewellery","33":"Home & Lifestyle","34":"Services","35":"Gifts","36":"Services"},"4":{"41":"Cafes","42":"Family & Casual","43":"Fine Dining"},"5":{"51":"SEE","52":"DO","53":"Family & Casual","54":"Sports and Leisure","55":"Theme Parks"},"6":{"61":"Health","62":"Grooming","63":"Beauty","64":"Training","65":"Charity","66":"Learning"},"7":{"71":"Airlines","72":"Hotels","73":"Holidays","74":"Car Hire","75":"Hotel"},"8":{"81":"Voice Package","82":"Data Package","83":"Roaming Package","86":"SMS Package","87":"Free Credit","88":"Free Minutes","90":"Recharge Credit","91":"Etisalat Bundle","92":"Smiles Offer","93":"Data Offer","94":"International Minutes","95":"Local Minutes","96":"Combo Pack","97":"Local/International Minutes","98":"SMS Offer Object","99":"Free International Minutes","100":"Free SMS Offer","101":"Data Deal","102":"Minutes Deal","103":"SMS Deal","104":"Combo Offer","105":"National Minutes","106":"Internet Calling Plan"},"11":{"111":"Fashion & Jewellery"}};
+
+
 function format(data) {
     data.data.CATEGORY_ID = category[data.data.CATEGORY_ID]||"Not Defined";
-    data.data.SUB_CATEGORY_ID = category[data.data.SUB_CATEGORY_ID+31]||"Not Defined";
+    data.data.SUB_CATEGORY_ID = subcategory[data.data.CATEGORY_ID][data.data.SUB_CATEGORY_ID]||"Not Defined";
 
     return {
         action: 'viewItem',
