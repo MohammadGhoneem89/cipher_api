@@ -10,7 +10,7 @@ function formatData(data) {
     });
     return {
         "contracts": {
-            "data": contractAddresses
+            "data": data
         }
     };
 }
@@ -30,7 +30,6 @@ exports.getContractAddresses = function (payload, UUIDKey, route, callback, JWTo
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
             const formattedData = formatData(parsedBody);
-            console.log(formattedData)
             callback(formattedData);
         })
         .catch(function (err) {
