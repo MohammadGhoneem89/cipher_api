@@ -6,7 +6,7 @@ const category = [ "None", "New Offers", "Trending Offers", "Shopping Offers", "
 const subcategory = ["Free Credit", "Free Minutes", "Recharge Credit", "Etisalat Bundle", "Smiles Offer", "Data Offer", "International Minutes", "Local Minutes", "Combo Pack", "Local/International Minutes", "SMS Offer Object", "Free International Minutes", "Free SMS Offer", "Services", "Malls & Hypermarkets", "Fashion & Jewellery", "Home & Lifestyle", "Cafes", "Family & Casual", "SEE", "DO", "Health", "Grooming", "Airlines", "Hotels", "Holidays", "Voice Package", "Data Package", "Roaming Package", "Beauty", "Minutes Deal", "Data Deal", "Car Hire", "Fine Dining", "SMS Deal", "Internet Calling Plan", "SMS Package", "National Minutes", "Training", "Combo Offer", "Hotel", "Gifts", "Family & Casual", "Charity", "Services", "Theme Parks", "Sports and Leisure", "Learning", "Fashion & Jewellery"];
 function format(data) {
     data.data.CATEGORY_ID = category[data.data.CATEGORY_ID]||"Not Defined";
-    data.data.SUB_CATEGORY_ID = category[data.data.SUB_CATEGORY_ID+87]||"Not Defined";
+    data.data.SUB_CATEGORY_ID = category[data.data.SUB_CATEGORY_ID+31]||"Not Defined";
 
     return {
         action: 'viewItem',
