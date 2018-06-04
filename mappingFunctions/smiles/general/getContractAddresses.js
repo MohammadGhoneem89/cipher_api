@@ -7,12 +7,14 @@ const contractAddresses = [{
     name: 'Sharaf DG',
     value: '0xfAD8CcA0aB96c0048AeC12f259514BA54D8b1e36'
 }]
-exports.getContractAddresses = function(payload, UUIDKey, route, callback, JWToken) {
+exports.getContractAddresses = function (payload, UUIDKey, route, callback, JWToken) {
 
     logger.info("The notification going is as follows" + JSON.stringify(payload))
 
     callback({
-        Contracts: contractAddresses
+        "contracts": {
+            "data": contractAddresses
+        }
     });
 }
 
