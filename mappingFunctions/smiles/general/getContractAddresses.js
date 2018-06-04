@@ -5,8 +5,8 @@ const logger = require('../../../lib/helpers/logger')().app;
 
 function formatData(data){
     data = data.map(value=>{
-        data.value = value.contractAddress;
-        return data;
+        value.value = value.contractAddress;
+        return value;
     });
     return data;
 }
