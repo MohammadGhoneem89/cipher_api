@@ -30,6 +30,7 @@ exports.getContractAddresses = function (payload, UUIDKey, route, callback, JWTo
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
             const formattedData = formatData(parsedBody);
+            console.log(formattedData)
             callback(formattedData);
         })
         .catch(function (err) {
