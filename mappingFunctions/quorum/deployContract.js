@@ -5,9 +5,10 @@ const logger = require('../../lib/helpers/logger')().app;
 const consortium = require('../../lib/services/consortium');
 
 exports.deployContract = function (payload, UUIDKey, route, callback, JWToken) {
-    const URL = config['host'] + '/contract/deploy';
 
-    /*var options = {
+    /*
+        const URL = config['host'] + '/contract/deploy';
+    var options = {
         method: 'POST',
         uri: URL,
         body: payload,

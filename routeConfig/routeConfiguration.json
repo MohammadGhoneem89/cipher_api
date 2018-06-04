@@ -588,6 +588,12 @@
       "MappingfunctionName": "resolveEscrow",
       "CustomMappingFile": "smiles/merchant/resolveEscrow.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getContractAddresses": {
+      "customMapping": true,
+      "MappingfunctionName": "getContractAddresses",
+      "CustomMappingFile": "smiles/merchant/getContractAddresses.js",
+      "mappingConfigFile": "ePayMapping"
     }
   }
 }
