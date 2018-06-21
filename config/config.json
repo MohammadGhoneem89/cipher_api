@@ -1,10 +1,10 @@
 {
   "keyVault": {
-    "env": "development",
+    "env": "core",
     "header":{
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
     },
-    "url": "http://51.144.125.224:9009/keyVault"
+    "url": "http://10.65.12.11:9019/keyVault"
   }
 }

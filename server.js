@@ -71,13 +71,6 @@ app.use(express.static('public'));
 app.use(express.static('exports'));
 app.use('/reporting', express());
 
-jsReport({
-  express: {app: app, server: appServer},
-  appPath: '/reporting'
-}).init()
-  .catch(function (e) {
-    logger.error(e, 'JS report error');
-  });
 
 MQ.start(ReadIncomingMessage);
 

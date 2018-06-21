@@ -2,7 +2,7 @@
 
 const logger = require('../api/bootstrap/logger').app;
 var config = require('../AppConfig');
-var Core = require('../Core/APICore.js');
+var Core = require('../GRPCCore/APICore.js');
 var RSVP = require('rsvp');
 
 var processTrnx = function (trnxId, trnxPayLoad, callback) {
