@@ -11,7 +11,6 @@ const clientIp = require('client-ip');
 const cors = require('cors');
 const rp = require('request-promise');
 const renderExport = require('./exports');
-const generateReports = require('./reports');
 let app = express();
 const expressWs = require('express-ws')(app);
 const crypto = require('./lib/helpers/crypto');
@@ -605,13 +604,6 @@ app.get('/reports', function (req, res) {
     JWT: JWToken,
     nationalization: language
   };
-  try {
-    generateReports(jsReport, payload, res, type);
-  }
-  catch (e) {
-    res.send(e);
-    return res.end();
-  }
 });
 
 app.post('/passOn', function (req, res) {
@@ -619,20 +611,6 @@ app.post('/passOn', function (req, res) {
 
   ReadIncomingMessage_Processing(req.body.msg);
 
-});
-
-const getFilterData = require('./reports/getFilterData');
-app.post('/getFilter', function (req, res) {
-  const id = req.body.id;
-  getFilterData(id)
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((e) => {
-      const error = e.stack || e;
-      res.send(error);
-      return res.end();
-    });
 });
 
 const couchQuery = require('./lib/couch/selectWithProjection');
