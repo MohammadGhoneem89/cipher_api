@@ -29,9 +29,6 @@ const authUser = require('./lib/auth/user');
 const logger = require('./Core/api/bootstrap/logger').app;
 
 const serverStats = require('./lib/services/serverStats');
-const couchViews = require('./CreateCouchViews.js');
-
-couchViews.Sync(config.get('couch.host') + ':' + config.get('couch.port'), config.get('couch.channel'));
 
 process.on('uncaughtException', (err) => {
   logger.error({fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack}, 'uncaught exception');
