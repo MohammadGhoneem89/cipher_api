@@ -1,8 +1,0 @@
-{
-	"containerData":{
-					"action":"getBatchById",
-					"data": {
-						"batchId": 215411
-					}
-			}
-}

@@ -4,7 +4,7 @@ const config = require('./config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const uuid = require('uuid/v1');
-const db = require('./database/db')(); // eslint-disable-line
+const db = require('./Core/database/db')(); // eslint-disable-line
 const jsReport = require('jsreport');
 const url = require('url');
 const clientIp = require('client-ip');
@@ -15,22 +15,21 @@ const generateReports = require('./reports');
 let app = express();
 const expressWs = require('express-ws')(app);
 const crypto = require('./lib/helpers/crypto');
-const RestController = require('./Controller/RestController.js');
+const RestController = require('./Core/Controller/RestController.js');
 const MQ = require('./MQListener.js');
-const mongoDB = require('./api/bootstrap/mongoDB');
+const mongoDB = require('./Core/api/bootstrap/mongoDB');
 const fileUpload = require('express-fileupload');
-const imageUpload = require('./validation/imageUpload');
-const fileUploadValid = require('./validation/fileUpload');
+const imageUpload = require('./Core/validation/imageUpload');
+const fileUploadValid = require('./Core/validation/fileUpload');
 const permissions = require('./lib/middleware/permissions');
 const docPermissions = require('./lib/middleware/docPermission');
 const requestLog = require('./lib/middleware/requesLog');
 const authUser = require('./lib/auth/user');
 
-const logger = require('./api/bootstrap/logger').app;
+const logger = require('./Core/api/bootstrap/logger').app;
 
 const serverStats = require('./lib/services/serverStats');
 const couchViews = require('./CreateCouchViews.js');
-const chrono = require('./background/app.js');
 
 couchViews.Sync(config.get('couch.host') + ':' + config.get('couch.port'), config.get('couch.channel'));
 
@@ -424,7 +423,7 @@ app.post('/uploadImg', function (req, res) {
   }
 });
 
-const getUpload = require('./validation/getUpload.js');
+const getUpload = require('./Core/validation/getUpload.js');
 
 app.get('/getUploadedFile/:id', docPermissions, function (req, res) {
   const UUID = req.params.id;
@@ -436,7 +435,7 @@ app.get('/getUploadedFile/:id', docPermissions, function (req, res) {
 
 });
 
-const getDocUpload = require('./validation/getDocUpload.js');
+const getDocUpload = require('./Core/validation/getDocUpload.js');
 
 app.get('/getDocUpload/:id', docPermissions, function (req, res) {
   const id = req.params.id;

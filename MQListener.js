@@ -4,7 +4,7 @@ const config = require('./AppConfig');
 const gConfig = require('./config');
 const crypto = require('./lib/helpers/crypto');
 const uuid = require('uuid/v1');
-const logger = require('./api/bootstrap/logger').app;
+const logger = require('./Core/api/bootstrap/logger').app;
 
 const MQConnStr = crypto.decrypt(gConfig.get('amqp.url'));
 
