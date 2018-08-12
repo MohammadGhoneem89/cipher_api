@@ -17,7 +17,7 @@ var fileTemplateDetailOut = function(payload,UUIDKey,route,callback,JWToken){
 	
     fileTemplateDetail(payload,callback);
 	 
-}
+};
 
 
 var fileTemplateDetail = function (payload,fileTemplateGet_CB) {
@@ -73,6 +73,6 @@ var fileTemplateDetail = function (payload,fileTemplateGet_CB) {
                     });
             }
         });
-}
+};
 
 exports.fileTemplateDetailOut = fileTemplateDetailOut;
