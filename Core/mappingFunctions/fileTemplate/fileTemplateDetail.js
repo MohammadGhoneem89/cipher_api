@@ -1,5 +1,5 @@
 const log4js = require('log4js');
-const logger = require('../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 const pointer = require("json-pointer");
 const permissionsHelper = require('../../lib/helpers/permissions');
 const permissionConst = require('../../lib/constants/permissions');

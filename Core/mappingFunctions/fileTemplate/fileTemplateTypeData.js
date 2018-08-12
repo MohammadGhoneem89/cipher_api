@@ -1,5 +1,5 @@
 
-var logger = require('../../lib/helpers/logger')().app;
+var logger = require('../../../lib/helpers/logger')().app;
 
 
 function getFileTemplateData(getFileTemplateData_CB){

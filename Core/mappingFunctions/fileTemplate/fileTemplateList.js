@@ -1,5 +1,5 @@
 
-const logger = require('../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 const typeData = require("./fileTemplateTypeData");
 const pointer = require("json-pointer");
 const permissionsHelper = require('../../lib/helpers/permissions');
