@@ -1,7 +1,7 @@
 'use strict';
 
-const commissionTemplate = require('../../lib/services/commissionTemplate');
-const commissionRepo = require("../../lib/repositories/commissionTemplate");
+const commissionTemplate = require('../../../lib/services/commissionTemplate');
+const commissionRepo = require("../../../lib/repositories/commissionTemplate");
 
 function commissionTemplateInsert(payload, UUIDKey, route, callback, JWToken) {
     payload.createdBy = JWToken._id;

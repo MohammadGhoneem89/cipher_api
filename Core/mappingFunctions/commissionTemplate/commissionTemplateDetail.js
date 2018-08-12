@@ -1,6 +1,6 @@
 'use strict';
 
-const commissionTemplate = require('../../lib/services/commissionTemplate');
+const commissionTemplate = require('../../../lib/services/commissionTemplate');
 var pointer = require("json-pointer");
 
 function get(payload, UUIDKey, route, callback, JWToken) {

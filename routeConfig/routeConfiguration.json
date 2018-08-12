@@ -66,6 +66,30 @@
       "CustomMappingFile": "fileTemplate/fileTemplateList.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "commissionTemplateList": {
+      "customMapping": true,
+      "MappingfunctionName": "commissionTemplateListOut",
+      "CustomMappingFile": "commissionTemplate/commissionTemplateList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "commissionTemplateDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "get",
+      "CustomMappingFile": "commissionTemplate/commissionTemplateDetail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "commissionTemplateInsert": {
+      "customMapping": true,
+      "MappingfunctionName": "commissionTemplateInsert",
+      "CustomMappingFile": "commissionTemplate/commissionTemplateInsert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "commissionTemplateUpdate": {
+      "customMapping": true,
+      "MappingfunctionName": "commissionTemplateUpdateOut",
+      "CustomMappingFile": "commissionTemplate/commissionTemplateUpdate.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "typeData": {
       "customMapping": true,
       "MappingfunctionName": "typeDataOut",
