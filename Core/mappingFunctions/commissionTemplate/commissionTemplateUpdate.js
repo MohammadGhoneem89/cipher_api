@@ -1,8 +1,8 @@
 'use strict';
 
-const commissionTemplate = require('../../lib/services/commissionTemplate');
+const commissionTemplate = require('../../../lib/services/commissionTemplate');
 const commissionPolicy = require('../getCommissionPolicy');
-const dates = require('../../lib/helpers/dates');
+const dates = require('../../../lib/helpers/dates');
 
 function commissionTemplateUpdateOut(payload, UUIDKey, route, callback, JWToken){
     payload.userId = JWToken._id;

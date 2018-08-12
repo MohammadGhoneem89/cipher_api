@@ -1,6 +1,6 @@
 'use strict';
-const logger = require('../../lib/helpers/logger')().app;
-const commissionTemplate = require('../../lib/services/commissionTemplate');
+const logger = require('../../../lib/helpers/logger')().app;
+const commissionTemplate = require('../../../lib/services/commissionTemplate');
 const _ = require('lodash');
 const pointer = require('json-pointer');
 
