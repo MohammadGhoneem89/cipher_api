@@ -2,8 +2,8 @@
 const logger = require('../../../lib/helpers/logger')().app;
 const typeData = require("./fileTemplateTypeData");
 const pointer = require("json-pointer");
-const permissionsHelper = require('../../lib/helpers/permissions');
-const permissionConst = require('../../lib/constants/permissions');
+const permissionsHelper = require('../../../lib/helpers/permissions');
+const permissionConst = require('../../../lib/constants/permissions');
 
 var fileTemplateListOut = function (payload, UUIDKey, route, callback, JWToken) {
 

@@ -4,8 +4,8 @@ var logger = require('../../../lib/helpers/logger')().app;
 var Validate = require("../../validation/validate.js");
 var validType = require("../../validation/validationFields");
 var pointer = require("json-pointer");
-const auditLog = require('../../lib/services/auditLog');
-const commonConst = require('../../lib/constants/common');
+const auditLog = require('../../../lib/services/auditLog');
+const commonConst = require('../../../lib/constants/common');
 
 var fileTemplateUpdateOut = function(payload,UUIDKey,route,callback,JWToken){
 
