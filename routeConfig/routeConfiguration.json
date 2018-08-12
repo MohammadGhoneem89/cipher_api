@@ -42,6 +42,30 @@
       "CustomMappingFile": "user/details.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "fileTemplateDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "fileTemplateDetailOut",
+      "CustomMappingFile": "fileTemplate/fileTemplateDetail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "fileTemplateInsert": {
+      "customMapping": true,
+      "MappingfunctionName": "fileTemplateInsertOut",
+      "CustomMappingFile": "fileTemplate/fileTemplateInsert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "fileTemplateUpdate": {
+      "customMapping": true,
+      "MappingfunctionName": "fileTemplateUpdateOut",
+      "CustomMappingFile": "fileTemplate/fileTemplateUpdate.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "fileTemplateList": {
+      "customMapping": true,
+      "MappingfunctionName": "fileTemplateListOut",
+      "CustomMappingFile": "fileTemplate/fileTemplateList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "typeData": {
       "customMapping": true,
       "MappingfunctionName": "typeDataOut",
