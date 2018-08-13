@@ -354,6 +354,54 @@
       "CustomMappingFile": "getFilterData.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "unlockUser": {
+      "customMapping": true,
+      "MappingfunctionName": "unlock",
+      "CustomMappingFile": "user/unlock.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "typeDataList": {
+      "customMapping": true,
+      "MappingfunctionName": "typeDataList",
+      "CustomMappingFile": "typeData/getTypeDataList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTypeDataDetailByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getTypeDataDetailById",
+      "CustomMappingFile": "typeData/getTypeDataDetailByID.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "insertTypeDataObject": {
+      "customMapping": true,
+      "MappingfunctionName": "insertTypeDataObject",
+      "CustomMappingFile": "typeData/insertTypeDataObject.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateTypeData": {
+      "customMapping": true,
+      "MappingfunctionName": "updateTypeData",
+      "CustomMappingFile": "typeData/updateTypeData.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "createPasswordPolicy": {
+      "customMapping": true,
+      "MappingfunctionName": "createPasswordPolicy",
+      "CustomMappingFile": "passwordPolicy/create.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updatePasswordPolicy": {
+      "customMapping": true,
+      "MappingfunctionName": "updatePasswordPolicy",
+      "CustomMappingFile": "passwordPolicy/update.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "fetchAllPasswordPolicy": {
+      "customMapping": true,
+      "MappingfunctionName": "fetchAllPasswordPolicy",
+      "CustomMappingFile": "passwordPolicy/fetchAll.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "consortiumSearch": {
       "customMapping": true,
       "MappingfunctionName": "consortiumList",
