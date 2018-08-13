@@ -3,7 +3,7 @@
  */
 'use strict';
 
-const passwordPolicy = require('../../lib/services/passwordPolicy');
+const passwordPolicy = require('../../../lib/services/passwordPolicy');
 
 
 function updatePasswordPolicy(payload, UUIDKey, route, callback, JWToken) {
