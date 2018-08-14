@@ -1,24 +1,25 @@
 'use strict';
-var config = require('../../../api/bootstrap/smiles.json')
+var config = require('../../../Core/api/bootstrap/smiles.json')
 const rp = require('request-promise');
-const logger = require('../../../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 function format(data) {
     data.data = data.data.map(value => {
         value['actions'] = [{
             actionType: "COMPONENT_FUNCTION",
             iconName: "fa fa-cogs",
             label: "View Transactions"
-        }]
+        }];
+
         return value
     })
     return {
-        action: 'Settlements',
-        settlements: data
+        action: 'completedSettlements',
+        completedSettlements: data
     }
 }
 
-exports.viewSettlements = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/getSettlementHistory';
+exports.viewCompletedSettlements = function (payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/provider/completedSettlements';
     var options = {
         method: 'POST',
         uri: URL,

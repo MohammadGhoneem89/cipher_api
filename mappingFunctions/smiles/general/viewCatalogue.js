@@ -1,25 +1,30 @@
 'use strict';
-var config = require('../../../api/bootstrap/smiles.json')
+var config = require('../../../Core/api/bootstrap/smiles.json')
 const rp = require('request-promise');
-const logger = require('../../../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
+
 function format(data){
     data.data = data.data.map(value=>{
-        const status = parseInt(value.status)||0;
-            value['actions'] = [{
-                actionType: "COMPONENT_FUNCTION",
-                iconName: "fa fa-eye",
-                label: "View More"
-            }];
-        return value
-    })
+        if(value.status===false){
+            value.status = {type: "ERROR", value: "INACTIVE"};
+        } else {
+            value.status = {type: "OK", value: "ACTIVE"}
+        }
+        value['actions'] = [{
+            actionType: "COMPONENT_FUNCTION",
+            iconName: "fa fa-eye",
+            label: "View more"
+        }]
+        return value;
+    });
     return {
-        action: 'Transactions',
-        transactions: data
+        action: 'Catalogue',
+        catalogue: data
     }
 }
 
-exports.viewTransactions = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/getSettlementTransactions';
+exports.viewCatalogue = function(payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/catalogue';
     var options = {
         method: 'POST',
         uri: URL,
@@ -43,14 +48,4 @@ exports.viewTransactions = function (payload, UUIDKey, route, callback, JWToken)
 
 
 
-/*
-viewSettlements({  "contractAddress":"0xefB08EA7690ABB57FC069617509a059Ec3672409",
-"settlementNumber":"1",
-"page":{
-  "currentPageNo":1,
-  "pageSize":1
-}}, "", "", function (data) {
-    console.log(data.orders)
-}
-    , "") 
-*/
+

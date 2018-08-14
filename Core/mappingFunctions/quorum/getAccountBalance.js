@@ -1,11 +1,11 @@
 'use strict';
-var config = require('../../api/bootstrap/quorum.json')
+let config = require('../../api/bootstrap/quorum.json');
 const rp = require('request-promise');
-const logger = require('../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 
 exports.getAccountBalance = function (payload, UUIDKey, route, callback, JWToken) {
     const URL = config['host'] + '/blockchain/account/'+payload['address'];
-    var options = {
+    let options = {
         method: 'GET',
         uri: URL,
         json: true // Automatically stringifies the body to JSON

@@ -1,10 +1,19 @@
 'use strict';
-var config = require('../../../api/bootstrap/smiles.json')
+var config = require('../../../Core/api/bootstrap/smiles.json')
 const rp = require('request-promise');
-const logger = require('../../../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 
-exports.placeOrder = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/provider/placeOrder';
+function format(data) {
+    return {
+        txInfo: {
+            action: 'txInfo',
+            data: data
+        }
+    }
+}
+
+exports.getTxCard = function (payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/provider/getTxCard';
     var options = {
         method: 'POST',
         uri: URL,
@@ -17,7 +26,8 @@ exports.placeOrder = function (payload, UUIDKey, route, callback, JWToken) {
         .then(function (parsedBody) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
-            callback(parsedBody);
+            const formattedData = format(parsedBody);
+            callback(formattedData);
         })
         .catch(function (err) {
             // POST failed...

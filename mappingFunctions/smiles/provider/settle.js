@@ -1,7 +1,7 @@
 'use strict';
-var config = require('../../../api/bootstrap/smiles.json')
+var config = require('../../../Core/api/bootstrap/smiles.json')
 const rp = require('request-promise');
-const logger = require('../../../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 
 function formatData(parsedBody) {
     let response = {
@@ -14,7 +14,7 @@ function formatData(parsedBody) {
         response.SettlementResponse.data = {
             "message": {
                 "status": "OK",
-                "errorDescription": "Request Successfull",
+                "errorDescription": "Settlement Successfull",
                 "displayToUser": true
             }
         };
@@ -22,7 +22,7 @@ function formatData(parsedBody) {
         response.SettlementResponse.data = {
             "message": {
                 "status": "ERROR",
-                "errorDescription": "Request Failed",
+                "errorDescription": "Settlement Failed",
                 "displayToUser": true
             }
         };
@@ -31,8 +31,8 @@ function formatData(parsedBody) {
 
 }
 
-exports.requestForSettlement = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/merchant/requestForSettlement';
+exports.settle = function (payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/provider/settle';
     var options = {
         method: 'POST',
         uri: URL,
@@ -45,7 +45,7 @@ exports.requestForSettlement = function (payload, UUIDKey, route, callback, JWTo
         .then(function (parsedBody) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
-            let formattedData = formatData(parsedBody);
+            let formattedData = formatData(parsedBody)
             callback(formattedData);
         })
         .catch(function (err) {

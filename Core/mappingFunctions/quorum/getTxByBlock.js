@@ -1,12 +1,12 @@
 'use strict';
-var config = require('../../api/bootstrap/quorum.json')
+let config = require('../../api/bootstrap/quorum.json');
 const rp = require('request-promise');
-const logger = require('../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 
 exports.txFromBlockAndIndex = function (payload, UUIDKey, route, callback, JWToken) {
     let URL = config['host'] ;
     URL += '/blockchain/getTxByBlock';
-    var options = {
+    let options = {
         method: 'POST',
         uri: URL,
         body: payload,

@@ -1,18 +1,18 @@
 'use strict';
-var config = require('../../api/bootstrap/quorum.json')
+let config = require('../../api/bootstrap/quorum.json');
 const rp = require('request-promise');
-const logger = require('../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 
 exports.contractSetter = function (payload, UUIDKey, route, callback, JWToken) {
     const URL = config['host'] + '/contract/'+payload['address']+'/set/'+payload['functionName'];
-    console.log(payload)
-    var options = {
+    console.log(payload);
+    let options = {
         method: 'POST',
         uri: URL,
         body: payload,
         json: true // Automatically stringifies the body to JSON
     };
-    logger.info("The notification going is as follows" + JSON.stringify(payload))
+    logger.info("The notification going is as follows" + JSON.stringify(payload));
 
     rp(options)
         .then(function (parsedBody) {

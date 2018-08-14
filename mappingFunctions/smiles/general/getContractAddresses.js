@@ -1,11 +1,22 @@
 'use strict';
-var config = require('../../../api/bootstrap/smiles.json')
+var config = require('../../../Core/api/bootstrap/smiles.json')
 const rp = require('request-promise');
-const logger = require('../../../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 
+function formatData(data) {
+    data = data.map(value => {
+        value.value = value.contractAddress;
+        return value;
+    });
+    return {
+        "contracts": {
+            "data": data
+        }
+    };
+}
 
-exports.getContractInformation = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/other/get';
+exports.getContractAddresses = function (payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/other/getAll';
     var options = {
         method: 'POST',
         uri: URL,
@@ -18,22 +29,17 @@ exports.getContractInformation = function (payload, UUIDKey, route, callback, JW
         .then(function (parsedBody) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
-            callback(parsedBody);
+            const formattedData = formatData(parsedBody);
+            callback(formattedData);
         })
         .catch(function (err) {
             // POST failed...
             logger.debug('==================== Request Failed==================' + err);
         });
+
+
 }
 
 
 
-/*
-viewSettlements({  "contractAddress":"0xefB08EA7690ABB57FC069617509a059Ec3672409",
-"page":{
-  "currentPageNo":1,
-  "pageSize":10
-}}, "", "", function (data) {
-    console.log(data.orders)
-}
-    , "") */
+

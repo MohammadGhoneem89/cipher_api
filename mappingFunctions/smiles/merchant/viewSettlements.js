@@ -1,29 +1,24 @@
 'use strict';
-var config = require('../../../api/bootstrap/smiles.json')
+var config = require('../../../Core/api/bootstrap/smiles.json')
 const rp = require('request-promise');
-const logger = require('../../../../lib/helpers/logger')().app;
-
+const logger = require('../../../lib/helpers/logger')().app;
 function format(data) {
     data.data = data.data.map(value => {
-        const status = parseInt(value.status) || 0;
-        value.paymentDetails = JSON.parse(value.paymentDetails);
-
         value['actions'] = [{
             actionType: "COMPONENT_FUNCTION",
             iconName: "fa fa-cogs",
-            label: "Complete Order"
+            label: "View Transactions"
         }]
-
-        return value;
+        return value
     })
     return {
-        action: 'PendingOrders',
-        pendingOrders: data
+        action: 'Settlements',
+        settlements: data
     }
 }
 
-exports.viewPendingOrders = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/merchant/pendingOrders';
+exports.viewSettlements = function (payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/getSettlementHistory';
     var options = {
         method: 'POST',
         uri: URL,
@@ -45,3 +40,14 @@ exports.viewPendingOrders = function (payload, UUIDKey, route, callback, JWToken
         });
 }
 
+
+
+/*
+viewSettlements({  "contractAddress":"0xefB08EA7690ABB57FC069617509a059Ec3672409",
+"page":{
+  "currentPageNo":1,
+  "pageSize":10
+}}, "", "", function (data) {
+    console.log(data.orders)
+}
+    , "") */

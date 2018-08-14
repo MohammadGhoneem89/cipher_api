@@ -1,19 +1,25 @@
 'use strict';
-var config = require('../../../api/bootstrap/smiles.json')
+var config = require('../../../Core/api/bootstrap/smiles.json')
 const rp = require('request-promise');
-const logger = require('../../../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 
-function format(data) {
+function format(data, contractAddress){
+    data.data.points['actions']=[{
+        actionType: "COMPONENT_FUNCTION",
+        iconName: "fa fa-cogs",
+        label: "Request Settlement"
+    }];
+    data.data.points['name']='Smiles';
+    data.data.points['contractAddress'] = contractAddress;
     return {
-        txInfo: {
-            action: 'txInfo',
-            data: data
+        action: 'Points',
+        points:{ data:[data.data.points]
         }
     }
 }
 
-exports.getTxCard = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/provider/getTxCard';
+exports.viewPoints = function(payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/points';
     var options = {
         method: 'POST',
         uri: URL,
@@ -26,7 +32,7 @@ exports.getTxCard = function (payload, UUIDKey, route, callback, JWToken) {
         .then(function (parsedBody) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
-            const formattedData = format(parsedBody);
+            const formattedData = format(parsedBody, payload['contractAddress']);
             callback(formattedData);
         })
         .catch(function (err) {
@@ -34,15 +40,3 @@ exports.getTxCard = function (payload, UUIDKey, route, callback, JWToken) {
             logger.debug('==================== Request Failed==================' + err);
         });
 }
-
-
-
-/*
-viewSettlements({  "contractAddress":"0xefB08EA7690ABB57FC069617509a059Ec3672409",
-"page":{
-  "currentPageNo":1,
-  "pageSize":10
-}}, "", "", function (data) {
-    console.log(data.orders)
-}
-    , "") */

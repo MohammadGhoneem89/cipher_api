@@ -1,25 +1,11 @@
 'use strict';
-var config = require('../../../api/bootstrap/smiles.json')
+var config = require('../../../Core/api/bootstrap/smiles.json')
 const rp = require('request-promise');
-const logger = require('../../../../lib/helpers/logger')().app;
-function format(data) {
-    data.data = data.data.map(value => {
-        value['actions'] = [{
-            actionType: "COMPONENT_FUNCTION",
-            iconName: "fa fa-cogs",
-            label: "View Transactions"
-        }];
+const logger = require('../../../lib/helpers/logger')().app;
 
-        return value
-    })
-    return {
-        action: 'completedSettlements',
-        completedSettlements: data
-    }
-}
 
-exports.viewCompletedSettlements = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/provider/completedSettlements';
+exports.getContractInformation = function (payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/other/get';
     var options = {
         method: 'POST',
         uri: URL,
@@ -32,8 +18,7 @@ exports.viewCompletedSettlements = function (payload, UUIDKey, route, callback, 
         .then(function (parsedBody) {
             logger.debug(JSON.stringify(parsedBody));
             logger.debug('==================== Sent Successfully==================');
-            const formattedData = format(parsedBody);
-            callback(formattedData);
+            callback(parsedBody);
         })
         .catch(function (err) {
             // POST failed...

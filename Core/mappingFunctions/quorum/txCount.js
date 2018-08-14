@@ -1,12 +1,12 @@
 'use strict';
-var config = require('../../api/bootstrap/quorum.json')
+let config = require('../../api/bootstrap/quorum.json');
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
 exports.txCount = function (payload, UUIDKey, route, callback, JWToken) {
     
     let URL = config['host'] + '/blockchain/block/' + payload['blockNumber'] + '/count';
-    var options = {
+    let options = {
         method: 'GET',
         uri: URL,
         json: true // Automatically stringifies the body to JSON

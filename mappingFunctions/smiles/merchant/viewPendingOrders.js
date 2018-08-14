@@ -1,30 +1,29 @@
 'use strict';
-var config = require('../../../api/bootstrap/smiles.json')
+var config = require('../../../Core/api/bootstrap/smiles.json')
 const rp = require('request-promise');
-const logger = require('../../../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 
-function format(data){
-    data.data = data.data.map(value=>{
-        if(value.status===false){
-            value.status = {type: "ERROR", value: "INACTIVE"};
-        } else {
-            value.status = {type: "OK", value: "ACTIVE"}
-        }
+function format(data) {
+    data.data = data.data.map(value => {
+        const status = parseInt(value.status) || 0;
+        value.paymentDetails = JSON.parse(value.paymentDetails);
+
         value['actions'] = [{
             actionType: "COMPONENT_FUNCTION",
-            iconName: "fa fa-eye",
-            label: "View more"
+            iconName: "fa fa-cogs",
+            label: "Complete Order"
         }]
+
         return value;
-    });
+    })
     return {
-        action: 'Catalogue',
-        catalogue: data
+        action: 'PendingOrders',
+        pendingOrders: data
     }
 }
 
-exports.viewCatalogue = function(payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/catalogue';
+exports.viewPendingOrders = function (payload, UUIDKey, route, callback, JWToken) {
+    let URL = config['host'] + '/merchant/pendingOrders';
     var options = {
         method: 'POST',
         uri: URL,
@@ -45,7 +44,4 @@ exports.viewCatalogue = function(payload, UUIDKey, route, callback, JWToken) {
             logger.debug('==================== Request Failed==================' + err);
         });
 }
-
-
-
 
