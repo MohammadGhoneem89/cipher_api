@@ -1,6 +1,6 @@
 'use strict';
 
-const typeData = require('../../lib/services/typeData');
+const typeData = require('../../../lib/services/typeData');
 
 
 function insertTypeDataObject(payload, UUIDKey, route, callback, JWToken) {

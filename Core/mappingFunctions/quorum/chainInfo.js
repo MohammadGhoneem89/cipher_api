@@ -5,14 +5,13 @@ const logger = require('../../../lib/helpers/logger')().app;
 
 exports.info = function (payload, UUIDKey, route, callback, JWToken) {
     const URL = config['host'] + '/blockchain';
-  console.log(URL, "YAHOOOOOOO");
     let options = {
         method: 'POST',
         uri: URL,
         body: payload,
         json: true // Automatically stringifies the body to JSON
     };
-    logger.info("The notification going is as follows" + JSON.stringify(payload))
+    logger.info("The notification going is as follows" + JSON.stringify(payload));
 
     rp(options)
         .then(function (parsedBody) {
@@ -24,6 +23,5 @@ exports.info = function (payload, UUIDKey, route, callback, JWToken) {
             // POST failed...
             logger.debug('==================== Request Failed==================' + err);
         });
-  console.log(URL, "CALLED");
 };
 

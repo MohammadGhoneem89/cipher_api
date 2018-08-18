@@ -1,6 +1,6 @@
 'use strict';
 
-const typeData = require('../../lib/services/typeData');
+const typeData = require('../../../lib/services/typeData');
 let pointer = require("json-pointer");
 
 function typeDataList(payload, UUIDKey, route, callback, JWToken) {
