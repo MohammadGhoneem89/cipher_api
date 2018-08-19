@@ -18,12 +18,12 @@ var entityUpdateOut = function (payload, UUIDKey, route, callback, JWToken) {
     logger.debug(" [ Entit Update ] Route : " + route);
     logger.debug(" [ Entit Update ] JWToken : " + JSON.stringify(JWToken, null, 2));
 
-    entityUpdate(payload, JWToken._id, callback);
+    orgUpdate(payload, JWToken._id, callback);
 
 
 }
 
-var entityUpdate = function (payload, userID, entityUpdateCB) {
+var orgUpdate = function (payload, userID, entityUpdateCB) {
 
     logger.debug(" [ Entity Update ] Entity data in request : " + JSON.stringify(payload, 2));
     var response = {

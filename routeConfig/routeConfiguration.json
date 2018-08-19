@@ -402,6 +402,30 @@
       "CustomMappingFile": "passwordPolicy/fetchAll.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "orgDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "entityDetailOut",
+      "CustomMappingFile": "org/orgDetail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "orgList": {
+      "customMapping": true,
+      "MappingfunctionName": "entityListOut",
+      "CustomMappingFile": "org/orgList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "orgUpdate": {
+      "customMapping": true,
+      "MappingfunctionName": "entityUpdateOut",
+      "CustomMappingFile": "org/orgUpdate.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "orgInsert": {
+      "customMapping": true,
+      "MappingfunctionName": "entityInsertOut",
+      "CustomMappingFile": "org/orgInsert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "consortiumSearch": {
       "customMapping": true,
       "MappingfunctionName": "consortiumList",

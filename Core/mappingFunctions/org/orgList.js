@@ -14,13 +14,13 @@ var entityListOut = function (payload, UUIDKey, route, callback, JWToken) {
     logger.debug(" [ Entity List ] Route : " + route);
     logger.debug(" [ Entity List ] JWToken : " + JSON.stringify(JWToken, null, 2));
 
-    entityList(payload, callback, JWToken);
+    orgList(payload, callback, JWToken);
 
 
 }
 
 
-function entityList(body, entityList_CB, JWToken) {
+function orgList(body, entityList_CB, JWToken) {
 
     logger.debug(JSON.stringify(JWToken) + "     >>> JWToken");
     logger.debug(" [ Entity List ] Entity list Data : " + JSON.stringify(body));

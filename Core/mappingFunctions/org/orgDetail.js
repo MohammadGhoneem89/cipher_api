@@ -14,12 +14,12 @@ var entityDetailOut = function(payload,UUIDKey,route,callback,JWToken){
 	 logger.debug(" [ Entity Detail ] JWToken : "+JSON.stringify(JWToken,null,2));
 	 
 	 payload.userId = JWToken._id;
-	 entityDetail(payload,callback);
+	 orgDetail(payload,callback);
 	 
 }
 
 
-var entityDetail = function (payload,entityGetCB) {
+var orgDetail = function (payload, entityGetCB) {
 
    
     logger.debug(" [Entity Detail] Entity ID : " + payload.entityID);

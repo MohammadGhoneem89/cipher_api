@@ -16,12 +16,12 @@ var entityInsertOut = function(payload,UUIDKey,route,callback,JWToken){
     logger.debug(" [ Entity Insert ] Route : " + route);
     logger.debug(" [ Entity Insert ] JWToken : " + JSON.stringify(JWToken,null,2));
 
-    entityInsert(payload,JWToken._id,callback);
+    orgInsert(payload,JWToken._id,callback);
 
 
 };
 
-var entityInsert = function (payload,userID,entityInsertCB) {
+var orgInsert = function (payload, userID, entityInsertCB) {
 
     logger.debug(" [ Entity Insert] Entity Inserted data : " + JSON.stringify(payload));
 
