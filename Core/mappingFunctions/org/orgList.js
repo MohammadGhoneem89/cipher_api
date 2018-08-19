@@ -1,6 +1,6 @@
 
 const logger = require('../../../lib/helpers/logger')().app;
-const entityTypeData = require("./entityTypeData");
+const entityTypeData = require("./orgTypeData");
 const pointer = require("json-pointer");
 const permissionsHelper = require('../../../lib/helpers/permissions');
 const permissionConst = require('../../../lib/constants/permissions');
