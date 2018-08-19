@@ -1,5 +1,5 @@
 const appConfig = global.config;
-const logger = require('../lib/helpers/logger')().app;
+const logger = require('../../lib/helpers/logger')().app;
 const pointer = require('json-pointer');
 const rp = require('request-promise');
 
