@@ -1,11 +1,11 @@
 
-const logger = require('../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 const entityTypeData = require("./entityTypeData");
 const pointer = require("json-pointer");
-const permissionsHelper = require('../../lib/helpers/permissions');
-const permissionConst = require('../../lib/constants/permissions');
+const permissionsHelper = require('../../../lib/helpers/permissions');
+const permissionConst = require('../../../lib/constants/permissions');
 const _ = require('lodash');
-const dateFormat = require('../../lib/helpers/dates');
+const dateFormat = require('../../../lib/helpers/dates');
 
 var entityListOut = function (payload, UUIDKey, route, callback, JWToken) {
 

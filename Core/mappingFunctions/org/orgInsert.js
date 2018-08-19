@@ -1,13 +1,13 @@
 
-const logger = require('../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 
 const Validate = require("../../validation/validate.js");
 const validType = require("../../validation/validationFields");
 const pointer = require("json-pointer");
-const auditLog = require('../../lib/services/auditLog');
-const commonConst = require('../../lib/constants/common');
+const auditLog = require('../../../lib/services/auditLog');
+const commonConst = require('../../../lib/constants/common');
 const commissionPolicy = require('../getCommissionPolicy');
-const Date = require('../../lib/helpers/dates');
+const Date = require('../../../lib/helpers/dates');
 
 var entityInsertOut = function(payload,UUIDKey,route,callback,JWToken){
 

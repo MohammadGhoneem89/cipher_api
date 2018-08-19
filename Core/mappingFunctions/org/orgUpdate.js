@@ -1,14 +1,14 @@
-var logger = require('../../lib/helpers/logger')().app;
+var logger = require('../../../lib/helpers/logger')().app;
 
 var Validate = require("../../validation/validate.js");
 var validType = require("../../validation/validationFields");
 var pointer = require("json-pointer");
 const commissionPolicy = require('../getCommissionPolicy');
-const config = require('../../config');
+const config = require('../../../config');
 const defaultImage = config.get('defaultImage');
-const auditLog = require('../../lib/services/auditLog');
-const commonConst = require('../../lib/constants/common');
-const Date = require('../../lib/helpers/dates');
+const auditLog = require('../../../lib/services/auditLog');
+const commonConst = require('../../../lib/constants/common');
+const Date = require('../../../lib/helpers/dates');
 
 
 var entityUpdateOut = function (payload, UUIDKey, route, callback, JWToken) {

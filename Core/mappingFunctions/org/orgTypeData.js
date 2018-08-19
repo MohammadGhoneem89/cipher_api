@@ -1,5 +1,5 @@
 
-const logger = require('../../lib/helpers/logger')().app;
+const logger = require('../../../lib/helpers/logger')().app;
 
 function getEntityTypeData(getEntityTypeData_CB){
 
