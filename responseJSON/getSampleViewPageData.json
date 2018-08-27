@@ -1,0 +1,130 @@
+{
+    "sampleViewPageData": {
+        "action": "sampleViewPageData",
+        "data": {
+            "recordID": "SampleID",
+            "statusList": [
+                {
+                    "label": "Status1",
+                    "status": true,
+                    "type": "SUCCESS",
+                    "legend": "(legend 1)"
+                },
+                {
+                    "label": "Status2",
+                    "status": true,
+                    "type": "SUCCESS",
+                    "legend": "(legend 2)"
+                },
+                {
+                    "label": "Status3",
+                    "status": true,
+                    "type": "SUCCESS",
+                    "legend": "(legend 3)"
+                },
+                {
+                    "label": "Status4",
+                    "status": true,
+                    "type": "SUCCESS",
+                    "legend": "(legend 4)"
+                },
+                {
+                    "label": "Status5",
+                    "status": false,
+                    "type": "SUCCESS",
+                    "legend": "(legend 5)"
+                }
+            ],
+			"currentStatus": "Status5",
+            "detailData": {
+                "name": "Sample Company",
+                "code": "Company Code",
+                "image": "/images/05a29de0-b9d7-11e7-8e40-4914fe72b15d.png",
+                "value1": "Value 1",
+                "value2": "Value 2",
+                "value3": "Value 3",
+                "value4": "Value 4"
+            },
+            "listData": {
+                "pageData": {
+                    "PageSize": 5,
+                    "currentPage": 1,
+                    "totalRecords": 50
+                },
+                "rows": [
+                    {
+                        "columnValue1": {
+                            "name": "Value 1",
+                            "imageURL": "/images/05a29de0-b9d7-11e7-8e40-4914fe72b15d.png"
+                        },
+                        "columnValue2": "14/01/2018",
+                        "columnValue3": "10",
+                        "columnValue4": "20",
+                        "columnValue5": "30",
+                        "columnValue6": "08/11/2017"
+                    },
+                    {
+                        "columnValue1": {
+                            "name": "Vaule 2",
+                            "imageURL": "/images/13ad9660-b9d7-11e7-8e40-4914fe72b15d.png"
+                        },
+                        "columnValue2": "14/01/2018",
+                        "columnValue3": "10",
+                        "columnValue4": "20",
+                        "columnValue5": "30",
+                        "columnValue6": "08/11/2017"
+                    },
+                    {
+                        "columnValue1": {
+                            "name": "Vaule 3",
+                            "imageURL": "/images/13ad9660-b9d7-11e7-8e40-4914fe72b15d.png"
+                        },
+                        "columnValue2": "14/01/2018",
+                        "columnValue3": "10",
+                        "columnValue4": "20",
+                        "columnValue5": "30",
+                        "columnValue6": "08/11/2017"
+                    },
+                    {
+                        "columnValue1": {
+                            "name": "Vaule 4",
+                            "imageURL": "/images/13ad9660-b9d7-11e7-8e40-4914fe72b15d.png"
+                        },
+                        "columnValue2": "14/01/2018",
+                        "columnValue3": "10",
+                        "columnValue4": "20",
+                        "columnValue5": "30",
+                        "columnValue6": "08/11/2017"
+                    },
+                    {
+                        "columnValue1": {
+                            "name": "Vaule 5",
+                            "imageURL": "/images/13ad9660-b9d7-11e7-8e40-4914fe72b15d.png"
+                        },
+                        "columnValue2": "14/01/2018",
+                        "columnValue3": "10",
+                        "columnValue4": "20",
+                        "columnValue5": "30",
+                        "columnValue6": "08/11/2017"
+                    }
+                ],
+                "enableInputSection": true
+            },
+            "actions": [
+                {
+                    "value": "1008",
+                    "type": "pageAction",
+                    "label": "COM_AB_Save",
+                    "labelName": "COM_AB_Save",
+                    "actionType": "pageAction",
+                    "params": "",
+                    "iconName": "",
+                    "URI": [
+                        "/SIMU/saveSampleData"
+                    ],
+                    "children": []
+                }
+            ]
+        }
+    }
+}

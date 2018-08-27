@@ -4,7 +4,7 @@ const config = require('./config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const uuid = require('uuid/v1');
-const db = require('./Core/database/db')(); // eslint-disable-line
+const db = require('./core/database/db')(); // eslint-disable-line
 const jsReport = require('jsreport');
 const url = require('url');
 const clientIp = require('client-ip');
@@ -14,27 +14,27 @@ const renderExport = require('./exports');
 let app = express();
 const expressWs = require('express-ws')(app);
 const crypto = require('./lib/helpers/crypto');
-const RestController = require('./Core/Controller/RestController.js');
+const RestController = require('./core/Controller/RestController.js');
 const MQ = require('./MQListener.js');
-const mongoDB = require('./Core/api/bootstrap/mongoDB');
+const mongoDB = require('./core/api/connectors/mongoDB');
 const fileUpload = require('express-fileupload');
-const imageUpload = require('./Core/validation/imageUpload');
-const fileUploadValid = require('./Core/validation/fileUpload');
+const imageUpload = require('./core/validation/imageUpload');
+const fileUploadValid = require('./core/validation/fileUpload');
 const permissions = require('./lib/middleware/permissions');
 const docPermissions = require('./lib/middleware/docPermission');
 const requestLog = require('./lib/middleware/requesLog');
 const authUser = require('./lib/auth/user');
 
-const logger = require('./Core/api/bootstrap/logger').app;
+const logger = require('./core/api/connectors/logger').app;
 
 const serverStats = require('./lib/services/serverStats');
 
 process.on('uncaughtException', (err) => {
-  logger.error({fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack}, 'uncaught exception');
+  logger.error({ fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack }, 'uncaught exception');
 });
 
 process.on('unhandledRejection', function (err) {
-  logger.error({fs: 'app.js', func: 'unhandledRejection', error: err, stack: err.stack}, 'unhandled Rejection');
+  logger.error({ fs: 'app.js', func: 'unhandledRejection', error: err, stack: err.stack }, 'unhandled Rejection');
 });
 
 const pagesKey = {};
@@ -66,10 +66,9 @@ app.use(express.static('public'));
 app.use(express.static('exports'));
 app.use('/reporting', express());
 
-
 MQ.start(ReadIncomingMessage);
 
-app.use(bodyParser.json({limit: 10000000}));
+app.use(bodyParser.json({ limit: 10000000 }));
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -82,10 +81,10 @@ MQ
   .startSend()
   .then((ch) => {
     ConnMQ = ch;
-    logger.info({fs: 'app.js', func: 'startSend'}, 'MQ Connection Loaded Successfully!!!');
+    logger.info({ fs: 'app.js', func: 'startSend' }, 'MQ Connection Loaded Successfully!!!');
   }).catch((err) => {
-  logger.error({error: err, fs: 'app.js', func: 'startSend'}, 'MQ Connection Loaded Error!!!');
-});
+    logger.error({ error: err, fs: 'app.js', func: 'startSend' }, 'MQ Connection Loaded Error!!!');
+  });
 
 function passOnCall(msg, uri) {
 
@@ -101,11 +100,11 @@ function passOnCall(msg, uri) {
 
   rp(options)
     .then(function (parsedBody) {
-      logger.info({fs: 'app.js', func: 'passOnCall'}, parsedBody, 'Broadcasted to other server');
+      logger.info({ fs: 'app.js', func: 'passOnCall' }, parsedBody, 'Broadcasted to other server');
     })
     .catch(function (err) {
       // POST failed...
-      logger.error({fs: 'app.js', func: 'passOnCall'}, err, 'Broadcasted to other server');
+      logger.error({ fs: 'app.js', func: 'passOnCall' }, err, 'Broadcasted to other server');
 
     });
 
@@ -148,13 +147,13 @@ function subscribe(msg) {
 
   const msg2 = MQ.getNewMessageForSubscription(msg.pageName, msg.userID, msg.data);
   MQ.MQOut(ConnMQ, '', msg2);
-  logger.info({fs: 'app.js', func: 'subscribe'}, msg2, 'sent subscription message');
+  logger.info({ fs: 'app.js', func: 'subscribe' }, msg2, 'sent subscription message');
 }
 
 function unsubscribe(eventname, subscriptionId, params) {
   const msg2 = MQ.getNewMessageForUnsubscription(eventname, subscriptionId, params);
   MQ.MQOut(ConnMQ, '', msg2);
-  logger.info({fs: 'app.js', func: 'unsubscribe'}, msg2, 'sent unsubscription  message');
+  logger.info({ fs: 'app.js', func: 'unsubscribe' }, msg2, 'sent unsubscription  message');
 }
 
 function sendMessage(msg) {
@@ -164,18 +163,18 @@ function sendMessage(msg) {
       client.send(JSON.stringify(msg));
     }
     catch (err) {
-      logger.error({fs: 'app.js', func: 'sendMessage'}, err, 'client socket not found');
+      logger.error({ fs: 'app.js', func: 'sendMessage' }, err, 'client socket not found');
     }
   });
 
 }
 
 app.ws('/Socket', function (ws, req) {
-  logger.info({fs: 'app.js', func: 'Socket'}, 'Web socket Handshake Recieved');
+  logger.info({ fs: 'app.js', func: 'Socket' }, 'Web socket Handshake Recieved');
   ws.on('message', function (msg) {
     logger.info('Web socket Handshake Recieved');
     const msg2 = JSON.parse(msg);
-    logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'this is request');
+    logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'this is request');
 
     const decoded = crypto.decrypt(msg2.token);
 
@@ -189,22 +188,22 @@ app.ws('/Socket', function (ws, req) {
           if (lastSubscription[decoded.userID]) {
             unsubscribe(lastSubscription[decoded.userID].page, decoded.userID, '');
           }
-          lastSubscription[decoded.userID] = {'page': msg2.pageName, 'params': msg2.data};
-          logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'The subscription parameters');
+          lastSubscription[decoded.userID] = { 'page': msg2.pageName, 'params': msg2.data };
+          logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'The subscription parameters');
           subscribe(msg2);
         }
       }
     }
     else {
-      logger.error({fs: 'app.js', func: 'Socket'}, 'Token doesnt have user ID' + JSON.stringify(msg2));
+      logger.error({ fs: 'app.js', func: 'Socket' }, 'Token doesnt have user ID' + JSON.stringify(msg2));
     }
-    logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'GOT Web socket END ');
+    logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'GOT Web socket END ');
   });
 
 });
 
 app.post('/TestingSocket', function (req, res) {
-  logger.debug({fs: 'app.js', func: 'TestingSocket'}, 'Handle Transaction on Cipher ');
+  logger.debug({ fs: 'app.js', func: 'TestingSocket' }, 'Handle Transaction on Cipher ');
   const messageJson = {
     'responseMessage': {
       'action': 'Connection Error',
@@ -221,7 +220,7 @@ app.post('/TestingSocket', function (req, res) {
   res.send(JSON.stringify(messageJson));
 
   expressWs.getWss().clients.forEach(function (client) {
-    logger.info({fs: 'app.js', func: 'TestingSocket'}, messageJson, 'Sending the message ');
+    logger.info({ fs: 'app.js', func: 'TestingSocket' }, messageJson, 'Sending the message ');
     client.send(JSON.stringify(messageJson));
   });
 
@@ -290,7 +289,7 @@ app.post('/uploadFile', docPermissions, function (req, res) {
 });
 
 function handleTokenVerification(req, res, callback, action) {
-  logger.info({fs: 'app.js', func: 'handleTokenVerification'}, 'Handle Transaction on Cipher ');
+  logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, 'Handle Transaction on Cipher ');
   const payload = req.body;
   let JWToken = '';
   if (payload.JWToken) {
@@ -300,11 +299,11 @@ function handleTokenVerification(req, res, callback, action) {
     JWToken = req.get('token');
   }
 
-  logger.info({fs: 'app.js', func: 'handleTokenVerification'}, JWToken, 'JWToken : ');
+  logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, JWToken, 'JWToken : ');
 
   const decoded = crypto.decrypt(JWToken);
   if (decoded) {
-    logger.info({fs: 'app.js', func: 'handleTokenVerification'}, decoded, 'decoded.userID:  ');
+    logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, decoded, 'decoded.userID:  ');
     return callback(decoded, req.body, res, action, req);
   }
 
@@ -368,7 +367,7 @@ function sendMessageForFileProcessing(userInfo, args, res, action, req) {
         }
       }
     };
-    logger.info({fs: 'app.js', func: 'sendMessageForFileProcessing'}, msg, ' message sent to the queue');
+    logger.info({ fs: 'app.js', func: 'sendMessageForFileProcessing' }, msg, ' message sent to the queue');
 
     MQ.MQOut(ConnMQ, 'FPS_Input_Queue', msg);
     res.send(respMessage);
@@ -380,7 +379,7 @@ function sendMessageForFileProcessing(userInfo, args, res, action, req) {
 app.post('/manualReconUpload', function (req, res) {
 
   const UUID = uuid();
-  logger.debug({fs: 'app.js', func: 'manualReconUpload'}, 'UUID:  ' + UUID);
+  logger.debug({ fs: 'app.js', func: 'manualReconUpload' }, 'UUID:  ' + UUID);
 
   handleTokenVerification(req, res, sendMessageForFileProcessing, 'FPS_VALIDATE');
 
@@ -389,7 +388,7 @@ app.post('/manualReconUpload', function (req, res) {
 app.post('/manualReconConfirm', function (req, res) {
 
   const UUID = uuid();
-  logger.debug({fs: 'app.js', func: 'manualReconConfirm'}, 'UUID:  ' + UUID);
+  logger.debug({ fs: 'app.js', func: 'manualReconConfirm' }, 'UUID:  ' + UUID);
 
   handleTokenVerification(req, res, sendMessageForFileProcessing, 'FPS_PROCESS_REQUEST');
 
@@ -419,19 +418,19 @@ app.post('/uploadImg', function (req, res) {
   }
 });
 
-const getUpload = require('./Core/validation/getUpload.js');
+const getUpload = require('./core/validation/getUpload.js');
 
 app.get('/getUploadedFile/:id', docPermissions, function (req, res) {
   const UUID = req.params.id;
 
-  logger.debug({fs: 'app.js', func: 'getUploadedFile'}, ' [ getUploadedFile ]   : ' + UUID);
+  logger.debug({ fs: 'app.js', func: 'getUploadedFile' }, ' [ getUploadedFile ]   : ' + UUID);
   getUpload(UUID, res, function (data) {
     res.send(data);
   });
 
 });
 
-const getDocUpload = require('./Core/validation/getDocUpload.js');
+const getDocUpload = require('./core/validation/getDocUpload.js');
 
 app.get('/getDocUpload/:id', docPermissions, function (req, res) {
   const id = req.params.id;
@@ -469,14 +468,14 @@ app.post('/APII/:channel/:action', permissions, function (req, res) {
   const JWToken = req.get('token');
   const action = req.params.action;
   const channel = req.params.channel;
-  logger.info({fs: 'app.js', func: 'APPI'}, 'Handle Transaction on Cipher ' + action + ' ' + channel);
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
   if (channel === 'Cipher') {
-    logger.trace({payload: payload}, 'Cipher APII call Payload');
+    logger.trace({ payload: payload }, 'Cipher APII call Payload');
   }
-  logger.info({fs: 'app.js', func: 'APPI'}, 'calling handleExternalRequest ');
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'calling handleExternalRequest ');
   const UUID = uuid();
-  logger.info({fs: 'app.js', func: 'APPI'}, 'UUID:  ' + UUID);
-  logger.info({fs: 'app.js', func: 'APPI'}, 'JWToken :  ' + JWToken);
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'UUID:  ' + UUID);
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'JWToken :  ' + JWToken);
 
   RestController.handleExternalRequest(payload, channel, action, UUID, res, '', ConnMQ);
 
@@ -493,15 +492,15 @@ app.post('/API/:channel/:action', permissions, function (req, res) {
   }
   const action = req.params.action;
   const channel = req.params.channel;
-  logger.info({fs: 'app.js', func: 'API'}, 'Handle Transaction on Cipher ' + action + ' ' + channel);
-  payload = Object.assign(payload, {action: action, channel: channel, ipAddress: clientIp(req)});
+  logger.info({ fs: 'app.js', func: 'API' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
+  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: clientIp(req) });
   logger.info('calling handleExternalRequest ');
   const UUID = uuid();
-  logger.info({fs: 'app.js', func: 'API'}, 'UUID:  ' + UUID);
-  logger.info({fs: 'app.js', func: 'API'}, 'JWToken :  ' + JWToken);
+  logger.info({ fs: 'app.js', func: 'API' }, 'UUID:  ' + UUID);
+  logger.info({ fs: 'app.js', func: 'API' }, 'JWToken :  ' + JWToken);
 
   const decoded = crypto.decrypt(JWToken);
-  logger.info({fs: 'app.js', func: 'API'}, decoded, 'decoded.userID:');
+  logger.info({ fs: 'app.js', func: 'API' }, decoded, 'decoded.userID:');
   RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded, ConnMQ);
 
 });
@@ -633,5 +632,5 @@ app.post('/couchQuery', function (req, res) {
 });
 
 app.post('/websocketNotifications', function (req, res) {
-  res.send({hello: 'world'});
+  res.send({ hello: 'world' });
 });

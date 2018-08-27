@@ -1,0 +1,23 @@
+{  "declarationDetail": {
+    "action": "declarationDetail",
+    "data": {
+        "owner": "",
+        "status": "",
+        "declarationNumber": "",
+        "declarationType": "",
+        "exporterName": "",
+        "exporterCountry": "",
+        "destinationCountry": "",
+        "portOfDischarge": "",
+        "nextPortOfDischarge": "",
+        "weight": "",
+        "etd": "",
+        "invoiceValue": "",
+        "deposit": "",
+        "modeOfPayment": "",
+        "address": "",
+        "items": [],
+        "containers": []
+    }
+}
+}

@@ -13,7 +13,7 @@
     },
     "GeneralError": {
       "Code": "004",
-      "Message": "Some Error Occured While Processing Transaction"
+      "Message": "Some Error Occurred While Processing Transaction"
     }
   },
   "EventTranCode": {

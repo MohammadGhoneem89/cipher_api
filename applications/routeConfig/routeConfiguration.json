@@ -1,0 +1,131 @@
+{
+  "Smiles": {
+    "CustomFunctionsLocation": "../../applications/smiles/mappingFunctions/",
+    "getMerchantInfo": {
+      "customMapping": true,
+      "MappingfunctionName": "getMerchantCards",
+      "CustomMappingFile": "merchant/getMerchantCards.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewOrders": {
+      "customMapping": true,
+      "MappingfunctionName": "viewOrders",
+      "CustomMappingFile": "smiles/merchant/viewOrders.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewPendingOrders": {
+      "customMapping": true,
+      "MappingfunctionName": "viewPendingOrders",
+      "CustomMappingFile": "smiles/merchant/viewPendingOrders.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewCatalogue": {
+      "customMapping": true,
+      "MappingfunctionName": "viewCatalogue",
+      "CustomMappingFile": "smiles/general/viewCatalogue.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewItem": {
+      "customMapping": true,
+      "MappingfunctionName": "viewItem",
+      "CustomMappingFile": "smiles/general/viewItem.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewPoints": {
+      "customMapping": true,
+      "MappingfunctionName": "viewPoints",
+      "CustomMappingFile": "smiles/merchant/viewPoints.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewSettlements": {
+      "customMapping": true,
+      "MappingfunctionName": "viewSettlements",
+      "CustomMappingFile": "smiles/merchant/viewSettlements.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewTransactions": {
+      "customMapping": true,
+      "MappingfunctionName": "viewTransactions",
+      "CustomMappingFile": "smiles/provider/viewTransactions.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getProviderCards": {
+      "customMapping": true,
+      "MappingfunctionName": "getProviderCards",
+      "CustomMappingFile": "smiles/provider/getProviderCards.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTxCard": {
+      "customMapping": true,
+      "MappingfunctionName": "getTxCard",
+      "CustomMappingFile": "smiles/provider/getTxCard.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewCompletedSettlements": {
+      "customMapping": true,
+      "MappingfunctionName": "viewCompletedSettlements",
+      "CustomMappingFile": "smiles/provider/viewCompletedSettlements.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewPendingSettlements": {
+      "customMapping": true,
+      "MappingfunctionName": "viewPendingSettlements",
+      "CustomMappingFile": "smiles/provider/viewPendingSettlements.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "placeOrder": {
+      "customMapping": true,
+      "MappingfunctionName": "placeOrder",
+      "CustomMappingFile": "smiles/provider/placeOrder.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "settle": {
+      "customMapping": true,
+      "MappingfunctionName": "settle",
+      "CustomMappingFile": "smiles/provider/settle.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "addItem": {
+      "customMapping": true,
+      "MappingfunctionName": "addItem",
+      "CustomMappingFile": "smiles/provider/addItem.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "addMultipleItems": {
+      "customMapping": true,
+      "MappingfunctionName": "addMultipleItems",
+      "CustomMappingFile": "smiles/provider/addMultipleItems.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "addFromExcel": {
+      "customMapping": true,
+      "MappingfunctionName": "addFromExcel",
+      "CustomMappingFile": "smiles/provider/addFromExcel.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "requestForSettlement": {
+      "customMapping": true,
+      "MappingfunctionName": "requestForSettlement",
+      "CustomMappingFile": "smiles/merchant/requestForSettlement.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "resolveEscrow": {
+      "customMapping": true,
+      "MappingfunctionName": "resolveEscrow",
+      "CustomMappingFile": "smiles/merchant/resolveEscrow.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getContractAddresses": {
+      "customMapping": true,
+      "MappingfunctionName": "getContractAddresses",
+      "CustomMappingFile": "smiles/general/getContractAddresses.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getContractInformation":{
+      "customMapping": true,
+      "MappingfunctionName": "getContractInformation",
+      "CustomMappingFile": "smiles/merchant/getContractInformation.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  }
+}

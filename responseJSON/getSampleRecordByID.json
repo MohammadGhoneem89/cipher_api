@@ -1,0 +1,29 @@
+{
+    "sampelDetail": {
+        "data": {
+            "recordID": "SampleRecordID",
+            "dropdownValue": "Value1",
+            "textboxValue": "Sample Text",
+            "dateValue": "01/08/2018",
+            "popupGrid": [
+                {
+                    "code": "Value1",
+                    "description": "Description Column in a grid",
+                    "qty": "20",
+                    "value": "1000"
+                },
+                {
+                    "code": "Value2",
+                    "description": "Description of second Column in a grid",
+                    "qty": "10",
+                    "value": "5000"
+                }
+            ],
+            "containers": [
+                "item1",
+                "item2",
+                "itme3"
+            ]
+        }
+    }
+}
