@@ -1,6 +1,6 @@
 {
-  "Smiles": {
-    "CustomFunctionsLocation": "../../applications/smiles/mappingFunctions/",
+  "SampleApp": {
+    "CustomFunctionsLocation": "../../applications/SampleApp/mappingFunctions/",
     "viewItem": {
       "customMapping": true,
       "MappingfunctionName": "viewItem",
