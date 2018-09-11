@@ -11,6 +11,7 @@ const clientIp = require('client-ip');
 const cors = require('cors');
 const rp = require('request-promise');
 const renderExport = require('./exports');
+// const generateReports = require('./reports');
 let app = express();
 const expressWs = require('express-ws')(app);
 const crypto = require('./lib/helpers/crypto');
@@ -28,6 +29,7 @@ const authUser = require('./lib/auth/user');
 const logger = require('./core/api/connectors/logger').app;
 
 const serverStats = require('./lib/services/serverStats');
+const notification = require('./core/mappingFunctions/notification/list');
 
 process.on('uncaughtException', (err) => {
   logger.error({ fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack }, 'uncaught exception');
@@ -55,7 +57,11 @@ const appServer = app.listen(config.get('port'), function () {
   console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
 });
 
+let HealthCheckHelper = require('./core/utils/health.js');
+let heathService = new HealthCheckHelper("REST", 10000, crypto.decrypt(config.get('amqp.url')));
+
 serverStats.upsert();
+// soapChannel.listen();
 
 app.options('*', cors());
 
@@ -66,7 +72,17 @@ app.use(express.static('public'));
 app.use(express.static('exports'));
 app.use('/reporting', express());
 
-MQ.start(ReadIncomingMessage);
+// jsReport({
+//   express: { app: app, server: appServer },
+//   appPath: '/reporting'
+// }).init()
+//   .catch(function (e) {
+//     logger.error(e, 'JS report error');
+//   });
+//
+// if (config.get('enableMQRead') == '1') {
+//   MQ.start(ReadIncomingMessage);
+// }
 
 app.use(bodyParser.json({ limit: 10000000 }));
 app.use(bodyParser.urlencoded({
@@ -86,13 +102,101 @@ MQ
     logger.error({ error: err, fs: 'app.js', func: 'startSend' }, 'MQ Connection Loaded Error!!!');
   });
 
+function unsubscribeOnClosedConnection(subscriberId) {
+  try {
+    if (lastSubscription[subscriberId].page) {
+      unsubscribe(lastSubscription[subscriberId].page, subscriberId, '');
+    }
+  }
+  catch (err) {
+    logger.error(err, 'some error in unsubscription');
+  }
+}
+
+function SendLater(msg, newmsg) {
+  try {
+    console.log("message came here in send later");
+    socketKey[msg.header.userID].send(JSON.stringify(newmsg));
+  }
+  catch (err) {
+    logger.error({ fs: 'app.js', func: 'SendLater' }, err, 'cannot send message to socket as socket is closed');
+  }
+
+}
+
+function handleRealTimeEvents(msg) {
+
+  if (msg.header.subscriberId) {
+    try {
+      if (socketKey[msg.header.subscriberId]) {
+        if (lastSubscription[msg.header.subscriberId]) {
+          if (JSON.stringify(msg.header.params) === JSON.stringify(lastSubscription[msg.header.subscriberId].params) && msg.header.page === lastSubscription[msg.header.subscriberId].page) {
+            logger.info({ fs: 'app.js', func: 'handleRealTimeEvents' }, msg, 'Incoming Message Received');
+            socketKey[msg.header.subscriberId].send(JSON.stringify(msg.body));
+          }
+        }
+        else {
+          socketKey[msg.header.subscriberId].send(JSON.stringify(msg.body));
+        }
+      }
+
+    }
+    catch (err) {
+      logger.error({ fs: 'app.js', func: 'handleRealTimeEvents' }, err, 'connection is closed unsubscribing');
+      unsubscribeOnClosedConnection(msg.header.subscriberId);
+    }
+  }
+}
+
+function handleRealTimeNotification(msg) {
+
+  if (socketKey[msg.body.userID] && socketKey[msg.body.userID].readyState == 1) {
+    const messageJson = {
+      'responseMessage': {
+        'action': 'Notification',
+        'data': {
+          'message': {
+            'status': msg.body.MessageType,
+            'errorDescription': msg.body.MessageText,
+            'routeTo': 'success',
+            'displayToUser': true
+          }
+        }
+      }
+    };
+
+    try {
+      socketKey[msg.body.userID].send(JSON.stringify(messageJson));
+
+      const param = {
+        'page': { 'currentPageNo': 1, 'pageSize': 5 },
+        'sortBy': { 'createdAt': -1 },
+        'userID': msg.body.userID,
+        'action': 'notificationList'
+      };
+      notification.listByUserID(param, '', '', function (response) {
+        socketKey[msg.body.userID].send(JSON.stringify(response));
+      });
+
+    }
+    catch (err) {
+      logger.error({
+        fs: 'app.js',
+        func: 'handleRealTimeEvents'
+      }, err, 'Cannot send notifications as the socket is closed');
+    }
+
+  }
+
+}
+
 function passOnCall(msg, uri) {
 
   const options = {
     method: 'POST',
-    uri: uri + '/passOn',
+    uri: uri + "passOn",
     body: {
-      password: 'abc',
+      password: config.get('passOnPassword'),
       msg: msg
     },
     json: true // Automatically stringifies the body to JSON
@@ -100,7 +204,10 @@ function passOnCall(msg, uri) {
 
   rp(options)
     .then(function (parsedBody) {
-      logger.info({ fs: 'app.js', func: 'passOnCall' }, parsedBody, 'Broadcasted to other server');
+      logger.info({
+        fs: 'app.js',
+        func: 'passOnCall'
+      }, parsedBody, 'Broadcasted to other server from Server ' + config.get('URLRestInterface'));
     })
     .catch(function (err) {
       // POST failed...
@@ -110,34 +217,59 @@ function passOnCall(msg, uri) {
 
 }
 
-function ReadIncomingMessage(msg) {
+// function ReadIncomingMessage_Processing(msg) {
+//
+//   if (msg.header && (msg.header.action === 'FPS_VALIDATE' || msg.header.action === 'FPS_PROCESS_REQUEST_UPDATE' || msg.header.action === 'FPS_VALIDATE_ERROR')) {
+//     console.log("Inside FPS_VALIDATE");
+//     handleFileMessage(msg);
+//   }
+//   else if (msg.header && msg.header.action === 'NOTIFICATION') {
+//     handleRealTimeNotification(msg);
+//   }
+//   else if (msg.header && msg.header.subscriberId) {
+//     handleRealTimeEvents(msg);
+//   }
+//   else {
+//     logger.info({ fs: 'app.js', func: 'ReadIncomingMessage_Processing' }, msg, 'Ignoring Message');
+//   }
+//
+// }
 
-  let userId = '';
-  if (msg.body) {
-    if (msg.body.userID) {
-      userId = msg.body.userID;
-    }
-  }
-  if (msg.header) {
-    if (msg.header.userID) {
-      userId = msg.header.userID;
-    }
-    if (msg.header.subscriberId) {
-      userId = msg.header.subscriberId;
-    }
-  }
-
-  if (!socketKey[userId]) {
-    serverStats.find().then((data) => {
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].ip !== config.get('URLRestInterface')) {
-          passOnCall(msg, data[i].ip);
-        }
-      }
-    });
-  }
-
-}
+// function ReadIncomingMessage(msg) {
+//
+//   let userId = "";
+//   if (msg.body) {
+//     if (msg.body.userID) {
+//       userId = msg.body.userID;
+//     }
+//   }
+//   if (msg.header) {
+//     if (msg.header.userID) {
+//       userId = msg.header.userID;
+//     }
+//     if (msg.header.subscriberId) {
+//       userId = msg.header.subscriberId;
+//     }
+//   }
+//
+//   console.log("Message is read from the queue" + JSON.stringify(msg));
+//   // if (!socketKey[userId]) {
+//   serverStats.find().then((data) => {
+//     for (let i = 0; i < data.length; i++) {
+//       if (data[i].ip.indexOf("127.0.0.1") == -1) {
+//         if (data[i].ip != config.get('URLRestInterface')) {
+//           passOnCall(msg, data[i].ip);
+//         }
+//       }
+//     }
+//   });
+//   // return;
+//
+//   // }
+//
+//   ReadIncomingMessage_Processing(msg);
+//
+// }
 
 // /////////////////////////////////////////////////////////////////////////////
 // /////////////////////// REST ENDPOINTS START HERE ///////////////////////////
@@ -195,36 +327,36 @@ app.ws('/Socket', function (ws, req) {
       }
     }
     else {
-      logger.error({ fs: 'app.js', func: 'Socket' }, 'Token doesnt have user ID' + JSON.stringify(msg2));
+      logger.error({ fs: 'app.js', func: 'Socket' }, "Token doesnt have user ID" + JSON.stringify(msg2));
     }
     logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'GOT Web socket END ');
   });
 
 });
 
-app.post('/TestingSocket', function (req, res) {
-  logger.debug({ fs: 'app.js', func: 'TestingSocket' }, 'Handle Transaction on Cipher ');
-  const messageJson = {
-    'responseMessage': {
-      'action': 'Connection Error',
-      'data': {
-        'message': {
-          'status': 'ERROR',
-          'errorDescription': req.body.m,
-          'routeTo': 'success',
-          'displayToUser': true
+/* app.post('/TestingSocket', function(req, res) {
+    logger.debug({fs: 'app.js', func: 'TestingSocket'}, 'Handle Transaction on Cipher ');
+    const messageJson = {
+        'responseMessage': {
+            'action': 'Connection Error',
+            'data': {
+                'message': {
+                    'status': 'ERROR',
+                    'errorDescription': req.body.m,
+                    'routeTo': 'success',
+                    'displayToUser': true
+                }
+            }
         }
-      }
-    }
-  };
-  res.send(JSON.stringify(messageJson));
+    };
+    res.send(JSON.stringify(messageJson));
 
-  expressWs.getWss().clients.forEach(function (client) {
-    logger.info({ fs: 'app.js', func: 'TestingSocket' }, messageJson, 'Sending the message ');
-    client.send(JSON.stringify(messageJson));
-  });
+    expressWs.getWss().clients.forEach(function(client) {
+        logger.info({fs: 'app.js', func: 'TestingSocket'}, messageJson, 'Sending the message ');
+        client.send(JSON.stringify(messageJson));
+    });
 
-});
+});*/
 
 app.post('/login', function (req, res) {
   const payload = req.body;
@@ -237,7 +369,7 @@ app.post('/login', function (req, res) {
         message: {
           status: 'OK',
           errorDescription: 'logged in successfully !!!',
-          newPageURL: '/blockchain',
+          routeTo: '',
           displayToUser: true
         },
         success: true,
@@ -253,7 +385,7 @@ app.post('/login', function (req, res) {
       res.send(response);
     })
     .catch((err) => {
-      console.log(err);
+      logger.error({ fs: 'app.js', func: 'login', error: err.stack || err }, 'login failed');
       response.loginResponse.data.message.status = 'ERROR';
       response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
       response.loginResponse.data.success = false;
@@ -261,30 +393,75 @@ app.post('/login', function (req, res) {
     });
 });
 
-app.post('/uploadFile', docPermissions, function (req, res) {
-  const JWToken = req.get('token');
-  const decoded = crypto.decrypt(JWToken);
-  const file = req.files.file;
-  const fileName = file.name;
-  const arr = fileName.split('.');
-  const ext = arr[1];
-  const userID = decoded.userID;
-  const UUID = uuid();
-  const source = req.body.source;
-  const params = req.body.type;
-  const context = req.body.context;
+app.post('/uploadFile/:action', permissions, function (req, res) {
+  let org = config.get('downloadAPIDetail.organization');
+  if (org === 'Entity' || org === 'Acquirer') {
+    console.log('=============Calling GSB==============');
 
-  if (!file) {
-    logger.error({
-      fs: 'app.js',
-      func: 'uploadFile'
-    }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
-    res.send('File dose not exist');
+    let options = {
+      method: 'POST',
+      uri: config.get('downloadAPIDetail.gsbURLs.upload'),
+      formData: {
+        name: 'files',
+        file: {
+          value: req.files.file.data,
+          options: {
+            filename: req.files.file.name,
+            contentType: req.files.file.mimetype
+          }
+        }
+      },
+      headers: {
+        'content-type': 'multipart/form-data',
+        source: req.body.source || '',
+        type: req.body.type,
+        context: req.body.context,
+        username: config.get('downloadAPIDetail.credentials.username'),
+        password: config.get('downloadAPIDetail.credentials.password')
+      }
+    };
+    rp(options)
+      .then((responses) => {
+        res.send(JSON.parse(responses));
+      })
+      .catch(function (err) {
+        let response = {
+          "status": "ERROR",
+          "message": "Failed to connect GSB",
+          err: err.stack || err
+        };
+        res.send(response);
+        res.end();
+      });
   }
   else {
-    fileUploadValid(file, UUID, ext, params, userID, source, context, function (data) {
-      res.send(data);
-    });
+    console.log('=============Organization is not entity==============');
+    const JWToken = req.get('token');
+    const decoded = crypto.decrypt(JWToken);
+    const file = req.files.file;
+    const fileName = file.name;
+    const arr = fileName.split('.');
+    const ext = arr[1];
+    const userID = decoded.userID;
+
+    const UUID = uuid();
+    const source = req.headers.source || req.body.source;
+    const params = req.headers.type || req.body.type;
+    const context = req.headers.context || req.body.context;
+
+    if (!file) {
+      logger.error({
+        fs: 'app.js',
+        func: 'uploadFile'
+      }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
+      res.send('File does not exist');
+    }
+    else {
+      fileUploadValid(file, UUID, ext, params, userID, source, context, function (data) {
+        res.send(data);
+      });
+    }
+
   }
 });
 
@@ -329,7 +506,7 @@ function sendMessageForFileProcessing(userInfo, args, res, action, req) {
   let msg = {};
   let newPageURL = '';
 
-  let userIP = '';
+  let userIP = "";
   if (req.connection) {
     userIP = req.connection.remoteAddress;
   }
@@ -396,19 +573,18 @@ app.post('/manualReconConfirm', function (req, res) {
 
 app.post('/uploadImg', function (req, res) {
 
+  const JWToken = req.get('token');
+  const decoded = crypto.decrypt(JWToken);
   const data = req.body.data;
   const UUID = uuid();
 
-  const userID = 'Admin';
-  const source = 'profileImage';
-  const params = 'Image';
-  const context = '8a6008e6-7d1e-8cd2-1631-c3bddf902f80';
+  const userID = decoded.userID;
+  const source = req.body.source || 'profileImage';
+  const params = req.body.type || 'Image';
+  const context = req.body.context;
 
   if (!data) {
-    logger.debug({
-      fs: 'app.js',
-      func: 'uploadImg'
-    }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
+    logger.debug({ fs: 'app.js', func: 'uploadImg' }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
     res.send('Image dose not exist');
   }
   else {
@@ -418,43 +594,45 @@ app.post('/uploadImg', function (req, res) {
   }
 });
 
-const getUpload = require('./core/validation/getUpload.js');
+const getUpload = require('./core/validation/getDocUploadEx.js');
 
-app.get('/getUploadedFile/:id', docPermissions, function (req, res) {
+app.get('/getUploadedFile/:action/:id', permissions, function (req, res) {
+  console.log('Taking it from local');
   const UUID = req.params.id;
-
+  // routetoGSB  = false;
+  console.log('==============UUID of downloaded file============' + UUID);
   logger.debug({ fs: 'app.js', func: 'getUploadedFile' }, ' [ getUploadedFile ]   : ' + UUID);
+
   getUpload(UUID, res, function (data) {
-    res.send(data);
+    console.log('==============Sending file in return========================' + UUID);
+    res.send(data, 'binary');
   });
 
 });
 
 const getDocUpload = require('./core/validation/getDocUpload.js');
 
-app.get('/getDocUpload/:id', docPermissions, function (req, res) {
-  const id = req.params.id;
-  const JWToken = req.get('token');
+app.post('/upload/:action', permissions, function (req, res) {
+  let id = req.params.id;
+  const JWToken = req.get("token");
   const decoded = crypto.decrypt(JWToken);
-  const source = req.params.source || 'R/D';
-  const ePayRefNo = req.params.ePayRefNo || '00000001518700';
-  const data = {
+  let source = req.query.source;
+  let ePayRefNo = req.query.ePayRefNo;
+  let data = {
     id: id,
     source: source,
     ePayRefNo: ePayRefNo,
     JWToken: decoded
   };
 
-  data.JWToken.orgType = 'Entity';
-
   getDocUpload(data)
     .then((fileData) => {
       res.download(fileData.path, fileData.name);
     })
     .catch((err) => {
-      const response = {
-        'status': 'ERROR',
-        'message': 'Failed to download',
+      let response = {
+        "status": "ERROR",
+        "message": "Failed to download",
         err: err.stack || err
       };
       res.send(response);
@@ -490,6 +668,7 @@ app.post('/API/:channel/:action', permissions, function (req, res) {
   else {
     JWToken = req.get('token');
   }
+  payload.token = JWToken;
   const action = req.params.action;
   const channel = req.params.channel;
   logger.info({ fs: 'app.js', func: 'API' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
@@ -547,90 +726,116 @@ function sendError(req, res) {
   res.end();
 }
 
-app.get('/export', function (req, res) {
-  const url_parts = url.parse(req.url, true);
-  const type = url_parts.query.type;
-  const gridType = url_parts.query.gridType;
-  const JWToken = url_parts.query.JWT;
-  let decoded;
-  try {
-    decoded = crypto.decrypt(JWToken);
-  }
-  catch (err) {
-    return sendError(res, req);
-  }
-  if (!decoded || !JWToken) {
-    return sendError(req, res);
-  }
-  let query = url_parts.query.searchCriteria || '';
-  try {
-    query = query ? JSON.parse(new Buffer(query, 'base64')) : '';
-  }
-  catch (e) {
-    res.send(e);
-    res.end();
-  }
+// app.get('/export/:channel', permissions, function (req, res) {
+//   const url_parts = url.parse(req.url, true);
+//   const type = url_parts.query.type;
+//   let gridType = url_parts.query.gridType;
+//   const JWToken = url_parts.query.JWT;
+//   let decoded;
+//   try {
+//     decoded = crypto.decrypt(JWToken);
+//   }
+//   catch (err) {
+//     return sendError(res, req);
+//   }
+//   if (!decoded || !JWToken) {
+//     return sendError(req, res);
+//   }
+//   let query = url_parts.query.searchCriteria || '';
+//   try {
+//     query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
+//   }
+//   catch (e) {
+//     res.send(e);
+//     res.end();
+//   }
+//   renderExport(type, gridType, query, jsReport, decoded, res);
+//
+// });
 
-  renderExport(type, gridType, query, jsReport, decoded, res);
-
-});
-
-const searchCriteriaOrgType = require('./lib/helpers/searchCriteriaOrgType');
-app.get('/reports', function (req, res) {
-  const url_parts = url.parse(req.url, true);
-  const id = url_parts.query.id;
-  const type = url_parts.query.reportFormat;
-  const JWToken = url_parts.query.JWT;
-  let language = url_parts.query.language;
-  let query = url_parts.query.searchCriteria || '';
-  query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
-  language = language ? JSON.parse(new Buffer(language, 'base64')) : {};
-  let decoded;
-  try {
-    decoded = crypto.decrypt(JWToken);
-  }
-  catch (err) {
-    return sendError(req, res);
-  }
-  if (!decoded || !JWToken) {
-    return sendError(req, res);
-  }
-  query = searchCriteriaOrgType(query, decoded);
-
-  const payload = {
-    filters: query,
-    reportsCriteriaId: id,
-    JWT: JWToken,
-    nationalization: language
-  };
-});
+// const searchCriteriaOrgType = require('./lib/helpers/searchCriteriaOrgType');
+// app.get('/reports/:channel/:action', permissions, function (req, res) {
+//   const url_parts = url.parse(req.url, true);
+//   let id = url_parts.query.id;
+//   const type = url_parts.query.reportFormat;
+//   const JWToken = url_parts.query.JWT;
+//   let language = url_parts.query.language;
+//   let query = url_parts.query.searchCriteria || '';
+//   query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
+//   language = language ? JSON.parse(new Buffer(language, 'base64')) : {};
+//   let decoded;
+//   try {
+//     decoded = crypto.decrypt(JWToken);
+//   }
+//   catch (err) {
+//     return sendError(req, res);
+//   }
+//   if (!decoded || !JWToken) {
+//     return sendError(req, res);
+//   }
+//   query = searchCriteriaOrgType(query, decoded);
+//
+//   const payload = {
+//     filters: query,
+//     reportsCriteriaId: id,
+//     JWT: JWToken,
+//     nationalization: language
+//   };
+//   // try {
+//   //   generateReports(jsReport, payload, res, type);
+//   // }
+//   // catch (e) {
+//   //   res.send(e);
+//   //   return res.end();
+//   // }
+// });
 
 app.post('/passOn', function (req, res) {
-  const password = req.body.password;
+  let passOnPassword = config.get('passOnPassword');
 
+  if (passOnPassword !== req.body.password) {
+    res.send(JSON.stringify({ "status": "Not Authorized to access the resource" }));
+    return;
+  }
   ReadIncomingMessage_Processing(req.body.msg);
-
+  res.send(JSON.stringify({ "status": "Done" }));
 });
 
-const couchQuery = require('./lib/couch/selectWithProjection');
+/* const getFilterData = require('./reports/getFilterData');
+app.post('/getFilter', function (req, res) {
+    const id = req.body.id;
+    getFilterData(id)
+        .then((data) => {
+            res.send(data);
+        })
+        .catch((e) => {
+            const error = e.stack || e;
+            res.send(error);
+            return res.end();
+        });
+});
+*/
+
+/* const couchQuery = require('./lib/couch/selectWithProjection');
 app.post('/couchQuery', function (req, res) {
 
-  req.body.channel = req.body.channel || 'transactions';
+    req.body.channel = req.body.channel || 'transactions';
 
-  couchQuery(req.body.channel, req.body.query, req.body.projection)
-    .then((queryResult) => {
-      const result = [];
-      queryResult.map((item) => {
-        result.push(item.data);
-      });
-      res.send(result);
-    })
-    .catch((err) => {
-      res.send(err);
-      return res.end();
-    });
+    couchQuery(req.body.channel, req.body.query, req.body.projection)
+        .then((queryResult) => {
+            const result = [];
+            queryResult.map((item) => {
+                result.push(item.data);
+            });
+            res.send(result);
+        })
+        .catch((err) => {
+            res.send(err);
+            return res.end();
+        });
 });
 
 app.post('/websocketNotifications', function (req, res) {
-  res.send({ hello: 'world' });
-});
+    res.send({hello: 'world'});
+});*/
+
