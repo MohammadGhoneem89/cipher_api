@@ -484,6 +484,12 @@
     }
   },
   "Quorum": {
+    "sendSignedTransaction": {
+      "customMapping": true,
+      "MappingfunctionName": "sendSignedTransaction",
+      "CustomMappingFile": "quorum/sendSignedTransaction.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "createAccount": {
       "customMapping": true,
       "MappingfunctionName": "createAccount",
