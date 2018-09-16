@@ -484,6 +484,12 @@
     }
   },
   "Quorum": {
+    "createAccount": {
+      "customMapping": true,
+      "MappingfunctionName": "createAccount",
+      "CustomMappingFile": "quorum/createAccount.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getLogs": {
       "customMapping": true,
       "MappingfunctionName": "getLogs",
