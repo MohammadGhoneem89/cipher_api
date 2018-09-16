@@ -538,6 +538,12 @@
       "CustomMappingFile": "quorum/deployContract.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "contractEncoder": {
+      "customMapping": true,
+      "MappingfunctionName": "contractEncoder",
+      "CustomMappingFile": "quorum/contractEncoder.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "contractSetter": {
       "customMapping": true,
       "MappingfunctionName": "contractSetter",
