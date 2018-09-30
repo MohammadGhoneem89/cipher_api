@@ -7,7 +7,6 @@ const uuid = require('uuid/v1');
 const db = require('./core/database/db')(); // eslint-disable-line
 const jsReport = require('jsreport');
 const url = require('url');
-const clientIp = require('client-ip');
 const cors = require('cors');
 const rp = require('request-promise');
 const renderExport = require('./exports');
@@ -32,11 +31,11 @@ const serverStats = require('./lib/services/serverStats');
 const notification = require('./core/mappingFunctions/notification/list');
 
 process.on('uncaughtException', (err) => {
-  logger.error({ fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack }, 'uncaught exception');
+  logger.error({fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack}, 'uncaught exception');
 });
 
 process.on('unhandledRejection', function (err) {
-  logger.error({ fs: 'app.js', func: 'unhandledRejection', error: err, stack: err.stack }, 'unhandled Rejection');
+  logger.error({fs: 'app.js', func: 'unhandledRejection', error: err, stack: err.stack}, 'unhandled Rejection');
 });
 
 const pagesKey = {};
@@ -72,35 +71,15 @@ app.use(express.static('public'));
 app.use(express.static('exports'));
 app.use('/reporting', express());
 
-// jsReport({
-//   express: { app: app, server: appServer },
-//   appPath: '/reporting'
-// }).init()
-//   .catch(function (e) {
-//     logger.error(e, 'JS report error');
-//   });
-//
-// if (config.get('enableMQRead') == '1') {
-//   MQ.start(ReadIncomingMessage);
-// }
+if (config.get('enableMQRead') == '1') {
+  MQ.start(ReadIncomingMessage);
+}
 
-app.use(bodyParser.json({ limit: 10000000 }));
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 app.use(requestLog);
 
-let ConnMQ = {};
-
-MQ
-  .startSend()
-  .then((ch) => {
-    ConnMQ = ch;
-    logger.info({ fs: 'app.js', func: 'startSend' }, 'MQ Connection Loaded Successfully!!!');
-  }).catch((err) => {
-    logger.error({ error: err, fs: 'app.js', func: 'startSend' }, 'MQ Connection Loaded Error!!!');
-  });
 
 function unsubscribeOnClosedConnection(subscriberId) {
   try {
@@ -119,7 +98,7 @@ function SendLater(msg, newmsg) {
     socketKey[msg.header.userID].send(JSON.stringify(newmsg));
   }
   catch (err) {
-    logger.error({ fs: 'app.js', func: 'SendLater' }, err, 'cannot send message to socket as socket is closed');
+    logger.error({fs: 'app.js', func: 'SendLater'}, err, 'cannot send message to socket as socket is closed');
   }
 
 }
@@ -131,7 +110,7 @@ function handleRealTimeEvents(msg) {
       if (socketKey[msg.header.subscriberId]) {
         if (lastSubscription[msg.header.subscriberId]) {
           if (JSON.stringify(msg.header.params) === JSON.stringify(lastSubscription[msg.header.subscriberId].params) && msg.header.page === lastSubscription[msg.header.subscriberId].page) {
-            logger.info({ fs: 'app.js', func: 'handleRealTimeEvents' }, msg, 'Incoming Message Received');
+            logger.info({fs: 'app.js', func: 'handleRealTimeEvents'}, msg, 'Incoming Message Received');
             socketKey[msg.header.subscriberId].send(JSON.stringify(msg.body));
           }
         }
@@ -142,7 +121,7 @@ function handleRealTimeEvents(msg) {
 
     }
     catch (err) {
-      logger.error({ fs: 'app.js', func: 'handleRealTimeEvents' }, err, 'connection is closed unsubscribing');
+      logger.error({fs: 'app.js', func: 'handleRealTimeEvents'}, err, 'connection is closed unsubscribing');
       unsubscribeOnClosedConnection(msg.header.subscriberId);
     }
   }
@@ -169,8 +148,8 @@ function handleRealTimeNotification(msg) {
       socketKey[msg.body.userID].send(JSON.stringify(messageJson));
 
       const param = {
-        'page': { 'currentPageNo': 1, 'pageSize': 5 },
-        'sortBy': { 'createdAt': -1 },
+        'page': {'currentPageNo': 1, 'pageSize': 5},
+        'sortBy': {'createdAt': -1},
         'userID': msg.body.userID,
         'action': 'notificationList'
       };
@@ -211,65 +190,58 @@ function passOnCall(msg, uri) {
     })
     .catch(function (err) {
       // POST failed...
-      logger.error({ fs: 'app.js', func: 'passOnCall' }, err, 'Broadcasted to other server');
+      logger.error({fs: 'app.js', func: 'passOnCall'}, err, 'Broadcasted to other server');
 
     });
 
 }
 
-// function ReadIncomingMessage_Processing(msg) {
-//
-//   if (msg.header && (msg.header.action === 'FPS_VALIDATE' || msg.header.action === 'FPS_PROCESS_REQUEST_UPDATE' || msg.header.action === 'FPS_VALIDATE_ERROR')) {
-//     console.log("Inside FPS_VALIDATE");
-//     handleFileMessage(msg);
-//   }
-//   else if (msg.header && msg.header.action === 'NOTIFICATION') {
-//     handleRealTimeNotification(msg);
-//   }
-//   else if (msg.header && msg.header.subscriberId) {
-//     handleRealTimeEvents(msg);
-//   }
-//   else {
-//     logger.info({ fs: 'app.js', func: 'ReadIncomingMessage_Processing' }, msg, 'Ignoring Message');
-//   }
-//
-// }
+function ReadIncomingMessage_Processing(msg) {
 
-// function ReadIncomingMessage(msg) {
-//
-//   let userId = "";
-//   if (msg.body) {
-//     if (msg.body.userID) {
-//       userId = msg.body.userID;
-//     }
-//   }
-//   if (msg.header) {
-//     if (msg.header.userID) {
-//       userId = msg.header.userID;
-//     }
-//     if (msg.header.subscriberId) {
-//       userId = msg.header.subscriberId;
-//     }
-//   }
-//
-//   console.log("Message is read from the queue" + JSON.stringify(msg));
-//   // if (!socketKey[userId]) {
-//   serverStats.find().then((data) => {
-//     for (let i = 0; i < data.length; i++) {
-//       if (data[i].ip.indexOf("127.0.0.1") == -1) {
-//         if (data[i].ip != config.get('URLRestInterface')) {
-//           passOnCall(msg, data[i].ip);
-//         }
-//       }
-//     }
-//   });
-//   // return;
-//
-//   // }
-//
-//   ReadIncomingMessage_Processing(msg);
-//
-// }
+  if (msg.header && (msg.header.action === 'FPS_VALIDATE' || msg.header.action === 'FPS_PROCESS_REQUEST_UPDATE' || msg.header.action === 'FPS_VALIDATE_ERROR')) {
+    console.log("Inside FPS_VALIDATE");
+    handleFileMessage(msg);
+  }
+  else if (msg.header && msg.header.action === 'NOTIFICATION') {
+    handleRealTimeNotification(msg);
+  }
+  else if (msg.header && msg.header.subscriberId) {
+    handleRealTimeEvents(msg);
+  }
+  else {
+    logger.info({fs: 'app.js', func: 'ReadIncomingMessage_Processing'}, msg, 'Ignoring Message');
+  }
+}
+
+function ReadIncomingMessage(msg) {
+
+  let userId = "";
+  if (msg.body) {
+    if (msg.body.userID) {
+      userId = msg.body.userID
+    }
+  }
+  if (msg.header) {
+    if (msg.header.userID) {
+      userId = msg.header.userID
+    }
+    if (msg.header.subscriberId) {
+      userId = msg.header.subscriberId
+    }
+  }
+
+  console.log("Message is read from the queue" + JSON.stringify(msg));
+  serverStats.find().then((data) => {
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].ip.indexOf("127.0.0.1") == -1) {
+        if (data[i].ip != config.get('URLRestInterface')) {
+          passOnCall(msg, data[i].ip);
+        }
+      }
+    }
+  });
+  ReadIncomingMessage_Processing(msg);
+}
 
 // /////////////////////////////////////////////////////////////////////////////
 // /////////////////////// REST ENDPOINTS START HERE ///////////////////////////
@@ -278,14 +250,14 @@ function passOnCall(msg, uri) {
 function subscribe(msg) {
 
   const msg2 = MQ.getNewMessageForSubscription(msg.pageName, msg.userID, msg.data);
-  MQ.MQOut(ConnMQ, '', msg2);
-  logger.info({ fs: 'app.js', func: 'subscribe' }, msg2, 'sent subscription message');
+  MQ.MQOut(null, '', msg2);
+  logger.info({fs: 'app.js', func: 'subscribe'}, msg2, 'sent subscription message');
 }
 
 function unsubscribe(eventname, subscriptionId, params) {
   const msg2 = MQ.getNewMessageForUnsubscription(eventname, subscriptionId, params);
-  MQ.MQOut(ConnMQ, '', msg2);
-  logger.info({ fs: 'app.js', func: 'unsubscribe' }, msg2, 'sent unsubscription  message');
+  MQ.MQOut(null, '', msg2);
+  logger.info({fs: 'app.js', func: 'unsubscribe'}, msg2, 'sent unsubscription  message');
 }
 
 function sendMessage(msg) {
@@ -295,18 +267,18 @@ function sendMessage(msg) {
       client.send(JSON.stringify(msg));
     }
     catch (err) {
-      logger.error({ fs: 'app.js', func: 'sendMessage' }, err, 'client socket not found');
+      logger.error({fs: 'app.js', func: 'sendMessage'}, err, 'client socket not found');
     }
   });
 
 }
 
 app.ws('/Socket', function (ws, req) {
-  logger.info({ fs: 'app.js', func: 'Socket' }, 'Web socket Handshake Recieved');
+  logger.info({fs: 'app.js', func: 'Socket'}, 'Web socket Handshake Recieved');
   ws.on('message', function (msg) {
     logger.info('Web socket Handshake Recieved');
     const msg2 = JSON.parse(msg);
-    logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'this is request');
+    logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'this is request');
 
     const decoded = crypto.decrypt(msg2.token);
 
@@ -320,43 +292,36 @@ app.ws('/Socket', function (ws, req) {
           if (lastSubscription[decoded.userID]) {
             unsubscribe(lastSubscription[decoded.userID].page, decoded.userID, '');
           }
-          lastSubscription[decoded.userID] = { 'page': msg2.pageName, 'params': msg2.data };
-          logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'The subscription parameters');
+          lastSubscription[decoded.userID] = {'page': msg2.pageName, 'params': msg2.data};
+          logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'The subscription parameters');
           subscribe(msg2);
         }
       }
     }
     else {
-      logger.error({ fs: 'app.js', func: 'Socket' }, "Token doesnt have user ID" + JSON.stringify(msg2));
+      logger.error({fs: 'app.js', func: 'Socket'}, "Token doesnt have user ID" + JSON.stringify(msg2));
     }
-    logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'GOT Web socket END ');
+    logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'GOT Web socket END ');
   });
 
 });
 
-/* app.post('/TestingSocket', function(req, res) {
-    logger.debug({fs: 'app.js', func: 'TestingSocket'}, 'Handle Transaction on Cipher ');
-    const messageJson = {
-        'responseMessage': {
-            'action': 'Connection Error',
-            'data': {
-                'message': {
-                    'status': 'ERROR',
-                    'errorDescription': req.body.m,
-                    'routeTo': 'success',
-                    'displayToUser': true
-                }
-            }
-        }
-    };
-    res.send(JSON.stringify(messageJson));
+function contains(input, checkval) {
+  return (input.indexOf(checkval) !== -1);
+}
 
-    expressWs.getWss().clients.forEach(function(client) {
-        logger.info({fs: 'app.js', func: 'TestingSocket'}, messageJson, 'Sending the message ');
-        client.send(JSON.stringify(messageJson));
-    });
-
-});*/
+function checkbadinput(req) {
+  const payload = req.body;
+  console.log("checking for illeagal characters.");
+  const requestString = JSON.stringify(payload);
+  if (contains(requestString, "$")) {
+    console.log("illeagal characters Found Sending Error!!");
+    logger.error({fs: 'app.js', func: 'login', error: err.stack || err}, 'illeagal characters Found Sending Error!!');
+    return true;
+  }
+  console.log("request OK!.");
+  return false;
+}
 
 app.post('/login', function (req, res) {
   const payload = req.body;
@@ -378,6 +343,15 @@ app.post('/login', function (req, res) {
       }
     }
   };
+  if (checkbadinput(req)) {
+    let err = {desc: 'invalid userId or password'};
+    response.loginResponse.data.message.status = 'ERROR';
+    response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
+    response.loginResponse.data.success = false;
+    res.send(response);
+    return;
+  }
+
   authUser(payload)
     .then((user) => {
       response.loginResponse.data.token = user.token;
@@ -385,7 +359,7 @@ app.post('/login', function (req, res) {
       res.send(response);
     })
     .catch((err) => {
-      logger.error({ fs: 'app.js', func: 'login', error: err.stack || err }, 'login failed');
+      logger.error({fs: 'app.js', func: 'login', error: err.stack || err}, 'login failed');
       response.loginResponse.data.message.status = 'ERROR';
       response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
       response.loginResponse.data.success = false;
@@ -394,6 +368,11 @@ app.post('/login', function (req, res) {
 });
 
 app.post('/uploadFile/:action', permissions, function (req, res) {
+  if (checkbadinput(req)) {
+    let resperr = {'error': "illeagal character found in request"}
+    res.send(resperr);
+    return;
+  }
   let org = config.get('downloadAPIDetail.organization');
   if (org === 'Entity' || org === 'Acquirer') {
     console.log('=============Calling GSB==============');
@@ -466,7 +445,12 @@ app.post('/uploadFile/:action', permissions, function (req, res) {
 });
 
 function handleTokenVerification(req, res, callback, action) {
-  logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, 'Handle Transaction on Cipher ');
+  if (checkbadinput(req)) {
+    let resperr = {'error': "illeagal character found in request"}
+    res.send(resperr);
+    return;
+  }
+  logger.info({fs: 'app.js', func: 'handleTokenVerification'}, 'Handle Transaction on Cipher ');
   const payload = req.body;
   let JWToken = '';
   if (payload.JWToken) {
@@ -476,11 +460,11 @@ function handleTokenVerification(req, res, callback, action) {
     JWToken = req.get('token');
   }
 
-  logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, JWToken, 'JWToken : ');
+  logger.info({fs: 'app.js', func: 'handleTokenVerification'}, JWToken, 'JWToken : ');
 
   const decoded = crypto.decrypt(JWToken);
   if (decoded) {
-    logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, decoded, 'decoded.userID:  ');
+    logger.info({fs: 'app.js', func: 'handleTokenVerification'}, decoded, 'decoded.userID:  ');
     return callback(decoded, req.body, res, action, req);
   }
 
@@ -501,78 +485,12 @@ function handleTokenVerification(req, res, callback, action) {
   return callback({}, {}, res, '', req);
 }
 
-function sendMessageForFileProcessing(userInfo, args, res, action, req) {
-  let respMsg = '';
-  let msg = {};
-  let newPageURL = '';
-
-  let userIP = "";
-  if (req.connection) {
-    userIP = req.connection.remoteAddress;
-  }
-  let objId = '';
-  if (req.body && req.body.objectID) {
-    objId = req.body.objectID;
-  }
-
-  if (userInfo.userID) {
-    const UUID = uuid();
-    if (action === 'FPS_PROCESS_REQUEST') {
-      msg = MQ.getNewMessageForReconProcess(userInfo.userID, userInfo.orgCode, UUID, userIP, action, args, 'UI');
-      respMsg = 'Recon file successfully confirmed';
-      newPageURL = 'reconAuditDetail/' + objId;
-    }
-
-    if (action === 'FPS_VALIDATE') {
-
-      msg = MQ.getNewMessageForReconValidate(userInfo.userID, userInfo.orgCode, UUID, userIP, action, args, 'UI');
-      respMsg = 'Recon file successfully uploaded';
-      newPageURL = 'manualReconStats' + '/' + args.orgType + '/' + args.orgCode + '/' + objId;
-
-    }
-
-    const respMessage = {
-      'responseMessage': {
-        'action': 'manualReconStats',
-        'data': {
-          'message': {
-            'status': 'OK',
-            'errorDescription': respMsg,
-            'newPageURL': '/' + newPageURL,
-            'displayToUser': true
-          }
-        }
-      }
-    };
-    logger.info({ fs: 'app.js', func: 'sendMessageForFileProcessing' }, msg, ' message sent to the queue');
-
-    MQ.MQOut(ConnMQ, 'FPS_Input_Queue', msg);
-    res.send(respMessage);
-
-  }
-
-}
-
-app.post('/manualReconUpload', function (req, res) {
-
-  const UUID = uuid();
-  logger.debug({ fs: 'app.js', func: 'manualReconUpload' }, 'UUID:  ' + UUID);
-
-  handleTokenVerification(req, res, sendMessageForFileProcessing, 'FPS_VALIDATE');
-
-});
-
-app.post('/manualReconConfirm', function (req, res) {
-
-  const UUID = uuid();
-  logger.debug({ fs: 'app.js', func: 'manualReconConfirm' }, 'UUID:  ' + UUID);
-
-  handleTokenVerification(req, res, sendMessageForFileProcessing, 'FPS_PROCESS_REQUEST');
-
-});
-
 app.post('/uploadImg', function (req, res) {
-
+  if (checkbadinput(req)) {
+    let resperr = {'error': "illeagal character found in request"}
+    res.send(resperr);
+    return;
+  }
   const JWToken = req.get('token');
   const decoded = crypto.decrypt(JWToken);
   const data = req.body.data;
@@ -584,7 +502,7 @@ app.post('/uploadImg', function (req, res) {
   const context = req.body.context;
 
   if (!data) {
-    logger.debug({ fs: 'app.js', func: 'uploadImg' }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
+    logger.debug({fs: 'app.js', func: 'uploadImg'}, ' [ File Upload Service ] File is not exist in req : ' + req.file);
     res.send('Image dose not exist');
   }
   else {
@@ -597,17 +515,19 @@ app.post('/uploadImg', function (req, res) {
 const getUpload = require('./core/validation/getDocUploadEx.js');
 
 app.get('/getUploadedFile/:action/:id', permissions, function (req, res) {
+  if (checkbadinput(req)) {
+    let resperr = {'error': "illeagal character found in request"}
+    res.send(resperr);
+    return;
+  }
   console.log('Taking it from local');
   const UUID = req.params.id;
-  // routetoGSB  = false;
   console.log('==============UUID of downloaded file============' + UUID);
-  logger.debug({ fs: 'app.js', func: 'getUploadedFile' }, ' [ getUploadedFile ]   : ' + UUID);
-
+  logger.debug({fs: 'app.js', func: 'getUploadedFile'}, ' [ getUploadedFile ]   : ' + UUID);
   getUpload(UUID, res, function (data) {
     console.log('==============Sending file in return========================' + UUID);
     res.send(data, 'binary');
   });
-
 });
 
 const getDocUpload = require('./core/validation/getDocUpload.js');
@@ -642,24 +562,34 @@ app.post('/upload/:action', permissions, function (req, res) {
 });
 
 app.post('/APII/:channel/:action', permissions, function (req, res) {
+  if (checkbadinput(req)) {
+    let resperr = {'error': "illeagal character found in request"};
+    res.send(resperr);
+    return;
+  }
   const payload = req.body;
   const JWToken = req.get('token');
   const action = req.params.action;
   const channel = req.params.channel;
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
+  logger.info({fs: 'app.js', func: 'APPI'}, 'Handle Transaction on Cipher ' + action + ' ' + channel);
   if (channel === 'Cipher') {
-    logger.trace({ payload: payload }, 'Cipher APII call Payload');
+    logger.trace({payload: payload}, 'Cipher APII call Payload');
   }
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'calling handleExternalRequest ');
+  logger.info({fs: 'app.js', func: 'APPI'}, 'calling handleExternalRequest ');
   const UUID = uuid();
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'UUID:  ' + UUID);
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'JWToken :  ' + JWToken);
+  logger.info({fs: 'app.js', func: 'APPI'}, 'UUID:  ' + UUID);
+  logger.info({fs: 'app.js', func: 'APPI'}, 'JWToken :  ' + JWToken);
 
-  RestController.handleExternalRequest(payload, channel, action, UUID, res, '', ConnMQ);
+  RestController.handleExternalRequest(payload, channel, action, UUID, res, '');
 
 });
 
 app.post('/API/:channel/:action', permissions, function (req, res) {
+  if (checkbadinput(req)) {
+    let resperr = {'error': "illeagal character found in request"};
+    res.send(resperr);
+    return;
+  }
   let payload = req.body;
   let JWToken = '';
   if (payload.JWToken) {
@@ -671,16 +601,16 @@ app.post('/API/:channel/:action', permissions, function (req, res) {
   payload.token = JWToken;
   const action = req.params.action;
   const channel = req.params.channel;
-  logger.info({ fs: 'app.js', func: 'API' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
-  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: clientIp(req) });
+  logger.info({fs: 'app.js', func: 'API'}, 'Handle Transaction on Cipher ' + action + ' ' + channel);
+  payload = Object.assign(payload, {action: action, channel: channel, ipAddress: "::1"});
   logger.info('calling handleExternalRequest ');
   const UUID = uuid();
-  logger.info({ fs: 'app.js', func: 'API' }, 'UUID:  ' + UUID);
-  logger.info({ fs: 'app.js', func: 'API' }, 'JWToken :  ' + JWToken);
+  logger.info({fs: 'app.js', func: 'API'}, 'UUID:  ' + UUID);
+  logger.info({fs: 'app.js', func: 'API'}, 'JWToken :  ' + JWToken);
 
   const decoded = crypto.decrypt(JWToken);
-  logger.info({ fs: 'app.js', func: 'API' }, decoded, 'decoded.userID:');
-  RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded, ConnMQ);
+  logger.info({fs: 'app.js', func: 'API'}, decoded, 'decoded.userID:');
+  RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
 
 });
 
@@ -726,116 +656,50 @@ function sendError(req, res) {
   res.end();
 }
 
-// app.get('/export/:channel', permissions, function (req, res) {
-//   const url_parts = url.parse(req.url, true);
-//   const type = url_parts.query.type;
-//   let gridType = url_parts.query.gridType;
-//   const JWToken = url_parts.query.JWT;
-//   let decoded;
-//   try {
-//     decoded = crypto.decrypt(JWToken);
-//   }
-//   catch (err) {
-//     return sendError(res, req);
-//   }
-//   if (!decoded || !JWToken) {
-//     return sendError(req, res);
-//   }
-//   let query = url_parts.query.searchCriteria || '';
-//   try {
-//     query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
-//   }
-//   catch (e) {
-//     res.send(e);
-//     res.end();
-//   }
-//   renderExport(type, gridType, query, jsReport, decoded, res);
-//
-// });
+app.get('/export/:channel', permissions, function (req, res) {
+  if (checkbadinput(req)) {
+    let resperr = {'error': "illeagal character found in request"}
+    res.send(resperr);
+    return;
+  }
+  const url_parts = url.parse(req.url, true);
+  const type = url_parts.query.type;
+  let gridType = url_parts.query.gridType;
+  const JWToken = url_parts.query.JWT;
+  let decoded;
+  try {
+    decoded = crypto.decrypt(JWToken);
+  }
+  catch (err) {
+    return sendError(res, req);
+  }
+  if (!decoded || !JWToken) {
+    return sendError(req, res);
+  }
+  let query = url_parts.query.searchCriteria || '';
+  try {
+    query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
+  }
+  catch (e) {
+    res.send(e);
+    res.end();
+  }
+  renderExport(type, gridType, query, jsReport, decoded, res);
 
-// const searchCriteriaOrgType = require('./lib/helpers/searchCriteriaOrgType');
-// app.get('/reports/:channel/:action', permissions, function (req, res) {
-//   const url_parts = url.parse(req.url, true);
-//   let id = url_parts.query.id;
-//   const type = url_parts.query.reportFormat;
-//   const JWToken = url_parts.query.JWT;
-//   let language = url_parts.query.language;
-//   let query = url_parts.query.searchCriteria || '';
-//   query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
-//   language = language ? JSON.parse(new Buffer(language, 'base64')) : {};
-//   let decoded;
-//   try {
-//     decoded = crypto.decrypt(JWToken);
-//   }
-//   catch (err) {
-//     return sendError(req, res);
-//   }
-//   if (!decoded || !JWToken) {
-//     return sendError(req, res);
-//   }
-//   query = searchCriteriaOrgType(query, decoded);
-//
-//   const payload = {
-//     filters: query,
-//     reportsCriteriaId: id,
-//     JWT: JWToken,
-//     nationalization: language
-//   };
-//   // try {
-//   //   generateReports(jsReport, payload, res, type);
-//   // }
-//   // catch (e) {
-//   //   res.send(e);
-//   //   return res.end();
-//   // }
-// });
+});
 
 app.post('/passOn', function (req, res) {
+  if (checkbadinput(req)) {
+    let resperr = {'error': "illeagal character found in request"};
+    res.send(resperr);
+    return;
+  }
   let passOnPassword = config.get('passOnPassword');
 
   if (passOnPassword !== req.body.password) {
-    res.send(JSON.stringify({ "status": "Not Authorized to access the resource" }));
+    res.send(JSON.stringify({"status": "Not Authorized to access the resource"}));
     return;
   }
   ReadIncomingMessage_Processing(req.body.msg);
-  res.send(JSON.stringify({ "status": "Done" }));
+  res.send(JSON.stringify({"status": "Done"}));
 });
-
-/* const getFilterData = require('./reports/getFilterData');
-app.post('/getFilter', function (req, res) {
-    const id = req.body.id;
-    getFilterData(id)
-        .then((data) => {
-            res.send(data);
-        })
-        .catch((e) => {
-            const error = e.stack || e;
-            res.send(error);
-            return res.end();
-        });
-});
-*/
-
-/* const couchQuery = require('./lib/couch/selectWithProjection');
-app.post('/couchQuery', function (req, res) {
-
-    req.body.channel = req.body.channel || 'transactions';
-
-    couchQuery(req.body.channel, req.body.query, req.body.projection)
-        .then((queryResult) => {
-            const result = [];
-            queryResult.map((item) => {
-                result.push(item.data);
-            });
-            res.send(result);
-        })
-        .catch((err) => {
-            res.send(err);
-            return res.end();
-        });
-});
-
-app.post('/websocketNotifications', function (req, res) {
-    res.send({hello: 'world'});
-});*/
-
