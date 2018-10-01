@@ -473,6 +473,72 @@
       "MappingfunctionName": "smartContractFileViewer",
       "CustomMappingFile": "consortium/smartContractFileViewer.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getdataSourceList": {
+      "customMapping": true,
+      "MappingfunctionName": "getdataSourceList",
+      "CustomMappingFile": "eventService/datasource.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getdataSource": {
+      "customMapping": true,
+      "MappingfunctionName": "getdataSource",
+      "CustomMappingFile": "eventService/datasource.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getdataSourceByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getdataSourceByID",
+      "CustomMappingFile": "eventService/datasource.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "upsertDataSource": {
+      "customMapping": true,
+      "MappingfunctionName": "upsertDataSource",
+      "CustomMappingFile": "eventService/datasource.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getDispatcherList": {
+      "customMapping": true,
+      "MappingfunctionName": "getEventDispatcherList",
+      "CustomMappingFile": "eventService/eventdispatcher.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getEventDispatcher": {
+      "customMapping": true,
+      "MappingfunctionName": "getEventDispatcher",
+      "CustomMappingFile": "eventService/eventdispatcher.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getEventDispatcherByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getEventDispatcherByID",
+      "CustomMappingFile": "eventService/eventdispatcher.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "upsertEventDispatcher": {
+      "customMapping": true,
+      "MappingfunctionName": "upsertEventDispatcher",
+      "CustomMappingFile": "eventService/eventdispatcher.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getEventRegistry": {
+      "customMapping": true,
+      "MappingfunctionName": "getEventRegistry",
+      "CustomMappingFile": "eventService/eventregistry.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getEventRegistryByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getEventRegistryByID",
+      "CustomMappingFile": "eventService/eventregistry.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "upsertEventRegistry": {
+      "customMapping": true,
+      "MappingfunctionName": "upsertEventRegistry",
+      "CustomMappingFile": "eventService/eventregistry.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Cipher": {

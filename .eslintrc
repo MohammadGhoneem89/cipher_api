@@ -245,7 +245,7 @@
     ],
     "strict": 2,
     "object-curly-spacing": [
-      2,
+      0,
       "always",
       {
         "arraysInObjects": true,
