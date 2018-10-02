@@ -1,24 +1,8 @@
 'use strict';
 
-const redis = require('core/api/connectors/redis');
-const config = require('../../../config/index');
-const logger = require('./logger');
-
-let _redis;
+const factory = require('../client/index');
+const crypto = require('../../../lib/helpers/crypto');
 
 module.exports = (() => {
-  _redis = _redis ? _redis : _createClient();
 
-  _redis.on('error', function(err) {
-    logger.app.error(err, 'Redis Connection Error');
-  });
-  _redis.on('warning', function(err) {
-    logger.app.error(err, 'Redis Connection Warning');
-  });
-
-  return _redis;
-
-  function _createClient() {
-    return redis.createClient(config.get('redis'));
-  }
 })();

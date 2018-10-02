@@ -1,5 +1,5 @@
 'use strict';
-
+const factory = require('./core/api/client/index');
 const config = require('./AppConfig');
 const gConfig = require('./config');
 const crypto = require('./lib/helpers/crypto');
@@ -8,16 +8,13 @@ const logger = require('./core/api/connectors/logger').app;
 
 const MQConnStr = crypto.decrypt(gConfig.get('amqp.url'));
 
-const open = require('amqplib').connect(MQConnStr);
-const openSend = require('amqplib');
+const open = factory.createClient('amqp', MQConnStr);
 
 let start = function (callback) {
   // Consumer
   if (config.EnableMQRead != "1") return;
 
-  open.then(conn => {
-    return conn.createChannel();
-  }).then(ch => {
+  open.then(ch => {
 
     let queueName = config.MessageQueueInfo.Express_Read;
     return ch.assertQueue(queueName, {durable: false}).then(ok => {
@@ -81,60 +78,6 @@ let getNewMessageForUnsubscription = function (eventname, subscriberId, params) 
   return Object.assign({}, msgFormat1);
 };
 
-let getNewMessageForReconValidate = function (userid, org, uuid, ip, action, others, reconType) {
-  let msgFormat1 = {
-    "header": {
-      "tranType": "0200",
-      "tranCode": "5000",
-      "userID": userid,
-      "org": "org1",
-      "timeStamp": Math.round((new Date()).getTime() / 1000).toString(),
-      "UUID": uuid,
-      "responseMQ": [config.MessageQueueInfo.Express_Read],
-      "ip": ip,
-      "service": "REST",
-      "action": action
-    },
-    "body": {
-      "fileName": others.fileName,
-      "filePath": others.filePath,
-      "reqType": others.orgType === "Entity" ? "E" : "A",
-      "shortCode": others.orgCode,
-      "serviceCode": others.serviceCode,
-      "IP": ip,
-      "reconType": reconType
-    }
-  };
-  return Object.assign({}, msgFormat1);
-};
-
-let getNewMessageForReconProcess = function (userid, org, uuid, ip, action, others, reconType) {
-  let msgFormat1 = {
-    "header": {
-      "tranType": "0200",
-      "tranCode": "5000",
-      "userID": userid,
-      "org": "org1",
-      "timeStamp": Math.round((new Date()).getTime() / 1000).toString(),
-      "UUID": uuid,
-      "responseMQ": [config.MessageQueueInfo.Express_Read],
-      "ip": ip,
-      "service": "REST",
-      "action": action
-    },
-    "body": {
-      "objectID": others.objectID || "",
-      "reqType": others.orgType === "Entity" ? "E" : "A",
-      "shortCode": others.orgCode,
-      "serviceCode": others.serviceCode,
-      "IP": ip,
-      "reconType": reconType
-    }
-  };
-  return Object.assign({}, msgFormat1);
-};
-
-
 function startSend() {
   return openSend.connect(MQConnStr)
     .then((conn) => conn.createChannel())
@@ -143,7 +86,6 @@ function startSend() {
       return setTimeout(startSend, 1000);
     });
 }
-
 
 var MQOut = function (chSend, sendQueueName, Message) {
 
@@ -154,7 +96,6 @@ var MQOut = function (chSend, sendQueueName, Message) {
   chSend.sendToQueue(sendQueueName, new Buffer(JSON.stringify(Message)));
 };
 
-
 let sendMessage = function (queueName, message) {
 
   //return;
@@ -162,12 +103,7 @@ let sendMessage = function (queueName, message) {
     queueName = config.MessageQueueInfo.RealTime_Write;
   }
   //sendResponse(MQConnStr ,queueName,message);
-
-
-  return open.then(conn => {
-    return conn.createChannel();
-
-  }).then(ch => {
+  return open.then(ch => {
     logger.info(message, 'message received');
     return ch.assertQueue(queueName, {durable: false}).then(ok => {
       ch.sendToQueue(queueName, new Buffer(JSON.stringify(message)));
@@ -183,8 +119,6 @@ module.exports = {
   start,
   getNewMessageForSubscription,
   getNewMessageForUnsubscription,
-  getNewMessageForReconValidate,
-  getNewMessageForReconProcess,
   startSend,
   MQOut
 };

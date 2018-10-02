@@ -1,18 +1,12 @@
 'use strict';
-
-const open = require('amqplib');
-const crypto = require('../../../lib/helpers/crypto');
 const config = require('../../../config/index');
+const factory = require('../client/index');
+const crypto = require('../../../lib/helpers/crypto');
 
-const MQConnStr = crypto.decrypt(config.get('amqp.url'));
+let mqConnection = crypto.decrypt(config.get('amqp.url'));
 
 function _start() {
-  return open.connect(MQConnStr)
-    .then((conn) => conn.createChannel())
-    .catch((err) => {
-      console.log('[AMQP] reconnecting', err); // eslint-disable-line no-console
-      return setTimeout(_start, 1000);
-    });
+  return factory.createClient('amqp', mqConnection);
 }
 
 module.exports = {
