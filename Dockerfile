@@ -20,6 +20,8 @@ RUN npm install
 # Bundle app source
 COPY . .
 
+RUN "mkdir /cipher/application/api/logs"
+
 EXPOSE 10051
 CMD [ "node", "app.js"]
 
