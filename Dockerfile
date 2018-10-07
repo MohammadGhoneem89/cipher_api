@@ -1,4 +1,4 @@
-FROM node:6.9.5
+FROM node:9.4.0
 
 # Create app directory
 WORKDIR /cipher/application/api
