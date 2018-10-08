@@ -539,6 +539,24 @@
       "MappingfunctionName": "upsertEventRegistry",
       "CustomMappingFile": "eventService/eventregistry.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getServiceList": {
+      "customMapping": true,
+      "MappingfunctionName": "getServiceList",
+      "CustomMappingFile": "eventService/datasource.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getEventServiceList": {
+      "customMapping": true,
+      "MappingfunctionName": "getServiceList",
+      "CustomMappingFile": "eventService/eventregistry.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getEventDispatcherStatus": {
+      "customMapping": true,
+      "MappingfunctionName": "getEventDispatcherStatus",
+      "CustomMappingFile": "eventService/eventdispatcher.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Cipher": {

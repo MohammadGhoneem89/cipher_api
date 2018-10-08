@@ -16,18 +16,17 @@ function getEventRegistry(payload, UUIDKey, route, callback, JWToken) {
         ]
       }];
 
-
-    data[0].forEach(element => {
+    data[0].forEach((element) => {
       let dtaSource = [];
       let dspthr = [];
-      element.dataSource.forEach(elem => {
+      element.dataSource.forEach((elem) => {
         dtaSource.push(elem.dataSourceName);
       });
-      element.dipatcher.forEach(elem => {
+      element.dipatcher.forEach((elem) => {
         dspthr.push(elem.dispatcherName);
       });
-      element.dataSource = dtaSource.join(', ')
-      element.dipatcher = dspthr.join(', ')
+      element.dataSource = dtaSource.join(', ');
+      element.dipatcher = dspthr.join(', ');
       element.actions = actions;
       element.createdBy = element.createdBy ? element.createdBy.userID : '';
     });
@@ -73,28 +72,25 @@ function getEventRegistryByID(payload, UUIDKey, route, callback, JWToken) {
     eventRegistry.findById(payload)
   ]).then((data) => {
 
-
     let dtaSource = [];
-    let dspthr = []
+    let dspthr = [];
     if (data[2]) {
 
-      data[2].rule.forEach(elem => {
-        elem.actions = [{label: "Delete", iconName: "fa fa-trash", actionType: "COMPONENT_FUNCTION"}]
-      })
+      data[2].rule.forEach((elem) => {
+        elem.actions = [{label: "Delete", iconName: "fa fa-trash", actionType: "COMPONENT_FUNCTION"}];
+      });
 
-      data[2].dataSource.forEach(elem => {
+      data[2].dataSource.forEach((elem) => {
         data[0].forEach((elemt, index) => {
-          if (elem.dataSourceName == elemt.dataSourceName)
-            dtaSource.push(index);
-        })
-      })
+          if (elem.dataSourceName == elemt.dataSourceName) {dtaSource.push(index);}
+        });
+      });
 
-      data[2].dipatcher.forEach(elem => {
+      data[2].dipatcher.forEach((elem) => {
         data[1].forEach((elemt, index) => {
-          if (elem.dispatcherName == elemt.dispatcherName)
-            dspthr.push(index);
-        })
-      })
+          if (elem.dispatcherName == elemt.dispatcherName) {dspthr.push(index);}
+        });
+      });
     }
     let response = {
       "AddUpdateEventList": {
@@ -107,11 +103,11 @@ function getEventRegistryByID(payload, UUIDKey, route, callback, JWToken) {
           "eventData": data[2]
         }
       }
-    }
+    };
     callback(response);
   }).catch((err) => {
-    callback(err)
-  })
+    callback(err);
+  });
 
 }
 
@@ -137,19 +133,20 @@ function upsertEventRegistry(payload, UUIDKey, route, callback, JWToken) {
     eventRegistry.update({eventName: payload.eventName}, payload).then((data) => {
 
       resp.responseMessage.data.message.status = "OK";
-      console.log(data)
+      console.log(data);
 
       data.nModified > 0 ?
         resp.responseMessage.data.message.errorDescription = "Record Updated Success!!" :
         resp.responseMessage.data.message.errorDescription = "Record Inserted Successfully!!";
 
-      resp.responseMessage.data.message.newPageURL = "/eventList"
+      resp.responseMessage.data.message.newPageURL = "/eventList";
       callback(resp);
     }).catch((err) => {
       console.log(err);
       callback(resp);
-    })
-  } else {
+    });
+  }
+  else {
     resp.responseMessage.data.message.status = "ERROR";
     resp.responseMessage.data.message.errorDescription = "Event Name is required!";
     resp.responseMessage.data.message.newPageURL = "";
@@ -157,6 +154,15 @@ function upsertEventRegistry(payload, UUIDKey, route, callback, JWToken) {
   }
 }
 
+function getServiceList(payload, UUIDKey, route, callback, JWToken) {
+  eventRegistry.getServiceList().then((data) => {
+    callback(data);
+  }).catch((err) => {
+    callback(err);
+  });
+}
+
 exports.getEventRegistry = getEventRegistry;
 exports.getEventRegistryByID = getEventRegistryByID;
 exports.upsertEventRegistry = upsertEventRegistry;
+exports.getServiceList = getServiceList;
