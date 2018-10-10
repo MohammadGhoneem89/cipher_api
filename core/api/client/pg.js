@@ -5,7 +5,7 @@ var PGExistingList = {};
 module.exports = async function (connectionURL) {
     const hash = crypto.createHash('md5').update(connectionURL).digest("hex");
     const createNewInstance = async () => {
-        let client = new pg({
+        let client = new pg.Client({
             connectionString: connectionURL,
         });
         PGExistingList[hash] = await client.connect();
