@@ -8,11 +8,12 @@ module.exports = async function (connectionURL) {
         let client = new pg.Client({
             connectionString: connectionURL,
         });
-        PGExistingList[hash] = await client.connect();
+        await client.connect();
         client.on('error', async (err) => {
             console.error('something bad has happened!', err.stack);
             await createNewInstance();
-        })
+        });
+        PGExistingList[hash] = client;
     }
 
     if (PGExistingList[hash]) {
