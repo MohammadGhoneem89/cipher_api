@@ -565,6 +565,14 @@
       "MappingfunctionName": "health",
       "CustomMappingFile": "healthService/health.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "Invoke": {
+      "protoFile": "Rest.proto",
+      "GRPCServiceIP": "10.65.10.18",
+      "GRPCServicePort": "1010",
+      "isAsync": false,
+      "customMapping": false,
+      "mappingConfigFile": "InvokeMapping"
     }
   },
   "Quorum": {

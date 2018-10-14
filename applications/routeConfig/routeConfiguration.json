@@ -6,6 +6,18 @@
       "MappingfunctionName": "viewItem",
       "CustomMappingFile": "general/viewItem.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getAccountList": {
+      "customMapping": true,
+      "MappingfunctionName": "GetAccountList",
+      "CustomMappingFile": "blockchainAccounts/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateAccountList": {
+      "customMapping": true,
+      "MappingfunctionName": "UpdateAccountList",
+      "CustomMappingFile": "blockchainAccounts/updates.js",
+      "mappingConfigFile": "ePayMapping"
     }
   }
 }

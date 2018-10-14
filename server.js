@@ -56,8 +56,8 @@ const appServer = app.listen(config.get('port'), function () {
   console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
 });
 
-let HealthCheckHelper = require('./core/utils/health.js');
-let heathService = new HealthCheckHelper("REST", 10000, crypto.decrypt(config.get('amqp.url')));
+// let HealthCheckHelper = require('./core/utils/health.js');
+// let heathService = new HealthCheckHelper("REST", 10000, crypto.decrypt(config.get('amqp.url')));
 
 serverStats.upsert();
 // soapChannel.listen();
