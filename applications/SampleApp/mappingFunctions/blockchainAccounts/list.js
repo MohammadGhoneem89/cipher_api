@@ -1,5 +1,7 @@
 const blockchainAccountServices = require('../../lib/services').blockchainAccount;
 const logger = require('../../../../lib/helpers/logger')().app;
+const config = require('../../../../config/index');
+const crypto = require('../../../../lib/helpers/crypto');
 
 function GetAccountList(payload, UUIDKey, route, callback, JWToken) {
   payload.userId = JWToken._id;
@@ -8,7 +10,7 @@ function GetAccountList(payload, UUIDKey, route, callback, JWToken) {
 
 async function get(payload, callback) {
   try {
-    let pg = 'postgresql://Admin:avanza123@blockchain.avanza.com:5432/OLAPCipher';
+    let pg = crypto.decrypt(config.get('postgressqlConfig.url'));
     let result = await blockchainAccountServices.getAccountList({pg});
     let data = result.accountList.map((item)=>{
       return {
@@ -34,10 +36,6 @@ async function get(payload, callback) {
     console.log(e);
     logger.app.info(e)
   }
-  // .catch((err) => {
-  //   logger.error(' [ Consortium Details ] Error : ' + err);
-  //   callback(err);
-  // });
 }
 
 exports.GetAccountList = GetAccountList;

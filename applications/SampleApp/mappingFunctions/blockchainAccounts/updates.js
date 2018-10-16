@@ -13,7 +13,7 @@ async function _get(payload, callback) {
   logger.debug(' [ Blockchain Account List ] Payload : ' + JSON.stringify(payload));
   try {
     let amqp = crypto.decrypt(config.get('amqp.url'));
-    let result = await blockchainAccountServices.upsertAccount({amqp}, {});
+    let result = await blockchainAccountServices.upsertAccount({amqp}, payload);
     const response = {
       responseMessage: {
         action: "updateAccountList",
@@ -30,6 +30,7 @@ async function _get(payload, callback) {
     callback(response);
   }
   catch (e) {
+    console.log(e);
     //   logger.error(' [ Consortium Details ] Error : ' + err);
     const response = {
       responseMessage: {

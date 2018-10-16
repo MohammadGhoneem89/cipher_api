@@ -1,6 +1,5 @@
-'use strict';
 
-const validator = require('../../../../lib/validator');
+const validator = require('../validator');
 const blockchainAccountRepo = require('../repositories').blockchainAccount;
 const permissionsHelper = require('../../../../lib/helpers/permissions');
 const permissionConst = require('../../../../lib/constants/permissions');
@@ -10,16 +9,14 @@ async function getAccountList(conStr) {
   let db = await blockchainAccountRepo.start(conStr);//To initialize db connection
   let [accountList, accountCount] = await Promise.all(
     [blockchainAccountRepo.selectAccounts(db),
-    blockchainAccountRepo.selectTotalCount(db)]);
+      blockchainAccountRepo.selectTotalCount(db)]);
   accountList = accountList.rows;
   accountCount = accountCount.rows;
   return {accountList, accountCount}
 }
 
-async function upsertAccount(conStr, payload){
-
-  const queueName = "BLA_Input_Queue";
-  const message = {
+async function sendBLAInvokeMsg(connection, queueName, fcnName, arguments) {
+  let message = {
     "Header": {
       "tranType": "0200",
       "tranCode": "0002",
@@ -29,22 +26,26 @@ async function upsertAccount(conStr, payload){
       "timeStamp": "8/3/2017, 4:06:33 AM",
       "ResponseMQ": ["Response_Input_Queue"]
     },
-    "BCData":{
+    "BCData": {
       "configType": "peerInvoke"
     },
-    "Body":{
-      "fcnName": "UpdateBalance",
-      "arguments": ["a", "50"]
+    "Body": {
+      fcnName,
+      arguments
     }
   };
+  return connection.assertQueue(queueName, {durable: false}).then(function (ok) {
+    connection.sendToQueue(queueName, new Buffer(JSON.stringify(message)));
+  });
+}
+
+async function upsertAccount(conStr, payload) {
+  let data = payload.data;
   try {
-    // let mq = await blockchainAccountRepo.start(conStr);
-    console.log(conStr.amqp);
+    await validator.validate(payload, validator.schemas.blockchainAccount.update);
     let amqp = await connector.createClient('amqp', conStr.amqp);
-    console.log(amqp);
-    return amqp.assertQueue(queueName).then(function (ok) {
-      amqp.sendToQueue(queueName, new Buffer(JSON.stringify(message)));
-    });
+    await sendBLAInvokeMsg(amqp,"BLA_Input_Queue","UpdateBalance",[data.accountName, data.amount]);
+
   }
   catch (e) {
     console.log(e);
