@@ -1,6 +1,7 @@
+'use strict';
 const eventDispatcher = require('../../../lib/repositories/eventDispatcher');
 const dates = require('../../../lib/helpers/dates');
-
+const pg = require('../../api/connectors/postgress');
 function getEventDispatcher(payload, UUIDKey, route, callback, JWToken) {
   eventDispatcher.findPageAndCount(payload).then((data) => {
     callback(data);
@@ -44,7 +45,7 @@ function upsertEventDispatcher(payload, UUIDKey, route, callback, JWToken) {
     let response = {
       msg: "dispatcherName is required"
     };
-    callback(response);
+    return callback(response);
   }
 }
 
@@ -76,37 +77,37 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
   let queryCriteria = queryCnt + query;
   let queryCriteriaFull = queryData + query;
   if (payload.page) {queryCriteriaFull += ` order by createdon desc limit ${payload.page.pageSize} OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)}`;}
+  pg.connection().then((conn) => {
+    return Promise.all([
+      conn.query(queryCriteria, []),
+      conn.query(queryCriteriaFull, [])
+    ]).then((data) => {
 
-  Promise.all([
-    global.client.query(queryCriteria, []),
-    global.client.query(queryCriteriaFull, [])
-  ]).then((data) => {
+      data[1].rows.forEach((elemt) => {
+        elemt.dispatcher = elemt.dispatcher.dispatcherName;
+        elemt.datasource = elemt.datasource.dataSourceName;
+        elemt.createdon = dates.shortDate(elemt.createdon);
+        elemt.updatedon = dates.shortDate(elemt.updatedon);
+        elemt.status = Status(elemt.status);
+      });
 
-    data[1].rows.forEach((elemt) => {
-      elemt.dispatcher = elemt.dispatcher.dispatcherName;
-      elemt.datasource = elemt.datasource.dataSourceName;
-      elemt.createdon = dates.shortDate(elemt.createdon);
-      elemt.updatedon = dates.shortDate(elemt.updatedon);
-      elemt.status = Status(elemt.status);
-
-    });
-
-    let response = {
-      "EventDispatcherStatus": {
-        "action": "EventDispatcherStatus",
-        "pageData": {
-          "pageSize": payload.page.pageSize,
-          "currentPageNo": payload.page.currentPageNo,
-          "totalRecords": data[0].rows.count
-        },
-        "data": {
-          "searchResult": data[1].rows
-
+      let response = {
+        "EventDispatcherStatus": {
+          "action": "EventDispatcherStatus",
+          "pageData": {
+            "pageSize": payload.page.pageSize,
+            "currentPageNo": payload.page.currentPageNo,
+            "totalRecords": data[0].rows.count
+          },
+          "data": {
+            "searchResult": data[1].rows
+          }
         }
-      }
-    };
-
-    callback(response);
+      }; 
+      return callback(response);
+    });
+  }).catch((err) => {
+    console.log(err);
   });
 }
 

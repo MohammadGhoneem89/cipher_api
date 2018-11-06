@@ -65,6 +65,7 @@
     "node-rest-client": "^3.1.0",
     "oad": "^0.1.0",
     "pg": "^7.4.3",
+    "pg-promise": "^8.5.1",
     "process-nextick-args": "^2.0.0",
     "redis": "^2.8.0",
     "request-json": "^0.6.3",

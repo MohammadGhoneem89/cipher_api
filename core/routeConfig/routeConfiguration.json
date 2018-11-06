@@ -573,6 +573,12 @@
       "isAsync": false,
       "customMapping": false,
       "mappingConfigFile": "InvokeMapping"
+    },
+    "Query": {
+      "customMapping": true,
+      "MappingfunctionName": "main",
+      "CustomMappingFile": "hyperledger/index.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Quorum": {

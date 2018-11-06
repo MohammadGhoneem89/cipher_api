@@ -5,7 +5,7 @@
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
     },
-    "url": "http://blockchain.avanza.com:9009/keyVault"
+    "url": "http://blockchain.avanza.com:9019/keyVault"
   }
 }
 

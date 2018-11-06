@@ -1,4 +1,4 @@
-const pg = require("pg");
+const { Pool } = require('pg')
 
 const crypto = require('crypto');
 
@@ -8,12 +8,14 @@ var PGExistingList = {};
 module.exports = async function (connectionURL) {
   const hash = crypto.createHash('md5').update(connectionURL).digest("hex");
   const createNewInstance = async () => {
-    let client = new pg.Client({
+
+  
+    let pool =  new Pool({
       connectionString: connectionURL,
     });
-    await client.connect();
-    PGExistingList[hash] = client;
-    client.on('error', async (err) => {
+    await pool.connect();
+    PGExistingList[hash] = pool;
+    pool.on('error', async (err) => {
       console.error('something bad has happened!', err.stack);
       await createNewInstance();
     })
