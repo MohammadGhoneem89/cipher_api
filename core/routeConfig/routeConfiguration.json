@@ -1,4 +1,68 @@
 {
+  "core": {
+    "getAPIDefinition": {
+      "customMapping": true,
+      "MappingfunctionName": "getAPIDefinition",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAPIDefinitionID": {
+      "customMapping": true,
+      "MappingfunctionName": "getAPIDefinitionID",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "upsertAPIDefinition": {
+      "customMapping": true,
+      "MappingfunctionName": "upsertAPIDefinition",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    
+    "getActiveAPIList": {
+      "customMapping": true,
+      "MappingfunctionName": "getActiveAPIList",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAPIList": {
+      "customMapping": true,
+      "MappingfunctionName": "getServiceList",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getMappingConfig": {
+      "customMapping": true,
+      "MappingfunctionName": "getMappingConfig",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getMappingConfigByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getMappingConfigByID",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "upsertMappingConfig": {
+      "customMapping": true,
+      "MappingfunctionName": "upsertMappingConfig",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getMappingList": {
+      "customMapping": true,
+      "MappingfunctionName": "getServiceList",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getListFunction": {
+      "customMapping": true,
+      "MappingfunctionName": "getListFunction",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+    
+  },
   "UI": {
     "permission": {
       "customMapping": true,

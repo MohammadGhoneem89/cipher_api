@@ -14,13 +14,12 @@ const apiPayloadRepo = require('../../lib/repositories/apiPayload');
 const _ = require('lodash');
 
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
-
   logger.debug({
     fs: 'RestController.js',
     func: 'handleExternalRequest'
   }, "===========Got Message [" + UUIDKey + "]!!!============");
-  logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, JSON.stringify(payload, null, 2));
-  logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, incommingRoute);
+  logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, JSON.stringify(payload, null, 2));
+  logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, incommingRoute);
 
   let requestData = {
     uuid: UUIDKey,
@@ -48,8 +47,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       responseCallback.send(error);
       return responseCallback.end();
     }
-    logger.debug({fs: 'RestController.js', func: 'ResponseCaller'}, JSON.stringify(data, null, 2));
-    logger.debug({fs: 'RestController.js', func: 'ResponseCaller'}, "=========== [" + UUIDKey + "]!!! ============");
+    logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, JSON.stringify(data, null, 2));
+    logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, "=========== [" + UUIDKey + "]!!! ============");
     responseCallback.send(data);
     return;
   };
@@ -60,7 +59,6 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   try {
 
     let routeConfigTemp = routeConfiguration[channel][incommingRoute];
-
     if (routeConfigTemp && routeConfigTemp.isRouteOveride && routeConfigTemp.isRouteOveride === true) {
       if (routeConfigTemp.fieldName && routeConfigTemp.Hierarchy) {
         try {
@@ -185,7 +183,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         fs: 'RestController.js',
         func: 'handleExternalRequest'
       }, " [handleExternalRequest] Value Extracted Successfully");
-      logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, " [handleExternalRequest] Value: " + val);
+      logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, " [handleExternalRequest] Value: " + val);
 
       logger.debug({
         fs: 'RestController.js',
@@ -445,14 +443,14 @@ function parseAndMapResponse(response, dependencyResponse, tranMapping, ErrorMes
       fs: 'RestController.js',
       func: 'parseAndMapResponse'
     }, " [parseAndMapResponse] Value Extracted Successfully");
-    logger.debug({fs: 'RestController.js', func: 'parseAndMapResponse'}, " [parseAndMapResponse] Value: " + val);
+    logger.debug({ fs: 'RestController.js', func: 'parseAndMapResponse' }, " [parseAndMapResponse] Value: " + val);
     logger.debug({
       fs: 'RestController.js',
       func: 'parseAndMapResponse'
     }, " [parseAndMapResponse] Executing validation function");
 
     if (true) {
-      logger.debug({fs: 'RestController.js', func: 'parseAndMapResponse'}, " [parseAndMapResponse] Validation Success");
+      logger.debug({ fs: 'RestController.js', func: 'parseAndMapResponse' }, " [parseAndMapResponse] Validation Success");
       logger.debug({
         fs: 'RestController.js',
         func: 'parseAndMapResponse'
@@ -505,7 +503,7 @@ function parseAndMapResponse(response, dependencyResponse, tranMapping, ErrorMes
 
     }
     else {
-      logger.debug({fs: 'RestController.js', func: 'parseAndMapResponse'}, " [parseAndMapResponse] Validation Failure");
+      logger.debug({ fs: 'RestController.js', func: 'parseAndMapResponse' }, " [parseAndMapResponse] Validation Failure");
       errorField += rightObjConfigurationMap.fieldName + " ";
       isError = true;
       // break;
@@ -519,7 +517,7 @@ function parseAndMapResponse(response, dependencyResponse, tranMapping, ErrorMes
 
 function sendGRPCRequest(protoFile, srvcAddressNPort, Request, UUIDKey, responseCallback, tranMapping, ErrorMessage) {
 
-  logger.debug({fs: 'RestController.js', func: 'sendGRPCRequest'}, ' [sendGRPCRequest] protoFile: ' + protoFile);
+  logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, ' [sendGRPCRequest] protoFile: ' + protoFile);
   logger.debug({
     fs: 'RestController.js',
     func: 'sendGRPCRequest'
@@ -532,7 +530,7 @@ function sendGRPCRequest(protoFile, srvcAddressNPort, Request, UUIDKey, response
   // var RESTSrvc = grpc.load(protoFile);
   let RESTSrvc = "";
   let client = new RESTSrvc.BLA.BLAService(srvcAddressNPort, grpc.credentials.createInsecure());
-  logger.debug({fs: 'RestController.js', func: 'sendGRPCRequest'}, ' [sendGRPCRequest] Sending query to Micservice');
+  logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, ' [sendGRPCRequest] Sending query to Micservice');
   client.query(Request, function (error, msg) {
 
     // printResponse(error, msg);
@@ -679,7 +677,7 @@ function parseDataAndExtractValue(payload, extConfig) {
 
   }
   catch (exp) {
-    logger.debug({fs: 'RestController.js', func: 'parseAndMapResponse'}, " [parseAndMapResponse] Exception: " + exp);
+    logger.debug({ fs: 'RestController.js', func: 'parseAndMapResponse' }, " [parseAndMapResponse] Exception: " + exp);
   }
 
   return obj;
@@ -705,7 +703,7 @@ function parseDependencyDataAndExtractValue(payload, extConfig) {
 
   }
   catch (exp) {
-    logger.debug({fs: 'RestController.js', func: 'parseAndMapResponse'}, " [parseAndMapResponse] Exception: " + exp);
+    logger.debug({ fs: 'RestController.js', func: 'parseAndMapResponse' }, " [parseAndMapResponse] Exception: " + exp);
   }
   return obj;
 

@@ -1,3 +1,4 @@
+'use strict';
 const eventRegistry = require('../../../lib/repositories/eventRegistry');
 const dataSource = require('../../../lib/repositories/dataSource');
 const eventDispatcher = require('../../../lib/repositories/eventDispatcher');
@@ -77,18 +78,18 @@ function getEventRegistryByID(payload, UUIDKey, route, callback, JWToken) {
     if (data[2]) {
 
       data[2].rule.forEach((elem) => {
-        elem.actions = [{label: "Delete", iconName: "fa fa-trash", actionType: "COMPONENT_FUNCTION"}];
+        elem.actions = [{ label: "Delete", iconName: "fa fa-trash", actionType: "COMPONENT_FUNCTION" }];
       });
 
       data[2].dataSource.forEach((elem) => {
         data[0].forEach((elemt, index) => {
-          if (elem.dataSourceName == elemt.dataSourceName) {dtaSource.push(index);}
+          if (elem.dataSourceName == elemt.dataSourceName) { dtaSource.push(index); }
         });
       });
 
       data[2].dipatcher.forEach((elem) => {
         data[1].forEach((elemt, index) => {
-          if (elem.dispatcherName == elemt.dispatcherName) {dspthr.push(index);}
+          if (elem.dispatcherName == elemt.dispatcherName) { dspthr.push(index); }
         });
       });
     }
@@ -130,7 +131,7 @@ function upsertEventRegistry(payload, UUIDKey, route, callback, JWToken) {
 
   if (payload.eventName) {
 
-    eventRegistry.update({eventName: payload.eventName}, payload).then((data) => {
+    eventRegistry.update({ eventName: payload.eventName }, payload).then((data) => {
 
       resp.responseMessage.data.message.status = "OK";
       console.log(data);
@@ -143,14 +144,14 @@ function upsertEventRegistry(payload, UUIDKey, route, callback, JWToken) {
       callback(resp);
     }).catch((err) => {
       console.log(err);
-      callback(resp);
+      return callback(resp);
     });
   }
   else {
     resp.responseMessage.data.message.status = "ERROR";
     resp.responseMessage.data.message.errorDescription = "Event Name is required!";
     resp.responseMessage.data.message.newPageURL = "";
-    callback(resp);
+    return callback(resp);
   }
 }
 
