@@ -190,7 +190,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         func: 'handleExternalRequest'
       }, " [handleExternalRequest] Executing validation function");
 
-      if (execValidation(val, leftObjConfigurationMap.validationFunction) === true) {
+      if (execValidation(val, leftObjConfigurationMap.validationFunction, payload) === true) {
         logger.debug({
           fs: 'RestController.js',
           func: 'handleExternalRequest'
@@ -649,12 +649,12 @@ function execTrigger(payload, extConfig) {
   return outVal;
 }
 
-function execValidation(value, functionName) {
+function execValidation(value, functionName, payload) {
   logger.debug({
     fs: 'RestController.js',
     func: 'execTrigger'
   }, " [execValidation] Calling function from validation functions : " + functionName);
-  let outVal = validationFunctions[functionName](value);
+  let outVal = validationFunctions[functionName](value, payload);
   return outVal;
 }
 

@@ -1,5 +1,6 @@
 'use strict';
 const MappingConfig = require('../../../lib/repositories/mappingConfig');
+const typeData = require('../../../lib/repositories/typeData');
 let customFunctions = require('../../Common/customFunctions.js');
 let validationFunctions = require('../../Common/validationFunctions.js');
 function getMappingConfig(payload, UUIDKey, route, callback, JWToken) {
@@ -163,28 +164,41 @@ function getListFunction(payload, UUIDKey, route, callback, JWToken) {
       "action": "FunctionData",
       "data": {
         custom: [],
-        validation: []
+        validation: [],
+        typeDataList: []
       }
     }
   };
-
-  for (let key in validationFunctions) {
-    let obj = {
-      "label": key,
-      "value": key
-    };
-    resp.FunctionData.data.validation.push(obj);
+  let Projection = {
+    "data": 1
   };
-
-  for (let key in customFunctions) {
-    let obj = {
-      "label": key,
-      "value": key
+  typeData.selectProjected({}, Projection).then((data) => {
+    data.forEach((element) => {
+      for (let key in element.data) {
+        let obj = {
+          "label": key,
+          "value": key
+        };
+        resp.FunctionData.data.typeDataList.push(obj);
+      }
+    });
+    for (let key in validationFunctions) {
+      let obj = {
+        "label": key,
+        "value": key
+      };
+      resp.FunctionData.data.validation.push(obj);
     };
-    resp.FunctionData.data.custom.push(obj);
-  };
-  callback(resp);
 
+    for (let key in customFunctions) {
+      let obj = {
+        "label": key,
+        "value": key
+      };
+      resp.FunctionData.data.custom.push(obj);
+    };
+    callback(resp);
+  });
 }
 
 exports.getMappingConfig = getMappingConfig;
