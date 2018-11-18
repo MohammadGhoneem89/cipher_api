@@ -48,7 +48,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     //record case
     let apiSample = _.cloneDeep(payload);
     if (_.get(apiSample, '_apiRecorder', false) === true) {
-      apiSample = _.omit(apiSample, 'token', 'action', 'channel', 'ipAddress', '_apiRecorder');
+      apiSample = _.omit(apiSample, 'token', 'action', 'channel', 'ipAddress', '_apiRecorder', 'JWToken', 'header');
       APIDefination.updateRequestStub(apiSample, incommingRoute, channel);
     }
     responseCallback.send(data);
