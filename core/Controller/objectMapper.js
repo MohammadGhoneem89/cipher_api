@@ -22,10 +22,10 @@ module.exports = class ObjectMapper {
   validate(element) {
     return new Promise((resolve, reject) => {
       let value = _.get(this.request, element.IN_FIELD, null);
-      if (!value && element.IN_ISREQUIRED == "Y") {
+      if (value !== false && !value && element.IN_ISREQUIRED == "Y") {
         reject(`${element.IN_FIELD} is Required!`);
       }
-      else if (value) {
+      else if (value === false || value) {
         let isTypeMatch = this.DataTypeMatchCheck(element.IN_FIELDDT, value);
         if (isTypeMatch === false) {
           reject(`${element.IN_FIELD} type should be ${element.IN_FIELDDT}!`);
