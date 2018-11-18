@@ -8,7 +8,7 @@ const GeneralRequestProcessor = require('./requestProcessor');
 const constants = require('../Common/constants_en.js');
 const ObjectMapper = require('./objectMapper');
 const OldRestController = require('./_RestController');
-
+const APIDefination = require('../mappingFunctions/systemAPI/APIDefination');
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
   logger.debug({
     fs: 'RestController.js',
@@ -45,6 +45,12 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     }
     logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, JSON.stringify(data, null, 2));
     logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, "=========== [" + UUIDKey + "]!!! ============");
+    //record case
+    let apiSample = _.cloneDeep(payload);
+    if (_.get(apiSample, '_apiRecorder', false) === true) {
+      apiSample = _.omit(apiSample, 'token', 'action', 'channel', 'ipAddress', '_apiRecorder');
+      APIDefination.updateRequestStub(apiSample, incommingRoute, channel);
+    }
     responseCallback.send(data);
     return;
   };

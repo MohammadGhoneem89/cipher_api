@@ -3,6 +3,13 @@ const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
 
+function updateRequestStub(payload, route, useCase) {
+  let query = { 'sampleRequest': payload };
+  APIDefinitation.update({ route: route, useCase: useCase }, query).then((data) => {
+    console.log("request Sample Updated!");
+  });
+}
+
 function LoadConfig() {
   let Projection = {
     "data": 1
@@ -221,3 +228,4 @@ exports.upsertAPIDefinition = upsertAPIDefinition;
 exports.getServiceList = getServiceList;
 exports.getActiveAPIList = getActiveAPIList;
 exports.LoadConfig = LoadConfig;
+exports.updateRequestStub = updateRequestStub;
