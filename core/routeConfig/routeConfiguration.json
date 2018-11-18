@@ -1,5 +1,30 @@
 {
   "core": {
+    "updateModuleConfig":{
+      "customMapping": true,
+      "MappingfunctionName": "updateModuleConfig",
+      "CustomMappingFile": "systemAPI/moduleConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getModuleList":{
+      "customMapping": true,
+      "MappingfunctionName": "getModuleConfig",
+      "CustomMappingFile": "systemAPI/moduleConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getModuleConfigByID":{
+      "customMapping": true,
+      "MappingfunctionName": "getModuleConfigByID",
+      "CustomMappingFile": "systemAPI/moduleConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    
+    "getTypeDataList":{
+      "customMapping": true,
+      "MappingfunctionName": "getTypeDataList",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getAPIDefinition": {
       "customMapping": true,
       "MappingfunctionName": "getAPIDefinition",

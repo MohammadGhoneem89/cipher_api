@@ -1,6 +1,42 @@
 'use strict';
 const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
+const typeData = require('../../../lib/repositories/typeData');
+
+function LoadConfig() {
+  let Projection = {
+    "data": 1
+  };
+  return Promise.all([
+    typeData.selectProjected({}, Projection),
+    APIDefinitation.getAPIConfig()
+  ]).then((data) => {
+    let typeObj = {};
+    data[0].forEach((element) => {
+      for (let key in element.data) {
+        let arrEnum = [];
+        element.data[key].forEach((object) => {
+          arrEnum.push(object.value);
+        });
+        _.set(typeObj, key, arrEnum);
+      }
+    });
+
+    let grouped = _.groupBy(data[1], 'useCase');
+    let routeConfig = {};
+    data[1].forEach((data) => {
+      let dest = data.useCase + "." + data.route;
+      data.RequestMapping = data.RequestMapping.fields;
+      data.ResponseMapping = data.ResponseMapping.fields;
+      let groupedRoute = _.omit(data, 'route', 'useCase');
+      _.set(routeConfig, dest, groupedRoute);
+    });
+    global.routeConfig = routeConfig;
+    global.enumInfo = typeObj;
+    return Promise.resolve();
+
+  });
+}
 function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
   APIDefinitation.findPageAndCount(payload).then((data) => {
     let actions = [
@@ -88,7 +124,6 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
   };
 
   if (payload.route && payload.useCase) {
-
     APIDefinitation.findById(payload).then((data) => {
       if (payload.operation === "insert" && data && data.length !== 0) {
         resp.responseMessage.data.message.status = "ERROR";
@@ -105,6 +140,9 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
           resp.responseMessage.data.message.errorDescription = "Record Inserted Successfully!!";
 
         resp.responseMessage.data.message.newPageURL = "/ApiList";
+        LoadConfig().then(() => {
+          console.log('Configurations Loaded For Request Processing!!');
+        });
         callback(resp);
       });
 
@@ -123,7 +161,22 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
 
 function getServiceList(payload, UUIDKey, route, callback, JWToken) {
   APIDefinitation.getServiceList().then((data) => {
-    callback(data);
+    let resp = {
+      "ApiListCombo": {
+        "action": "ApiListCombo",
+        "data": {
+          ApiList: []
+        }
+      }
+    };
+    data.forEach((key) => {
+      let obj = {
+        "label": `/${key.useCase}/${key.route}`,
+        "value": `/${key.useCase}/${key.route}`
+      };
+      resp.ApiListCombo.data.ApiList.push(obj);
+    });
+    callback(resp);
   }).catch((err) => {
     callback(err);
   });
@@ -167,3 +220,4 @@ exports.getAPIDefinitionID = getAPIDefinitionID;
 exports.upsertAPIDefinition = upsertAPIDefinition;
 exports.getServiceList = getServiceList;
 exports.getActiveAPIList = getActiveAPIList;
+exports.LoadConfig = LoadConfig;

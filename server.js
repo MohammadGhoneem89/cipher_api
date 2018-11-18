@@ -31,11 +31,11 @@ const serverStats = require('./lib/services/serverStats');
 const notification = require('./core/mappingFunctions/notification/list');
 
 process.on('uncaughtException', (err) => {
-  logger.error({fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack}, 'uncaught exception');
+  logger.error({ fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack }, 'uncaught exception');
 });
 
 process.on('unhandledRejection', function (err) {
-  logger.error({fs: 'app.js', func: 'unhandledRejection', error: err, stack: err.stack}, 'unhandled Rejection');
+  logger.error({ fs: 'app.js', func: 'unhandledRejection', error: err, stack: err.stack }, 'unhandled Rejection');
 });
 
 const pagesKey = {};
@@ -48,14 +48,18 @@ mongoDB.connection(config.get('mongodb.url'));
 
 app = expressWs.app;
 
-const appServer = app.listen(config.get('port'), function () {
-  logger.info({
-    fs: 'app.js ',
-    func: 'index'
-  }, 'server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
-  console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
+const routeData = require('./core/mappingFunctions/systemAPI/APIDefination');
+let appServer;
+routeData.LoadConfig().then(() => {
+  console.log('Configurations Loaded For Request Processing!!');
+  appServer = app.listen(config.get('port'), function () {
+    logger.info({
+      fs: 'app.js ',
+      func: 'index'
+    }, 'server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
+    console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
+  });
 });
-
 // let HealthCheckHelper = require('./core/utils/health.js');
 // let heathService = new HealthCheckHelper("REST", 10000, crypto.decrypt(config.get('amqp.url')));
 
@@ -75,8 +79,8 @@ if (config.get('enableMQRead') == '1') {
   MQ.start(ReadIncomingMessage);
 }
 
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(requestLog);
 
@@ -98,7 +102,7 @@ function SendLater(msg, newmsg) {
     socketKey[msg.header.userID].send(JSON.stringify(newmsg));
   }
   catch (err) {
-    logger.error({fs: 'app.js', func: 'SendLater'}, err, 'cannot send message to socket as socket is closed');
+    logger.error({ fs: 'app.js', func: 'SendLater' }, err, 'cannot send message to socket as socket is closed');
   }
 
 }
@@ -110,7 +114,7 @@ function handleRealTimeEvents(msg) {
       if (socketKey[msg.header.subscriberId]) {
         if (lastSubscription[msg.header.subscriberId]) {
           if (JSON.stringify(msg.header.params) === JSON.stringify(lastSubscription[msg.header.subscriberId].params) && msg.header.page === lastSubscription[msg.header.subscriberId].page) {
-            logger.info({fs: 'app.js', func: 'handleRealTimeEvents'}, msg, 'Incoming Message Received');
+            logger.info({ fs: 'app.js', func: 'handleRealTimeEvents' }, msg, 'Incoming Message Received');
             socketKey[msg.header.subscriberId].send(JSON.stringify(msg.body));
           }
         }
@@ -121,7 +125,7 @@ function handleRealTimeEvents(msg) {
 
     }
     catch (err) {
-      logger.error({fs: 'app.js', func: 'handleRealTimeEvents'}, err, 'connection is closed unsubscribing');
+      logger.error({ fs: 'app.js', func: 'handleRealTimeEvents' }, err, 'connection is closed unsubscribing');
       unsubscribeOnClosedConnection(msg.header.subscriberId);
     }
   }
@@ -148,8 +152,8 @@ function handleRealTimeNotification(msg) {
       socketKey[msg.body.userID].send(JSON.stringify(messageJson));
 
       const param = {
-        'page': {'currentPageNo': 1, 'pageSize': 5},
-        'sortBy': {'createdAt': -1},
+        'page': { 'currentPageNo': 1, 'pageSize': 5 },
+        'sortBy': { 'createdAt': -1 },
         'userID': msg.body.userID,
         'action': 'notificationList'
       };
@@ -190,7 +194,7 @@ function passOnCall(msg, uri) {
     })
     .catch(function (err) {
       // POST failed...
-      logger.error({fs: 'app.js', func: 'passOnCall'}, err, 'Broadcasted to other server');
+      logger.error({ fs: 'app.js', func: 'passOnCall' }, err, 'Broadcasted to other server');
 
     });
 
@@ -209,7 +213,7 @@ function ReadIncomingMessage_Processing(msg) {
     handleRealTimeEvents(msg);
   }
   else {
-    logger.info({fs: 'app.js', func: 'ReadIncomingMessage_Processing'}, msg, 'Ignoring Message');
+    logger.info({ fs: 'app.js', func: 'ReadIncomingMessage_Processing' }, msg, 'Ignoring Message');
   }
 }
 
@@ -251,13 +255,13 @@ function subscribe(msg) {
 
   const msg2 = MQ.getNewMessageForSubscription(msg.pageName, msg.userID, msg.data);
   MQ.MQOut(null, '', msg2);
-  logger.info({fs: 'app.js', func: 'subscribe'}, msg2, 'sent subscription message');
+  logger.info({ fs: 'app.js', func: 'subscribe' }, msg2, 'sent subscription message');
 }
 
 function unsubscribe(eventname, subscriptionId, params) {
   const msg2 = MQ.getNewMessageForUnsubscription(eventname, subscriptionId, params);
   MQ.MQOut(null, '', msg2);
-  logger.info({fs: 'app.js', func: 'unsubscribe'}, msg2, 'sent unsubscription  message');
+  logger.info({ fs: 'app.js', func: 'unsubscribe' }, msg2, 'sent unsubscription  message');
 }
 
 function sendMessage(msg) {
@@ -267,18 +271,18 @@ function sendMessage(msg) {
       client.send(JSON.stringify(msg));
     }
     catch (err) {
-      logger.error({fs: 'app.js', func: 'sendMessage'}, err, 'client socket not found');
+      logger.error({ fs: 'app.js', func: 'sendMessage' }, err, 'client socket not found');
     }
   });
 
 }
 
 app.ws('/Socket', function (ws, req) {
-  logger.info({fs: 'app.js', func: 'Socket'}, 'Web socket Handshake Recieved');
+  logger.info({ fs: 'app.js', func: 'Socket' }, 'Web socket Handshake Recieved');
   ws.on('message', function (msg) {
     logger.info('Web socket Handshake Recieved');
     const msg2 = JSON.parse(msg);
-    logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'this is request');
+    logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'this is request');
 
     const decoded = crypto.decrypt(msg2.token);
 
@@ -292,16 +296,16 @@ app.ws('/Socket', function (ws, req) {
           if (lastSubscription[decoded.userID]) {
             unsubscribe(lastSubscription[decoded.userID].page, decoded.userID, '');
           }
-          lastSubscription[decoded.userID] = {'page': msg2.pageName, 'params': msg2.data};
-          logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'The subscription parameters');
+          lastSubscription[decoded.userID] = { 'page': msg2.pageName, 'params': msg2.data };
+          logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'The subscription parameters');
           subscribe(msg2);
         }
       }
     }
     else {
-      logger.error({fs: 'app.js', func: 'Socket'}, "Token doesnt have user ID" + JSON.stringify(msg2));
+      logger.error({ fs: 'app.js', func: 'Socket' }, "Token doesnt have user ID" + JSON.stringify(msg2));
     }
-    logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'GOT Web socket END ');
+    logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'GOT Web socket END ');
   });
 
 });
@@ -316,7 +320,7 @@ function checkbadinput(req) {
   const requestString = JSON.stringify(payload);
   if (contains(requestString, "$")) {
     console.log("illeagal characters Found Sending Error!!");
-    logger.error({fs: 'app.js', func: 'login', error: err.stack || err}, 'illeagal characters Found Sending Error!!');
+    logger.error({ fs: 'app.js', func: 'login', error: err.stack || err }, 'illeagal characters Found Sending Error!!');
     return true;
   }
   console.log("request OK!.");
@@ -344,7 +348,7 @@ app.post('/login', function (req, res) {
     }
   };
   if (checkbadinput(req)) {
-    let err = {desc: 'invalid userId or password'};
+    let err = { desc: 'invalid userId or password' };
     response.loginResponse.data.message.status = 'ERROR';
     response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
     response.loginResponse.data.success = false;
@@ -359,7 +363,7 @@ app.post('/login', function (req, res) {
       res.send(response);
     })
     .catch((err) => {
-      logger.error({fs: 'app.js', func: 'login', error: err.stack || err}, 'login failed');
+      logger.error({ fs: 'app.js', func: 'login', error: err.stack || err }, 'login failed');
       response.loginResponse.data.message.status = 'ERROR';
       response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
       response.loginResponse.data.success = false;
@@ -369,7 +373,7 @@ app.post('/login', function (req, res) {
 
 app.post('/uploadFile/:action', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"}
+    let resperr = { 'error': "illeagal character found in request" }
     res.send(resperr);
     return;
   }
@@ -446,11 +450,11 @@ app.post('/uploadFile/:action', permissions, function (req, res) {
 
 function handleTokenVerification(req, res, callback, action) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"}
+    let resperr = { 'error': "illeagal character found in request" }
     res.send(resperr);
     return;
   }
-  logger.info({fs: 'app.js', func: 'handleTokenVerification'}, 'Handle Transaction on Cipher ');
+  logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, 'Handle Transaction on Cipher ');
   const payload = req.body;
   let JWToken = '';
   if (payload.JWToken) {
@@ -460,11 +464,11 @@ function handleTokenVerification(req, res, callback, action) {
     JWToken = req.get('token');
   }
 
-  logger.info({fs: 'app.js', func: 'handleTokenVerification'}, JWToken, 'JWToken : ');
+  logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, JWToken, 'JWToken : ');
 
   const decoded = crypto.decrypt(JWToken);
   if (decoded) {
-    logger.info({fs: 'app.js', func: 'handleTokenVerification'}, decoded, 'decoded.userID:  ');
+    logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, decoded, 'decoded.userID:  ');
     return callback(decoded, req.body, res, action, req);
   }
 
@@ -487,7 +491,7 @@ function handleTokenVerification(req, res, callback, action) {
 
 app.post('/uploadImg', function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"}
+    let resperr = { 'error': "illeagal character found in request" }
     res.send(resperr);
     return;
   }
@@ -502,7 +506,7 @@ app.post('/uploadImg', function (req, res) {
   const context = req.body.context;
 
   if (!data) {
-    logger.debug({fs: 'app.js', func: 'uploadImg'}, ' [ File Upload Service ] File is not exist in req : ' + req.file);
+    logger.debug({ fs: 'app.js', func: 'uploadImg' }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
     res.send('Image dose not exist');
   }
   else {
@@ -516,14 +520,14 @@ const getUpload = require('./core/validation/getDocUploadEx.js');
 
 app.get('/getUploadedFile/:action/:id', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"}
+    let resperr = { 'error': "illeagal character found in request" }
     res.send(resperr);
     return;
   }
   console.log('Taking it from local');
   const UUID = req.params.id;
   console.log('==============UUID of downloaded file============' + UUID);
-  logger.debug({fs: 'app.js', func: 'getUploadedFile'}, ' [ getUploadedFile ]   : ' + UUID);
+  logger.debug({ fs: 'app.js', func: 'getUploadedFile' }, ' [ getUploadedFile ]   : ' + UUID);
   getUpload(UUID, res, function (data) {
     console.log('==============Sending file in return========================' + UUID);
     res.send(data, 'binary');
@@ -563,7 +567,7 @@ app.post('/upload/:action', permissions, function (req, res) {
 
 app.post('/APII/:channel/:action', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"};
+    let resperr = { 'error': "illeagal character found in request" };
     res.send(resperr);
     return;
   }
@@ -571,14 +575,14 @@ app.post('/APII/:channel/:action', permissions, function (req, res) {
   const JWToken = req.get('token');
   const action = req.params.action;
   const channel = req.params.channel;
-  logger.info({fs: 'app.js', func: 'APPI'}, 'Handle Transaction on Cipher ' + action + ' ' + channel);
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
   if (channel === 'Cipher') {
-    logger.trace({payload: payload}, 'Cipher APII call Payload');
+    logger.trace({ payload: payload }, 'Cipher APII call Payload');
   }
-  logger.info({fs: 'app.js', func: 'APPI'}, 'calling handleExternalRequest ');
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'calling handleExternalRequest ');
   const UUID = uuid();
-  logger.info({fs: 'app.js', func: 'APPI'}, 'UUID:  ' + UUID);
-  logger.info({fs: 'app.js', func: 'APPI'}, 'JWToken :  ' + JWToken);
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'UUID:  ' + UUID);
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'JWToken :  ' + JWToken);
 
   RestController.handleExternalRequest(payload, channel, action, UUID, res, '');
 
@@ -586,7 +590,7 @@ app.post('/APII/:channel/:action', permissions, function (req, res) {
 
 app.post('/API/:channel/:action', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"};
+    let resperr = { 'error': "illeagal character found in request" };
     res.send(resperr);
     return;
   }
@@ -601,15 +605,15 @@ app.post('/API/:channel/:action', permissions, function (req, res) {
   payload.token = JWToken;
   const action = req.params.action;
   const channel = req.params.channel;
-  logger.info({fs: 'app.js', func: 'API'}, 'Handle Transaction on Cipher ' + action + ' ' + channel);
-  payload = Object.assign(payload, {action: action, channel: channel, ipAddress: "::1"});
+  logger.info({ fs: 'app.js', func: 'API' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
+  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: "::1" });
   logger.info('calling handleExternalRequest ');
   const UUID = uuid();
-  logger.info({fs: 'app.js', func: 'API'}, 'UUID:  ' + UUID);
-  logger.info({fs: 'app.js', func: 'API'}, 'JWToken :  ' + JWToken);
+  logger.info({ fs: 'app.js', func: 'API' }, 'UUID:  ' + UUID);
+  logger.info({ fs: 'app.js', func: 'API' }, 'JWToken :  ' + JWToken);
 
   const decoded = crypto.decrypt(JWToken);
-  logger.info({fs: 'app.js', func: 'API'}, decoded, 'decoded.userID:');
+  logger.info({ fs: 'app.js', func: 'API' }, decoded, 'decoded.userID:');
   RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
 
 });
@@ -658,7 +662,7 @@ function sendError(req, res) {
 
 app.get('/export/:channel', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"}
+    let resperr = { 'error': "illeagal character found in request" }
     res.send(resperr);
     return;
   }
@@ -690,16 +694,16 @@ app.get('/export/:channel', permissions, function (req, res) {
 
 app.post('/passOn', function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"};
+    let resperr = { 'error': "illeagal character found in request" };
     res.send(resperr);
     return;
   }
   let passOnPassword = config.get('passOnPassword');
 
   if (passOnPassword !== req.body.password) {
-    res.send(JSON.stringify({"status": "Not Authorized to access the resource"}));
+    res.send(JSON.stringify({ "status": "Not Authorized to access the resource" }));
     return;
   }
   ReadIncomingMessage_Processing(req.body.msg);
-  res.send(JSON.stringify({"status": "Done"}));
+  res.send(JSON.stringify({ "status": "Done" }));
 });

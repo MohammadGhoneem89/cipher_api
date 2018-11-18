@@ -3,6 +3,9 @@ const MappingConfig = require('../../../lib/repositories/mappingConfig');
 const typeData = require('../../../lib/repositories/typeData');
 let customFunctions = require('../../Common/customFunctions.js');
 let validationFunctions = require('../../Common/validationFunctions.js');
+const groupPermission = require('../../../lib/services/group');
+let apiDefination = require('./APIDefination');
+const _ = require('lodash');
 function getMappingConfig(payload, UUIDKey, route, callback, JWToken) {
   MappingConfig.findPageAndCount(payload).then((data) => {
     let actions = [
@@ -108,6 +111,9 @@ function upsertMappingConfig(payload, UUIDKey, route, callback, JWToken) {
           resp.responseMessage.data.message.errorDescription = "Record Inserted Successfully!!";
 
         resp.responseMessage.data.message.newPageURL = "/mappingList";
+        apiDefination.LoadConfig().then(() => {
+          console.log('Configurations Loaded For Request Processing!!');
+        });
         callback(resp);
       }).catch((err) => {
         console.log(err);
@@ -165,15 +171,20 @@ function getListFunction(payload, UUIDKey, route, callback, JWToken) {
       "data": {
         custom: [],
         validation: [],
-        typeDataList: []
+        typeDataList: [],
+        permissionList: []
       }
     }
   };
   let Projection = {
     "data": 1
   };
-  typeData.selectProjected({}, Projection).then((data) => {
-    data.forEach((element) => {
+  Promise.all([
+    groupPermission.listPermissions({}),
+    typeData.selectProjected({}, Projection)
+  ]).then((data) => {
+    resp.FunctionData.data.permissionList = data[0];
+    data[1].forEach((element) => {
       for (let key in element.data) {
         let obj = {
           "label": key,
@@ -201,8 +212,36 @@ function getListFunction(payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
+
+function getTypeDataList(payload, UUIDKey, route, callback, JWToken) {
+  let resp = {
+    "enumList": {
+      "action": "enumList",
+      "data": {}
+    }
+  };
+  let Projection = {
+    "data": 1
+  };
+  typeData.selectProjected({}, Projection).then((data) => {
+    data.forEach((element) => {
+      for (let key in element.data) {
+        let arrEnum = [];
+        element.data[key].forEach((object) => {
+          arrEnum.push(object.value);
+        });
+
+        _.set(resp.enumList.data, key, arrEnum);
+
+      }
+    });
+
+    callback(resp);
+  });
+}
 exports.getMappingConfig = getMappingConfig;
 exports.getMappingConfigByID = getMappingConfigByID;
 exports.upsertMappingConfig = upsertMappingConfig;
 exports.getServiceList = getServiceList;
 exports.getListFunction = getListFunction;
+exports.getTypeDataList = getTypeDataList;
