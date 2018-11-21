@@ -2,20 +2,21 @@
 const _ = require('lodash');
 const Simulator = require('./simulator');
 const rp = require('request-promise');
-
+const path = require('path');
+const fs = require('fs');
+const amq = require('../../core/api/connectors/queue');
 module.exports = class Dispatcher {
-  constructor(OriginalRequest, MappeedRequest, configData, UUID, typeList) {
+  constructor(OriginalRequest, MappeedRequest, configData, UUID, typeList, JWTtoken) {
     this.oRequest = OriginalRequest;
     this.request = MappeedRequest;
     this.configdata = configData;
     this.simucases = configData.simucases || [];
     this.UUID = UUID;
     this.typeList = typeList;
+    this.JWT = JWTtoken;
   }
   SendGetRequest() {
     return new Promise((resolve, reject) => {
-      //  if simulated return response
-
       let getResponse;
       if (this.configdata.isSimulated && this.configdata.isSimulated === true) {
         let simu = new Simulator(this.oRequest, this.simucases);
@@ -41,6 +42,7 @@ module.exports = class Dispatcher {
       }
       else if (this.configdata.communicationMode === 'QUEUE') {
         this.connectQueueService().then((data) => {
+          console.log(data);
           resolve(data);
         }).catch((ex) => {
           reject(ex);
@@ -61,7 +63,21 @@ module.exports = class Dispatcher {
         "error": false,
         "message": "Processed OK!"
       };
-      resolve(generalResponse);
+      let fileLoc = path.resolve(__dirname, `../mappingFunctions/${this.configdata.CustomMappingFile}`);
+      let Orequest = this.request;
+      let route = this.configdata.route;
+      let JWT = this.JWT;
+      let UUID = this.UUID;
+      fs.exists(fileLoc, function (exists) {
+        if (exists) {
+          let mappingFunctions = require(fileLoc);
+          mappingFunctions.getActiveAPIList(Orequest, UUID, route, resolve, JWT, null, null);
+        }
+        else {
+          generalResponse.error = true;
+          generalResponse.message = `mapping file does not exist ${fileLoc}`;
+        }
+      });
     });
   }
 
@@ -86,14 +102,29 @@ module.exports = class Dispatcher {
     });
   }
 
-  connectQueueService(requestServiceQueue, responseQueue) {
-    //  this.configdata.requestServiceQueue
-    //  , this.responseQueue
-    let generalResponse = {
-      "error": false,
-      "message": "Processed OK!"
-    };
-    return Promise.resolve(generalResponse);
-  }
+  connectQueueService(responseQueue) {
+    return amq.start()
+      .then((ch) => {
+        return ch.assertQueue(this.configdata.requestServiceQueue, { durable: false })
+          .then(() => {
+            let generalResponse = {
+              "error": false,
+              "message": "Processed OK!"
+            };
+            let responseQueue = [];
+            let today = new Date()
+            responseQueue.push(this.configdata.responseQueue);
+            _.set(this.request, 'Header.tranType', "0200");
+            _.set(this.request, 'Header.userID', "STUB");
+            _.set(this.request, 'Header.org', "STUB");
+            _.set(this.request, 'Header.UUID', this.UUID);
+            _.set(this.request, 'Header.ResponseMQ', responseQueue);
+            _.set(this.request, 'Header.timeStamp', today.toISOString());
+            console.log(JSON.stringify(this.request, null, 2))
+            ch.sendToQueue(this.configdata.requestServiceQueue, new Buffer(JSON.stringify(this.request)));
+            return generalResponse;
+          });
+      });
+  };
 
-}
+};

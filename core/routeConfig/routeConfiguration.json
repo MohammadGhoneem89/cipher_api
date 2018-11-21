@@ -1,25 +1,30 @@
 {
   "core": {
-    "updateModuleConfig":{
+    "dispatchEmail": {
+      "customMapping": true,
+      "MappingfunctionName": "dispatchEmail",
+      "CustomMappingFile": "systemAPI/eMailDispatch.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateModuleConfig": {
       "customMapping": true,
       "MappingfunctionName": "updateModuleConfig",
       "CustomMappingFile": "systemAPI/moduleConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getModuleList":{
+    "getModuleList": {
       "customMapping": true,
       "MappingfunctionName": "getModuleConfig",
       "CustomMappingFile": "systemAPI/moduleConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getModuleConfigByID":{
+    "getModuleConfigByID": {
       "customMapping": true,
       "MappingfunctionName": "getModuleConfigByID",
       "CustomMappingFile": "systemAPI/moduleConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
-    
-    "getTypeDataList":{
+    "getTypeDataList": {
       "customMapping": true,
       "MappingfunctionName": "getTypeDataList",
       "CustomMappingFile": "systemAPI/mappingConfig.js",
@@ -43,7 +48,6 @@
       "CustomMappingFile": "systemAPI/APIDefination.js",
       "mappingConfigFile": "ePayMapping"
     },
-    
     "getActiveAPIList": {
       "customMapping": true,
       "MappingfunctionName": "getActiveAPIList",
@@ -86,7 +90,6 @@
       "CustomMappingFile": "systemAPI/mappingConfig.js",
       "mappingConfigFile": "ePayMapping"
     }
-    
   },
   "UI": {
     "permission": {
@@ -593,6 +596,12 @@
       "CustomMappingFile": "eventService/eventdispatcher.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getDispatcherMeta": {
+      "customMapping": true,
+      "MappingfunctionName": "getDispatcherMeta",
+      "CustomMappingFile": "eventService/eventdispatcher.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getEventDispatcher": {
       "customMapping": true,
       "MappingfunctionName": "getEventDispatcher",
@@ -639,6 +648,12 @@
       "customMapping": true,
       "MappingfunctionName": "getServiceList",
       "CustomMappingFile": "eventService/eventregistry.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateEventDispatcherStatus": {
+      "customMapping": true,
+      "MappingfunctionName": "updateEventDispatcherStatus",
+      "CustomMappingFile": "eventService/eventdispatcher.js",
       "mappingConfigFile": "ePayMapping"
     },
     "getEventDispatcherStatus": {

@@ -65,6 +65,7 @@
     "node-couch": "^2.3.0",
     "node-couchdb": "^1.2.0",
     "node-rest-client": "^3.1.0",
+    "nodemailer": "^4.7.0",
     "oad": "^0.1.0",
     "object-mapper": "^5.0.0",
     "pg": "^7.4.3",

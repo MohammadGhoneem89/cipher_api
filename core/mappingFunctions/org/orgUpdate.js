@@ -1,3 +1,4 @@
+'use strict';
 var logger = require('../../../lib/helpers/logger')().app;
 
 var Validate = require("../../validation/validate.js");

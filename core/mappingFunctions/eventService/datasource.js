@@ -1,3 +1,4 @@
+'use strict';
 const dataSource = require('../../../lib/repositories/dataSource');
 
 function getdataSource(payload, UUIDKey, route, callback, JWToken) {
@@ -14,7 +15,7 @@ function getdataSource(payload, UUIDKey, route, callback, JWToken) {
         ]
       }];
 
-    data[0].forEach(element => {
+    data[0].forEach((element) => {
       element.actions = actions;
       element.createdBy = element.createdBy ? element.createdBy.userID : '';
     });
@@ -64,7 +65,7 @@ function getdataSourceByID(payload, UUIDKey, route, callback, JWToken) {
 
     data.sourceDataDefination.forEach(elem => {
       elem.dataJsonStructure.forEach(e => {
-        e.actions = [{label: "Delete", iconName: "fa fa-trash", actionType: "COMPONENT_FUNCTION"}]
+        e.actions = [{ label: "Delete", iconName: "fa fa-trash", actionType: "COMPONENT_FUNCTION" }]
       })
     })
 
@@ -101,7 +102,7 @@ function upsertDataSource(payload, UUIDKey, route, callback, JWToken) {
 
 
   if (payload.dataSourceName) {
-    dataSource.update({dataSourceName: payload.dataSourceName}, payload).then((data) => {
+    dataSource.update({ dataSourceName: payload.dataSourceName }, payload).then((data) => {
       resp.responseMessage.data.message.status = "OK";
       console.log(data)
 

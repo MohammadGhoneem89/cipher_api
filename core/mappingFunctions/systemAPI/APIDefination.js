@@ -190,6 +190,22 @@ function getServiceList(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
+  let resp = {
+    "responseMessage": {
+      "action": "upsertAPIDefinition",
+      "data": {
+        "message": {
+          "status": "ERROR",
+          "errorDescription": "Route and UseCase must be provided!!",
+          "displayToUser": true,
+          "newPageURL": ""
+        }
+      }
+    }
+  };
+  if (!payload.route || !payload.useCase) {
+    return callback(resp);
+  }
   APIDefinitation.getActiveAPIList(payload).then((data) => {
     let grouped = _.groupBy(data, 'useCase');
     let resp = {};

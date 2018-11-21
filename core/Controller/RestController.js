@@ -45,10 +45,9 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     }
     logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, JSON.stringify(data, null, 2));
     logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, "=========== [" + UUIDKey + "]!!! ============");
-    //record case
     let apiSample = _.cloneDeep(payload);
     if (_.get(apiSample, '_apiRecorder', false) === true) {
-      apiSample = _.omit(apiSample, 'token', 'action', 'channel', 'ipAddress', '_apiRecorder', 'JWToken', 'header');
+      apiSample = _.omit(apiSample, 'token', 'action', 'channel', 'ipAddress', '_apiRecorder', 'JWToken', 'header', 'CipherJWT');
       APIDefination.updateRequestStub(apiSample, incommingRoute, channel);
     }
     responseCallback.send(data);
@@ -70,7 +69,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     return OldRestController.handleExternalRequest(payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ);
   }
   let millisecondsstart = (new Date()).getTime();
-  let Cipher = new GeneralRequestProcessor(payload, configdata, UUIDKey, global.enumInfo, JWToken);
+  let Cipher = new GeneralRequestProcessor(payload, configdata, global.enumInfo, UUIDKey, JWToken);
   Cipher.processIncommingMessage().then((response) => {
     if (configdata.isResValBypass === false) {
       let successStatus = true;
@@ -96,7 +95,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     ResponseCaller(data);
     let millisecondsend = (new Date()).getTime();
     logger.error({ fs: 'RestController.js', func: 'handleExternalRequest' }, `Message Processed In:  ${(millisecondsend - millisecondsstart)} ms`);
-    logger.error({ fs: 'RestController.js', func: 'handleExternalRequest' }, "Response Recieved: " + JSON.stringify(data));
+    //logger.error({ fs: 'RestController.js', func: 'handleExternalRequest' }, "Response Recieved: " + JSON.stringify(data));
   });
 };
 

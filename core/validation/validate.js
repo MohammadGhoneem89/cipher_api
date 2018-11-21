@@ -49,6 +49,7 @@ module.exports = {
 
 function validateSingle(rules, data, x, val) {
   var error = ""
+  let regex='';
   if (rules[x]["required"] && (typeof val == "undefined" || val == null || val == "")) {
     error += "Value is Required,";
   }

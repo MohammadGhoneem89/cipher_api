@@ -1,12 +1,60 @@
 'use strict';
 const eventDispatcher = require('../../../lib/repositories/eventDispatcher');
+const group = require('../../../lib/repositories/group');
+const emailTemplate = require('../../../lib/repositories/emailTemplate');
 const dates = require('../../../lib/helpers/dates');
 const pg = require('../../api/connectors/postgress');
+
 function getEventDispatcher(payload, UUIDKey, route, callback, JWToken) {
   eventDispatcher.findPageAndCount(payload).then((data) => {
-    callback(data);
+    let actions = [
+      {
+        "value": "1003",
+        "type": "componentAction",
+        "label": "View",
+        "params": "",
+        "iconName": "icon-docs",
+        "URI": [
+          "/editDispatcher/"
+        ]
+      }];
+
+    data[0].forEach((element) => {
+      element.actions = actions;
+      element.hiddenID = element.useCase + "/" + element.route;
+      element.createdBy = element.createdBy ? element.createdBy.userID : '';
+    });
+
+    let response = {
+      "EventDispatcherList": {
+        "action": "EventDispatcherList",
+        "pageData": {
+          "pageSize": payload.page.pageSize,
+          "currentPageNo": payload.page.currentPageNo,
+          "totalRecords": data[1]
+        },
+        "data": {
+          "searchResult": data[0]
+        }
+      }
+    };
+    callback(response);
   }).catch((err) => {
-    callback(err);
+    console.log(JSON.stringify(err));
+    let response = {
+      "EventDispatcherList": {
+        "action": "EventDispatcherList",
+        "pageData": {
+          "pageSize": payload.page.pageSize,
+          "currentPageNo": payload.page.currentPageNo,
+          "totalRecords": 0
+        },
+        "data": {
+          "searchResult": []
+        }
+      }
+    };
+    callback(response);
   });
 }
 
@@ -20,7 +68,47 @@ function getEventDispatcherList(payload, UUIDKey, route, callback, JWToken) {
 
 function getEventDispatcherByID(payload, UUIDKey, route, callback, JWToken) {
   eventDispatcher.findById(payload).then((data) => {
-    callback(data);
+    let response = {
+      "EventDispatcherDetails": {
+        "action": "EventDispatcherDetails",
+        "data": data
+      }
+    };
+    callback(response);
+  }).catch((err) => {
+    callback(err);
+  });
+}
+
+function getDispatcherMeta(payload, UUIDKey, route, callback, JWToken) {
+  let resp = {
+    EventDispatcherTypeList: {
+      action: "EventDispatcherTypeList",
+      data: {
+        group: [],
+        emailTemplate: []
+      }
+    }
+  };
+  Promise.all([
+    group.find({}),
+    emailTemplate.findTypeData()
+  ]).then((data) => {
+    data[0].forEach((key) => {
+      let obj = {
+        "label": key.name,
+        "value": key.name
+      };
+      resp.EventDispatcherTypeList.data.group.push(obj);
+    });
+    data[1].forEach((key) => {
+      let obj = {
+        "label": key.label,
+        "value": key._id
+      };
+      resp.EventDispatcherTypeList.data.emailTemplate.push(obj);
+    });
+    callback(resp);
   }).catch((err) => {
     callback(err);
   });
@@ -28,24 +116,35 @@ function getEventDispatcherByID(payload, UUIDKey, route, callback, JWToken) {
 
 function upsertEventDispatcher(payload, UUIDKey, route, callback, JWToken) {
   payload.createdBy = JWToken._id;
+  let resp = {
+    "responseMessage": {
+      "action": "upsertEventDispatcher",
+      "data": {
+        "message": {
+          "status": "ERROR",
+          "errorDescription": "Some Error Occured during operation!!, Please Contact Support",
+          "displayToUser": true,
+          "newPageURL": ""
+        }
+      }
+    }
+  };
   if (payload.dispatcherName) {
-    eventDispatcher.update({dispatcherName: payload.dispatcherName}, payload).then((data) => {
-      let response = {
-        msg: data
-      };
-      callback(response);
+    eventDispatcher.update({ dispatcherName: payload.dispatcherName }, payload).then((data) => {
+      resp.responseMessage.data.message.status = "OK";
+      data.nModified > 0 ?
+        resp.responseMessage.data.message.errorDescription = "Record Updated Success!!" :
+        resp.responseMessage.data.message.errorDescription = "Record Inserted Successfully!!";
+      resp.responseMessage.data.message.newPageURL = '/DispatchList';
+      callback(resp);
     }).catch((err) => {
-      let response = {
-        msg: "errornous insert" + err
-      };
-      callback(response);
+      console.log(err);
+      callback(resp);
     });
   }
   else {
-    let response = {
-      msg: "dispatcherName is required"
-    };
-    return callback(response);
+    resp.responseMessage.data.message.errorDescription = "dispatcherName is required";
+    return callback(resp);
   }
 }
 
@@ -76,7 +175,7 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
 
   let queryCriteria = queryCnt + query;
   let queryCriteriaFull = queryData + query;
-  if (payload.page) {queryCriteriaFull += ` order by createdon desc limit ${payload.page.pageSize} OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)}`;}
+  if (payload.page) { queryCriteriaFull += ` order by createdon desc limit ${payload.page.pageSize} OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)}`; }
   pg.connection().then((conn) => {
     return Promise.all([
       conn.query(queryCriteria, []),
@@ -86,24 +185,25 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
       data[1].rows.forEach((elemt) => {
         elemt.dispatcher = elemt.dispatcher.dispatcherName;
         elemt.datasource = elemt.datasource.dataSourceName;
-        elemt.createdon = dates.shortDate(elemt.createdon);
-        elemt.updatedon = dates.shortDate(elemt.updatedon);
+        elemt.createdon = elemt.createdon;
+        elemt.updatedon = elemt.updatedon;
         elemt.status = Status(elemt.status);
+        elemt.actions = [{ label: "ReQueue", iconName: "fa fa-recycle", actionType: "COMPONENT_FUNCTION" }];
       });
-
+      console.log(JSON.stringify(data[0].rows,null,5))
       let response = {
         "EventDispatcherStatus": {
           "action": "EventDispatcherStatus",
           "pageData": {
             "pageSize": payload.page.pageSize,
             "currentPageNo": payload.page.currentPageNo,
-            "totalRecords": data[0].rows.count
+            "totalRecords": data[0].rows[0].count
           },
           "data": {
             "searchResult": data[1].rows
           }
         }
-      }; 
+      };
       return callback(response);
     });
   }).catch((err) => {
@@ -112,10 +212,32 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function updateEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
-  eventDispatcher.findById(payload).then((data) => {
-    callback(data);
-  }).catch((err) => {
-    callback(err);
+  let queryData = `update eventdispatchqueue set status=0 WHERE internalid=${payload.eventID}`;
+  let resp = {
+    "responseMessage": {
+      "action": "upsertEventDispatcher",
+      "data": {
+        "message": {
+          "status": "ERROR",
+          "errorDescription": "Some Error Occured during operation!!, Please Contact Support",
+          "displayToUser": true,
+          "newPageURL": ""
+        }
+      }
+    }
+  };
+  pg.connection().then((conn) => {
+    conn.query(queryData, []).then((data) => {
+      resp.responseMessage.data.message.status = "OK";
+      resp.responseMessage.data.message.errorDescription = "Event ReQueued!!";
+      return callback(resp);
+    }).catch((ex) => {
+      console.log(ex);
+      return callback(resp);
+    });
+  }).catch((ex) => {
+    console.log(ex);
+    return callback(resp);
   });
 }
 
@@ -126,7 +248,7 @@ function Status(tranStatus) {
   };
   if (tranStatus == 0) {
     vs.value = 'Penfing',
-    vs.type = 'WARNING';
+      vs.type = 'WARNING';
   }
   else if (tranStatus == 1) {
     vs.value = 'Dispatched';
@@ -146,3 +268,5 @@ exports.getEventDispatcher = getEventDispatcher;
 exports.getEventDispatcherByID = getEventDispatcherByID;
 exports.upsertEventDispatcher = upsertEventDispatcher;
 exports.getEventDispatcherStatus = getEventDispatcherStatus;
+exports.getDispatcherMeta = getDispatcherMeta;
+exports.updateEventDispatcherStatus = updateEventDispatcherStatus;
