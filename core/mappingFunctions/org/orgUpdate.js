@@ -22,7 +22,7 @@ let entityUpdateOut = function (payload, UUIDKey, route, callback, JWToken) {
 
 };
 
-function orgUpdate (payload, userID, entityUpdateCB) {
+function orgUpdate(payload, userID, entityUpdateCB) {
 
   logger.debug(" [ Entity Update ] Entity data in request : " + JSON.stringify(payload, 2));
   let response = {

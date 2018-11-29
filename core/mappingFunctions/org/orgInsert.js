@@ -1,5 +1,5 @@
+'use strict';
 const logger = require('../../../lib/helpers/logger')().app;
-
 const Validate = require("../../validation/validate.js");
 const validType = require("../../validation/validationFields");
 const pointer = require("json-pointer");

@@ -1,5 +1,23 @@
 {
   "core": {
+    "updateNetworkConfig": {
+      "customMapping": true,
+      "MappingfunctionName": "updateNetworkConfig",
+      "CustomMappingFile": "systemAPI/networkConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getNetworkList": {
+      "customMapping": true,
+      "MappingfunctionName": "getNetworkConfig",
+      "CustomMappingFile": "systemAPI/networkConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getNetworkConfigByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getNetworkConfigByID",
+      "CustomMappingFile": "systemAPI/networkConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "dispatchEmail": {
       "customMapping": true,
       "MappingfunctionName": "dispatchEmail",

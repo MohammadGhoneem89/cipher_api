@@ -176,6 +176,7 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
   let queryCriteria = queryCnt + query;
   let queryCriteriaFull = queryData + query;
   if (payload.page) { queryCriteriaFull += ` order by createdon desc limit ${payload.page.pageSize} OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)}`; }
+ console.log(queryCriteriaFull);
   pg.connection().then((conn) => {
     return Promise.all([
       conn.query(queryCriteria, []),
