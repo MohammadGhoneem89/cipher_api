@@ -25,30 +25,26 @@ module.exports = class Dispatcher {
         }).catch((ex) => {
           reject(ex);
         });
-      }
-      else if (this.configdata.isCustomMapping === true) {
+      } else if (this.configdata.isCustomMapping === true) {
         this.executeCustomFunction().then((data) => {
           resolve(data);
         }).catch((ex) => {
           reject(ex);
         });
-      }
-      else if (this.configdata.communicationMode === 'REST') {
+      } else if (this.configdata.communicationMode === 'REST') {
         this.connectRestService().then((data) => {
           resolve(data);
         }).catch((ex) => {
           reject(ex);
         });
-      }
-      else if (this.configdata.communicationMode === 'QUEUE') {
+      } else if (this.configdata.communicationMode === 'QUEUE') {
         this.connectQueueService().then((data) => {
           console.log(data);
           resolve(data);
         }).catch((ex) => {
           reject(ex);
         });
-      }
-      else {
+      } else {
         let generalResponse = {
           "error": true,
           "message": "CommunicationMode invalid!"
@@ -68,12 +64,12 @@ module.exports = class Dispatcher {
       let route = this.configdata.route;
       let JWT = this.JWT;
       let UUID = this.UUID;
+      let functionName = this.configdata.MappingfunctionName;
       fs.exists(fileLoc, function (exists) {
         if (exists) {
           let mappingFunctions = require(fileLoc);
-          mappingFunctions.getActiveAPIList(Orequest, UUID, route, resolve, JWT, null, null);
-        }
-        else {
+          mappingFunctions[functionName](Orequest, UUID, route, resolve, JWT, null, null);
+        } else {
           generalResponse.error = true;
           generalResponse.message = `mapping file does not exist ${fileLoc}`;
         }
@@ -105,7 +101,9 @@ module.exports = class Dispatcher {
   connectQueueService(responseQueue) {
     return amq.start()
       .then((ch) => {
-        return ch.assertQueue(this.configdata.requestServiceQueue, { durable: false })
+        return ch.assertQueue(this.configdata.requestServiceQueue, {
+            durable: false
+          })
           .then(() => {
             let generalResponse = {
               "error": false,
