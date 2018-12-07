@@ -1,62 +1,87 @@
 'use strict';
-let validator = require('validator');
-let validatorFunc= {
-  isEmail: validator.isEmail,
-  isURL: validator.isURL,
-  isMACAddress: validator.isMACAddress,
-  isIP: validator.isIP,
-  isFQDN: validator.isFQDN,
-  isBoolean: validator.isBoolean,
-  isAlpha: validator.isAlpha,
-  isAlphanumeric: validator.isAlphanumeric,
-  isNumeric: validator.isNumeric,
-  isPort: validator.isPort,
-  isLowercase: validator.isLowercase,
-  isUppercase: validator.isUppercase,
-  isAscii: validator.isAscii,
-  isInt: validator.isInt,
-  isFloat: validator.isFloat,
-  isDecimal: validator.isDecimal,
-  isHexadecimal: validator.isHexadecimal,
-  isHexColor: validator.isHexColor,
-  isISRC: validator.isISRC,
-  isMD5: validator.isMD5,
-  isHash: validator.isHash,
-  isJSON: validator.isJSON,
-  isEmpty: validator.default,
-  isByteLength: validator.isByteLength,
-  isUUID: validator.isUUID,
-  isMongoId: validator.isMongoId,
-  isCreditCard: validator.isCreditCard,
-  isISIN: validator.isISIN,
-  isISBN: validator.isISBN,
-  isISSN: validator.isISSN,
-  isMobilePhone: validator.isMobilePhone,
-  isPostalCode: validator.isPostalCode,
-  isCurrency: validator.isCurrency,
-  isISO8601: validator.isISO8601,
-  isISO31661Alpha2: validator.isISO31661Alpha2,
-  isBase64: validator.isBase64,
-  isDataURI: validator.isDataURI,
-  isMimeType: validator.isMimeType,
-  isLatLong: validator.isLatLong,
-};
-module.exports = {
-  bypass: (value) => {
-    return true;
-  },
-  validateTestFalse: (value) => {
-    return new Promise((resr, rej) => {
-      return rej();
-    });
-  },
-  required: (value) => {
-    if (value && value !== '' && value !== '-') { return true; } // eslint-disable-line
-    return false;
-  },
-  requiredArray: (value) => {
-    if (value instanceof Array) { return true; }
-    return true;
-  },
-  ...validatorFunc
+
+const moment = require('moment');
+const entityRepo = require('../lib/repositories/entity');
+
+function validateTestFalse(value) {
+  return false;
 }
+
+function bypass(value) {
+  return true;
+}
+
+function required(value) {
+  // TODO check typeof and value for the below
+  if (value && value != '' && value != '-') {return true;} // eslint-disable-line
+  return false;
+}
+
+function requiredArray(value) {
+  // TODO fix this with _.isArray function
+  if (value instanceof Array) {return true;}
+  return true;
+}
+
+function validateAcqDate(date) {
+  return moment(date, 'DD-MM-YYYY HH:mm:ss').isValid();
+}
+
+function validateDSGDate(date) {
+  return moment(date, 'DD-MM-YYYY HH:mm:ss').isValid();
+}
+
+function validateEntityDate(date) {
+  return moment(date, 'DD-MM-YYYY HH:mm:ss').isValid();
+}
+
+function validateSpCode(spCode) {
+  return entityRepo.findOne({ spCode: spCode })
+    .then((entity) => !!entity);
+}
+
+
+function validateStatus(data) {
+   
+    switch(data[0]){
+      case "Reconciled":
+                return true
+      case "RECEIVED":
+                return true
+      case "Declined":
+                return true
+      case "Authorized":
+                return true
+      case "AUTHRECEIVED":
+                return true
+      case "Initiated":
+                return true
+      default:
+                return false;
+    }
+
+}
+
+function validateStatusAcq(data) {
+   
+    switch(data){
+      case "declined":
+                return true
+      case "Authorized":
+                return true
+      default:
+                return false;
+    }
+
+}
+
+exports.bypass = bypass;
+exports.required = required;
+exports.requiredArray = requiredArray;
+exports.validateSpCode = validateSpCode;
+exports.validateDSGDate = validateDSGDate;
+exports.validateAcqDate = validateAcqDate;
+exports.validateTestFalse = validateTestFalse;
+exports.validateEntityDate = validateEntityDate;
+exports.validateStatus = validateStatus;
+exports.validateStatusAcq=validateStatusAcq;

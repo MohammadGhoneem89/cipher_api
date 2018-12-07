@@ -1,7 +1,7 @@
 'use strict';
 let customFunctions = require('./core/Common/customFunctions.js');
 let constants = require('./core/Common/constants_en.js');
-let validationFunctions = require('./core/Common/validationFunctions.js');
+let validationFunctions = require('./core/Common/_validationFunctions.js');
 let flatten = require('flat');
 let unflatten = require('flat').unflatten;
 let validator = require('validator');

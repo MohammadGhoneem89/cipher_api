@@ -232,10 +232,38 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
         "data": resp
       }
     };
+
     callback(response);
   }).catch((err) => {
     callback(err);
   });
+}
+
+function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
+    let resp = {
+        "getActiveAPIs": {
+            "action": "getActiveAPIs",
+            "data": {
+                "message": {
+                    "status": "ERROR",
+                    "errorDescription": "UseCase must be provided!!",
+                    "displayToUser": true,
+                    "newPageURL": ""
+                }
+            }
+        }
+    };
+    if (!payload.useCase) {
+        return callback(resp);
+    }
+    APIDefinitation.getActiveAPIs(payload).then((data) => {
+        if(data){
+            callback(data);
+        }
+
+    }).catch((err) => {
+        callback(err);
+    });
 }
 
 exports.getAPIDefinition = getAPIDefinition;
@@ -245,3 +273,4 @@ exports.getServiceList = getServiceList;
 exports.getActiveAPIList = getActiveAPIList;
 exports.LoadConfig = LoadConfig;
 exports.updateRequestStub = updateRequestStub;
+exports.getActiveAPIs = getActiveAPIs;

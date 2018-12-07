@@ -125,3 +125,27 @@ th {
 .margin-right{
 	margin-right: 20%;
 }
+
+.shadowBox {
+	background-color: #A5D2D6;
+	margin : 15px;
+	padding: 10px;
+}
+.jsonBox {
+	background-color: linen;
+	margin : 15px;
+	padding: 20px;
+	border: 1px;
+
+}
+
+.box {
+	background-color: #A5D2D6;
+	margin : 15px;
+	padding: 20px;
+}
+
+.codeBox{
+	padding: 10px;
+	margin: 10px;
+}

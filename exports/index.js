@@ -27,7 +27,7 @@ function renderExport(type, gridType, query, jsReport, JWToken, res) {
 
   func(query, JWToken)
     .then((data) => {
-      resData = data;
+      resData = data || [];
       return Promise.all([
         readHTMLTemplate(exportConfig.exportConfiguration[gridType].body),
         readHTMLTemplate(exportConfig.exportConfiguration[gridType].header),

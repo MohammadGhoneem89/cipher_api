@@ -2,7 +2,7 @@
 const permission = require('../../../lib/repositories/permission');
 const typeData = require('../../../lib/repositories/typeData');
 let customFunctions = require('../../Common/customFunctions.js');
-let validationFunctions = require('../../Common/validationFunctions.js');
+let validationFunctions = require('../../Common/_validationFunctions.js');
 const groupPermission = require('../../../lib/services/group');
 const _ = require('lodash');
 function getModuleConfig(payload, UUIDKey, route, callback, JWToken) {

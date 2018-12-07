@@ -3,7 +3,7 @@ const _ = require('lodash');
 const typeOf = require('typeof');
 const casting = require('casting');
 const customFunctions = require('../Common/customFunctions.js');
-const validationFunctions = require('../Common/validationFunctions.js');
+const validationFunctions = require('../Common/_validationFunctions.js');
 
 module.exports = class ObjectMapper {
   constructor(req, mappingConfig, typeData, UUID) {
