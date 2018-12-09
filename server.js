@@ -358,8 +358,19 @@ app.post('/login', function (req, res) {
       }
     }
   };
+
+  const apiResponse = {
+    messageStatus: 'OK',
+    errorCode: 200,
+    errorDescription: "logged in successfully !!!",
+    token: "",
+    timestamp: ""
+  };
+
   if (checkbadinput(req)) {
-    let err = { desc: 'invalid userId or password' };
+    let err = {
+      desc: 'invalid userId or password'
+    };
     response.loginResponse.data.message.status = 'ERROR';
     response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
     response.loginResponse.data.success = false;
@@ -369,12 +380,21 @@ app.post('/login', function (req, res) {
 
   authUser(payload)
     .then((user) => {
-      response.loginResponse.data.token = user.token;
-      response.loginResponse.data.firstScreen = user.firstScreen;
-      res.send(response);
+      if (user.userType == "API") {
+        apiResponse.token = user.token;
+        res.send(apiResponse);
+      } else {
+        response.loginResponse.data.token = user.token;
+        response.loginResponse.data.firstScreen = user.firstScreen;
+        res.send(response);
+      }
     })
     .catch((err) => {
-      logger.error({ fs: 'app.js', func: 'login', error: err.stack || err }, 'login failed');
+      logger.error({
+        fs: 'app.js',
+        func: 'login',
+        error: err.stack || err
+      }, 'login failed');
       response.loginResponse.data.message.status = 'ERROR';
       response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
       response.loginResponse.data.success = false;

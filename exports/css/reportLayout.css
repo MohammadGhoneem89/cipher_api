@@ -3,7 +3,7 @@
 	padding: 0px
 }
 body {
-	font-family: arial;
+	font-family: verdana;
 }
 body[dir="rtl"] strong, body[dir="rtl"] p {
 	direction: rtl;
@@ -127,12 +127,12 @@ th {
 }
 
 .shadowBox {
-	background-color: #A5D2D6;
+	background-color: #FFFFFF;
 	margin : 15px;
 	padding: 10px;
 }
 .jsonBox {
-	background-color: linen;
+	background-color: #FFFFFF;
 	margin : 15px;
 	padding: 20px;
 	border: 1px;
@@ -140,7 +140,7 @@ th {
 }
 
 .box {
-	background-color: #A5D2D6;
+	background-color: #F2F2F2;
 	margin : 15px;
 	padding: 20px;
 }
