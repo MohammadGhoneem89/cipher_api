@@ -29,6 +29,16 @@
             "headerHeight": "150px",
             "footerHeight": "150px",
             "orientation": "landscape"
+        },
+        "getActiveAPIs": {
+            "exportTitle": "API List",
+            "header": "./exports/commonTemplates/header.html",
+            "footer": "./exports/commonTemplates/footerWithoutDate.html",
+            "body": "./exports/templates/ApiList_Body.html",
+            "functionName": "getActiveAPIs",
+            "headerHeight": "150px",
+            "footerHeight": "150px",
+            "orientation": "portrait"
         }
     }
 }

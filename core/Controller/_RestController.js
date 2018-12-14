@@ -6,7 +6,7 @@ let config = require('../../AppConfig');
 let routeConfiguration = Object.assign(require('../routeConfig/routeConfiguration.json'), require('../../applications/routeConfig/routeConfiguration.json'));
 
 let customFunctions = require('../Common/customFunctions.js');
-let validationFunctions = require('../Common/validationFunctions.js');
+let validationFunctions = require('../Common/_validationFunctions.js');
 let pointer = require('json-pointer');
 let MQSend = require('../IntegrationMQ/MQSendResponse.js');
 // var grpc = require('grpc');

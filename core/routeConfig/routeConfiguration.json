@@ -150,6 +150,12 @@
       "CustomMappingFile": "systemAPI/APIDefination.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getActiveAPIs": {
+      "customMapping": true,
+      "MappingfunctionName": "getActiveAPIs",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "upsertAPIDefinition": {
       "customMapping": true,
       "MappingfunctionName": "upsertAPIDefinition",

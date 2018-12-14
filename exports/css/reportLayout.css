@@ -3,7 +3,7 @@
 	padding: 0px
 }
 body {
-	font-family: arial;
+	font-family: verdana;
 }
 body[dir="rtl"] strong, body[dir="rtl"] p {
 	direction: rtl;
@@ -124,4 +124,28 @@ th {
 }
 .margin-right{
 	margin-right: 20%;
+}
+
+.shadowBox {
+	background-color: #FFFFFF;
+	margin : 15px;
+	padding: 10px;
+}
+.jsonBox {
+	background-color: #FFFFFF;
+	margin : 15px;
+	padding: 20px;
+	border: 1px;
+
+}
+
+.box {
+	background-color: #F2F2F2;
+	margin : 15px;
+	padding: 20px;
+}
+
+.codeBox{
+	padding: 10px;
+	margin: 10px;
 }
