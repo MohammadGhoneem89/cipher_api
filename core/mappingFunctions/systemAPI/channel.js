@@ -1,9 +1,8 @@
 'use strict';
-const networkConfig = require('../../../lib/repositories/networkConfig');
-const orgTypeData = require('../org/orgTypeData');
+const channel = require('../../../lib/repositories/channel');
 const _ = require('lodash');
-function getNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
-  networkConfig.findPageAndCount(payload).then((data) => {
+function getChannelConfig(payload, UUIDKey, route, callback, JWToken) {
+  channel.findPageAndCount(payload).then((data) => {
     let actions = [
       {
         "value": "1003",
@@ -12,7 +11,7 @@ function getNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
         "params": "",
         "iconName": "icon-docs",
         "URI": [
-          "/editNetwork/"
+          "/CreateChannel/"
         ]
       }];
     data[0].forEach((element) => {
@@ -21,8 +20,8 @@ function getNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
     });
 
     let response = {
-      "NetworkList": {
-        "action": "NetworkList",
+      "ChannelList": {
+        "action": "ChannelList",
         "pageData": {
           "pageSize": payload.page.pageSize,
           "currentPageNo": payload.page.currentPageNo,
@@ -37,8 +36,8 @@ function getNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
   }).catch((err) => {
     console.log(JSON.stringify(err));
     let response = {
-      "NetworkList": {
-        "action": "NetworkList",
+      "ChannelList": {
+        "action": "ChannelList",
         "pageData": {
           "pageSize": payload.page.pageSize,
           "currentPageNo": payload.page.currentPageNo,
@@ -52,29 +51,38 @@ function getNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
     callback(response);
   });
 }
-function getNetworkConfigByID(payload, UUIDKey, route, callback, JWToken) {
+function getChannelConfigByID(payload, UUIDKey, route, callback, JWToken) {
   Promise.all([
-    networkConfig.findById(payload)
+    channel.findById(payload)
   ]).then((data) => {
     let response = {
-      "AddUpdateNetwork": {
-        "action": "AddUpdateNetwork",
+      "AddUpdateChannel": {
+        "action": "AddUpdateChannel",
         "data": {
-          "NetworkConfig": data[0]
+          "ChannelConfig": data[0]
         }
       }
     };
     callback(response);
   }).catch((err) => {
-    callback(err);
+    console.log(err);
+    let response = {
+      "AddUpdateChannel": {
+        "action": "AddUpdateChannel",
+        "data": {
+          "ChannelConfig": {}
+        }
+      }
+    };
+    callback(response);
   });
 }
-function updateNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
+function updateChannelConfig(payload, UUIDKey, route, callback, JWToken) {
   payload.createdBy = JWToken._id;
 
   let resp = {
     "responseMessage": {
-      "action": "updateNetworkConfig",
+      "action": "updateChannelConfig",
       "data": {
         "message": {
           "status": "ERROR",
@@ -87,10 +95,10 @@ function updateNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
   };
 
   if (true) {
-    networkConfig.update(payload).then((data) => {
+    channel.update(payload).then((data) => {
       resp.responseMessage.data.message.status = "OK";
       resp.responseMessage.data.message.errorDescription = "Record Updated Success!!";
-      resp.responseMessage.data.message.newPageURL = "/NetworkList";
+      resp.responseMessage.data.message.newPageURL = "/ChannelList";
       callback(resp);
     });
   }
@@ -103,60 +111,31 @@ function updateNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function getServiceList(payload, UUIDKey, route, callback, JWToken) {
-  orgTypeData((data) => {
-    let resp = {
-      "NetworkTypeData": {
-        "action": "NetworkTypeData",
-        "data": {
-          networks: [],
-          orgList: data || []
-        }
-      }
-    };
-    Promise.all([
-      networkConfig.getList()
-    ]).then((data) => {
-      data[0].forEach((key) => {
-        let obj = {
-          "label": key.networkName,
-          "value": key._id
-        };
-        resp.NetworkTypeData.data.networks.push(obj);
-      });
-      callback(resp);
-    }).catch((err) => {
-      callback(err);
-    });
-  });
-}
-
-function getPeerList(payload, UUIDKey, route, callback, JWToken) {
   let resp = {
-    "NetworkPeerList": {
-      "action": "NetworkPeerList",
+    "ChannelTypeData": {
+      "action": "ChannelTypeData",
       "data": {
-        peers: []
+        channels: []
       }
     }
   };
   Promise.all([
-    networkConfig.findById(payload)
+    channel.getList(payload)
   ]).then((data) => {
-    data[0].peerList.forEach((elem) => {
-      elem.actions = [{
-        "label": "Join Channel",
-        "iconName": "fa fa-chain",
-        "actionType": "COMPONENT_FUNCTION"
-      }];
+    data[0].forEach((key) => {
+      let obj = {
+        "label": `${key.channelName}-${key.networkName}`,
+        "value": key._id
+      };
+      resp.ChannelTypeData.data.channels.push(obj);
     });
-    resp.NetworkPeerList.data.peers = data[0].peerList;
     callback(resp);
   }).catch((err) => {
     callback(err);
   });
 }
-exports.updateNetworkConfig = updateNetworkConfig;
-exports.getNetworkConfig = getNetworkConfig;
-exports.getNetworkConfigByID = getNetworkConfigByID;
+
+exports.updateChannelConfig = updateChannelConfig;
+exports.getChannelConfig = getChannelConfig;
+exports.getChannelConfigByID = getChannelConfigByID;
 exports.getServiceList = getServiceList;
-exports.getPeerList = getPeerList;

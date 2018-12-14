@@ -10,14 +10,11 @@ const auditLog = require('../../../lib/services/auditLog');
 const commonConst = require('../../../lib/constants/common');
 const Date = require('../../../lib/helpers/dates');
 
-
 let entityUpdateOut = function (payload, UUIDKey, route, callback, JWToken) {
-
   logger.debug(" [ Entit Update ] PAYLOAD : " + JSON.stringify(payload, null, 2));
   logger.debug(" [ Entit Update ] UUID : " + UUIDKey);
   logger.debug(" [ Entit Update ] Route : " + route);
   logger.debug(" [ Entit Update ] JWToken : " + JSON.stringify(JWToken, null, 2));
-
   orgUpdate(payload, JWToken._id, callback);
 
 };

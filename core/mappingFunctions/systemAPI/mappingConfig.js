@@ -58,6 +58,33 @@ function getMappingConfig(payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
+function getMappingConfigOrgFieldData(payload, UUIDKey, route, callback, JWToken) {
+  Promise.all([
+    MappingConfig.findByRequestId(payload)
+  ]).then((data) => {
+    let result = [];
+    if (data[0].fields) {
+      data[0].fields.forEach((elem, index) => {
+        if (elem.IN_FIELDTYPE === 'OrgIdentifier') {
+          result.push(elem);
+        }
+      });
+    }
+    let response = {
+      "MappingOrgFieldData": {
+        "action": "MappingOrgFieldData",
+        "data": {
+          "OrgFieldData": result
+        }
+      }
+    };
+    callback(response);
+  }).catch((err) => {
+    callback(err);
+  });
+}
+
+
 function getMappingConfigByID(payload, UUIDKey, route, callback, JWToken) {
   Promise.all([
     MappingConfig.findById(payload)
@@ -245,3 +272,4 @@ exports.upsertMappingConfig = upsertMappingConfig;
 exports.getServiceList = getServiceList;
 exports.getListFunction = getListFunction;
 exports.getTypeDataList = getTypeDataList;
+exports.getMappingConfigOrgFieldData = getMappingConfigOrgFieldData;

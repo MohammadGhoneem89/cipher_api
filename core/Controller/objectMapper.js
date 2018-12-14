@@ -98,7 +98,7 @@ module.exports = class ObjectMapper {
   start() {
     let promiseList = [];
     this.mappingConfig.forEach((element) => {
-      if (element.IN_FIELDTYPE === 'data' || element.IN_FIELDTYPE === 'execFunctionOnData') {
+      if (element.IN_FIELDTYPE === 'data' || element.IN_FIELDTYPE === 'execFunctionOnData' || element.IN_FIELDTYPE === 'OrgIdentifier') {
         promiseList.push(this.validate(element));
       }
       else if (element.IN_FIELDTYPE === 'UUID') {
@@ -111,9 +111,17 @@ module.exports = class ObjectMapper {
     return Promise.all(promiseList).then((data) => {
       let fwdMessage = {};
       this.mappingConfig.forEach((element, index) => {
-        _.set(fwdMessage, element.MAP_FIELD, data[index]);
+        if (element.IN_FIELDDT != 'array' && element.MAP_FIELDDT == 'array') {
+          //  execute rules and update JSON
+          let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
+          _.set(fwdMessage, element.MAP_FIELD, settingArray.push(data[index]));
+        }
+        else {
+          _.set(fwdMessage, element.MAP_FIELD, data[index]);
+        }
+
       });
       return fwdMessage;
     });
   }
-}
+};

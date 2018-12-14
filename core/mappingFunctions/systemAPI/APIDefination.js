@@ -213,7 +213,7 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
       let dest = data.useCase + "." + data.route;
       let reqMap = []
       data.RequestMapping.fields.forEach((field) => {
-        if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData") {
+        if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData" || field.IN_FIELDTYPE === "OrgIdentifier") {
           reqMap.push(field);
         }
       });

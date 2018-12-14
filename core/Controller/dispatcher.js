@@ -8,12 +8,74 @@ const amq = require('../../core/api/connectors/queue');
 module.exports = class Dispatcher {
   constructor(OriginalRequest, MappeedRequest, configData, UUID, typeList, JWTtoken) {
     this.oRequest = OriginalRequest;
-    this.request = MappeedRequest;
     this.configdata = configData;
     this.simucases = configData.simucases || [];
     this.UUID = UUID;
     this.typeList = typeList;
     this.JWT = JWTtoken;
+    if (configData.isBlockchain === true) {
+      let isMatched = false;
+      let rules = _.get(configData, 'rules', []);
+      let channelName = "";
+      let networkName = "";
+      let smartContractName = "";
+      let smartContractFunc = "";
+      let tranCode = "0002";
+      rules.forEach((elem) => {
+        let flags = [];
+        elem.ruleList.forEach((element) => {
+          if (element.field != "*") {
+            let extValue = _.get(OriginalRequest, element.field, null);
+            if (!extValue) {
+              throw new Error(`blockchain routing error | ${element.field} must be defined`);
+            }
+            let litmus = false;
+            if (element.value == '*') {
+              litmus = true;
+            }
+            else if (extValue == element.field) {
+              litmus = true;
+            }
+            else {
+              litmus = false;
+            }
+            flags.push(litmus);
+          }
+          else {
+            flags.push(true);
+          }
+
+        });
+        let flagRuleApproved = true;
+        flags.forEach((e) => {
+          if (e === false) {
+            flagRuleApproved = false;
+          }
+        });
+        if (isMatched === false && flagRuleApproved === true) {
+          channelName = elem.channel.channelName;
+          networkName = elem.channel.networkName;
+          smartContractName = elem.smartcontract;
+          smartContractFunc = elem.smartcontractFunc;
+          tranCode = elem.type;
+          isMatched = true;
+        }
+      });
+      if (isMatched === false) {
+        throw new Error(`blockchain routing error | matching rule not found!!!`);
+      }
+      else {
+        let userID = JWTtoken && JWTtoken.userID ? JWTtoken.userID : "admin";
+        _.set(MappeedRequest, 'Header.tranCode', tranCode || "0002");
+        _.set(MappeedRequest, 'Header.userID', userID);
+        _.set(MappeedRequest, 'Header.network', networkName);
+        _.set(MappeedRequest, 'BCData.channelName', channelName);
+        _.set(MappeedRequest, 'BCData.smartContractName', smartContractName);
+        _.set(MappeedRequest, 'Body.fcnName', smartContractFunc);
+
+      }
+    }
+    this.request = MappeedRequest;
   }
   SendGetRequest() {
     return new Promise((resolve, reject) => {
@@ -82,6 +144,10 @@ module.exports = class Dispatcher {
   }
 
   connectRestService() {
+    let today = new Date();
+    _.set(this.request, 'Header.tranType', "0200");
+    _.set(this.request, 'Header.UUID', this.UUID);
+    _.set(this.request, 'Header.timeStamp', today.toISOString());
     let rpOptions = {
       method: 'POST',
       url: this.configdata.ServiceURL,
@@ -112,11 +178,9 @@ module.exports = class Dispatcher {
               "message": "Processed OK!"
             };
             let responseQueue = [];
-            let today = new Date()
+            let today = new Date();
             responseQueue.push(this.configdata.responseQueue);
             _.set(this.request, 'Header.tranType', "0200");
-            _.set(this.request, 'Header.userID', "STUB");
-            _.set(this.request, 'Header.org', "STUB");
             _.set(this.request, 'Header.UUID', this.UUID);
             _.set(this.request, 'Header.ResponseMQ', responseQueue);
             _.set(this.request, 'Header.timeStamp', today.toISOString());
