@@ -2,7 +2,7 @@
 const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
-
+const fs  = require('fs');
 function updateRequestStub(payload, route, useCase) {
   let query = { 'sampleRequest': payload };
   APIDefinitation.update({ route: route, useCase: useCase }, query).then((data) => {
@@ -240,30 +240,30 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
-    let resp = {
-        "getActiveAPIs": {
-            "action": "getActiveAPIs",
-            "data": {
-                "message": {
-                    "status": "ERROR",
-                    "errorDescription": "UseCase must be provided!!",
-                    "displayToUser": true,
-                    "newPageURL": ""
-                }
-            }
+  let resp = {
+    "getActiveAPIs": {
+      "action": "getActiveAPIs",
+      "data": {
+        "message": {
+          "status": "ERROR",
+          "errorDescription": "UseCase must be provided!!",
+          "displayToUser": true,
+          "newPageURL": ""
         }
-    };
-    if (!payload.useCase) {
-        return callback(resp);
+      }
     }
-    APIDefinitation.getActiveAPIs(payload).then((data) => {
-        if(data){
-            callback(data);
-        }
+  };
+  if (!payload.useCase) {
+    return callback(resp);
+  }
+  APIDefinitation.getActiveAPIs(payload).then((data) => {
+    if (data) {
+      callback(data);
+    }
 
-    }).catch((err) => {
-        callback(err);
-    });
+  }).catch((err) => {
+    callback(err);
+  });
 }
 
 let chainCodeData = [];
@@ -272,7 +272,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   console.log(payload, "IQRA");
   APIDefinitation.findPageAndCount(payload)
     .then((data) => {
-
+      console.log(data)
       data[0].map(item => {
         if (item.isSmartContract == true && item.isActive == true) {
           chainCodeData.push({
@@ -438,7 +438,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let GetData = fData.substring(IndxFnDef, IndxFnDefEnd);
         let hData = Ldata.replace(GetData, ovt)
 
-        fs.writeFile(responses[0].ApiListData.useCase + 'ChainCode.txt', hData, 'utf8', function () {
+        fs.writeFile(responses[0].ApiListData.useCase + 'ChainCode.go', hData, 'utf8', function () {
           // app.get("/ApiList", function(req, res) {
           //   res.download('E:/git-repo/cipher_api/PRChainCode.txt')
           // })
@@ -474,6 +474,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
     });
 
 }
+
+
 exports.downloadChainCode = downloadChainCode;
 exports.getAPIDefinition = getAPIDefinition;
 exports.getAPIDefinitionID = getAPIDefinitionID;
