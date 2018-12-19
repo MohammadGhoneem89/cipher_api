@@ -2,7 +2,7 @@
 const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
-const fs  = require('fs');
+const fs = require('fs');
 function updateRequestStub(payload, route, useCase) {
   let query = { 'sampleRequest': payload };
   APIDefinitation.update({ route: route, useCase: useCase }, query).then((data) => {
@@ -269,7 +269,7 @@ function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
 
 function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let chainCodeData = [];
-let responses = [];
+  let responses = [];
   console.log(payload, "IQRA");
   APIDefinitation.findPageAndCount(payload)
     .then((data) => {
@@ -289,12 +289,15 @@ let responses = [];
       // console.log(chainCodeData, "IQRAAAAAAAAAAAAAAAAAAAAAAAA")
 
 
-      responses.push({
-        ApiListData: {
-          useCase: chainCodeData[0].useCase,
-          APIdata: []
-        }
-      })
+
+      {
+        responses.push({
+          ApiListData: {
+            useCase: chainCodeData[0].useCase,
+            APIdata: []
+          }
+        })
+      }
       let response = {};
       for (let i = 0; i < chainCodeData.length; i++) {
         {
@@ -347,15 +350,15 @@ let responses = [];
           };
         }
 
-      for (let i in DupIndex)
-        // console.log(responses[0].ApiListData.APIdata[DupIndex[i]].MSP)
+      // for (let i in DupIndex)
+      // console.log(responses[0].ApiListData.APIdata[DupIndex[i]].MSP)
 
 
       //Empty APIdata
-      responses[0].ApiListData.APIdata.length = 0
-
-      for (let m = 0; m < uniqueMSP.length; m++)
-        responses[0].ApiListData.APIdata.push(uniqueMSP[m])
+      responses[0].ApiListData.APIdata = uniqueMSP
+      console.log(responses)
+      // for (let m = 0; m < uniqueMSP.length; m++)
+        // responses[0].ApiListData.APIdata.push(uniqueMSP[m])
       // console.log(JSON.stringify(responses))
 
       let updateIndex = "", newData = ""
@@ -438,9 +441,9 @@ let responses = [];
         let IndxFnDefEnd = data.search("//<<FunctionDefinition - End>>");
         let GetData = fData.substring(IndxFnDef, IndxFnDefEnd);
         let hData = Ldata.replace(GetData, ovt)
-console.log(hData)
+        // console.log(hData)
         fs.writeFile(responses[0].ApiListData.useCase + 'ChainCode.go', hData, 'utf8', function () {
-          
+
         })
         // console.log(mData)
       });
