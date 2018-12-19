@@ -27,10 +27,10 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     action: incommingRoute,
     payload: payload
   };
-
   apiPayloadRepo.create(requestData);
 
-  let ResponseCaller = function (data) {
+
+  let ResponseCaller = function (data, responderMethod) {
     logger.debug({
       fs: 'RestController.js',
       func: 'ResponseCaller'
@@ -49,6 +49,9 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     }
     logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, JSON.stringify(data, null, 2));
     logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, "=========== [" + UUIDKey + "]!!! ============");
+    if(responderMethod){
+      responderMethod(responseCallback);
+    }
     responseCallback.send(data);
     return;
   };

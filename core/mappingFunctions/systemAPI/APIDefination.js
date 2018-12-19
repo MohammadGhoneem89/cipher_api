@@ -3,9 +3,10 @@ const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
 const fs = require('fs');
+
 function updateRequestStub(payload, route, useCase) {
-  let query = { 'sampleRequest': payload };
-  APIDefinitation.update({ route: route, useCase: useCase }, query).then((data) => {
+  let query = {'sampleRequest': payload};
+  APIDefinitation.update({route: route, useCase: useCase}, query).then((data) => {
     console.log("request Sample Updated!");
   });
 }
@@ -44,6 +45,7 @@ function LoadConfig() {
 
   });
 }
+
 function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
   APIDefinitation.findPageAndCount(payload).then((data) => {
     let actions = [
@@ -137,7 +139,7 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
         resp.responseMessage.data.message.errorDescription = "route & useCase already exist!";
         return callback(resp);
       }
-      return APIDefinitation.update({ route: payload.route, useCase: payload.useCase }, payload).then((data) => {
+      return APIDefinitation.update({route: payload.route, useCase: payload.useCase}, payload).then((data) => {
 
         resp.responseMessage.data.message.status = "OK";
         console.log(data);
@@ -271,6 +273,16 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let chainCodeData = [];
   let responses = [];
   console.log(payload, "IQRA");
+  payload = {
+    "action": "mappingData",
+    "searchCriteria": {
+      "useCase": "PR"
+    },
+    "page": {
+      "currentPageNo": 1,
+      "pageSize": 10
+    }
+  };
   APIDefinitation.findPageAndCount(payload)
     .then((data) => {
       // console.log(data)
@@ -320,6 +332,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
 
       let DupIndex = []
+
       function removeDuplicatesBy(comparator, array) {
         let unique = [];
         for (let i = 0; i < array.length; i++) {
@@ -347,23 +360,29 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           if (responses[0].ApiListData.APIdata[m].MSP == responses[0].ApiListData.APIdata[DupIndex[k]].MSP) {
             responses[0].ApiListData.APIdata[m].APIList.push(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0])
 
-          };
+          }
+          ;
         }
 
       // for (let i in DupIndex)
       // console.log(responses[0].ApiListData.APIdata[DupIndex[i]].MSP)
 
 
-      //Empty APIdata
-      responses[0].ApiListData.APIdata = uniqueMSP
-      console.log(responses)
-      // for (let m = 0; m < uniqueMSP.length; m++)
-        // responses[0].ApiListData.APIdata.push(uniqueMSP[m])
+     // for (let i in DupIndex)
+        // console.log(responses[0].ApiListData.APIdata[DupIndex[i]].MSP)
+
+
+        //Empty APIdata
+        responses[0].ApiListData.APIdata.length = 0
+
+      for (let m = 0; m < uniqueMSP.length; m++)
+        responses[0].ApiListData.APIdata.push(uniqueMSP[m])
       // console.log(JSON.stringify(responses))
 
       let updateIndex = "", newData = ""
       let mData = "", mData2 = "", mData3 = "", wData = "";
       let mData1 = ""
+
       function mspFunctionsLogic(data) {
 
         let funcLogicStart = data.search("//<<Function Validation Logic-Start>>");
@@ -374,7 +393,9 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
           wData = ""
 
-          if (i > 0) { newData = "\n" }
+          if (i > 0) {
+            newData = "\n"
+          }
           newData += updateIndex.replace(/<<MSP>>/g, responses[0].ApiListData.APIdata[i].MSP)
 
           mData = newData.search("//<<FunctionCases-Start>>")
@@ -400,7 +421,10 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         return mData1
 
       }
-      let xData = ""; let fData = ""
+
+      let xData = "";
+      let fData = ""
+
       function mspFunctionDesc(data) {
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
 
@@ -442,38 +466,45 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let GetData = fData.substring(IndxFnDef, IndxFnDefEnd);
         let hData = Ldata.replace(GetData, ovt)
         // console.log(hData)
+
+
         fs.writeFile(responses[0].ApiListData.useCase + 'ChainCode.go', hData, 'utf8', function () {
 
         })
         // console.log(mData)
+        callback(hData, (responseCallback)=>{
+          responseCallback.set({
+            'Content-Type': 'application/octet-stream',
+            'Content-Disposition': 'attachment; filename=' + "IQRAFILE.go"
+          });
+        });
       });
-      callback(responses);
     }).catch((err) => {
-      console.log(err)
-      console.log(JSON.stringify(err));
-      for (let i = 0; i < chainCodeData.length; i++) {
-        var response = {
-          "ApiListData": {
-            "useCase": "",
-            "APIdata": [
-              {
-                "MSP": "",
-                "APIList": [
-                  {
-                    "route": "",
-                    "purpose": ""
+    console.log(err)
+    console.log(JSON.stringify(err));
+    for (let i = 0; i < chainCodeData.length; i++) {
+      var response = {
+        "ApiListData": {
+          "useCase": "",
+          "APIdata": [
+            {
+              "MSP": "",
+              "APIList": [
+                {
+                  "route": "",
+                  "purpose": ""
 
-                  }
+                }
 
-                ]
-              }
-            ]
-          }
+              ]
+            }
+          ]
         }
-        // console.log(response)
       }
-      callback(response);
-    });
+      // console.log(response)
+    }
+    callback(response);
+  });
 
 }
 

@@ -96,6 +96,51 @@ func (t *PRChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 			logger.Warning("Invoke did not find function: " + function)
 			return shim.Error("Received unknown function invocation: " + function)
 		}
+	} else 
+//<<Function Validation Logic-Start>>
+	if org == "SDG" {						
+		switch functionName := function; functionName {
+		//<<FunctionCases-Start>>
+		
+		case "AddTenant":
+			return t.AddTenant(stub, args,"AddTenant")
+					
+		//<<FunctionCases-End>>
+		
+		default:
+			logger.Warning("Invoke did not find function: " + function)
+			return shim.Error("Received unknown function invocation: " + function)
+		}
+	} else 
+//<<Function Validation Logic-Start>>
+	if org == "ENBD" {						
+		switch functionName := function; functionName {
+		//<<FunctionCases-Start>>
+		
+		case "AssociatePaymentInstruments":
+			return t.AssociatePaymentInstruments(stub, args,"AssociatePaymentInstruments")
+					
+		//<<FunctionCases-End>>
+		
+		default:
+			logger.Warning("Invoke did not find function: " + function)
+			return shim.Error("Received unknown function invocation: " + function)
+		}
+	} else 
+//<<Function Validation Logic-Start>>
+	if org == "DLD" {						
+		switch functionName := function; functionName {
+		//<<FunctionCases-Start>>
+		
+		case "EjariTerminationStatus":
+			return t.EjariTerminationStatus(stub, args,"EjariTerminationStatus")
+					
+		//<<FunctionCases-End>>
+		
+		default:
+			logger.Warning("Invoke did not find function: " + function)
+			return shim.Error("Received unknown function invocation: " + function)
+		}
 	} else //<<Function Validation Logic - End>>
 	{
 		return shim.Error("Invalid MSP: " + org)
@@ -134,6 +179,66 @@ func insertDataAndRaiseEvent(stub shim.ChaincodeStubInterface,key string,eventTy
 /*
 	Function Name:<<FunctionName>>
 	//<<FunctionDefinition - Start>>
+/*
+	Function Name:AddTenant
+	Description: UAE Pass authentication token event for the user login is stamped on blockchain for both WASL and Bank.
+*/
+func (t *PRChainCode) AddTenant(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("AddTenant: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here	
+
+	logger.Debug("AddTenant function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:AssociatePaymentInstruments
+	Description: The API consumed by the Bank to stamp the payment instruments association on the blockchain. This could have variations to store first time payments as well as later payments done based on payment terms.
+*/
+func (t *PRChainCode) AssociatePaymentInstruments(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("AssociatePaymentInstruments: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here	
+
+	logger.Debug("AssociatePaymentInstruments function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:EjariTerminationStatus
+	Description: When DLD will receive the termination request either from Blockchain or WASL legacy system, DLD to call this API to update the status on Blockchain when termination is successful.
+*/
+func (t *PRChainCode) EjariTerminationStatus(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("EjariTerminationStatus: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here	
+
+	logger.Debug("EjariTerminationStatus function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
 /*
 	Function Name:AddTenant
 	Description: UAE Pass authentication token event for the user login is stamped on blockchain for both WASL and Bank.

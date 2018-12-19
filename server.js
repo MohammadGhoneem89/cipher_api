@@ -619,7 +619,11 @@ app.post('/APII/:channel/:action', permissions, function (req, res) {
 
 });
 
-app.post('/API/:channel/:action', permissions, function (req, res) {
+app.get('/API/:channel/:action', permissions, apiCallsHandler);
+
+app.post('/API/:channel/:action', permissions, apiCallsHandler);
+
+function apiCallsHandler(req, res){
   if (checkbadinput(req)) {
     let resperr = { 'error': "illeagal character found in request" };
     res.send(resperr);
@@ -646,8 +650,7 @@ app.post('/API/:channel/:action', permissions, function (req, res) {
   const decoded = crypto.decrypt(JWToken);
   logger.info({ fs: 'app.js', func: 'API' }, decoded, 'decoded.userID:');
   RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
-
-});
+}
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
