@@ -266,13 +266,14 @@ function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
-let chainCodeData = [];
-let responses = [];
+
 function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
+  let chainCodeData = [];
+let responses = [];
   console.log(payload, "IQRA");
   APIDefinitation.findPageAndCount(payload)
     .then((data) => {
-      console.log(data)
+      // console.log(data)
       data[0].map(item => {
         if (item.isSmartContract == true && item.isActive == true) {
           chainCodeData.push({
@@ -285,7 +286,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           });
         }
       });
-      console.log(chainCodeData, "IQRAAAAAAAAAAAAAAAAAAAAAAAA")
+      // console.log(chainCodeData, "IQRAAAAAAAAAAAAAAAAAAAAAAAA")
 
 
       responses.push({
@@ -312,7 +313,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         }
 
       }
-      console.log(responses[0].ApiListData.APIdata)
+      // console.log(responses[0].ApiListData.APIdata)
 
 
       let DupIndex = []
@@ -336,7 +337,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       let uniqueMSP = removeDuplicatesBy(function (a, b) {
         return a.MSP === b.MSP
       }, responses[0].ApiListData.APIdata);
-      console.log("unique : \n", uniqueMSP, "\n DupIndex :", DupIndex)
+      // console.log("unique : \n", uniqueMSP, "\n DupIndex :", DupIndex)
 
       for (let m = 0; m < responses[0].ApiListData.APIdata.length; m++)
         for (let k = 0; k < DupIndex.length; k++) {
@@ -347,7 +348,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         }
 
       for (let i in DupIndex)
-        console.log(responses[0].ApiListData.APIdata[DupIndex[i]].MSP)
+        // console.log(responses[0].ApiListData.APIdata[DupIndex[i]].MSP)
 
 
       //Empty APIdata
@@ -355,7 +356,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
       for (let m = 0; m < uniqueMSP.length; m++)
         responses[0].ApiListData.APIdata.push(uniqueMSP[m])
-      console.log(JSON.stringify(responses))
+      // console.log(JSON.stringify(responses))
 
       let updateIndex = "", newData = ""
       let mData = "", mData2 = "", mData3 = "", wData = "";
@@ -437,11 +438,9 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let IndxFnDefEnd = data.search("//<<FunctionDefinition - End>>");
         let GetData = fData.substring(IndxFnDef, IndxFnDefEnd);
         let hData = Ldata.replace(GetData, ovt)
-
+console.log(hData)
         fs.writeFile(responses[0].ApiListData.useCase + 'ChainCode.go', hData, 'utf8', function () {
-          // app.get("/ApiList", function(req, res) {
-          //   res.download('E:/git-repo/cipher_api/PRChainCode.txt')
-          // })
+          
         })
         // console.log(mData)
       });
