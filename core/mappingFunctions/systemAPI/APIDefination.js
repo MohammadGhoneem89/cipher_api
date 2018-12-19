@@ -367,16 +367,16 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       // for (let i in DupIndex)
       // console.log(responses[0].ApiListData.APIdata[DupIndex[i]].MSP)
 
+          };
+        }
 
-     // for (let i in DupIndex)
-        // console.log(responses[0].ApiListData.APIdata[DupIndex[i]].MSP)
+      // for (let i in DupIndex)
+      // console.log(responses[0].ApiListData.APIdata[DupIndex[i]].MSP)
 
-
-        //Empty APIdata
-        responses[0].ApiListData.APIdata.length = 0
-
-      for (let m = 0; m < uniqueMSP.length; m++)
-        responses[0].ApiListData.APIdata.push(uniqueMSP[m])
+      responses[0].ApiListData.APIdata = uniqueMSP
+      console.log(responses)
+      // for (let m = 0; m < uniqueMSP.length; m++)
+        // responses[0].ApiListData.APIdata.push(uniqueMSP[m])
       // console.log(JSON.stringify(responses))
 
       let updateIndex = "", newData = ""
