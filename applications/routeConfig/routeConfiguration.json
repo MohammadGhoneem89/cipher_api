@@ -1,4 +1,13 @@
 {
+  "Wasl": {
+    "CustomFunctionsLocation": "../../applications/WASL/mappingFunctions/",
+    "viewItem": {
+      "customMapping": true,
+      "MappingfunctionName": "viewItem",
+      "CustomMappingFile": "general/viewItem.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
   "SampleApp": {
     "CustomFunctionsLocation": "../../applications/SampleApp/mappingFunctions/",
     "viewItem": {
