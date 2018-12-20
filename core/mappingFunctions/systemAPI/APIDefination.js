@@ -446,7 +446,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       }
 
 
-      fs.readFile('test.txt', 'utf8', function (err, data) {
+      fs.readFile('ChaincodeTemplate.txt', 'utf8', function (err, data) {
         if (err) {
           return console.log(err);
 
