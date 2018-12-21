@@ -1,6 +1,5 @@
 'use strict';
-var atob = require('atob');
-const crypto = require('../../../lib/helpers/crypto')
+
 const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
@@ -269,30 +268,11 @@ function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
     callback(err);
   });
 }
-function b64DecodeUnicode(str) {
-  return decodeURIComponent(Array.prototype.map.call(atob(str), function (c) {
-    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-  }).join(''))
-}
 
 function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let chainCodeData = [];
   let responses = [];
   console.log(payload.query, "IQRA");
-  // console.log(payload.url)
-  // function getUrlVars(url) {
-  //   var vars = {};
-  //   var parts = url.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
-  //     vars[key] = value;
-  //   });
-  //   return vars;
-  // }
-  // let chk = getUrlVars(payload.url)
-  // let chk1 = chk.searchCriteriaEncode
-  // console.log(JSON.parse(new Buffer(chk.searchCriteriaEncode, 'base64')))
-
-  // const decode = b64DecodeUnicode(chk1)
-  // console.log(decode)
 
   var request = {
     "action": "mappingData",
@@ -317,7 +297,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           });
         }
       });
-      // console.log(chainCodeData, "IQRAAAAAAAAAAAAAAAAAAAAAAAA")
 
 
       {
@@ -464,10 +443,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let IndxFnDefEnd = data.search("//<<FunctionDefinition - End>>");
         let GetData = fData.substring(IndxFnDef, IndxFnDefEnd);
         let hData = Ldata.replace(GetData, ovt)
-        // console.log(hData)
-
-
-        // console.log(mData)
+        
         callback(hData, (responseCallback) => {
 
           responseCallback.set({
