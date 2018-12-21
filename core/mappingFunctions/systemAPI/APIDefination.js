@@ -6,8 +6,8 @@ const typeData = require('../../../lib/repositories/typeData');
 const fs = require('fs');
 
 function updateRequestStub(payload, route, useCase) {
-  let query = { 'sampleRequest': payload };
-  APIDefinitation.update({ route: route, useCase: useCase }, query).then((data) => {
+  let query = {'sampleRequest': payload};
+  APIDefinitation.update({route: route, useCase: useCase}, query).then((data) => {
     console.log("request Sample Updated!");
   });
 }
@@ -140,7 +140,7 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
         resp.responseMessage.data.message.errorDescription = "route & useCase already exist!";
         return callback(resp);
       }
-      return APIDefinitation.update({ route: payload.route, useCase: payload.useCase }, payload).then((data) => {
+      return APIDefinitation.update({route: payload.route, useCase: payload.useCase}, payload).then((data) => {
 
         resp.responseMessage.data.message.status = "OK";
         console.log(data);
@@ -274,19 +274,19 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let responses = [];
   console.log(payload.query, "IQRA");
 
-  var request = {
+  let request = {
     "action": "mappingData",
     "searchCriteria": payload.query.searchCriteria,
     "page": {
-        "currentPageNo": 1,
-        "pageSize": 10
+      "currentPageNo": 1,
+      "pageSize": 10
     }
-}
+  };
   APIDefinitation.findPageAndCount(request)
     .then((data) => {
       // console.log(data)
       data[0].map(item => {
-        if (item.isSmartContract == true && item.isActive == true) {
+        if (item.isSmartContract === true && item.isActive === true) {
           chainCodeData.push({
             'isActive': item.isActive,
             'MSP': item.MSP,
@@ -319,7 +319,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
               }
             ]
-          }
+          };
 
           responses[0].ApiListData.APIdata.push(response)
         }
@@ -328,7 +328,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       // console.log(responses[0].ApiListData.APIdata)
 
 
-      let DupIndex = []
+      let DupIndex = [];
 
       function removeDuplicatesBy(comparator, array) {
         let unique = [];
@@ -358,15 +358,14 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
             responses[0].ApiListData.APIdata[m].APIList.push(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0])
 
           }
-          ;
         }
 
-      responses[0].ApiListData.APIdata = uniqueMSP
+      responses[0].ApiListData.APIdata = uniqueMSP;
       // console.log(responses)
 
-      let updateIndex = "", newData = ""
+      let updateIndex = "", newData = "";
       let mData = "", mData2 = "", mData3 = "", wData = "";
-      let mData1 = ""
+      let mData1 = "";
 
       function mspFunctionsLogic(data) {
 
@@ -443,7 +442,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let IndxFnDefEnd = data.search("//<<FunctionDefinition - End>>");
         let GetData = fData.substring(IndxFnDef, IndxFnDefEnd);
         let hData = Ldata.replace(GetData, ovt)
-        
+
         callback(hData, (responseCallback) => {
 
           responseCallback.set({
@@ -453,31 +452,31 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         });
       });
     }).catch((err) => {
-      console.log(err)
-      console.log(JSON.stringify(err));
-      for (let i = 0; i < chainCodeData.length; i++) {
-        var response = {
-          "ApiListData": {
-            "useCase": "",
-            "APIdata": [
-              {
-                "MSP": "",
-                "APIList": [
-                  {
-                    "route": "",
-                    "purpose": ""
+    console.log(err)
+    console.log(JSON.stringify(err));
+    for (let i = 0; i < chainCodeData.length; i++) {
+      var response = {
+        "ApiListData": {
+          "useCase": "",
+          "APIdata": [
+            {
+              "MSP": "",
+              "APIList": [
+                {
+                  "route": "",
+                  "purpose": ""
 
-                  }
+                }
 
-                ]
-              }
-            ]
-          }
+              ]
+            }
+          ]
         }
-        // console.log(response)
       }
-      callback(response);
-    });
+      // console.log(response)
+    }
+    callback(response);
+  });
 
 }
 
