@@ -11,7 +11,7 @@ module.exports = class GeneralRequestProcessor {
     this.configdata = configdata;
     this.typeData = typeData;
     this.UUID = UUID;
-    this.JWTokenData;
+    this.JWTokenData = JWTokenData;
   }
   processIncommingMessage() {
     return new Promise((resolve, reject) => {

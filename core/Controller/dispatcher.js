@@ -152,14 +152,20 @@ module.exports = class Dispatcher {
       timeout: 10000, //  configurable
       json: true
     };
+
+    console.log(JSON.stringify(rpOptions, null, 2))
     return rp(rpOptions).then((data) => {
+      let generalResponse = {
+        "error": true,
+        "message": "Failed to get response"
+      };
       if (data) {
+        if (data.success === false) {
+          throw new Error(data.message);
+        }
         return data;
       }
-      let generalResponse = {
-        "error": false,
-        "message": "Processed OK!"
-      };
+
       return generalResponse;
     });
   }
@@ -168,8 +174,8 @@ module.exports = class Dispatcher {
     return amq.start()
       .then((ch) => {
         return ch.assertQueue(this.configdata.requestServiceQueue, {
-            durable: false
-          })
+          durable: false
+        })
           .then(() => {
             let generalResponse = {
               "error": false,
