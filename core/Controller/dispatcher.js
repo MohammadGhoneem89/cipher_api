@@ -8,12 +8,74 @@ const amq = require('../../core/api/connectors/queue');
 module.exports = class Dispatcher {
   constructor(OriginalRequest, MappeedRequest, configData, UUID, typeList, JWTtoken) {
     this.oRequest = OriginalRequest;
-    this.request = MappeedRequest;
     this.configdata = configData;
     this.simucases = configData.simucases || [];
     this.UUID = UUID;
     this.typeList = typeList;
     this.JWT = JWTtoken;
+    if (configData.isBlockchain === true) {
+      let isMatched = false;
+      let rules = _.get(configData, 'rules', []);
+      let channelName = "";
+      let networkName = "";
+      let smartContractName = "";
+      let smartContractFunc = "";
+      let tranCode = "0002";
+      rules.forEach((elem) => {
+        let flags = [];
+        elem.ruleList.forEach((element) => {
+          if (element.field != "*") {
+            let extValue = _.get(OriginalRequest, element.field, null);
+            if (!extValue) {
+              throw new Error(`blockchain routing error | ${element.field} must be defined`);
+            }
+            let litmus = false;
+            if (element.value == '*') {
+              litmus = true;
+            }
+            else if (extValue == element.field) {
+              litmus = true;
+            }
+            else {
+              litmus = false;
+            }
+            flags.push(litmus);
+          }
+          else {
+            flags.push(true);
+          }
+
+        });
+        let flagRuleApproved = true;
+        flags.forEach((e) => {
+          if (e === false) {
+            flagRuleApproved = false;
+          }
+        });
+        if (isMatched === false && flagRuleApproved === true) {
+          channelName = elem.channel.channelName;
+          networkName = elem.channel.networkName;
+          smartContractName = elem.smartcontract;
+          smartContractFunc = elem.smartcontractFunc;
+          tranCode = elem.type;
+          isMatched = true;
+        }
+      });
+      if (isMatched === false) {
+        throw new Error(`blockchain routing error | matching rule not found!!!`);
+      }
+      else {
+        let userID = JWTtoken && JWTtoken.userID ? JWTtoken.userID : "admin";
+        _.set(MappeedRequest, 'Header.tranCode', tranCode || "0002");
+        _.set(MappeedRequest, 'Header.userID', userID);
+        _.set(MappeedRequest, 'Header.network', networkName);
+        _.set(MappeedRequest, 'BCData.channelName', channelName);
+        _.set(MappeedRequest, 'BCData.smartContractName', smartContractName);
+        _.set(MappeedRequest, 'Body.fcnName', smartContractFunc);
+
+      }
+    }
+    this.request = MappeedRequest;
   }
   SendGetRequest() {
     return new Promise((resolve, reject) => {
@@ -78,6 +140,10 @@ module.exports = class Dispatcher {
   }
 
   connectRestService() {
+    let today = new Date();
+    _.set(this.request, 'Header.tranType', "0200");
+    _.set(this.request, 'Header.UUID', this.UUID);
+    _.set(this.request, 'Header.timeStamp', today.toISOString());
     let rpOptions = {
       method: 'POST',
       url: this.configdata.ServiceURL,
@@ -86,14 +152,20 @@ module.exports = class Dispatcher {
       timeout: 10000, //  configurable
       json: true
     };
+
+    console.log(JSON.stringify(rpOptions, null, 2))
     return rp(rpOptions).then((data) => {
+      let generalResponse = {
+        "error": true,
+        "message": "Failed to get response"
+      };
       if (data) {
+        if (data.success === false) {
+          throw new Error(data.message);
+        }
         return data;
       }
-      let generalResponse = {
-        "error": false,
-        "message": "Processed OK!"
-      };
+
       return generalResponse;
     });
   }
@@ -102,19 +174,17 @@ module.exports = class Dispatcher {
     return amq.start()
       .then((ch) => {
         return ch.assertQueue(this.configdata.requestServiceQueue, {
-            durable: false
-          })
+          durable: false
+        })
           .then(() => {
             let generalResponse = {
               "error": false,
               "message": "Processed OK!"
             };
             let responseQueue = [];
-            let today = new Date()
+            let today = new Date();
             responseQueue.push(this.configdata.responseQueue);
             _.set(this.request, 'Header.tranType', "0200");
-            _.set(this.request, 'Header.userID', "STUB");
-            _.set(this.request, 'Header.org', "STUB");
             _.set(this.request, 'Header.UUID', this.UUID);
             _.set(this.request, 'Header.ResponseMQ', responseQueue);
             _.set(this.request, 'Header.timeStamp', today.toISOString());

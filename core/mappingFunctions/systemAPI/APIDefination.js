@@ -1,6 +1,5 @@
 'use strict';
-var atob = require('atob');
-const crypto = require('../../../lib/helpers/crypto')
+
 const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
@@ -217,7 +216,7 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
       let dest = data.useCase + "." + data.route;
       let reqMap = []
       data.RequestMapping.fields.forEach((field) => {
-        if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData") {
+        if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData" || field.IN_FIELDTYPE === "OrgIdentifier") {
           reqMap.push(field);
         }
       });
@@ -269,44 +268,25 @@ function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
     callback(err);
   });
 }
-function b64DecodeUnicode(str) {
-  return decodeURIComponent(Array.prototype.map.call(atob(str), function (c) {
-    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-  }).join(''))
-}
 
 function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let chainCodeData = [];
   let responses = [];
   console.log(payload.query, "IQRA");
-  // console.log(payload.url)
-  // function getUrlVars(url) {
-  //   var vars = {};
-  //   var parts = url.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
-  //     vars[key] = value;
-  //   });
-  //   return vars;
-  // }
-  // let chk = getUrlVars(payload.url)
-  // let chk1 = chk.searchCriteriaEncode
-  // console.log(JSON.parse(new Buffer(chk.searchCriteriaEncode, 'base64')))
 
-  // const decode = b64DecodeUnicode(chk1)
-  // console.log(decode)
-
-  var request = {
+  let request = {
     "action": "mappingData",
     "searchCriteria": payload.query.searchCriteria,
     "page": {
-        "currentPageNo": 1,
-        "pageSize": 10
+      "currentPageNo": 1,
+      "pageSize": 10
     }
-}
+  };
   APIDefinitation.findPageAndCount(request)
     .then((data) => {
       // console.log(data)
       data[0].map(item => {
-        if (item.isSmartContract == true && item.isActive == true) {
+        if (item.isSmartContract === true && item.isActive === true) {
           chainCodeData.push({
             'isActive': item.isActive,
             'MSP': item.MSP,
@@ -317,7 +297,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           });
         }
       });
-      // console.log(chainCodeData, "IQRAAAAAAAAAAAAAAAAAAAAAAAA")
 
 
       {
@@ -340,7 +319,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
               }
             ]
-          }
+          };
 
           responses[0].ApiListData.APIdata.push(response)
         }
@@ -349,7 +328,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       // console.log(responses[0].ApiListData.APIdata)
 
 
-      let DupIndex = []
+      let DupIndex = [];
 
       function removeDuplicatesBy(comparator, array) {
         let unique = [];
@@ -379,30 +358,27 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
             responses[0].ApiListData.APIdata[m].APIList.push(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0])
 
           }
-          ;
         }
 
-      responses[0].ApiListData.APIdata = uniqueMSP
+      responses[0].ApiListData.APIdata = uniqueMSP;
       // console.log(responses)
 
       let updateIndex = "", newData = ""
       let mData = "", mData2 = "", mData3 = "", wData = "";
       let mData1 = ""
-
-      function mspFunctionsLogic(data) {
-
+      function findFnLogicIndex(data) {
         let funcLogicStart = data.search("//<<Function Validation Logic-Start>>");
         let funcLogicEnd = data.search("//<<Function Validation Logic - End>>")
         updateIndex = data.substring(funcLogicStart, funcLogicEnd);
-
-
+        return updateIndex;
+      }
+      function mspFunctionsLogic(data) {
+        let getUpdatedInd = findFnLogicIndex(data)
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
           wData = ""
 
-          if (i > 0) {
-            newData = "\n"
-          }
-          newData += updateIndex.replace(/<<MSP>>/g, responses[0].ApiListData.APIdata[i].MSP)
+          if (i > 0) { newData = "\n" }
+          newData += getUpdatedInd.replace(/<<MSP>>/g, responses[0].ApiListData.APIdata[i].MSP)
 
           mData = newData.search("//<<FunctionCases-Start>>")
           mData2 = newData.search("//<<FunctionCases-End>>")
@@ -423,14 +399,17 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
       let xData = "";
       let fData = ""
-
+      function findFnDescInd(data) {
+        let IndxFnDef = data.search("//<<FunctionDefinition - Start>>");
+        let IndxFnDefEnd = data.search("//<<FunctionDefinition - End>>");
+        let GetData = data.substring(IndxFnDef, IndxFnDefEnd);
+        return GetData;
+      }
       function mspFunctionDesc(data) {
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
 
-          let IndxFnDef = data.search("//<<FunctionDefinition - Start>>");
-          let IndxFnDefEnd = data.search("//<<FunctionDefinition - End>>");
-          let GetData = data.substring(IndxFnDef, IndxFnDefEnd);
-          let sData = GetData.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase)
+          let getFnDescInd = findFnDescInd(data)
+          let sData = getFnDescInd.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase)
 
           for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList.length; j++) {
             {
@@ -446,7 +425,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       }
 
 
-      fs.readFile('test.txt', 'utf8', function (err, data) {
+      fs.readFile('ChaincodeTemplate.txt', 'utf8', function (err, data) {
         if (err) {
           return console.log(err);
 
@@ -455,19 +434,12 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let ov = mspFunctionsLogic(data)
         let ovt = mspFunctionDesc(data)
 
-        let funcLogicStart = fData.search("//<<Function Validation Logic-Start>>") //+ 38;
-        let funcLogicEnd = fData.search("//<<Function Validation Logic - End>>")
-        let nupdateIndex = fData.substring(funcLogicStart, funcLogicEnd);
-        let Ldata = fData.replace(nupdateIndex, ov)
+        let getFnLogicInd = findFnLogicIndex(fData)
+        let Ldata = fData.replace(getFnLogicInd, ov)
 
-        let IndxFnDef = data.search("//<<FunctionDefinition - Start>>");
-        let IndxFnDefEnd = data.search("//<<FunctionDefinition - End>>");
-        let GetData = fData.substring(IndxFnDef, IndxFnDefEnd);
-        let hData = Ldata.replace(GetData, ovt)
-        // console.log(hData)
+        let getFnDescInd = findFnDescInd(fData)
+        let hData = Ldata.replace(getFnDescInd, ovt)
 
-
-        // console.log(mData)
         callback(hData, (responseCallback) => {
 
           responseCallback.set({

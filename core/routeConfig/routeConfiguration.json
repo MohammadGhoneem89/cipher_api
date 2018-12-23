@@ -1,8 +1,98 @@
 {
   "core": {
+    "getConsortiumTypeList": {
+      "customMapping": true,
+      "MappingfunctionName": "getServiceList",
+      "CustomMappingFile": "systemAPI/consortium.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getConsortiumList": {
+      "customMapping": true,
+      "MappingfunctionName": "getConsortiumConfig",
+      "CustomMappingFile": "systemAPI/consortium.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getConsortiumConfigByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getConsortiumConfigByID",
+      "CustomMappingFile": "systemAPI/consortium.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateConsortiumConfig": {
+      "customMapping": true,
+      "MappingfunctionName": "updateConsortiumConfig",
+      "CustomMappingFile": "systemAPI/consortium.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getSmartContractConfigDetailedByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getSmartContractConfigDetailedByID",
+      "CustomMappingFile": "systemAPI/smartcontract.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getSmartContractTypeList": {
+      "customMapping": true,
+      "MappingfunctionName": "getServiceList",
+      "CustomMappingFile": "systemAPI/smartcontract.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getSmartContractList": {
+      "customMapping": true,
+      "MappingfunctionName": "getSmartContractConfig",
+      "CustomMappingFile": "systemAPI/smartcontract.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getSmartContractConfigByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getSmartContractConfigByID",
+      "CustomMappingFile": "systemAPI/smartcontract.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateSmartContractConfig": {
+      "customMapping": true,
+      "MappingfunctionName": "updateSmartContractConfig",
+      "CustomMappingFile": "systemAPI/smartcontract.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getChannelTypeList": {
+      "customMapping": true,
+      "MappingfunctionName": "getServiceList",
+      "CustomMappingFile": "systemAPI/channel.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getChannelList": {
+      "customMapping": true,
+      "MappingfunctionName": "getChannelConfig",
+      "CustomMappingFile": "systemAPI/channel.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getChannelConfigByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getChannelConfigByID",
+      "CustomMappingFile": "systemAPI/channel.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateChannelConfig": {
+      "customMapping": true,
+      "MappingfunctionName": "updateChannelConfig",
+      "CustomMappingFile": "systemAPI/channel.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "updateNetworkConfig": {
       "customMapping": true,
       "MappingfunctionName": "updateNetworkConfig",
+      "CustomMappingFile": "systemAPI/networkConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getPeerList": {
+      "customMapping": true,
+      "MappingfunctionName": "getPeerList",
+      "CustomMappingFile": "systemAPI/networkConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getNetworkTypeList": {
+      "customMapping": true,
+      "MappingfunctionName": "getServiceList",
       "CustomMappingFile": "systemAPI/networkConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
@@ -82,6 +172,12 @@
       "customMapping": true,
       "MappingfunctionName": "getServiceList",
       "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getMappingConfigOrgFieldData": {
+      "customMapping": true,
+      "MappingfunctionName": "getMappingConfigOrgFieldData",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
     "getMappingConfig": {
@@ -734,6 +830,12 @@
       "isAsync": false,
       "customMapping": false,
       "mappingConfigFile": "InvokeMapping"
+    },
+    "hyperledgerConnect": {
+      "customMapping": true,
+      "MappingfunctionName": "generalNetworkOps",
+      "CustomMappingFile": "hyperledger/index.js",
+      "mappingConfigFile": "ePayMapping"
     },
     "Query": {
       "customMapping": true,

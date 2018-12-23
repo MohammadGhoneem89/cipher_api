@@ -472,6 +472,7 @@ app.post('/uploadFile/:action', permissions, function (req, res) {
     }
     else {
       fileUploadValid(file, UUID, ext, params, userID, source, context, function (data) {
+        console.log(data)
         res.send(data);
       });
     }

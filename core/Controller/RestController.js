@@ -10,6 +10,7 @@ const ObjectMapper = require('./objectMapper');
 const OldRestController = require('./_RestController');
 const APIDefination = require('../mappingFunctions/systemAPI/APIDefination');
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
+
   logger.debug({
     fs: 'RestController.js',
     func: 'handleExternalRequest'
@@ -79,7 +80,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         _.set(response, '__cipherUIErrorStatus', constants.cipherUISuccess);
         _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
       };
-      let objMapper = new ObjectMapper(response, configdata.ResponseMapping, global.enumInfo, UUIDKey);
+      let objMapper = new ObjectMapper(response, configdata.ResponseMapping, global.enumInfo, UUIDKey, JWToken);
       return objMapper.start().then((mappedData) => {
         return mappedData;
       }).catch((ex) => {
