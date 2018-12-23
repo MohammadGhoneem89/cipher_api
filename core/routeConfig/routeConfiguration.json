@@ -209,6 +209,12 @@
       "MappingfunctionName": "getListFunction",
       "CustomMappingFile": "systemAPI/mappingConfig.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "downloadChainCode": {
+      "customMapping": true,
+      "MappingfunctionName": "downloadChainCode",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "UI": {

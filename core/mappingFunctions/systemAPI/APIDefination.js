@@ -1,7 +1,9 @@
 'use strict';
+
 const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
+const fs = require('fs');
 
 function updateRequestStub(payload, route, useCase) {
   let query = { 'sampleRequest': payload };
@@ -44,6 +46,7 @@ function LoadConfig() {
 
   });
 }
+
 function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
   APIDefinitation.findPageAndCount(payload).then((data) => {
     let actions = [
@@ -240,32 +243,242 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
-    let resp = {
-        "getActiveAPIs": {
-            "action": "getActiveAPIs",
-            "data": {
-                "message": {
-                    "status": "ERROR",
-                    "errorDescription": "UseCase must be provided!!",
-                    "displayToUser": true,
-                    "newPageURL": ""
-                }
-            }
+  let resp = {
+    "getActiveAPIs": {
+      "action": "getActiveAPIs",
+      "data": {
+        "message": {
+          "status": "ERROR",
+          "errorDescription": "UseCase must be provided!!",
+          "displayToUser": true,
+          "newPageURL": ""
         }
-    };
-    if (!payload.useCase) {
-        return callback(resp);
+      }
     }
-    APIDefinitation.getActiveAPIs(payload).then((data) => {
-        if(data){
-            callback(data);
-        }
+  };
+  if (!payload.useCase) {
+    return callback(resp);
+  }
+  APIDefinitation.getActiveAPIs(payload).then((data) => {
+    if (data) {
+      callback(data);
+    }
 
-    }).catch((err) => {
-        callback(err);
-    });
+  }).catch((err) => {
+    callback(err);
+  });
 }
 
+function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
+  let chainCodeData = [];
+  let responses = [];
+  console.log(payload.query, "IQRA");
+
+  let request = {
+    "action": "mappingData",
+    "searchCriteria": payload.query.searchCriteria,
+    "page": {
+      "currentPageNo": 1,
+      "pageSize": 10
+    }
+  };
+  APIDefinitation.findPageAndCount(request)
+    .then((data) => {
+      // console.log(data)
+      data[0].map(item => {
+        if (item.isSmartContract === true && item.isActive === true) {
+          chainCodeData.push({
+            'isActive': item.isActive,
+            'MSP': item.MSP,
+            'description': item.description,
+            'route': item.route,
+            'useCase': item.useCase,
+            'isSmartContract': item.isSmartContract
+          });
+        }
+      });
+
+
+      {
+        responses.push({
+          ApiListData: {
+            useCase: chainCodeData[0].useCase,
+            APIdata: []
+          }
+        })
+      }
+      let response = {};
+      for (let i = 0; i < chainCodeData.length; i++) {
+        {
+          response = {
+            "MSP": chainCodeData[i].MSP,
+            "APIList": [
+              {
+                "route": chainCodeData[i].route,
+                "purpose": chainCodeData[i].description
+
+              }
+            ]
+          };
+
+          responses[0].ApiListData.APIdata.push(response)
+        }
+
+      }
+      // console.log(responses[0].ApiListData.APIdata)
+
+
+      let DupIndex = [];
+
+      function removeDuplicatesBy(comparator, array) {
+        let unique = [];
+        for (let i = 0; i < array.length; i++) {
+          let isUnique = true;
+          for (let j = 0; j < i; j++) {
+            if (comparator(array[i], array[j])) {
+              isUnique = false;
+              DupIndex.push(i);
+              break;
+            }
+          }
+          if (isUnique) unique.push(array[i]);
+        }
+        // console.log(unique)
+        return unique;
+      }
+
+      let uniqueMSP = removeDuplicatesBy(function (a, b) {
+        return a.MSP === b.MSP
+      }, responses[0].ApiListData.APIdata);
+      // console.log("unique : \n", uniqueMSP, "\n DupIndex :", DupIndex)
+
+      for (let m = 0; m < responses[0].ApiListData.APIdata.length; m++)
+        for (let k = 0; k < DupIndex.length; k++) {
+          if (responses[0].ApiListData.APIdata[m].MSP == responses[0].ApiListData.APIdata[DupIndex[k]].MSP) {
+            responses[0].ApiListData.APIdata[m].APIList.push(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0])
+
+          }
+        }
+
+      responses[0].ApiListData.APIdata = uniqueMSP;
+      // console.log(responses)
+
+      let updateIndex = "", newData = ""
+      let mData = "", mData2 = "", mData3 = "", wData = "";
+      let mData1 = ""
+      function findFnLogicIndex(data) {
+        let funcLogicStart = data.search("//<<Function Validation Logic-Start>>");
+        let funcLogicEnd = data.search("//<<Function Validation Logic - End>>")
+        updateIndex = data.substring(funcLogicStart, funcLogicEnd);
+        return updateIndex;
+      }
+      function mspFunctionsLogic(data) {
+        let getUpdatedInd = findFnLogicIndex(data)
+        for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
+          wData = ""
+
+          if (i > 0) { newData = "\n" }
+          newData += getUpdatedInd.replace(/<<MSP>>/g, responses[0].ApiListData.APIdata[i].MSP)
+
+          mData = newData.search("//<<FunctionCases-Start>>")
+          mData2 = newData.search("//<<FunctionCases-End>>")
+          mData3 = newData.substring(mData, mData2)
+
+          for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList.length; j++) {
+
+            wData += mData3.replace(/<<FunctionName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route)
+            if (j == responses[0].ApiListData.APIdata[i].APIList.length - 1) {
+              mData1 += newData.replace(mData3, wData)
+            }
+          }
+
+        }
+        return mData1
+
+      }
+
+      let xData = "";
+      let fData = ""
+      function findFnDescInd(data) {
+        let IndxFnDef = data.search("//<<FunctionDefinition - Start>>");
+        let IndxFnDefEnd = data.search("//<<FunctionDefinition - End>>");
+        let GetData = data.substring(IndxFnDef, IndxFnDefEnd);
+        return GetData;
+      }
+      function mspFunctionDesc(data) {
+        for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
+
+          let getFnDescInd = findFnDescInd(data)
+          let sData = getFnDescInd.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase)
+
+          for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList.length; j++) {
+            {
+              let gData = sData.replace(/<<FunctionName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route)
+              fData = gData.replace(/<<FunctionDescription>>/g, responses[0].ApiListData.APIdata[i].APIList[j].purpose)
+
+            }
+
+            xData += fData
+          }
+        }
+        return xData
+      }
+
+
+      fs.readFile('ChaincodeTemplate.txt', 'utf8', function (err, data) {
+        if (err) {
+          return console.log(err);
+
+        }
+        let fData = data.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase)
+        let ov = mspFunctionsLogic(data)
+        let ovt = mspFunctionDesc(data)
+
+        let getFnLogicInd = findFnLogicIndex(fData)
+        let Ldata = fData.replace(getFnLogicInd, ov)
+
+        let getFnDescInd = findFnDescInd(fData)
+        let hData = Ldata.replace(getFnDescInd, ovt)
+
+        callback(hData, (responseCallback) => {
+
+          responseCallback.set({
+            'Content-Type': 'application/octet-stream',
+            'Content-Disposition': 'attachment; filename=' + "PRChainCode.go",
+          });
+        });
+      });
+    }).catch((err) => {
+      console.log(err)
+      console.log(JSON.stringify(err));
+      for (let i = 0; i < chainCodeData.length; i++) {
+        var response = {
+          "ApiListData": {
+            "useCase": "",
+            "APIdata": [
+              {
+                "MSP": "",
+                "APIList": [
+                  {
+                    "route": "",
+                    "purpose": ""
+
+                  }
+
+                ]
+              }
+            ]
+          }
+        }
+        // console.log(response)
+      }
+      callback(response);
+    });
+
+}
+
+
+exports.downloadChainCode = downloadChainCode;
 exports.getAPIDefinition = getAPIDefinition;
 exports.getAPIDefinitionID = getAPIDefinitionID;
 exports.upsertAPIDefinition = upsertAPIDefinition;

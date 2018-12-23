@@ -620,7 +620,11 @@ app.post('/APII/:channel/:action', permissions, function (req, res) {
 
 });
 
-app.post('/API/:channel/:action', permissions, function (req, res) {
+app.get('/API/:channel/:action', permissions, apiCallsHandler);
+
+app.post('/API/:channel/:action', permissions, apiCallsHandler);
+
+function apiCallsHandler(req, res){
   if (checkbadinput(req)) {
     let resperr = { 'error': "illeagal character found in request" };
     res.send(resperr);
@@ -637,8 +641,11 @@ app.post('/API/:channel/:action', permissions, function (req, res) {
   payload.token = JWToken;
   const action = req.params.action;
   const channel = req.params.channel;
+  
+  const url_parts = url.parse(req.url, true);
+  const query = url_parts.query;
   logger.info({ fs: 'app.js', func: 'API' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
-  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: "::1" });
+  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: "::1", query});
   logger.info('calling handleExternalRequest ');
   const UUID = uuid();
   logger.info({ fs: 'app.js', func: 'API' }, 'UUID:  ' + UUID);
@@ -647,8 +654,7 @@ app.post('/API/:channel/:action', permissions, function (req, res) {
   const decoded = crypto.decrypt(JWToken);
   logger.info({ fs: 'app.js', func: 'API' }, decoded, 'decoded.userID:');
   RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
-
-});
+}
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -739,3 +745,7 @@ app.post('/passOn', function (req, res) {
   ReadIncomingMessage_Processing(req.body.msg);
   res.send(JSON.stringify({ "status": "Done" }));
 });
+// app.get('/ApiList', function (req, res) {
+//   res.download('E:/git-repo/cipher_api/PRChainCode.go')
+
+// })
