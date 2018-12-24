@@ -4,6 +4,8 @@ const user = require('../../../lib/services/user');
 
 function get(payload, UUIDKey, route, callback, JWToken) {
   payload.userID = JWToken._id;
+  if (JWToken.userID != 'admin' && JWToken.userID != 'Admin')
+	payload.orgCode = JWToken.orgCode;
   getDetails(payload, callback);
 }
 

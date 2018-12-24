@@ -1,11 +1,11 @@
 {
   "keyVault": {
-    "env": "core",
+    "env": "WASL_Dev",
     "header":{
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
     },
-    "url": "http://blockchain.avanza.com:9019/keyVault"
+    "url": "http://wasl.avanza.com:9019/keyVault"
   }
 }
 

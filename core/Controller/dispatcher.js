@@ -24,8 +24,12 @@ module.exports = class Dispatcher {
       rules.forEach((elem) => {
         let flags = [];
         elem.ruleList.forEach((element) => {
+            console.log(">>>>>>>>ROUTING MATCH RULE<<<<<<<<<")
+            console.log(element.field)
+            console.log(element.value)
           if (element.field != "*") {
             let extValue = _.get(OriginalRequest, element.field, null);
+
             if (!extValue) {
               throw new Error(`blockchain routing error | ${element.field} must be defined`);
             }
@@ -33,7 +37,7 @@ module.exports = class Dispatcher {
             if (element.value == '*') {
               litmus = true;
             }
-            else if (extValue == element.field) {
+            else if (extValue == element.value) {
               litmus = true;
             }
             else {

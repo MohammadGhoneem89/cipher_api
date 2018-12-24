@@ -134,7 +134,18 @@ module.exports = class ObjectMapper {
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
           settingArray.push(data[index][0]);
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
+        } else if ((element.IN_FIELDDT == 'number' ||element.IN_FIELDDT == 'boolean') && element.MAP_FIELDDT == 'array') {
+          //  execute rules and update JSON
+          let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
+          settingArray.push(String(data[index][0]));
+          _.set(fwdMessage, element.MAP_FIELD, settingArray);
         } else if (element.IN_FIELDDT == 'object' && element.MAP_FIELDDT == 'array') {
+          //  execute rules and update JSON
+          let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
+          let stringObj = JSON.stringify(data[index][0]);
+          settingArray.push(stringObj);
+          _.set(fwdMessage, element.MAP_FIELD, settingArray);
+        } else if (element.IN_FIELDDT == 'array' && element.MAP_FIELDDT == 'array') {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
           let stringObj = JSON.stringify(data[index][0]);
