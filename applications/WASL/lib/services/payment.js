@@ -1,9 +1,9 @@
 'use strict';
 
-const validator = require('../validator');
-const paymentRepo = require('../repositories/payment');
-const permissionsHelper = require('../helpers/permissions');
-const permissionConst = require('../constants/permissions');
+const validator = require('../../../../lib/validator');
+const paymentRepo = require('../../lib/repositories/payment');
+const permissionsHelper = require('../../../../lib/helpers/permissions');
+const permissionConst = require('../../../../lib/constants/permissions');
 const _ = require('lodash');
 
 function getList(payload) {

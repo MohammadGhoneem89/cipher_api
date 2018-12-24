@@ -1,6 +1,6 @@
 'use strict';
 
-const payment = require('../../../lib/services/payment');
+const payment = require('../../lib/services/payment');
 
 function detail(payload, UUIDKey, route, callback, JWToken) {
     paymentDetail(payload, callback);

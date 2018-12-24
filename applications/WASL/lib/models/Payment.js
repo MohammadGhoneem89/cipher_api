@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const dates = require('../helpers/dates');
+const dates = require('../../../../lib/helpers/dates');
 
 const schema = new Schema({
     name: {
