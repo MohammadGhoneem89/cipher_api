@@ -1,7 +1,7 @@
 'use strict';
 
-const payment = require('../../lib/services/payment');
-const dates = require('../../lib/helpers/dates');
+const payment = require('../../../../lib/services/payment');
+const dates = require('../../../../lib/helpers/dates');
 
 function update(payload, UUIDKey, route, callback, JWToken) {
     payload.userId = JWToken._id;
