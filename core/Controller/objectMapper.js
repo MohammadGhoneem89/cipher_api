@@ -98,7 +98,7 @@ module.exports = class ObjectMapper {
         resolve(String(org));
       }
       else {
-        reject('orgCode is not defined!!');
+        reject('JWT orgCode is not defined, please authenticate or check configuration!!');
       }
     });
   }
