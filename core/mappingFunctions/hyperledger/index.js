@@ -16,13 +16,13 @@ let main = function (payload, UUIDKey, route, callback, JWToken) {
       tranType: "0200",
       tranCode: payload.function,
       userID: "STUB",
-      network: "STUB",
+      network: payload.network || 'network1',
       timeStamp: (new Date()).toTimeString(),
       UUID: UUIDKey,
       ResponseMQ: []
     },
     BCData: {
-      configType: "peerQuery"
+      "channelName": payload.channelName || 'prwchannel'
     },
     Body: {
       fcnName: "STUB",
