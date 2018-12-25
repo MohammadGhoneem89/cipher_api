@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {
   "Wasl": {
     "CustomFunctionsLocation": "../../applications/WASL/mappingFunctions/",
@@ -55,62 +54,4 @@
       "mappingConfigFile": "ePayMapping"
     }
   }
-=======
-{
-  "Wasl": {
-    "CustomFunctionsLocation": "../../applications/WASL/mappingFunctions/",
-    "viewItem": {
-      "customMapping": true,
-      "MappingfunctionName": "viewItem",
-      "CustomMappingFile": "general/viewItem.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-
-    "getPaymentList" : {
-      "customMapping": true,
-      "MappingfunctionName": "list",
-      "CustomMappingFile": "payment/list.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getPaymentDetail" : {
-      "customMapping": true,
-      "MappingfunctionName": "detail",
-      "CustomMappingFile": "payment/detail.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "insertPayment" : {
-      "customMapping": true,
-      "MappingfunctionName": "create",
-      "CustomMappingFile": "payment/insert.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "updatePayment" : {
-      "customMapping": true,
-      "MappingfunctionName": "update",
-      "CustomMappingFile": "payment/update.js",
-      "mappingConfigFile": "ePayMapping"
-    }
-  },
-  "SampleApp": {
-    "CustomFunctionsLocation": "../../applications/SampleApp/mappingFunctions/",
-    "viewItem": {
-      "customMapping": true,
-      "MappingfunctionName": "viewItem",
-      "CustomMappingFile": "general/viewItem.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getAccountList": {
-      "customMapping": true,
-      "MappingfunctionName": "GetAccountList",
-      "CustomMappingFile": "blockchainAccounts/list.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "updateAccountList": {
-      "customMapping": true,
-      "MappingfunctionName": "UpdateAccountList",
-      "CustomMappingFile": "blockchainAccounts/updates.js",
-      "mappingConfigFile": "ePayMapping"
-    }
-  }
->>>>>>> origin/wasl_property_project
 }
