@@ -9,6 +9,8 @@ const constants = require('../Common/constants_en.js');
 const ObjectMapper = require('./objectMapper');
 const OldRestController = require('./_RestController');
 const APIDefination = require('../mappingFunctions/systemAPI/APIDefination');
+const apiFilter = ['RenewContract'];
+
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
 
   logger.debug({
@@ -18,14 +20,25 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, JSON.stringify(payload, null, 2));
   logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, incommingRoute);
 
-  let requestData = {
-    uuid: UUIDKey,
-    channel: channel,
-    action: incommingRoute,
-    payload: payload
-  };
+  if(apiFilter.indexOf(incommingRoute) >= 0){
+        if(payload.body.password || payload.JWToken || payload.JWT){
+            delete payload.body.password;
+            delete payload.JWToken;
+            delete payload.JWT;
+        }
 
-  apiPayloadRepo.create(requestData);
+        let requestData = {
+            uuid: UUIDKey,
+            channel: channel,
+            action: incommingRoute,
+            payload: payload
+        };
+
+        apiPayloadRepo.create(requestData);
+    }
+  
+  
+  
 
   let ResponseCaller = function (data) {
     logger.debug({

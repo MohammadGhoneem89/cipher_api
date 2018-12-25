@@ -129,26 +129,35 @@ module.exports = class ObjectMapper {
     return Promise.all(promiseList).then((data) => {
       let fwdMessage = {};
       this.mappingConfig.forEach((element, index) => {
+        console.log(element.IN_FIELDDT);
         if (element.IN_FIELDDT == 'string' && element.MAP_FIELDDT == 'array') {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          settingArray.push(data[index][0]);
+          let fieldData="";
+          fieldData = data && data[index] && data[index][0] ? data[index][0] : ""
+          settingArray.push(fieldData);
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
         } else if ((element.IN_FIELDDT == 'number' ||element.IN_FIELDDT == 'boolean') && element.MAP_FIELDDT == 'array') {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          settingArray.push(String(data[index][0]));
+          let fieldData="";
+          fieldData = data && data[index] && data[index][0] ? data[index][0] : "";
+          settingArray.push(String(fieldData));
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
         } else if (element.IN_FIELDDT == 'object' && element.MAP_FIELDDT == 'array') {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          let stringObj = JSON.stringify(data[index][0]);
+          let fieldData="";
+          fieldData = data && data[index] && data[index][0] ? data[index][0] : {};
+          let stringObj = JSON.stringify(fieldData);
           settingArray.push(stringObj);
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
         } else if (element.IN_FIELDDT == 'array' && element.MAP_FIELDDT == 'array') {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          let stringObj = JSON.stringify(data[index][0]);
+          let fieldData="";
+          fieldData = data && data[index] && data[index][0] ? data[index][0] : [];
+          let stringObj = JSON.stringify(fieldData);
           settingArray.push(stringObj);
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
         }

@@ -12,6 +12,7 @@ let MQSend = require('../IntegrationMQ/MQSendResponse.js');
 // var grpc = require('grpc');
 const apiPayloadRepo = require('../../lib/repositories/apiPayload');
 const _ = require('lodash');
+const apiFilter = ['RenewContract'];
 
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
   logger.debug({
@@ -21,13 +22,22 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, JSON.stringify(payload, null, 2));
   logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, incommingRoute);
 
-  let requestData = {
-    uuid: UUIDKey,
-    channel: channel,
-    action: incommingRoute,
-    payload: payload
-  };
-  apiPayloadRepo.create(requestData);
+  if(apiFilter.indexOf(incommingRoute) >= 0){
+        if(payload.body.password || payload.JWToken || payload.JWT){
+            delete payload.body.password;
+            delete payload.JWToken;
+            delete payload.JWT;
+        }
+
+        let requestData = {
+            uuid: UUIDKey,
+            channel: channel,
+            action: incommingRoute,
+            payload: payload
+        };
+
+        apiPayloadRepo.create(requestData);
+    }
 
 
   let ResponseCaller = function (data, responderMethod) {
