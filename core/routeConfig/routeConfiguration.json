@@ -787,33 +787,6 @@
       "MappingfunctionName": "getEventDispatcherStatus",
       "CustomMappingFile": "eventService/eventdispatcher.js",
       "mappingConfigFile": "ePayMapping"
-    },
-
-
-
-    "getPaymentList" : {
-      "customMapping": true,
-      "MappingfunctionName": "list",
-      "CustomMappingFile": "payment/list.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getPaymentDetail" : {
-      "customMapping": true,
-      "MappingfunctionName": "detail",
-      "CustomMappingFile": "payment/detail.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "insertPayment" : {
-      "customMapping": true,
-      "MappingfunctionName": "create",
-      "CustomMappingFile": "payment/insert.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "updatePayment" : {
-      "customMapping": true,
-      "MappingfunctionName": "update",
-      "CustomMappingFile": "payment/update.js",
-      "mappingConfigFile": "ePayMapping"
     }
   },
   "Cipher": {
