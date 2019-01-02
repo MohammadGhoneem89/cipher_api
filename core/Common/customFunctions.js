@@ -26,7 +26,7 @@ module.exports = {
   },
   jsonParse: (data, payload, jwt) => {
     try {
-      return JSON.Parse(data);
+      return JSON.parse(data);
     } catch (ex) {
       console.log(ex);
       throw new Error("Could not Parse incomming data!!!");
