@@ -25,11 +25,9 @@ module.exports = class GeneralRequestProcessor {
         let message;
         if (data.length > 0) {
           message = data[0];
-          message.CipherJWT = this.JWTokenData;
         }
         else {
           message = this.request;
-          message.CipherJWT = this.JWTokenData;
         }
 
         let controller = new Dispatcher(this.request, message, this.configdata, this.UUID, global.enumInfo, this.JWTokenData);
