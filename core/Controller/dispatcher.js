@@ -24,14 +24,20 @@ module.exports = class Dispatcher {
       rules.forEach((elem) => {
         let flags = [];
         elem.ruleList.forEach((element) => {
-            console.log(">>>>>>>>ROUTING MATCH RULE<<<<<<<<<")
-            console.log(element.field)
-            console.log(element.value)
+          console.log(">>>>>>>>ROUTING MATCH RULE<<<<<<<<<")
+          console.log(element.field)
+          console.log(element.value)
           if (element.field != "*") {
             let extValue = _.get(OriginalRequest, element.field, null);
-
             if (!extValue) {
-              throw new Error(`blockchain routing error | ${element.field} must be defined`);
+              extValue = _.get(OriginalRequest, '__JWTORG', null);
+              console.log("Final Matching Value Picked from JWT " + extValue);
+              if (!extValue) {
+                throw new Error(`blockchain routing error | ${element.field} must be defined`);
+              }
+            }
+            else {
+              console.log("Final Matching Value Picked from Request " + extValue);
             }
             let litmus = false;
             if (element.value == '*') {

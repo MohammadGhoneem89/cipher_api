@@ -83,6 +83,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     return OldRestController.handleExternalRequest(payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ);
   }
   let millisecondsstart = (new Date()).getTime();
+  _.set(payload, '__JWTORG', JWToken.orgCode);
   let Cipher = new GeneralRequestProcessor(payload, configdata, global.enumInfo, UUIDKey, JWToken);
   Cipher.processIncommingMessage().then((response) => {
     if (configdata.isResValBypass === false) {
