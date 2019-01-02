@@ -21,11 +21,14 @@ module.exports = {
     return data;
   },
   validateInstrumentObject: (data, payload, jwt) => {
-    data.date = dates.ddMMyyyyslash(data.date);
-    data.amount = parseFloat(data.amount) || 0;
-    data.providerMetaData = data.providerMetaData ? JSON.stringify(data.providerMetaData) : undefined;
-    data.bankMetaData = data.bankMetaData ? JSON.stringify(data.bankMetaData) : undefined;
-    data.beneficiaryData = data.beneficiaryData ? JSON.stringify(data.beneficiaryData) : undefined;
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>."+JSON.stringify(data))
+    data.forEach((element, index) => {
+      element.date = dates.ddMMyyyyslash(element.date);
+      element.amount = parseFloat(element.amount) || 0;
+      element.providerMetaData = element.providerMetaData ? JSON.stringify(element.providerMetaData) : undefined;
+      element.bankMetaData = element.bankMetaData ? JSON.stringify(element.bankMetaData) : undefined;
+      element.beneficiaryData = element.beneficiaryData ? JSON.stringify(element.beneficiaryData) : undefined;
+    });
     return data;
   }
 
