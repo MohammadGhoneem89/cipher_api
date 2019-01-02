@@ -80,7 +80,10 @@ module.exports = class ObjectMapper {
     });
   }
   CustomFunctionsExecution(data, payload, config) {
-    return customFunctions[config.IN_FIELDFUNCTION](data, payload, this.JWToken);
+    if (customFunctions[config.IN_FIELDFUNCTION] instanceof Function) {
+      return customFunctions[config.IN_FIELDFUNCTION](data, payload, this.JWToken);
+    }
+    throw new Error(`${config.IN_FIELDFUNCTION} is not found locally!`)
   }
   CustomValidationCheck(functionName, data) {
     let response = { 'error': false };
@@ -129,6 +132,7 @@ module.exports = class ObjectMapper {
     return Promise.all(promiseList).then((data) => {
       let fwdMessage = {};
       this.mappingConfig.forEach((element, index) => {
+
         if (element.IN_FIELDDT == 'string' && element.MAP_FIELDDT == 'array' && element.IN_FIELDTYPE === 'JWTORG') {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
@@ -141,7 +145,12 @@ module.exports = class ObjectMapper {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
           let fieldData = "";
-          fieldData = data && data[index] && data[index][0] ? data[index][0] : ""
+          if (data[index] instanceof Array) {
+            fieldData = data && data[index] && data[index][0] ? data[index][0] : "";
+          }
+          else {
+            fieldData = String(data && data[index] && data[index] ? data[index] : "");
+          }
           settingArray.push(fieldData);
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
         }
