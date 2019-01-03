@@ -1,5 +1,17 @@
 {
   "core": {
+    "generateMappingFile": {
+      "customMapping": true,
+      "MappingfunctionName": "generateMappingFile",
+      "CustomMappingFile": "generateMappingFile.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getDBFields": {
+      "customMapping": true,
+      "MappingfunctionName": "getDBFields",
+      "CustomMappingFile": "getDBFields.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getConsortiumTypeList": {
       "customMapping": true,
       "MappingfunctionName": "getServiceList",
