@@ -31,6 +31,14 @@ module.exports = {
       console.log(ex);
       throw new Error("Could not Parse incomming data!!!");
     }
+  },
+  jsonParseNoError: (data, payload, jwt) => {
+    try {
+      return JSON.parse(data);
+    } catch (ex) {
+      console.log(ex);
+      return {}
+    }
   }
 
 };
