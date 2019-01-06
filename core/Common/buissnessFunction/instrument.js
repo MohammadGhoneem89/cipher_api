@@ -26,6 +26,8 @@ module.exports = {
       element.bankMetaData = element.bankMetaData ? JSON.stringify(element.bankMetaData) : undefined;
       element.beneficiaryData = element.beneficiaryData ? JSON.stringify(element.beneficiaryData) : undefined;
     });
+    
+    data = _.orderBy(data, ['date'], ['asc']);
     return data;
   },
   validateInstrumentObject: (data, payload, jwt) => {
