@@ -17,6 +17,9 @@ module.exports = {
   translateDateToEpoch: (data, payload, jwt) => {
     return dates.ddMMyyyyslash(data);
   },
+  ddMMyyyy: (data, payload, jwt) => {
+    return dates.ddMMyyyyMS(data);
+  },
   convertStringToFloat: (data, payload, jwt) => {
     let number = parseFloat(data);
     if (isNaN(number)) {
