@@ -71,6 +71,8 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
                 break;
             case 'mongo':
                 break;
+            default:
+                throw 'Not found';
         }
         generateFileContent(file, callback);
     } catch (err) {
