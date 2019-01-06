@@ -19,6 +19,9 @@ module.exports = {
             case 'pg':
                 client = await pg(connectionURL);
                 break;
+            case 'postgres':
+                client = await pg(connectionURL);
+            break;
         }
         return client;
     }
