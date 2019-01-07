@@ -2,13 +2,28 @@ const fs = require('fs');
 const uuid = require('uuid/v1');
 const keyVaultRepo = require('../../lib/repositories/keyVault');
 
-function generateFileContent(file, callback) {
+function generateFileContent(file, isActions, callback) {
+    let actions = '';
+    if(isActions){
+        actions=`for(let i=0;i<response.length;i++){
+            response[i]['actions']=[{
+                "actionType": "COMPONENT_FUNCTION",
+                "iconName": "fa fa-eye",
+                "label": "View",
+                "URI": [
+                    "/"
+                ]
+            }]
+        }`
+    }
     let overall = `const client = require('../../api/client');
     \nconst execute = async function (payload, UUIDKey, route, callback, JWToken) {
         try{
             ${file}
+            \n${actions}
             callback({
-                data: response});
+                dbExecution: {
+                    data:response}});
         } catch(err){
             callback({error: err})
         }
@@ -64,7 +79,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
                 if (payload.enablePaging) {
                     pagingData = 'LIMIT ${payload.paging.size},${payload.paging.offset}'
                 }
-                let queryString = `select ${fields} from ${payload.tableName} where ${conditions} ${pagingData};`
+                let queryString = `select ${fields} from ${payload.object} where ${conditions} ${pagingData};`
                 file = `                
                 let instance = await client.createClient('pg', '${dbConfig.connection}');
                 const query = {
@@ -79,7 +94,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
             default:
                 throw 'Not found';
         }
-        generateFileContent(file, callback);
+        generateFileContent(file, payload.enableActions, callback);
     } catch (err) {
         //logger.debug(" [ DB ] ERROR : " + err);
         console.log(err)
@@ -91,22 +106,28 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
 
 /*
 let data = {
-    adapterType: 'postgress',
-    connectionString: 'postgresql://Admin:avanza123@104.211.155.19:5432/invoiceFinancing',
-    tableName: 'invoiceResponse',
-    conditions: [{
-        name: 'suppliername',
-        value: 'name'
-    }, {
-        name: 'type',
-        value: 'type'
-    }],
-    fields: [{
-        name: 'refNo',
-        as: 'reference'
-    }],
-    objectType: 'table',
-    enablePaging: true
+    "database": "postgres",
+    "adaptor":"adaptor4",
+    "enableActions": true,
+    "enablePaging": true,
+    "objectType": "table",
+    "object": "invoiceResponse",
+    "conditions": [
+        {
+            "name": "suppliername",
+            "value": "name"
+        },
+        {
+            "name": "type",
+            "value": "type"
+        }
+    ],
+    "fields": [
+        {
+            "name": "refNo",
+            "as": "reference"
+        }
+    ]
 }
 
 generateMappingFile(data, '', '', (data) => {
