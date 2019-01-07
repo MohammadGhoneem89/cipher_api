@@ -38,7 +38,7 @@ function generateFileContent(file, isActions, callback) {
             })
         }
         callback({
-            response: {
+            generateMappingFile: {
                 data: {
                     uuid: id,
                     functionName: 'execute',
@@ -133,7 +133,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
         })
     }
 }
-
+/*
 
 let data = {
     "database": "postgres",
@@ -162,6 +162,6 @@ let data = {
 
 generateMappingFile(data, '', '', (data) => {
     console.log(data)
-}, '')
+}, '')*/
 
 exports.generateMappingFile = generateMappingFile;
