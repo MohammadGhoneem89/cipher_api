@@ -63,7 +63,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
                         if (conditions.length !== 0) {
                             conditions += ' AND'
                         }
-                        conditions += ` ${payload.conditions[i].name} = $${i + 1}`;
+                        conditions += ` "${payload.conditions[i].name}" = $${i + 1}`;
                         if (valuesString.length > 0) {
                             valuesString += ',';
                         }
@@ -74,13 +74,13 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
                         if (fields.length !== 0) {
                             fields += ' ,'
                         }
-                        fields += ` ${payload.fields[i].name} as ${payload.fields[i].as}`;
+                        fields += ` "${payload.fields[i].name}" as ${payload.fields[i].as}`;
                     }
                     let pagingData = '';
                     if (payload.enablePaging) {
                         pagingData = 'LIMIT ${payload.paging.size},${payload.paging.offset}'
                     }
-                    let queryString = `select ${fields} from ${payload.object} where ${conditions} ${pagingData};`
+                    let queryString = `select ${fields} from "${payload.object}" where ${conditions} ${pagingData};`
                     file = `                
                     let instance = await client.createClient('pg', '${dbConfig.connection}');
                     const query = {
