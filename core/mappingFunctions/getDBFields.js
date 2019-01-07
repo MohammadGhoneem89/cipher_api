@@ -16,7 +16,7 @@ const getDBFields = async function (payload, UUIDKey, route, callback, JWToken) 
       case 'postgres':
         if (payload.objectType === 'table') {
           const query = {
-            text: `select * from  ${payload.tableName} where false;`,
+            text: `select * from  ${payload.object} where false;`,
             values: []
           };
           const data = await instance.query(query);
@@ -34,12 +34,11 @@ const getDBFields = async function (payload, UUIDKey, route, callback, JWToken) 
             FROM    pg_catalog.pg_namespace n
             JOIN    pg_catalog.pg_proc p
             ON      p.pronamespace = n.oid
-            WHERE   n.nspname = 'public' and p.proname='${payload.tableName}';`,
+            WHERE   n.nspname = 'public' and p.proname='${payload.object}';`,
             values: []
           };
           let data = await instance.query(query);
           data = data.rows[0].proargnames;
-          console.log(data)
           for (let i = 0; i < data.length; i++) {
             response.getDBFields.data.push({
               _id: data[i],
