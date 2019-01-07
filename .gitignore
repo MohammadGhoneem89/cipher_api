@@ -5,3 +5,4 @@ _lib
 package-lock.json
 uploads
 epayqnfs
+core/mappingFunctions/generated/*
