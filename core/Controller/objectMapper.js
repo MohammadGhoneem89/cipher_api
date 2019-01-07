@@ -69,7 +69,7 @@ module.exports = class ObjectMapper {
           reject(`${element.IN_FIELD} unable to cast field to ${element.MAP_FIELDDT}!`);
         }
       }).then((data) => {
-        return this.CustomFunctionsExecution(data, this.request, element)
+        return this.CustomFunctionsExecution(data, this.request, element);
       }).then((data) => {
         resolve(data);
       }).catch((exp) => {
@@ -80,7 +80,10 @@ module.exports = class ObjectMapper {
     });
   }
   CustomFunctionsExecution(data, payload, config) {
-    return Promise.resolve(data);
+    if (customFunctions[config.IN_FIELDFUNCTION] instanceof Function) {
+      return customFunctions[config.IN_FIELDFUNCTION](data, payload, this.JWToken);
+    }
+    throw new Error(`${config.IN_FIELDFUNCTION} is not found locally!`)
   }
   CustomValidationCheck(functionName, data) {
     let response = { 'error': false };
@@ -93,9 +96,9 @@ module.exports = class ObjectMapper {
   }
   getOrg() {
     return new Promise((resolve, reject) => {
-      let org = this.JWToken.orgCode
+      let org = _.get(this.request, '__JWTORG', "");
       if (org) {
-        resolve(String(org));
+        resolve(org);
       }
       else {
         reject('JWT orgCode is not defined, please authenticate or check configuration!!');
@@ -129,34 +132,50 @@ module.exports = class ObjectMapper {
     return Promise.all(promiseList).then((data) => {
       let fwdMessage = {};
       this.mappingConfig.forEach((element, index) => {
-        console.log(element.IN_FIELDDT);
-        if (element.IN_FIELDDT == 'string' && element.MAP_FIELDDT == 'array') {
+
+        if (element.IN_FIELDDT == 'string' && element.MAP_FIELDDT == 'array' && element.IN_FIELDTYPE === 'JWTORG') {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          let fieldData="";
-          fieldData = data && data[index] && data[index][0] ? data[index][0] : ""
+          let fieldData = "";
+          fieldData = data && data[index];
           settingArray.push(fieldData);
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
-        } else if ((element.IN_FIELDDT == 'number' ||element.IN_FIELDDT == 'boolean') && element.MAP_FIELDDT == 'array') {
+        }
+        else if (element.IN_FIELDDT == 'string' && element.MAP_FIELDDT == 'array') {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          let fieldData="";
+          let fieldData = "";
+          if (data[index] instanceof Array) {
+            fieldData = data && data[index] && data[index][0] ? data[index][0] : "";
+          }
+          else {
+            fieldData = String(data && data[index] && data[index] ? data[index] : "");
+          }
+          settingArray.push(fieldData);
+          _.set(fwdMessage, element.MAP_FIELD, settingArray);
+        }
+        else if ((element.IN_FIELDDT == 'number' || element.IN_FIELDDT == 'boolean') && element.MAP_FIELDDT == 'array') {
+          //  execute rules and update JSON
+          let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
+          let fieldData = "";
           fieldData = data && data[index] && data[index][0] ? data[index][0] : "";
           settingArray.push(String(fieldData));
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
-        } else if (element.IN_FIELDDT == 'object' && element.MAP_FIELDDT == 'array') {
+        }
+        else if (element.IN_FIELDDT == 'object' && element.MAP_FIELDDT == 'array') {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          let fieldData="";
+          let fieldData = "";
           fieldData = data && data[index] && data[index][0] ? data[index][0] : {};
           let stringObj = JSON.stringify(fieldData);
           settingArray.push(stringObj);
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
-        } else if (element.IN_FIELDDT == 'array' && element.MAP_FIELDDT == 'array') {
+        }
+        else if (element.IN_FIELDDT == 'array' && element.MAP_FIELDDT == 'array') {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          let fieldData="";
-          fieldData = data && data[index] && data[index][0] ? data[index][0] : [];
+          let fieldData = "";
+          fieldData = data && data[index] && data[index] ? data[index] : [];
           let stringObj = JSON.stringify(fieldData);
           settingArray.push(stringObj);
           _.set(fwdMessage, element.MAP_FIELD, settingArray);

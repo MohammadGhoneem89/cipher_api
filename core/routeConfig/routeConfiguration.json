@@ -1,5 +1,29 @@
 {
   "core": {
+    "generateMappingFile": {
+      "customMapping": true,
+      "MappingfunctionName": "generateMappingFile",
+      "CustomMappingFile": "generateMappingFile.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getDBFields": {
+      "customMapping": true,
+      "MappingfunctionName": "getDBFields",
+      "CustomMappingFile": "getDBFields.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAdaptorsList": {
+      "customMapping": true,
+      "MappingfunctionName": "list",
+      "CustomMappingFile": "dbDetails/adaptors.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAvailableObjectsList": {
+      "customMapping": true,
+      "MappingfunctionName": "availableObjects",
+      "CustomMappingFile": "dbDetails/adaptors.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getConsortiumTypeList": {
       "customMapping": true,
       "MappingfunctionName": "getServiceList",

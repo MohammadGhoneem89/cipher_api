@@ -20,25 +20,25 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, JSON.stringify(payload, null, 2));
   logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, incommingRoute);
 
-  if(apiFilter.indexOf(incommingRoute) >= 0){
-        if(payload.body.password || payload.JWToken || payload.JWT){
-            delete payload.body.password;
-            delete payload.JWToken;
-            delete payload.JWT;
-        }
-
-        let requestData = {
-            uuid: UUIDKey,
-            channel: channel,
-            action: incommingRoute,
-            payload: payload
-        };
-
-        apiPayloadRepo.create(requestData);
+  if (apiFilter.indexOf(incommingRoute) >= 0) {
+    if (payload.body.password || payload.JWToken || payload.JWT) {
+      delete payload.body.password;
+      delete payload.JWToken;
+      delete payload.JWT;
     }
-  
-  
-  
+
+    let requestData = {
+      uuid: UUIDKey,
+      channel: channel,
+      action: incommingRoute,
+      payload: payload
+    };
+
+    apiPayloadRepo.create(requestData);
+  }
+
+
+
 
   let ResponseCaller = function (data) {
     logger.debug({
@@ -83,6 +83,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     return OldRestController.handleExternalRequest(payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ);
   }
   let millisecondsstart = (new Date()).getTime();
+  console.log('__JWTORG>>>>>>>>>>>>>>>>>>>>>>' + JWToken.orgCode)
+  _.set(payload, '__JWTORG', JWToken.orgCode);
   let Cipher = new GeneralRequestProcessor(payload, configdata, global.enumInfo, UUIDKey, JWToken);
   Cipher.processIncommingMessage().then((response) => {
     if (configdata.isResValBypass === false) {

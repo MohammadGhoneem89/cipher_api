@@ -2,54 +2,38 @@
 
 const _ = require('lodash');
 const moment = require('moment');
+const dates = require('../../lib/helpers/dates');
+const inst = require('./buissnessFunction/instrument.js');
 module.exports = {
-  STUB: (payload) => {
-    return payload;
+  STUB: (data, payload, jwt) => {
+    return data;
   },
-  getDate: (payload) => {
-    return new Date().toLocaleString();
+  ...inst
+  ,
+  getDate: (data, payload, jwt) => {
+    let format = 'YYYY/MM/DD HH:mm:ss ZZ';
+    return moment().format(format);
   },
-  ConvertDateToISO: (value) => {
-    if (value) {
-      value = this._getUnixDate(value);
+  translateDateToEpoch: (data, payload, jwt) => {
+    return dates.ddMMyyyyslash(data);
+  },
+  ddMMyyyy: (data, payload, jwt) => {
+    return dates.ddMMyyyyMS(data);
+  },
+  convertStringToFloat: (data, payload, jwt) => {
+    let number = parseFloat(data);
+    if (isNaN(number)) {
+      throw new Error("Could not Parse Float!!!");
     }
-    return value.toString() || "";
+    return number;
   },
-  getHyphen: (value) => {
-    return '000';
-  },
-  ConvertCaptureDateDateToISO: (payload) => {
-    return this._getUnixDate(payload.TransactionCaptureDate);
-  },
-  _getUnixDate: (dateStr) => {
-    let unixDate = moment(dateStr, 'DD-MM-YYYY HH:mm:ss').valueOf() / 1000;
-    return unixDate.toString();
-  },
-  ArrayToString: (value) => {
-    if (value) {
-      return value.join();
+  jsonParse: (data, payload, jwt) => {
+    try {
+      return JSON.parse(data);
+    } catch (ex) {
+      console.log(ex);
+      throw new Error("Could not Parse incomming data!!!");
     }
-    return value;
-  },
-  dataToString: (value) => {
-    let retval = '';
-    if (value) {
-      retval = JSON.stringify(value);
-    }
-    if (retval === null) {
-      retval = '';
-    }
-    return retval;
-  },
-  actionTransform: (str) => {
-    str = str.toLowerCase();
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  },
-  emptyToDash: (value) => {
-    value = _.isEmpty(value) ? '-' : value;
-    return value;
-  },
-  consolidatedQuery: (value) => {
-    return ["100"];
   }
+
 };

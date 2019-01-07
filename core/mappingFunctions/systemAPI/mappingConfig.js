@@ -65,7 +65,7 @@ function getMappingConfigOrgFieldData(payload, UUIDKey, route, callback, JWToken
     let result = [];
     if (data[0].fields) {
       data[0].fields.forEach((elem, index) => {
-        if (elem.IN_FIELDTYPE === 'OrgIdentifier') {
+        if (elem.IN_FIELDTYPE === 'OrgIdentifier' || elem.IN_FIELDTYPE === 'JWTORG' ) {
           result.push(elem);
         }
       });
