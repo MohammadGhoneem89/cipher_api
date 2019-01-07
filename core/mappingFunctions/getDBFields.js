@@ -9,32 +9,54 @@ const getDBFields = async function (payload, UUIDKey, route, callback, JWToken) 
       data: []
     }
   };
-    try {
-      let dbConfig = await keyVaultRepo.getDBConfig(payload.database, payload.adaptor);
-      let instance = await client.createClient(payload.database, dbConfig.connection);
-        switch (payload.database) {
-            case 'postgres':
-                const query = {
-                    text: `SELECT column_name
-                  FROM information_schema.columns 
-                  WHERE table_name='${payload.table}';`,
-                    values: []
-                };
-                const data = await instance.query(query);
-                  for(let row of data.rows){
-                    response.getDBFields.data.push({
-                      label: row.column_name,
-                      value: row.column_name
-                    });
-                  }
-                break;
-            case 'mongo':
-                break;
+  try {
+    let dbConfig = await keyVaultRepo.getDBConfig(payload.database, payload.adaptor);
+    let instance = await client.createClient(payload.database, dbConfig.connection);
+    switch (payload.database) {
+      case 'postgres':
+        if (payload.objectType === 'table') {
+          const query = {
+            text: `select * from  ${payload.tableName} where false;`,
+            values: []
+          };
+          const data = await instance.query(query);
+          for (let i = 0; i < data.fields.length; i++) {
+            const element = data.fields[i];
+            response.getDBFields.data.push({
+              _id: element.name,
+              label: element.name,
+              name: element.name
+            });
+          }
+        } else {
+          const query = {
+            text: `SELECT  proargnames
+            FROM    pg_catalog.pg_namespace n
+            JOIN    pg_catalog.pg_proc p
+            ON      p.pronamespace = n.oid
+            WHERE   n.nspname = 'public' and p.proname='${payload.tableName}';`,
+            values: []
+          };
+          let data = await instance.query(query);
+          data = data.rows[0].proargnames;
+          console.log(data)
+          for (let i = 0; i < data.length; i++) {
+            response.getDBFields.data.push({
+              _id: data[i],
+              label: data[i],
+              name: data[i]
+            });
+          }
         }
-    } catch (err) {
-        logger.debug(" [ DB ] ERROR : " + err);
+        break;
+      case 'mongo':
+        break;
     }
-    callback(response);
+  } catch (err) {
+    console.log(err)
+    logger.debug(" [ DB ] ERROR : " + err);
+  }
+  callback(response);
 }
 
 exports.getDBFields = getDBFields;

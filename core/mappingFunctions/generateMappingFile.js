@@ -58,12 +58,15 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
                     }
                     fields += ` ${payload.fields[i].name} as ${payload.fields[i].as}`;
                 }
-
-                let queryString = `select ${fields} from ${payload.tableName} where ${conditions};`
+                let pagingData='';
+                if(payload.enablePaging){
+                    pagingData = 'LIMIT ${payload.paging.size},${payload.paging.offset}'
+                }
+                let queryString = `select ${fields} from ${payload.tableName} where ${conditions} ${pagingData};`
                 file = `                
                 let instance = await client.createClient('pg', payload.connectionString);
                 const query = {
-                    text: '${queryString}',
+                    text: \`${queryString}\`,
                     values: [${valuesString}]
                 }
                 let response = await instance.query(query);
@@ -86,7 +89,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
 
 /*
 let data = {
-    adapterType: 'pg',
+    adapterType: 'postgress',
     connectionString: 'postgresql://Admin:avanza123@104.211.155.19:5432/invoiceFinancing',
     tableName: 'invoiceResponse',
     conditions: [{
@@ -99,11 +102,13 @@ let data = {
     fields: [{
         name: 'refNo',
         as: 'reference'
-    }]
+    }],
+    objectType: 'table',
+    enablePaging: true
 }
 
 generateMappingFile(data, '', '', (data) => {
     console.log(data)
-}, '')
-*/
+}, '')*/
+
 exports.generateMappingFile = generateMappingFile;
