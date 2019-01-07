@@ -204,5 +204,4 @@ module.exports = class Dispatcher {
           });
       });
   };
-
 };

@@ -20,6 +20,9 @@ module.exports = {
   ddMMyyyy: (data, payload, jwt) => {
     return dates.ddMMyyyyMS(data);
   },
+  MSddMMyyyyHHmmS: (data, payload, jwt) => {
+    return dates.MSddMMyyyyHHmmS(data);
+  },
   convertStringToFloat: (data, payload, jwt) => {
     let number = parseFloat(data);
     if (isNaN(number)) {
