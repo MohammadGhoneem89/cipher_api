@@ -1,13 +1,29 @@
 const fs = require('fs');
 const uuid = require('uuid/v1');
+const keyVaultRepo = require('../../lib/repositories/keyVault');
 
-function generateFileContent(file, callback) {
+function generateFileContent(file, isActions, callback) {
+    let actions = '';
+    if(isActions){
+        actions=`for(let i=0;i<response.length;i++){
+            response[i]['actions']=[{
+                "actionType": "COMPONENT_FUNCTION",
+                "iconName": "fa fa-eye",
+                "label": "View",
+                "URI": [
+                    "/"
+                ]
+            }]
+        }`
+    }
     let overall = `const client = require('../../api/client');
     \nconst execute = async function (payload, UUIDKey, route, callback, JWToken) {
         try{
             ${file}
+            \n${actions}
             callback({
-                data: response});
+                dbExecution: {
+                    data:response}});
         } catch(err){
             callback({error: err})
         }
@@ -22,7 +38,7 @@ function generateFileContent(file, callback) {
             })
         }
         callback({
-            response: {
+            generateMappingFile: {
                 data: {
                     uuid: id,
                     functionName: 'execute',
@@ -37,44 +53,78 @@ function generateFileContent(file, callback) {
 const generateMappingFile = async function (payload, UUIDKey, route, callback, JWToken) {
     let file;
     try {
-        switch (payload.adapterType) {
-            case 'postgress':
-                let conditions = '';
-                let valuesString = '';
-                for (let i = 0; i < payload.conditions.length; i++) {
-                    if (conditions.length !== 0) {
-                        conditions += ' AND'
+        const dbConfig = await keyVaultRepo.getDBConfig(payload.database, payload.adaptor);
+        switch (payload.database) {
+            case 'postgres':
+                if(payload.objectType==='table'){
+                    let conditions = '';
+                    let valuesString = '';
+                    for (let i = 0; i < payload.conditions.length; i++) {
+                        if (conditions.length !== 0) {
+                            conditions += ' AND'
+                        }
+                        conditions += ` ${payload.conditions[i].name} = $${i + 1}`;
+                        if (valuesString.length > 0) {
+                            valuesString += ',';
+                        }
+                        valuesString += 'payload.' + payload.conditions[i].value;
                     }
-                    conditions += ` ${payload.conditions[i].name} = $${i + 1}`;
-                    if (valuesString.length > 0) {
-                        valuesString += ',';
+                    let fields = '';
+                    for (let i = 0; i < payload.fields.length; i++) {
+                        if (fields.length !== 0) {
+                            fields += ' ,'
+                        }
+                        fields += ` ${payload.fields[i].name} as ${payload.fields[i].as}`;
                     }
-                    valuesString += 'payload.' + payload.conditions[i].value;
-                }
-                let fields = '';
-                for (let i = 0; i < payload.fields.length; i++) {
-                    if (fields.length !== 0) {
-                        fields += ' ,'
+                    let pagingData = '';
+                    if (payload.enablePaging) {
+                        pagingData = 'LIMIT ${payload.paging.size},${payload.paging.offset}'
                     }
-                    fields += ` ${payload.fields[i].name} as ${payload.fields[i].as}`;
+                    let queryString = `select ${fields} from ${payload.object} where ${conditions} ${pagingData};`
+                    file = `                
+                    let instance = await client.createClient('pg', '${dbConfig.connection}');
+                    const query = {
+                        text: \`${queryString}\`,
+                        values: [${valuesString}]
+                    }
+                    let response = await instance.query(query);
+                    response = response.rows;`
+                } else {
+                    let valuesString = '';
+                    for (let i = 0; i < payload.conditions.length; i++) {
+                        if (valuesString.length > 0) {
+                            valuesString += ',';
+                        }
+                        valuesString += '${payload.' + payload.conditions[i].value+"}";
+                    }
+                    let fields = '';
+                    for (let i = 0; i < payload.fields.length; i++) {
+                        if (fields.length !== 0) {
+                            fields += ' ,'
+                        }
+                        fields += ` ${payload.fields[i].name} as ${payload.fields[i].as}`;
+                    }
+                    let pagingData = '';
+                    if (payload.enablePaging) {
+                        pagingData = 'LIMIT ${payload.paging.size},${payload.paging.offset}'
+                    }
+                    let queryString = `select ${fields} from ${payload.object}(${valuesString}) ${pagingData};`
+                    file = `                
+                    let instance = await client.createClient('pg', '${dbConfig.connection}');
+                    const query = {
+                        text: \`${queryString}\`,
+                        values: []
+                    }
+                    let response = await instance.query(query);
+                    response = response.rows;`
                 }
-
-                let queryString = `select ${fields} from ${payload.tableName} where ${conditions};`
-                file = `                
-                let instance = await client.createClient('pg', payload.connectionString);
-                const query = {
-                    text: '${queryString}',
-                    values: [${valuesString}]
-                }
-                let response = await instance.query(query);
-                response = response.rows;`
                 break;
             case 'mongo':
                 break;
             default:
                 throw 'Not found';
         }
-        generateFileContent(file, callback);
+        generateFileContent(file, payload.enableActions, callback);
     } catch (err) {
         //logger.debug(" [ DB ] ERROR : " + err);
         console.log(err)
@@ -83,27 +133,35 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
         })
     }
 }
-
 /*
+
 let data = {
-    adapterType: 'pg',
-    connectionString: 'postgresql://Admin:avanza123@104.211.155.19:5432/invoiceFinancing',
-    tableName: 'invoiceResponse',
-    conditions: [{
-        name: 'suppliername',
-        value: 'name'
-    }, {
-        name: 'type',
-        value: 'type'
-    }],
-    fields: [{
-        name: 'refNo',
-        as: 'reference'
-    }]
+    "database": "postgres",
+    "adaptor":"adaptor4",
+    "enableActions": true,
+    "enablePaging": true,
+    "objectType": "tables",
+    "object": "invoiceResponse",
+    "conditions": [
+        {
+            "name": "suppliername",
+            "value": "name"
+        },
+        {
+            "name": "type",
+            "value": "type"
+        }
+    ],
+    "fields": [
+        {
+            "name": "refNo",
+            "as": "reference"
+        }
+    ]
 }
 
 generateMappingFile(data, '', '', (data) => {
     console.log(data)
-}, '')
-*/
+}, '')*/
+
 exports.generateMappingFile = generateMappingFile;
