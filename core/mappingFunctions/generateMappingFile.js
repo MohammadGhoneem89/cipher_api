@@ -60,8 +60,8 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
                     }
                     fields += ` ${payload.fields[i].name} as ${payload.fields[i].as}`;
                 }
-                let pagingData='';
-                if(payload.enablePaging){
+                let pagingData = '';
+                if (payload.enablePaging) {
                     pagingData = 'LIMIT ${payload.paging.size},${payload.paging.offset}'
                 }
                 let queryString = `select ${fields} from ${payload.tableName} where ${conditions} ${pagingData};`
