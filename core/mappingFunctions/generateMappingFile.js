@@ -38,9 +38,9 @@ function generateFileContent(file, callback) {
 const generateMappingFile = async function (payload, UUIDKey, route, callback, JWToken) {
     let file;
     try {
+        const dbConfig = await keyVaultRepo.getDBConfig(payload.database, payload.adaptor);
         switch (payload.database) {
             case 'postgres':
-                let dbConfig = await keyVaultRepo.getDBConfig(payload.database, payload.adaptor);
                 let conditions = '';
                 let valuesString = '';
                 for (let i = 0; i < payload.conditions.length; i++) {
