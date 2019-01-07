@@ -1,5 +1,6 @@
 const fs = require('fs');
 const uuid = require('uuid/v1');
+const keyVaultRepo = require('../../lib/repositories/keyVault');
 
 function generateFileContent(file, callback) {
     let overall = `const client = require('../../api/client');
@@ -37,8 +38,9 @@ function generateFileContent(file, callback) {
 const generateMappingFile = async function (payload, UUIDKey, route, callback, JWToken) {
     let file;
     try {
-        switch (payload.adapterType) {
-            case 'postgress':
+        switch (payload.database) {
+            case 'postgres':
+                let dbConfig = await keyVaultRepo.getDBConfig(payload.database, payload.adaptor);
                 let conditions = '';
                 let valuesString = '';
                 for (let i = 0; i < payload.conditions.length; i++) {
@@ -64,7 +66,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
                 }
                 let queryString = `select ${fields} from ${payload.tableName} where ${conditions} ${pagingData};`
                 file = `                
-                let instance = await client.createClient('pg', payload.connectionString);
+                let instance = await client.createClient('pg', '${dbConfig.connection}');
                 const query = {
                     text: \`${queryString}\`,
                     values: [${valuesString}]
