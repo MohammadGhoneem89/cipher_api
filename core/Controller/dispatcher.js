@@ -90,7 +90,8 @@ module.exports = class Dispatcher {
   SendGetRequest() {
     return new Promise((resolve, reject) => {
       let getResponse;
-      if (this.configdata.isSimulated && this.configdata.isSimulated === true) {
+      let bypassSimu = _.get(this.request, 'bypassSimu', false);
+      if (this.configdata.isSimulated && this.configdata.isSimulated === true && bypassSimu === false) {
         let simu = new Simulator(this.oRequest, this.simucases);
         simu.getResponse().then((data) => {
           resolve(data);
