@@ -3,7 +3,7 @@
     "generateMappingFile": {
       "customMapping": true,
       "MappingfunctionName": "generateMappingFile",
-      "CustomMappingFile": "generateMappingFile.js",
+      "CustomMappingFile": "generateMappingFile/index.js",
       "mappingConfigFile": "ePayMapping"
     },
     "getDBFields": {
