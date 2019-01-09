@@ -23,7 +23,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
     }
 }
 
-
+/*
 let data = {
     "database": "postgres",
     "adaptor":"adaptor4",
@@ -51,6 +51,6 @@ let data = {
 
 generateMappingFile(data, '', '', (data) => {
     console.log(data)
-}, '')
+}, '')*/
 
 exports.generateMappingFile = generateMappingFile;
