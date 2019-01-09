@@ -87,7 +87,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   _.set(payload, '__JWTORG', JWToken.orgCode);
   let Cipher = new GeneralRequestProcessor(payload, configdata, global.enumInfo, UUIDKey, JWToken);
   Cipher.processIncommingMessage().then((response) => {
-    if (configdata.isResValBypass === false) {
+
+    if (configdata.isResValBypass === false && configdata.isSimulated === false) {
       let successStatus = true;
       if (!response.__cipherMessage) {
         _.set(response, '__cipherSuccessStatus', successStatus);
