@@ -13,7 +13,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
             default:
                 throw 'Not found';
         }
-        generateFileContent(file, payload.enableActions, callback);
+        generateFileContent((payload.useCase+"_"+payload.route),payload.file, payload.enableActions, callback);
     } catch (err) {
         //logger.debug(" [ DB ] ERROR : " + err);
         console.log(err)
@@ -23,8 +23,10 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
     }
 }
 
-/*
+
 let data = {
+    "useCase":"1",
+    "route":"2",
     "database": "postgres",
     "adaptor":"adaptor4",
     "enableActions": true,
@@ -51,6 +53,6 @@ let data = {
 
 generateMappingFile(data, '', '', (data) => {
     console.log(data)
-}, '')*/
+}, '')
 
 exports.generateMappingFile = generateMappingFile;

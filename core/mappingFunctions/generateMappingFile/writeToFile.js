@@ -1,7 +1,6 @@
 const fs = require('fs');
-const uuid = require('uuid/v1');
 const path = require('path')
-module.exports = function (file, isActions, callback) {
+module.exports = function (name, file, isActions, callback) {
     let actions = '';
     if (isActions) {
         actions = `for(let i=0;i<response.length;i++){
@@ -30,8 +29,7 @@ module.exports = function (file, isActions, callback) {
         \n}
         \nexports.execute = execute;
     `;
-    const id = uuid();
-    fs.writeFile(path.join(__dirname, '../', 'generated', `${id}.js`), overall, function (err) {
+    fs.writeFile(path.join(__dirname, '../', 'generated', `${name}.js`), overall, function (err) {
         if (err) {
             callback({
                 error: err
@@ -40,9 +38,9 @@ module.exports = function (file, isActions, callback) {
         callback({
             generateMappingFile: {
                 data: {
-                    uuid: id,
+                    uuid: name,
                     functionName: 'execute',
-                    path: `/generated/${id}.js`
+                    path: `/generated/${name}.js`
                 },
                 status: 'OK'
             }
