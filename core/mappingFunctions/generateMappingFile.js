@@ -1,6 +1,5 @@
 const fs = require('fs');
 const uuid = require('uuid/v1');
-const keyVaultRepo = require('../../lib/repositories/keyVault');
 
 function generateFileContent(file, isActions, callback) {
     let actions = '';
@@ -16,7 +15,8 @@ function generateFileContent(file, isActions, callback) {
             }]
         }`
     }
-    let overall = `const client = require('../../api/client');
+    let overall = `const keyVaultRepo = require('../../../lib/repositories/keyVault');\n
+    const client = require('../../api/client');
     \nconst execute = async function (payload, UUIDKey, route, callback, JWToken) {
         try{
             ${file}
@@ -53,7 +53,6 @@ function generateFileContent(file, isActions, callback) {
 const generateMappingFile = async function (payload, UUIDKey, route, callback, JWToken) {
     let file;
     try {
-        const dbConfig = await keyVaultRepo.getDBConfig(payload.database, payload.adaptor);
         switch (payload.database) {
             case 'postgres':
                 if(payload.objectType==='table'){
@@ -63,7 +62,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
                         if (conditions.length !== 0) {
                             conditions += ' AND'
                         }
-                        conditions += ` ${payload.conditions[i].name} = $${i + 1}`;
+                        conditions += ` "${payload.conditions[i].name}" = $${i + 1}`;
                         if (valuesString.length > 0) {
                             valuesString += ',';
                         }
@@ -74,15 +73,16 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
                         if (fields.length !== 0) {
                             fields += ' ,'
                         }
-                        fields += ` ${payload.fields[i].name} as ${payload.fields[i].as}`;
+                        fields += ` "${payload.fields[i].name}" as ${payload.fields[i].as}`;
                     }
                     let pagingData = '';
                     if (payload.enablePaging) {
                         pagingData = 'LIMIT ${payload.paging.size},${payload.paging.offset}'
                     }
-                    let queryString = `select ${fields} from ${payload.object} where ${conditions} ${pagingData};`
-                    file = `                
-                    let instance = await client.createClient('pg', '${dbConfig.connection}');
+                    let queryString = `select ${fields} from "${payload.object}" where ${conditions} ${pagingData};`
+                    file = `     
+                    const dbConfig = await keyVaultRepo.getDBConfig('postgres', '${payload.adaptor}');           
+                    let instance = await client.createClient('pg', dbConfig.connection);
                     const query = {
                         text: \`${queryString}\`,
                         values: [${valuesString}]
