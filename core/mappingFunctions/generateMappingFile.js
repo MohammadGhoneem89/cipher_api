@@ -124,7 +124,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
             default:
                 throw 'Not found';
         }
-        generateFileContent(file, payload.enableActions, callback);
+        generateFileContent(file, callback);
     } catch (err) {
         //logger.debug(" [ DB ] ERROR : " + err);
         console.log(err)
@@ -133,6 +133,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
         })
     }
 }
+
 /*
 
 let data = {
@@ -158,10 +159,29 @@ let data = {
             "as": "reference"
         }
     ]
+=======
+
+/*
+let data = {
+    adapterType: 'pg',
+    connectionString: 'postgresql://Admin:avanza123@104.211.155.19:5432/invoiceFinancing',
+    tableName: 'invoiceResponse',
+    conditions: [{
+        name: 'suppliername',
+        value: 'name'
+    }, {
+        name: 'type',
+        value: 'type'
+    }],
+    fields: [{
+        name: 'refNo',
+        as: 'reference'
+    }]
+>>>>>>> origin/master
 }
 
 generateMappingFile(data, '', '', (data) => {
     console.log(data)
+<<<<<<< HEAD
 }, '')*/
-
 exports.generateMappingFile = generateMappingFile;
