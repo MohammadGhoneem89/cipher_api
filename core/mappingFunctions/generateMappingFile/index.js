@@ -23,7 +23,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
     }
 }
 
-
+/*
 let data = {
     "useCase":"1",
     "route":"2",
@@ -53,6 +53,6 @@ let data = {
 
 generateMappingFile(data, '', '', (data) => {
     console.log(data)
-}, '')
+}, '')*/
 
 exports.generateMappingFile = generateMappingFile;
