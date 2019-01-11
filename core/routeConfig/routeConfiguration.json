@@ -6,6 +6,24 @@
       "CustomMappingFile": "generateMappingFile.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "upsertEndpointDefination": {
+      "customMapping": true,
+      "MappingfunctionName": "upsert",
+      "CustomMappingFile": "endpointDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "findEndpointDefinationById": {
+      "customMapping": true,
+      "MappingfunctionName": "findOne",
+      "CustomMappingFile": "endpointDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "findEndpointDefination": {
+      "customMapping": true,
+      "MappingfunctionName": "list",
+      "CustomMappingFile": "endpointDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getDBFields": {
       "customMapping": true,
       "MappingfunctionName": "getDBFields",
