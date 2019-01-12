@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}/css/reportLayout.css">
+    {{/if}}
+</head>
+<body>
+
+<br/>
+
+<div class="row">
+    <span class="pull-left margin-left">
+         <h4>Ejari Number : {{:criteria.ejariNumber}} </h4>
+    </span>
+    <span class="pull-right margin-right">
+         <h4>Contract Ref : {{:criteria.contractRef}}</h4>
+    </span>
+    <div class="clearfix"></div>
+</div>
+
+<br/>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Ejari Report</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>No.</th>
+                            <th>Contract Ref</th>
+                            <th>CRM Ref</th>
+                            <th>Tenant Name</th>
+                            <th>Mobile</th>
+                            <th>Email</th>
+                            <th>Emirates ID</th>
+                            <th>Business Partner No</th>
+                            <th>Contract Status</th>
+                            <th>Amount</th>
+                            <th>Ejari Number</th>
+                            <th>Ejari Status</th>
+                            <th>Ejari Termination Status</th>
+                        </tr>
+                        {^{for searchResult}}
+                        <tr>
+                            <td>{{: #index + 1}}</td>
+                            <td>{{:ContractRef}}</td>
+                            <td>{{:CRMRef}}</td>
+                            <td>{{:TenantName}}</td>
+                            <td>{{:Mobile}}</td>
+                            <td>{{:Email}}</td>
+                            <td>{{:EmiratesID}}</td>
+                            <td>{{:BusinessPartnerNo}}</td>
+                            <td>{{:ContractStatus}}</td>
+                            <td>{{:Amount}}</td>
+                            <td>{{:EjariNumber}}</td>
+                            <td>{{:EjariStatus}}</td>
+                            <td>{{:EjariTerminationStatus}}</td>
+                        </tr>
+                        {{/for}}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="display:none">
+        <img src="{{:images.wasl}}"/>
+    </span>
+</body>
+</html>

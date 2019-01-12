@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}css/reportLayout.css">
+    {{/if}}
+</head>
+<body>
+<div class="row">
+   <span class="pull-left margin-left">
+        <h4>من تاريخ : {{:criteria.fromDate}}</h4>
+        <h4> إلى تاريخ : {{:criteria.toDate}}</h4>
+    </span>
+    <span class="pull-right margin-right">
+
+        <h4>{{:criteria.Entity}} : مزود الخدمة</h4>
+        <h4>{{:criteria.Acquirer}} : المؤسسة المالية</h4>
+        <h4>{{:criteria.paymentMethod}} : طريقة الدفع</h4>
+        <h4>{{:criteria.cardType}} : نوع البطاقة</h4>
+        <h4>{{:criteria.tranStatusValues}} : حالة المطابقة</h4>
+        <h4>{{:criteria.paymentStatus}} : حالة الدفع</h4>
+        </span>
+    <div class="clearfix"></div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">تفاصيل معاملات مزودين الخدمة </h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>الإجمالي(AED)</th>
+                            <th>رقم الإرجاع</th>
+                            <th>رقم الاعتراض</th>
+                            <th>رقم التسوية</th>
+                            <th>حالة المعاملة</th>
+                            <th>المؤسسة المالية</th>
+                            <th>نوع البطاقة</th>
+                            <th>مرجع الدفع الالكتروني</th>
+                            <th>SP TRN</th>
+                            <th>PG TRN</th>
+                            <th>الخدمة</th>
+                            <th>مزود الخدمة</th>
+                            <th>تاريخ المعاملة</th>
+                            <th>No.</th>
+                        </tr>
+                        {^{for searchResult}}
+                        <tr>
+                            <td class="border-right border-left text-right">{{:TotalBillAmount}}</td>
+                            <td class="border-right">{{:RefundRef}}</td>
+                            <td class="border-right">{{:DisputeRef}}</td>
+                            <td class="border-right">{{:BatchID}}</td>
+                            <td class="border-right">{{:Status}}</td>
+                            <td class="border-right">{{:AcquirerId}}</td>
+                            <td class="border-right">{{:CardType}}</td>
+                            <td class="border-right">{{:PayRef}}</td>
+                            <td class="border-right">{{:BillerRefNo}}</td>
+                            <td class="border-right">{{:PGRefNumber}}</td>
+                            <td class="border-right">{{:ServiceCode}}</td>
+                            <td class="border-right border-left">{{:SPCode}}</td>
+                            <td class="border-right border-left">{{:TransactionCaptureDate}}</td>
+                            <td class="border-right border-left">{{: #index + 1}}</td>
+                        </tr>
+                        {{/for}}
+                        <tr>
+                            <td class="border-left  thick-line text-center font-20" >{{:totalTransactions}}</td>
+                            <td class="thick-line text-center font-20" colspan="2">إجمالي المعاملة</td>
+                            <td class="border-left thick-line text-center text-right font-20">{{:total}}</td>
+                            <td class=" thick-line text-center font-20" colspan="2">المبلغ الإجمالي</td>
+                            <td class="thick-line text-center text-left font-20"></td>
+                            <td class="border-right border-left thick-line text-center" colspan="7"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="display:none">
+        <img src="{{:images.sdg}}"/>
+        <img src="{{:images.dof}}"/>
+    </span>
+</body>
+</html>

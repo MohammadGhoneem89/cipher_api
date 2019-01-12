@@ -1,0 +1,3 @@
+No.,Transaction Date,Entity,Service,PG TRN,SP TRN,ePay Ref No,Card Type,Bank,Transaction Status,Settlement ID,Dispute ID,Refund ID,Amount(AED)
+{{for searchResult}}{{: #index + 1}},{{:TransactionCaptureDate}},{{:SPCode}},{{:ServiceCode}},{{:PGRefNumber}},{{:BillerRefNo}},{{:PayRef}},{{:CardType}},{{:AcquirerId}},{{:Status}},{{:BatchID}},{{:DisputeRef}},{{:RefundRef}},{{:TotalBillAmount}}
+{{/for}},,,,,,,,,Total Transactions,{{:totalTransactions}},Total Amount,{{:total}},
