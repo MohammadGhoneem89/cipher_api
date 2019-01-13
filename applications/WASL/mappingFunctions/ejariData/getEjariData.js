@@ -4,8 +4,7 @@ const _ = require('lodash');
 
 
 
-
-function getEjariData(payload,callback) {
+function getEjariData(payload, UUIDKey, route, callback, JWToken) {
     let query ;
     let res = {"contractDetail": {}};
     let ejariNumber = ``;
@@ -46,7 +45,7 @@ function getEjariData(payload,callback) {
     });
 }
 
-function getInstrumentList(payload,callback) {
+function getInstrumentList(payload, UUIDKey, route, callback, JWToken) {
     let query = '';
     let res = {
         page : {},
@@ -97,7 +96,7 @@ function getInstrumentList(payload,callback) {
     });
 }
 
-function getBouncedCheques(payload,callback) {
+function getBouncedCheques(payload, UUIDKey, route, callback, JWToken) {
     let query = '';
     let res = {
        page : {},
