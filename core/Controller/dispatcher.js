@@ -138,13 +138,17 @@ module.exports = class Dispatcher {
       let JWT = this.JWT;
       let UUID = this.UUID;
       let functionName = this.configdata.MappingfunctionName;
+      console.log("SEARCHING FILE>>>>>>>>>" + fileLoc)
       fs.exists(fileLoc, function (exists) {
         if (exists) {
+          console.log("<<<<<<FILE Found>>>>>>"); 
           let mappingFunctions = require(fileLoc);
+          console.log("<<<<<<Calling>>>>>> "+ functionName); 
           mappingFunctions[functionName](Orequest, UUID, route, resolve, JWT, null, null);
         } else {
           generalResponse.error = true;
           generalResponse.message = `mapping file does not exist ${fileLoc}`;
+          reject(generalResponse);
         }
       });
     });
