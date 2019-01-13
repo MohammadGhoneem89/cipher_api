@@ -132,58 +132,61 @@ module.exports = class ObjectMapper {
     return Promise.all(promiseList).then((data) => {
       let fwdMessage = {};
       this.mappingConfig.forEach((element, index) => {
-
-        if (element.IN_FIELDDT == 'string' && element.MAP_FIELDDT == 'array' && element.IN_FIELDTYPE === 'JWTORG') {
-          //  execute rules and update JSON
-          let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          let fieldData = "";
-          fieldData = data && data[index];
-          settingArray.push(fieldData);
-          _.set(fwdMessage, element.MAP_FIELD, settingArray);
-        }
-        else if (element.IN_FIELDDT == 'string' && element.MAP_FIELDDT == 'array') {
-          //  execute rules and update JSON
-          let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          let fieldData = "";
-          if (data[index] instanceof Array) {
+        if (this.mappingConfig.mappingType == 'REQUEST') {
+          if (element.IN_FIELDDT == 'string' && element.MAP_FIELDDT == 'array' && element.IN_FIELDTYPE === 'JWTORG') {
+            //  execute rules and update JSON
+            let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
+            let fieldData = "";
+            fieldData = data && data[index];
+            settingArray.push(fieldData);
+            _.set(fwdMessage, element.MAP_FIELD, settingArray);
+          }
+          else if (element.IN_FIELDDT == 'string' && element.MAP_FIELDDT == 'array') {
+            //  execute rules and update JSON
+            let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
+            let fieldData = "";
+            if (data[index] instanceof Array) {
+              fieldData = data && data[index] && data[index][0] ? data[index][0] : "";
+            }
+            else {
+              fieldData = String(data && data[index] && data[index] ? data[index] : "");
+            }
+            settingArray.push(fieldData);
+            _.set(fwdMessage, element.MAP_FIELD, settingArray);
+          }
+          else if ((element.IN_FIELDDT == 'number' || element.IN_FIELDDT == 'boolean') && element.MAP_FIELDDT == 'array') {
+            //  execute rules and update JSON
+            let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
+            let fieldData = "";
             fieldData = data && data[index] && data[index][0] ? data[index][0] : "";
+            settingArray.push(String(fieldData));
+            _.set(fwdMessage, element.MAP_FIELD, settingArray);
+          }
+          else if (element.IN_FIELDDT == 'object' && element.MAP_FIELDDT == 'array') {
+            //  execute rules and update JSON
+            let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
+            let fieldData = "";
+            fieldData = data && data[index] && data[index][0] ? data[index][0] : {};
+            let stringObj = JSON.stringify(fieldData);
+            settingArray.push(stringObj);
+            _.set(fwdMessage, element.MAP_FIELD, settingArray);
+          }
+          else if (element.IN_FIELDDT == 'array' && element.MAP_FIELDDT == 'array') {
+            //  execute rules and update JSON
+            let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
+            let fieldData = "";
+            fieldData = data && data[index] && data[index] ? data[index] : [];
+            let stringObj = JSON.stringify(fieldData);
+            settingArray.push(stringObj);
+            _.set(fwdMessage, element.MAP_FIELD, settingArray);
           }
           else {
-            fieldData = String(data && data[index] && data[index] ? data[index] : "");
+            _.set(fwdMessage, element.MAP_FIELD, data[index]);
           }
-          settingArray.push(fieldData);
-          _.set(fwdMessage, element.MAP_FIELD, settingArray);
-        }
-        else if ((element.IN_FIELDDT == 'number' || element.IN_FIELDDT == 'boolean') && element.MAP_FIELDDT == 'array') {
-          //  execute rules and update JSON
-          let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          let fieldData = "";
-          fieldData = data && data[index] && data[index][0] ? data[index][0] : "";
-          settingArray.push(String(fieldData));
-          _.set(fwdMessage, element.MAP_FIELD, settingArray);
-        }
-        else if (element.IN_FIELDDT == 'object' && element.MAP_FIELDDT == 'array') {
-          //  execute rules and update JSON
-          let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          let fieldData = "";
-          fieldData = data && data[index] && data[index][0] ? data[index][0] : {};
-          let stringObj = JSON.stringify(fieldData);
-          settingArray.push(stringObj);
-          _.set(fwdMessage, element.MAP_FIELD, settingArray);
-        }
-        else if (element.IN_FIELDDT == 'array' && element.MAP_FIELDDT == 'array') {
-          //  execute rules and update JSON
-          let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
-          let fieldData = "";
-          fieldData = data && data[index] && data[index] ? data[index] : [];
-          let stringObj = JSON.stringify(fieldData);
-          settingArray.push(stringObj);
-          _.set(fwdMessage, element.MAP_FIELD, settingArray);
         }
         else {
           _.set(fwdMessage, element.MAP_FIELD, data[index]);
         }
-
       });
       return fwdMessage;
     });
