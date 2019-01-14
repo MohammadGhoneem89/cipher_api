@@ -6,12 +6,13 @@ const customFunctions = require('../Common/customFunctions.js');
 const validationFunctions = require('../Common/_validationFunctions.js');
 
 module.exports = class ObjectMapper {
-  constructor(req, mappingConfig, typeData, UUID, JWToken) {
+  constructor(req, mappingConfig, typeData, UUID, JWToken, mappingType) {
     this.request = req;
     this.mappingConfig = mappingConfig;
     this.typeData = typeData;
     this.error = [];
     this.UUID = UUID;
+    this.mappingType = mappingType;
     this.JWToken = JWToken;
   }
   DataTypeMatchCheck(type, value) {
@@ -171,7 +172,7 @@ module.exports = class ObjectMapper {
           settingArray.push(stringObj);
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
         }
-        else if (element.IN_FIELDDT == 'array' && element.MAP_FIELDDT == 'array') {
+        else if (element.IN_FIELDDT == 'array' && element.MAP_FIELDDT == 'array' && this.mappingType == 'Request') {
           //  execute rules and update JSON
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
           let fieldData = "";
@@ -183,7 +184,6 @@ module.exports = class ObjectMapper {
         else {
           _.set(fwdMessage, element.MAP_FIELD, data[index]);
         }
-
       });
       return fwdMessage;
     });

@@ -4,7 +4,19 @@ module.exports = function (payload) {
         if (fields.length !== 0) {
             fields += ' ,'
         }
-        fields += ` "${payload.fields[i].name}" as ${payload.fields[i].as}`;
+
+        const names = payload.fields[i].name.split('->');
+        let fieldName = "";
+        for (let i = 0; i < names.length; i++) {
+            if (i === 0) {
+                fieldName = "\"" + names[i] + "\"";
+            } else if (i === names.length - 1) {
+                fieldName += '->>' + "'" + names[i] + "'";
+            } else {
+                fieldName += '->' + "'" + names[i] + "'";
+            }
+        }
+        fields += ` ${fieldName} as ${payload.fields[i].as}`;
     }
     let pagingData = '';
     if (payload.enablePaging) {
@@ -18,7 +30,18 @@ module.exports = function (payload) {
             if (conditions.length !== 0) {
                 conditions += ' AND'
             }
-            conditions += ` "${payload.conditions[i].name}" = $${i + 1}`;
+            const names = payload.conditions[i].name.split('->');
+            let fieldName = "";
+            for (let i = 0; i < names.length; i++) {
+                if (i === 0) {
+                    fieldName = "\"" + names[i] + "\"";
+                } else if (i === names.length - 1) {
+                    fieldName += '->>' + "'" + names[i] + "'";
+                } else {
+                    fieldName += '->' + "'" + names[i] + "'";
+                }
+            }
+            conditions += ` ${fieldName} = $${i + 1}`;
             if (valuesString.length > 0) {
                 valuesString += ',';
             }

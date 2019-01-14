@@ -7,7 +7,6 @@
       "CustomMappingFile": "general/viewItem.js",
       "mappingConfigFile": "ePayMapping"
     },
-
     "getPaymentList" : {
       "customMapping": true,
       "MappingfunctionName": "list",

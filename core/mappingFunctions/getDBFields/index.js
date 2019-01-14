@@ -1,7 +1,7 @@
-const client = require('../api/client');
-let logger = require('../../lib/helpers/logger')().app;
-const keyVaultRepo = require('../../lib/repositories/keyVault');
-
+const client = require('../../api/client');
+let logger = require('../../../lib/helpers/logger')().app;
+const keyVaultRepo = require('../../../lib/repositories/keyVault');
+const postgresProcess = require('./adaptors/postgres');
 const getDBFields = async function (payload, UUIDKey, route, callback, JWToken) {
   const response = {
     getDBFields: {
@@ -15,19 +15,7 @@ const getDBFields = async function (payload, UUIDKey, route, callback, JWToken) 
     switch (payload.database) {
       case 'postgres':
         if (payload.objectType === 'table') {
-          const query = {
-            text: `select * from  ${payload.object} where false;`,
-            values: []
-          };
-          const data = await instance.query(query);
-          for (let i = 0; i < data.fields.length; i++) {
-            const element = data.fields[i];
-            response.getDBFields.data.push({
-              _id: element.name,
-              label: element.name,
-              name: element.name
-            });
-          }
+          response.getDBFields.data = await postgresProcess(instance, payload);
         } else {
           const query = {
             text: `SELECT  proargnames

@@ -110,7 +110,8 @@ module.exports = class Dispatcher {
         }).catch((ex) => {
           reject(ex);
         });
-      } else if (this.configdata.communicationMode === 'QUEUE') {
+      }
+      else if (this.configdata.communicationMode === 'QUEUE') {
         this.connectQueueService().then((data) => {
           console.log(data);
           resolve(data);
@@ -138,13 +139,17 @@ module.exports = class Dispatcher {
       let JWT = this.JWT;
       let UUID = this.UUID;
       let functionName = this.configdata.MappingfunctionName;
+      console.log("SEARCHING FILE>>>>>>>>>" + fileLoc)
       fs.exists(fileLoc, function (exists) {
         if (exists) {
+          console.log("<<<<<<FILE Found>>>>>>");
           let mappingFunctions = require(fileLoc);
+          console.log("<<<<<<Calling>>>>>> " + functionName);
           mappingFunctions[functionName](Orequest, UUID, route, resolve, JWT, null, null);
         } else {
           generalResponse.error = true;
           generalResponse.message = `mapping file does not exist ${fileLoc}`;
+          reject(generalResponse);
         }
       });
     });
@@ -163,7 +168,6 @@ module.exports = class Dispatcher {
       timeout: 10000, //  configurable
       json: true
     };
-
     console.log(JSON.stringify(rpOptions, null, 2))
     return rp(rpOptions).then((data) => {
       let generalResponse = {
@@ -176,7 +180,6 @@ module.exports = class Dispatcher {
         }
         return data;
       }
-
       return generalResponse;
     });
   }

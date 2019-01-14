@@ -4,15 +4,16 @@ const _ = require('lodash');
 
 
 
+function getEjariData(payload, UUIDKey, route, callback, JWToken) {
 
-function getEjariData(payload,callback) {
+    console.log("Entry Recived"+JSON.stringify(payload))
     let query ;
     let res = {"contractDetail": {}};
     let ejariNumber = ``;
     let ContractRef = ``;
 
-    if(!_.isEmpty(payload.body.ejariNumber)){
-        ejariNumber = ` AND "tranxData" -> 'ejariData' ->> 'ejariNumber' = '${payload.body.ejariNumber}'`;
+    if(!_.isEmpty(payload.ejariNumber)){
+        ejariNumber = ` AND "tranxData" -> 'ejariData' ->> 'ejariNumber' = '${payload.ejariNumber}'`;
     }
 
     query = `SELECT json_agg(res.*) as data FROM (SELECT "tranxData" ->> 'contractID' as contractID,
@@ -46,7 +47,7 @@ function getEjariData(payload,callback) {
     });
 }
 
-function getInstrumentList(payload,callback) {
+function getInstrumentList(payload, UUIDKey, route, callback, JWToken) {
     let query = '';
     let res = {
         page : {},
@@ -97,7 +98,7 @@ function getInstrumentList(payload,callback) {
     });
 }
 
-function getBouncedCheques(payload,callback) {
+function getBouncedCheques(payload, UUIDKey, route, callback, JWToken) {
     let query = '';
     let res = {
        page : {},
