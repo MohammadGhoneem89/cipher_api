@@ -1,82 +1,177 @@
 
 'use strict';
-async function getEvent(payload, UUIDKey, route, callback, JWToken) {
-    try {
-      console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Request Recieved for Event >>>>>>>>>>>>>>>>>>>>>>")
-      console.log(JSON.stringify(payload.eventData,null,2))
-     
-      switch (payload.eventData.eventName) {
-        
-        case "RenewContract":
-          {
-            return  callback({
-              error:false,
-              message:"RenewContract"
+//var objectMapper = require('object-mapper');
+let rp = require('request-promise');
+
+
+async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
+
+  try {
+    console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
+    console.log(JSON.stringify(payload.eventName, null, 2))
+
+    switch (payload.eventName) {
+
+      case "RenewContract":
+        {
+          return callback({
+            error: false,
+            message: "RenewContract"
+          })
+        }
+      case "UpdateContract":
+        {
+          return callback({
+            error: false,
+            message: "UpdateContract"
+          })
+
+        }
+      case "EventOnUpdateFirstPaymentStatus":
+        {
+
+          options.body.eventName = payload.eventName
+          //payload is input and based on template we get the revised
+          //transformed json that we can pass to the REST Call
+          rp(options)
+            .then(function (body) {
+              // POST succeeded...
+              return true;
             })
-          }
-        case "UpdateContract":
-          {
+            .catch(function (err) {
+              // POST failed...
+              return false;
+            });
+        }
+      case "EventOnUpdatePaymentStatus":
+        {
 
-          }
-        case "GetContractDetails ":
-          {
+        }
+      case "EventOnEjariAvailable":
+        {
 
-          }
-        case "EventOnUpdateFirstPaymentStatus":
-          {
+        }
+      case "ReplacePaymentInstruments":
+        {
 
-          }
-        case "EventOnUpdatePaymentStatus":
-          {
+        }
+      case "ReplacePaymentInstrumentsBackOffice":
+        {
 
-          }
-        case "EventOnEjariAvailable":
-          {
+        }
+      case "TerminateContract":
+        {
 
-          }
-        case "ReplacePaymentInstruments":
-          {
+        }
+      case "EventOnTerminateContract":
+        {
 
-          }
-        case "ReplacePaymentInstrumentsBackOffice":
-          {
+        }
+      case "EventOnUpdateKYCDetail":
+        {
 
-          }
-        case "TerminateContract":
-          {
+        }
+      case "UpdateKYCDetail":
+        {
 
-          }
-        case "EventOnTerminateContract":
-          {
+          updateKYCDetail().then(function (body) {
+            // POST succeeded...
+            console.log("updateKYCDetail dispatched", body)
+          })
+            .catch(function (err) {
+              // POST failed...
+              console.log("Error : ", err)
 
-          }
-        case "ReprocessEjari":
-          {
+            });
+          callback({
+            error: false,
+            message: "UpdateKYCDetail dispatched"
+          })
+        }
+        case "EjariData":
+        {
+          EjariAvailable().then(function (body) {
+            console.log("EjariAvailable dispatched", body)
+          }).catch(function (err) {
+            console.log("error : ", err)
+          })
+          callback({
+            error: true,
+            message: "EjariAvailable dispatched"
+          })
+        }
 
-          }
-        case "GetKYCDetail":
-          {
-
-          }
-        case "EventOnUpdateKYCDetail":
-          {
-
-          }
-        case "GetInstrumentList":
-          {
-
-          }
-          return "&&&&&&&&&&&&&&&&&&"
-        default:
+      default:
         callback({
-          error:true,
-          message:"invalid case"
+          error: true,
+          message: "invalid case"
         })
         break;
-      }
-    }
-    catch (err) {
-      console.log(err)
     }
   }
-  exports.getEvent = getEvent
+  catch (err) {
+    console.log(err)
+  }
+}
+exports.handlePMevents = handlePMevents
+
+
+
+
+function updateKYCDetail() {
+
+  let options = {
+    method: 'POST',
+    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
+    qs: { eventName: 'updateKYCDetail' },
+    body:
+    {
+      header:
+      {
+        username: 'api_user',
+        password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+      },
+      body:
+      {
+        residenceAddress: 'wer',
+        contactPersonMobile: '234',
+        nationality: 'sfef',
+        dateOfBirth: '',
+        emiratesIDNumber: '12341234',
+        emiratesIDExpiryDate: '',
+        POBox: '',
+        passportExpiryDate: '',
+        passportIssueDate: '',
+        passportIssuePlace: '',
+        passportNumber: '',
+        phoneNumber: '',
+        gender: '',
+        tenantNameEnglish: '',
+        tenantNameArabic: '',
+        visaExpiryDate: '',
+        visaNo: '',
+        visaStatus: '',
+        visaStartDate: ''
+      }
+    },
+    json: true
+  };
+  return rp(options);
+}
+
+function EjariAvailable() {
+  var options = { method: 'POST',
+  url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
+  qs: { eventName: 'ejariAvailable' },
+  body: 
+   { header: 
+      { username: 'api_user',
+        password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b' },
+     body: 
+      { contractID: '4323940',
+        ejariID: '389492834',
+        date: '05/11/2018' } },
+  json: true };
+
+  return rp(options);
+}

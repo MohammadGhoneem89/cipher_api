@@ -7,6 +7,12 @@
       "CustomMappingFile": "general/viewItem.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "handlePMevents": {
+      "customMapping": true,
+      "MappingfunctionName": "handlePMevents",
+      "CustomMappingFile": "events/handlePMevents.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getPaymentList" : {
       "customMapping": true,
       "MappingfunctionName": "list",

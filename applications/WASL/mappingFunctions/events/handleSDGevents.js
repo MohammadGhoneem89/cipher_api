@@ -1,8 +1,8 @@
 
 'use strict';
-async function getEvent(payload, UUIDKey, route, callback, JWToken) {
+async function handleSDGevents(payload, UUIDKey, route, callback, JWToken) {
     try {
-      console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Request Recieved for Event >>>>>>>>>>>>>>>>>>>>>>")
+      console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
       console.log(JSON.stringify(payload.eventData,null,2))
      
       switch (payload.eventData.eventName) {
@@ -11,7 +11,7 @@ async function getEvent(payload, UUIDKey, route, callback, JWToken) {
           {
             return  callback({
               error:false,
-              message:"RenewContract"
+              message:"AddTenant"
             })
           }
         case "Logout":
@@ -23,7 +23,7 @@ async function getEvent(payload, UUIDKey, route, callback, JWToken) {
 
           }
        
-          return "&&&&&&&&&&&&&&&&&&7"
+          return "none"
         default:
         callback({
           error:true,
@@ -36,4 +36,4 @@ async function getEvent(payload, UUIDKey, route, callback, JWToken) {
       console.log(err)
     }
   }
-  exports.getEvent = getEvent
+  exports.handleSDGevents = handleSDGevents
