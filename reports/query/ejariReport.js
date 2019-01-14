@@ -7,6 +7,7 @@ const findStatus = require('../../lib/helpers/findStatus');
 const amountFormat = require('../../lib/helpers/amountFormat');
 const func = require('../../applications/WASL/mappingFunctions/ejariData/getEjariData');
 const pg = require('../../core/api/connectors/postgress');
+const typeDataRepo = require('../../lib/repositories/typeData');
 
 
 
@@ -14,10 +15,15 @@ function ejariReport(payload) {
     return new Promise((resolve, reject) => {
         let criteria = { body:{}};
         if(!_.isEmpty(payload.query)){
+            if(!_.isEmpty(payload.query.fromDate)){
+                criteria.body.fromDate = _.get(payload.query,'fromDate.$gte','');
+            }
+            if(!_.isEmpty(payload.query.toDate)){
+                criteria.body.toDate = _.get(payload.query,'toDate.$lte','');
+            }
             if(!_.isEmpty(payload.query.ejariNumber)){
                 criteria.body.ejariNumber = _.get(payload.query,'ejariNumber.$in[0]','');
             }
-
             if(!_.isEmpty(payload.query.contractRef)){
                 criteria.body.contractRef = _.get(payload.query,'contractRef.$in[0]','');
             }
@@ -45,19 +51,25 @@ function ejariReport(payload) {
         if (criteria.body && criteria.body.toDate && criteria.body.fromDate) {
             let fromdate = criteria.body.fromDate;
             let todate = criteria.body.toDate;
-            queryfull += ` AND contract."tranxData" ->> 'contractEndDate' between '${fromdate}' AND '${todate}'`;
+            queryfull += ` AND cast(contract."tranxData" ->> 'tranDate' as bigint) <= ${todate} OR cast(contract."tranxData" ->> 'tranDate' as bigint) >= ${fromdate} `;
         }
 
         if(!_.isEmpty(criteria.body.contractRef)){
             queryfull += ` AND contract."tranxData" ->> 'contractReference' = '${criteria.body.contractRef}'`;
         }
 
-
-        pg.connection().then((conn) => {
-            return conn.query(queryfull, [])
-                .then((bouncedChequeData) => {
-                    let Data = _.get(bouncedChequeData, 'rows', []);
-                    Data = formatter(Data)
+        if(!_.isEmpty(criteria.body.ejariNumber)){
+            queryfull += ` AND contract."tranxData" -> 'ejariData' ->> 'ejariNumber' = '${criteria.body.ejariNumber}'`;
+        }
+        pg.connection()
+            .then((conn) => {
+            Promise.all([
+                conn.query(queryfull, []),
+                valueMap()
+            ])
+                .then((data) => {
+                    let Data = _.get(data[0], 'rows', []);
+                    Data = formatter(Data,data[1]);
 
                     resolve(
                         {
@@ -75,7 +87,7 @@ function ejariReport(payload) {
 }
 
 
-function formatter(data){
+function formatter(data,typeData){
     let formatedData = [];
     let obj;
     for(let val of data){
@@ -87,16 +99,22 @@ function formatter(data){
         obj.Email = _.get(val,'email','');
         obj.EmiratesID = _.get(val,'emiratesID','');
         obj.BusinessPartnerNo = _.get(val,'businessPartnerNumber','');
-        obj.ContractStatus = _.get(val,'contractStatus','');
+        obj.ContractStatus = _.get(_.find(typeData, {value: _.get(val,'contractStatus','') }), 'label', '');
         obj.Amount = _.get(val,'contractAmount','');
         obj.EjariNumber =  _.get(val,'ejariNumber','');
         obj.EjariStatus = _.get(val,'ejariStatus','');
         obj.EjariTerminationStatus  = _.get(val,'ejariTerminationStatus','');
         formatedData.push(obj);
     }
+
     return formatedData;
 }
 
+
+function valueMap(){
+    return typeDataRepo.findFields("Contract_Status")
+        .then((res) => _.get(res,'data.Contract_Status',[]))
+}
 
 
 module.exports = ejariReport;

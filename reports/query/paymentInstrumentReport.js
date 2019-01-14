@@ -6,11 +6,10 @@ const dates = require('../../lib/helpers/dates');
 const findStatus = require('../../lib/helpers/findStatus');
 const amountFormat = require('../../lib/helpers/amountFormat');
 const func = require('../../applications/WASL/mappingFunctions/ejariData/getEjariData');
-
+const typeDataRepo = require('../../lib/repositories/typeData');
 const pg = require('../../core/api/connectors/postgress');
 
 function paymentInstrumentReport(payload) {
-
     return new Promise((resolve, reject) => {
         let criteria = { body:{}, page : { pageSize : 10000, currentPageNo: 1}};
         if(!_.isEmpty(payload.query)){
@@ -23,11 +22,11 @@ function paymentInstrumentReport(payload) {
             if(!_.isEmpty(payload.query.contractRef)){
                 criteria.body.contractRef = _.get(payload.query,'contractRef.$in[0]','');
             }
-            if(!_.isEmpty(payload.query.status)){
-                criteria.body.status = _.get(payload.query,'status.$in[0]','');
+            if(!_.isEmpty(payload.query.instrumentStatus)){
+                criteria.body.status = _.get(payload.query,'instrumentStatus.$in[0]','');
             }
             if(!_.isEmpty(payload.query.paymentMethod)){
-                criteria.body.status = _.get(payload.query,'paymentMethod.$in[0]','');
+                criteria.body.paymentMethod = _.get(payload.query,'paymentMethod.$in[0]','');
             }
         }
 
@@ -47,13 +46,13 @@ function paymentInstrumentReport(payload) {
                          payment."tranxData" -> 'date' as "dueDate",
                          payment."tranxData" -> 'status' as "status"
                          FROM "Contracts" as contract, "kycCollections" as kyc, "PaymentInstruments" as payment
-                         where contract."tranxData" ->> 'EID' = kyc."tranxData" -> 'SDG' ->> 'emiratesID' 
+                         where contract."tranxData" ->> 'EIDA' = kyc."tranxData" -> 'SDG' ->> 'emiratesID' 
                          and contract."tranxData" ->> 'contractID' = payment."tranxData" ->> 'contractID'`;
 
         if (criteria.body && criteria.body.toDate && criteria.body.fromDate) {
             let fromdate = criteria.body.fromDate;
             let todate = criteria.body.toDate;
-            queryfull += ` AND contract."tranxData" ->> 'contractEndDate' between '${fromdate}' AND '${todate}'`;
+            queryfull += ` AND cast(contract."tranxData" ->> 'tranDate' as bigint) <= ${todate} OR cast(contract."tranxData" ->> 'tranDate' as bigint) >= ${fromdate} `;
         }
 
         if(!_.isEmpty(criteria.body.contractRef)){
@@ -61,18 +60,27 @@ function paymentInstrumentReport(payload) {
         }
 
         if(!_.isEmpty(criteria.body.status)){
-            queryfull += ` AND contract."tranxData" ->> 'contractStatus' = '${criteria.body.status}'`;
+            queryfull += ` AND payment."tranxData" ->> 'status' = '${criteria.body.status}'`;
+        }
+
+        if(!_.isEmpty(criteria.body.paymentMethod)){
+            queryfull += ` AND contract."tranxData" ->> 'paymentMethod' = '${criteria.body.paymentMethod}'`;
         }
 
         if (payload.page) {
             queryfull += ` order by contract."tranxData" ->> 'date' desc limit ${criteria.page.pageSize} OFFSET ${criteria.page.pageSize * (criteria.page.currentPageNo - 1)}) as res`;
         }
 
-        pg.connection().then((conn) => {
-            return conn.query(queryfull, [])
-                .then((bouncedChequeData) => {
-                    let Data = _.get(bouncedChequeData, 'rows', []);
-                    Data = formatter(Data);
+        pg.connection()
+            .then((conn) => {
+                Promise.all([
+                    conn.query(queryfull, []),
+                    valueMap("Instrument_Status"),
+                    valueMap("InstrumentType")
+                ])
+                    .then((data) => {
+                    let Data = _.get(data[0], 'rows', []);
+                    Data = formatter(Data,data[1],data[2]);
                     resolve(
                         {
                             totalTransactions: Data.length,
@@ -90,7 +98,7 @@ function paymentInstrumentReport(payload) {
 }
 
 
-function formatter(data){
+function formatter(data,typeData1,typeData2){
     let formatedData = [];
     let obj;
     for(let val of data){
@@ -104,14 +112,20 @@ function formatter(data){
                 obj.Bank = _.get(val,'bank','');
                 obj.DOSPreApprovedNo = _.get(val,'DDSPreApproveNo','');
                 obj.Amount = _.get(val,'amount','');
-                obj.InstrumentType =  _.get(val,'paymentMethod','');
+                obj.InstrumentType =  _.get(_.find(typeData2, {value: _.get(val,'paymentMethod','') }), 'label', '');
                 obj.InstrumentNo = _.get(val,'instrumentNo','');
                 obj.DueDate  = dates.MMddyyyy(+_.get(val,'dueDate',''));
                 obj.TranDate  = dates.MMddyyyy(+_.get(val,'tranDate',0));
-                obj.Status  = _.get(val,'status','');
+                obj.Status  =_.get(_.find(typeData1, {value: _.get(val,'status','') }), 'label', '');
                 formatedData.push(obj);
             }
     return formatedData;
+}
+
+
+function valueMap(name){
+    return typeDataRepo.findFields(name)
+        .then((res) => _.get(res,`data.${name}`,[]))
 }
 
 
