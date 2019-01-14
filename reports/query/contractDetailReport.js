@@ -6,6 +6,7 @@ const findStatus = require('../../lib/helpers/findStatus');
 const amountFormat = require('../../lib/helpers/amountFormat');
 const func = require('../../applications/WASL/mappingFunctions/ejariData/getEjariData');
 const pg = require('../../core/api/connectors/postgress');
+const typeDataRepo = require('../../lib/repositories/typeData');
 
 function contractDetailReport(payload) {
     return new Promise((resolve, reject) => {
@@ -20,8 +21,8 @@ function contractDetailReport(payload) {
             if(!_.isEmpty(payload.query.contractRef)){
                 criteria.body.contractRef = _.get(payload.query,'contractRef.$in[0]','');
             }
-            if(!_.isEmpty(payload.query.status)){
-                criteria.body.status = _.get(payload.query,'status.$in[0]','');
+            if(!_.isEmpty(payload.query.contractStatus)){
+                criteria.body.status = _.get(payload.query,'contractStatus.$in[0]','');
             }
         }
 
@@ -42,32 +43,31 @@ function contractDetailReport(payload) {
                          FROM "Contracts" as contract, "kycCollections" as kyc
                          where contract."tranxData" ->> 'EID' = kyc."tranxData" -> 'SDG' ->> 'emiratesID'`;
 
-
-
         if (criteria.body && criteria.body.toDate && criteria.body.fromDate) {
             let fromdate = criteria.body.fromDate;
             let todate = criteria.body.toDate;
-            queryfull += ` AND contract."tranxData" ->> 'contractEndDate' between '${fromdate}' AND '${todate}'`;
+             queryfull += ` AND cast(contract."tranxData" ->> 'tranDate' as bigint) <= ${todate} OR cast(contract."tranxData" ->> 'tranDate' as bigint) >= ${fromdate} `;
         }
 
         if(!_.isEmpty(criteria.body.contractRef)){
             queryfull += ` AND contract."tranxData" ->> 'contractReference' = '${criteria.body.contractRef}'`;
         }
-
         if(!_.isEmpty(criteria.body.status)){
             queryfull += ` AND contract."tranxData" ->> 'contractStatus' = '${criteria.body.status}'`;
         }
-
         if (payload.page) {
             queryfull += ` order by contract."tranxData" ->> 'date' desc limit ${criteria.page.pageSize} OFFSET ${criteria.page.pageSize * (criteria.page.currentPageNo - 1)}) as res`;
         }
-
-
-        pg.connection().then((conn) => {
-            return conn.query(queryfull, [])
-                .then((bouncedChequeData) => {
-                    let Data = _.get(bouncedChequeData, 'rows', []);
-                    Data = formatter(Data);
+        pg.connection()
+            .then((conn) => {
+                Promise.all([
+                    conn.query(queryfull, []),
+                    valueMap("Contract_Status"),
+                    valueMap("InstrumentType")
+                ])
+                    .then((data) => {
+                    let Data = _.get(data[0], 'rows', []);
+                    Data = formatter(Data,data[1],data[2]);
 
                     resolve(
                         {
@@ -78,7 +78,7 @@ function contractDetailReport(payload) {
                         });
                 });
         }).catch((err) => {
-            console.log("ERROR : ", err)
+            console.log("ERROR : ", err);
             reject(err);
         });
 
@@ -86,7 +86,7 @@ function contractDetailReport(payload) {
 }
 
 
-function formatter(data){
+function formatter(data,typeData,typeData2){
     let formatedData = [];
         let obj;
         for(let val of data){
@@ -99,17 +99,22 @@ function formatter(data){
             obj.Email = _.get(val,'email','');
             obj.EmiratesID = _.get(val,'emiratesID','');
             obj.BusinessPartnerNo = _.get(val,'businessPartnerNumber','');
-            obj.ContractStatus = _.get(val,'contractStatus','');
             obj.RentAmount = _.get(val,'contractAmount','');
             obj.TranDate = _.get(val,'tranDate','');
-            obj.PaymentMethod = _.get(val,'paymentMethod','');
+            obj.PaymentMethod = _.get(_.find(typeData2, {value: _.get(val,'paymentMethod','') }), 'label', '');
             obj.EjariNumber = _.get(val,'ejariNumber','');
-            obj.Status = _.get(val,'contractStatus','');
+            obj.Status = _.get(_.find(typeData, {value: _.get(val,'contractStatus','') }), 'label', '');
             obj.ContractStartDate =  dates.MMddyyyy(+_.get(val,'contractStartDate',''));
             obj.ContractEndDate = dates.MMddyyyy(+_.get(val,'contractEndDate',''));
             formatedData.push(obj);
         }
         return formatedData;
+}
+
+
+function valueMap(name){
+    return typeDataRepo.findFields(name)
+        .then((res) => _.get(res,`data.${name}`,[]))
 }
 
 module.exports = contractDetailReport;
