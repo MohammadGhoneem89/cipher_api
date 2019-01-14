@@ -9,7 +9,7 @@
     "getDBFields": {
       "customMapping": true,
       "MappingfunctionName": "getDBFields",
-      "CustomMappingFile": "getDBFields.js",
+      "CustomMappingFile": "getDBFields/index.js",
       "mappingConfigFile": "ePayMapping"
     },
     "getAdaptorsList": {

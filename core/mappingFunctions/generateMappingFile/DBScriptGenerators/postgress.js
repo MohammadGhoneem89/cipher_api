@@ -4,7 +4,14 @@ module.exports = function (payload) {
         if (fields.length !== 0) {
             fields += ' ,'
         }
-        fields += ` "${payload.fields[i].name}" as ${payload.fields[i].as}`;
+        let fieldName = payload.fields[i].name;
+        if(fieldName.includes('->')){
+            const index = fieldName.indexOf('->');
+            fieldName = "\""+fieldName.substr(0, index) + "\"" + fieldName.substr(index);
+        } else {
+            fieldName = "\""+fieldName+"\""
+        }
+        fields += ` ${fieldName} as ${payload.fields[i].as}`;
     }
     let pagingData = '';
     if (payload.enablePaging) {
