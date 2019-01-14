@@ -36,11 +36,13 @@ let data = {
     "conditions": [
         {
             "name": "suppliername",
-            "value": "name"
+            "value": "name",
+            "operator": "="
         },
         {
             "name": "type",
-            "value": "type"
+            "value": "type",
+            "operator": "="
         }
     ],
     "fields": [

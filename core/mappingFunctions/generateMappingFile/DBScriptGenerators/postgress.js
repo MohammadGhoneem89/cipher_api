@@ -4,7 +4,6 @@ module.exports = function (payload) {
         if (fields.length !== 0) {
             fields += ' ,'
         }
-
         const names = payload.fields[i].name.split('->');
         let fieldName = "";
         for (let i = 0; i < names.length; i++) {
@@ -20,7 +19,7 @@ module.exports = function (payload) {
     }
     let pagingData = '';
     if (payload.enablePaging) {
-        pagingData = 'LIMIT ${payload.paging.size},${payload.paging.offset}'
+        pagingData = 'LIMIT ${payload.page.pageSize},${payload.page.toSkip}'
     }
     let valuesString = '';
     let queryString = '';
@@ -41,7 +40,7 @@ module.exports = function (payload) {
                     fieldName += '->' + "'" + names[i] + "'";
                 }
             }
-            conditions += ` ${fieldName} = $${i + 1}`;
+            conditions += ` ${fieldName} ${payload.conditions[i].operator || "="} $${i + 1}`;
             if (valuesString.length > 0) {
                 valuesString += ',';
             }
