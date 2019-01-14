@@ -10,6 +10,8 @@ module.exports = function (payload) {
         for (let i = 0; i < names.length; i++) {
             if (i === 0) {
                 fieldName = "\"" + names[i] + "\"";
+            } else if (i === names.length - 1) {
+                fieldName += '->>' + "'" + names[i] + "'";
             } else {
                 fieldName += '->' + "'" + names[i] + "'";
             }
