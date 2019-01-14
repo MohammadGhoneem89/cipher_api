@@ -7,7 +7,7 @@ function flatten(data, acc) {
                 if (label.includes('->>')) {
                     return key + '->' + label;
                 } else {
-                    return key + '->>\'' + label + '\'';
+                    return key + '->>' + label;
                 }
             })
             acc = acc.concat(extra);
