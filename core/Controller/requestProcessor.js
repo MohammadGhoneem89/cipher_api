@@ -16,8 +16,7 @@ module.exports = class GeneralRequestProcessor {
   processIncommingMessage() {
     return new Promise((resolve, reject) => {
       let promiseList = [];
-
-      let objMapper = new ObjectMapper(this.request, this.configdata.RequestMapping, global.enumInfo, this.UUID, this.JWTokenData);
+      let objMapper = new ObjectMapper(this.request, this.configdata.RequestMapping, global.enumInfo, this.UUID, this.JWTokenData, 'Request');
       if (this.configdata.isValBypass === false) {
         promiseList.push(objMapper.start());
       }
