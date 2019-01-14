@@ -16,7 +16,7 @@ const getDBFields = async function (payload, UUIDKey, route, callback, JWToken) 
       case 'postgres':
         if (payload.objectType === 'table') {
           const query = {
-            text: `select * from  ${payload.object} where false;`,
+            text: `select * from  "${payload.object}" where false;`,
             values: []
           };
           const data = await instance.query(query);
