@@ -4,12 +4,15 @@ module.exports = function (payload) {
         if (fields.length !== 0) {
             fields += ' ,'
         }
-        let fieldName = payload.fields[i].name;
-        if(fieldName.includes('->')){
-            const index = fieldName.indexOf('->');
-            fieldName = "\""+fieldName.substr(0, index) + "\"" + fieldName.substr(index);
-        } else {
-            fieldName = "\""+fieldName+"\""
+
+        const names = payload.fields[i].name.split('->');
+        let fieldName = "";
+        for (let i = 0; i < names.length; i++) {
+            if (i === 0) {
+                fieldName = "\"" + names[i] + "\"";
+            } else {
+                fieldName += '->' + "'" + names[i] + "'";
+            }
         }
         fields += ` ${fieldName} as ${payload.fields[i].as}`;
     }
