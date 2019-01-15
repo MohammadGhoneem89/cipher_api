@@ -25,7 +25,7 @@ function _upsert(payload, callback) {
               status: 'OK',
               errorDescription: 'Endpoint updated successfully',
               displayToUser: true,
-              newPageURL: '/userList'
+              newPageURL: '/endpoint'
             }
           }
         }
