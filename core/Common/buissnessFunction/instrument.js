@@ -193,41 +193,57 @@ module.exports = {
     }
   },
 
-  ParseKYCDetail: (data, payload, jwt) => {
+  ParseKYCDetailGDRFA: (data, payload, jwt) => {
 
 
     try {
       let result = JSON.parse(data);
-      let dateOfBirth = _.get(result, "GDRFA.dateOfBirth", undefined);
-      let natIdExpDate = _.get(result, "GDRFA.natIdExpDate", undefined);
-      let passportIssueDate = _.get(result, "GDRFA.passport.passportIssueDate", undefined);
-      let passportExpiryDate = _.get(result, "GDRFA.passport.passportExpiryDate", undefined);
-      let visaIssueDate = _.get(result, "GDRFA.visaIssueDate", undefined);
-      let visaExpiryDate = _.get(result, "GDRFA.visaExpiryDate", undefined);
-      let lastSyncDate = _.get(result, "GDRFA.lastSyncDate", undefined);  
-      let sdgVisaExpiryDate = _.get(result, "SDG.visaExpiryDate", undefined);
-
-
-      _.get(result, "GDRFA.dateOfBirth", dateOfBirth >= 0 ? dates.MSddMMyyyyHHmmS(dateOfBirth) : undefined);
-      _.get(result, "GDRFA.natIdExpDate", natIdExpDate >= 0 ? dates.MSddMMyyyyHHmmS(natIdExpDate) : undefined);
-      _.get(result, "GDRFA.passport.passportIssueDate", passportIssueDate >= 0 ? dates.MSddMMyyyyHHmmS(passportIssueDate) : undefined);
-      _.get(result, "GDRFA.passport.passportExpiryDate", passportExpiryDate >= 0 ? dates.MSddMMyyyyHHmmS(passportExpiryDate) : undefined);
-      _.get(result, "GDRFA.visaIssueDate", visaIssueDate >= 0 ? dates.MSddMMyyyyHHmmS(visaIssueDate) : undefined);
-      _.get(result, "GDRFA.visaExpiryDate", visaExpiryDate >= 0 ? dates.MSddMMyyyyHHmmS(visaExpiryDate) : undefined);
-      _.get(result, "GDRFA.lastSyncDate", lastSyncDate >= 0 ? dates.MSddMMyyyyHHmmS(lastSyncDate) : undefined);      
-      _.get(result, "SDG.visaExpiryDate", sdgVisaExpiryDate >= 0 ? dates.MSddMMyyyyHHmmS(sdgVisaExpiryDate) : undefined);
-
-      _.set(result, 'GDRFA.emiratesIDExpiryDate', undefined);
-      _.set(result, 'GDRFA.phoneNo', _.get(result, "GDRFA.phoneNO", undefined));
-      _.set(result, 'GDRFA.phoneNO',  undefined);
       
-      _.set(result, 'GDRFA.natId', _.get(result, "GDRFA.natID", undefined));
-      _.set(result, 'GDRFA.natID',  undefined);
+      let dateOfBirth = _.get(result, "dateOfBirth", undefined);
+      let natIdExpDate = _.get(result, "natIdExpDate", undefined);
+      let passportIssueDate = _.get(result, "passport.passportIssueDate", undefined);
+      let passportExpiryDate = _.get(result, "passport.passportExpiryDate", undefined);
+      let visaIssueDate = _.get(result, "visaIssueDate", undefined);
+      let visaExpiryDate = _.get(result, "visaExpiryDate", undefined);
+      let lastSyncDate = _.get(result, "lastSyncDate", undefined);  
+      
 
-      _.set(result, 'GDRFA.natIdExpDate', _.get(result, "GDRFA.natIDExpDate", undefined));
-      _.set(result, 'GDRFA.natIDExpDate',  undefined);
+
+      _.get(result, "dateOfBirth", dateOfBirth >= 0 ? dates.MSddMMyyyyHHmmS(dateOfBirth) : undefined);
+      _.get(result, "natIdExpDate", natIdExpDate >= 0 ? dates.MSddMMyyyyHHmmS(natIdExpDate) : undefined);
+      _.get(result, "passport.passportIssueDate", passportIssueDate >= 0 ? dates.MSddMMyyyyHHmmS(passportIssueDate) : undefined);
+      _.get(result, "passport.passportExpiryDate", passportExpiryDate >= 0 ? dates.MSddMMyyyyHHmmS(passportExpiryDate) : undefined);
+      _.get(result, "visaIssueDate", visaIssueDate >= 0 ? dates.MSddMMyyyyHHmmS(visaIssueDate) : undefined);
+      _.get(result, "visaExpiryDate", visaExpiryDate >= 0 ? dates.MSddMMyyyyHHmmS(visaExpiryDate) : undefined);
+      _.get(result, "lastSyncDate", lastSyncDate >= 0 ? dates.MSddMMyyyyHHmmS(lastSyncDate) : undefined);      
+      
+
+      _.set(result, 'emiratesIDExpiryDate', undefined);
+      _.set(result, 'phoneNo', _.get(result, "phoneNO", undefined));
+      _.set(result, 'phoneNO',  undefined);
+      
+      _.set(result, 'natId', _.get(result, "natID", undefined));
+      _.set(result, 'natID',  undefined);
+
+      _.set(result, 'natIdExpDate', _.get(result, "natIDExpDate", undefined));
+      _.set(result, 'natIDExpDate',  undefined);
 
 
+      return result;
+
+    } catch (ex) {
+      console.log(ex);
+      return jsonParseNoError(data, payload, jwt);
+    }
+  },
+
+  ParseKYCDetailSDG: (data, payload, jwt) => {
+
+
+    try {
+      let result = JSON.parse(data);    
+      let sdgVisaExpiryDate = _.get(result, "visaExpiryDate", undefined);
+      _.set(result, "visaExpiryDate", sdgVisaExpiryDate >= 0 ? dates.MSddMMyyyyHHmmS(sdgVisaExpiryDate) : undefined);
       return result;
 
     } catch (ex) {
