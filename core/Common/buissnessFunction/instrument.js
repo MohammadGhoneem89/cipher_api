@@ -170,7 +170,7 @@ module.exports = {
     }
 
     try {
-      let result = JSON.parse(data);
+      let result = data;
       let startDate = _.get(result, "contractStartDate", undefined);
       let EndDate = _.get(result, "contractEndDate", undefined);
       result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyyHHmmS(startDate) : undefined;
