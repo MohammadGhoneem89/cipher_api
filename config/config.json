@@ -5,7 +5,7 @@
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
     },
-    "url": "http://blockchain.avanza.com:9019/keyVault"
+    "url": "http://wasl.avanza.com:9019/keyVault"
   },
   "coreDB":{
     "env": "core_database_list",
