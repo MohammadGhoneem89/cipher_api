@@ -2,6 +2,7 @@ const mongo = require('./mongoose');
 const amqp = require('./amqp');
 const redis = require('./redis');
 const pg = require('./pg');
+const sequelize = require('./sequelize');
 
 module.exports = {
     createClient: async function (type, connectionURL) {
@@ -19,9 +20,9 @@ module.exports = {
             case 'pg':
                 client = await pg(connectionURL);
                 break;
-            case 'postgres':
-                client = await pg(connectionURL);
-            break;
+            case 'sequelize':
+                client = await sequelize(connectionURL);
+                break;
         }
         return client;
     }

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path')
-module.exports = function (name, file, isActions, callback) {
+module.exports = function (useCase, route, file, isActions, callback) {
+    const name = useCase+"_"+route;
     let actions = '';
     if (isActions) {
         actions = `for(let i=0;i<response.length;i++){
@@ -14,14 +15,15 @@ module.exports = function (name, file, isActions, callback) {
             }]
         }`
     }
-    let overall = `const keyVaultRepo = require('../../../lib/repositories/keyVault');\n
+    let overall = `  const Sequelize = require('sequelize');\n
+    const keyVaultRepo = require('../../../lib/repositories/keyVault');\n
     const client = require('../../api/client');
     \nconst execute = async function (payload, UUIDKey, route, callback, JWToken) {
         try{
             ${file}
             \n${actions}
             callback({
-                dbExecution: {
+                "${route}": {
                     data:response}});
         } catch(err){
             callback({error: err})

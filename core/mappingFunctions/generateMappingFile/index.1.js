@@ -1,5 +1,5 @@
 const generateFileContent = require('./writeToFile')
-const postgres = require('./DBScriptGenerators/sql');
+const postgres = require('./DBScriptGenerators/postgress');
 
 const generateMappingFile = async function (payload, UUIDKey, route, callback, JWToken) {
     let file;
@@ -13,7 +13,7 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
             default:
                 throw 'Not found';
         }
-        generateFileContent(payload.useCase,payload.route,file, payload.enableActions, callback);
+        generateFileContent((payload.useCase+"_"+payload.route),file, payload.enableActions, callback);
     } catch (err) {
         //logger.debug(" [ DB ] ERROR : " + err);
         console.log(err)
