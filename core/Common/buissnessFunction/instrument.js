@@ -78,8 +78,9 @@ module.exports = {
         element.beneficiaryData = element.beneficiaryData ? JSON.parse(element.beneficiaryData) : undefined;
       });
       _.set(result,'instrumentList',undefined);
+      _.set(result,'instrumentDetail',undefined);
       return result;
-
+      
     } catch (ex) {
       console.log(ex);
       return jsonParseNoError(data, payload, jwt);
