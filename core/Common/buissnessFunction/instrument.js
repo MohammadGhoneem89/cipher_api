@@ -88,6 +88,10 @@ module.exports = {
       _.set(result, 'contractSignedHash', undefined);
       _.set(result, 'CRMTicketNo', undefined);
       _.set(result, 'ejariData.contractID', undefined);
+      _.set(result, 'terminationDate', undefined);
+      _.set(result, 'terminationReason', undefined);
+      _.set(result, 'tranDate', undefined);
+      
       return result;
 
     } catch (ex) {
