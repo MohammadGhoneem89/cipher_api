@@ -114,7 +114,7 @@ module.exports = {
       contract.contractEndDate = result.contractEndDate
       contract.oldEjariNumber = result.oldEjariNumber
       contract.paymentCount = result.paymentCount
-      contract.userReferenceNo = result.userReferenceNo
+      contract.userReferenceNo = result.userReferenceNo || ""
      
 
       return contract;
