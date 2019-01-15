@@ -79,12 +79,13 @@ module.exports = {
 
         _.set(element, 'contractID', undefined);
         _.set(element, 'documentName', undefined);
-        _.set(element, 'Key', undefined);
+        _.set(element, 'key', undefined);
         _.set(element, 'failureReason', undefined);
       });
       
       _.set(result, 'documentName', undefined);
-      _.set(result, 'Key', undefined);
+      _.set(result, 'key', undefined);
+      _.set(result, 'EIDA', undefined);
       _.set(result, 'instrumentList', undefined);
       _.set(result, 'instrumentDetail', undefined);
       _.set(result, 'checkKYCStatus', undefined);
@@ -120,7 +121,7 @@ module.exports = {
 
         _.set(element, 'contractID', undefined);
         _.set(element, 'documentName', undefined);
-        _.set(element, 'Key', undefined);
+        _.set(element, 'key', undefined);
         _.set(element, 'failureReason', undefined);
 
         _.set(element, 'cancellationReason', undefined);
@@ -132,7 +133,7 @@ module.exports = {
       });
         
       _.set(result, 'documentName', undefined);
-      _.set(result, 'Key', undefined);
+      _.set(result, 'key', undefined);
       _.set(result, 'instrumentList', undefined);
       _.set(result, 'instrumentDetail', undefined);
       _.set(result, 'checkKYCStatus', undefined);
