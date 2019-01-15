@@ -197,7 +197,7 @@ module.exports = {
 console.log("THIS IS MY VALUE---------->",data);
 
     try {    
-      let result = JSON.parse(data);
+      let result = data;
       
       let dateOfBirth = _.get(result, "dateOfBirth", undefined);
       let natIdExpDate = _.get(result, "natIdExpDate", undefined);
@@ -241,7 +241,7 @@ console.log("THIS IS MY VALUE---------->",data);
 
 
     try {
-      let result = JSON.parse(data);    
+      let result = data;    
       let sdgVisaExpiryDate = _.get(result, "visaExpiryDate", undefined);
       _.set(result, "visaExpiryDate", sdgVisaExpiryDate >= 0 ? dates.MSddMMyyyyHHmmS(sdgVisaExpiryDate) : undefined);
       return result;
