@@ -39,7 +39,7 @@ function getEjariData(payload, UUIDKey, route, callback, JWToken) {
             .then((ejariData) => {
             let Data = ejariData.rows[0] || {};
                 Data = Data.data || [];
-                res.contractDetail = ejariFormatter(Data);
+                res.contractDetail = ejariFormatter(Data)[0] || {};
                 return callback(res);
         });
     }).catch((err) => {
