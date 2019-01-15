@@ -3,7 +3,7 @@
 let rp=require('request-promise')
 async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
   try {
-    console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
+    console.log("<<<Request Recieved for Event>>>>")
     console.log(JSON.stringify(payload.eventName, null, 2))
 
     switch (payload.eventName) {
@@ -13,11 +13,6 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
           return getPromise(payload,TerminateContract,callback)
         }
 
-
-      case "EjariData":
-        {
-          return getPromise(payload,EjariAvailable,callback)
-        }
       case "TerminateContract":
         {
           return getPromise(payload,TerminateContract,callback)
@@ -79,30 +74,7 @@ function TerminateContract() {
   };
   return rp(options);
 }
-function EjariAvailable(){
-  var options = {
-    method: 'POST',
-    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
-    qs: { eventName: 'ejariAvailable' },
-    body:
-    {
-      header:
-      {
-        username: 'api_user',
-        password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-      },
-      body:
-      {
-        contractID: '4323940',
-        ejariID: '389492834',
-        date: '05/11/2018'
-      }
-    },
-    json: true
-  };
 
-  return rp(options);
-}
 async function getPromise(payload,func,callback){
   func().then(function (body) {
     console.log(payload.eventName+ " dispatched", body)
