@@ -1,10 +1,3 @@
-/*
-const sequelize = new Sequelize("postgresql://Admin:avanza123@51.140.250.28:5432/WASL", {})
-sequelize.query("SELECT * FROM \"qDocs\"", { type: sequelize.QueryTypes.SELECT})
-  .then(users => {
-      //console.log(users)
-    // We don't need spread here, since only the results will be returned for select queries
-  })*/
 module.exports = (data) => {
     let fields = '{';
     let whereFields = '{';
