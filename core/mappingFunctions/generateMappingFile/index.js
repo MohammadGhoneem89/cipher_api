@@ -1,12 +1,12 @@
 const generateFileContent = require('./writeToFile')
-const postgres = require('./DBScriptGenerators/sql');
+const sql = require('./DBScriptGenerators/sql');
 
 const generateMappingFile = async function (payload, UUIDKey, route, callback, JWToken) {
     let file;
     try {
         switch (payload.database) {
             case 'postgres':
-                file = postgres(payload);
+                file = sql(payload);
                 break;
             case 'mongo':
                 break;
@@ -50,7 +50,11 @@ let data = {
             "name": "refNo",
             "as": "reference"
         }
-    ]
+    ],
+      "page": {
+    "pageSize": 1,
+    "currentPageNo": 2
+  }
 }
 
 generateMappingFile(data, '', '', (data) => {
