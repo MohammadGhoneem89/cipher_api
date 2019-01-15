@@ -76,9 +76,18 @@ module.exports = {
         element.providerMetaData = element.providerMetaData ? JSON.parse(element.providerMetaData) : undefined;
         element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
         element.beneficiaryData = element.beneficiaryData ? JSON.parse(element.beneficiaryData) : undefined;
+
+        _.set(element, 'contractID', undefined);
+        _.set(element, 'documentName', undefined);
+        _.set(element, 'Key', undefined);
+        _.set(element, 'failureReason', undefined);
       });
       _.set(result, 'instrumentList', undefined);
       _.set(result, 'instrumentDetail', undefined);
+      _.set(result, 'checkKYCStatus', undefined);
+      _.set(result, 'contractSignedHash', undefined);
+      _.set(result, 'CRMTicketNo', undefined);
+      _.set(result, 'ejariData.contractID', undefined);
       return result;
 
     } catch (ex) {
@@ -97,9 +106,6 @@ module.exports = {
       "paymentCount": "",
       "userReferenceNo": "",
     }
-
-
-
 
     try {
       let result = JSON.parse(data);
