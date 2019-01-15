@@ -61,6 +61,7 @@ module.exports = (data) => {
     };
 
     let toEmit = `
+    const dbConfig = await keyVaultRepo.getDBConfig('postgres', '${payload.adaptor}');           
   const instance = await client.createClient('sequelize', dbConfig.connection);
   const Model = instance.define("${data.object}", ${fields});
   let queryOptions = ${JSON.stringify(queryOptions)};`
