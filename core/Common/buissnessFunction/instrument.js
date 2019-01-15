@@ -77,10 +77,48 @@ module.exports = {
         element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
         element.beneficiaryData = element.beneficiaryData ? JSON.parse(element.beneficiaryData) : undefined;
       });
-      _.set(result,'instrumentList',undefined);
-      _.set(result,'instrumentDetail',undefined);
+      _.set(result, 'instrumentList', undefined);
+      _.set(result, 'instrumentDetail', undefined);
       return result;
-      
+
+    } catch (ex) {
+      console.log(ex);
+      return jsonParseNoError(data, payload, jwt);
+    }
+  },
+
+  ParseContractDataForEjari: (data, payload, jwt) => {
+    let contract = {
+      "contractID": "",
+      "contractAmount": "",
+      "contractStartDate": "",
+      "contractEndDate": "",
+      "oldEjariNumber": "",
+      "paymentCount": "",
+      "userReferenceNo": "",
+    }
+
+
+
+
+    try {
+      let result = JSON.parse(data);
+      let startDate = _.get(result, "contractStartDate", undefined);
+      let EndDate = _.get(result, "contractEndDate", undefined);
+      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyyHHmmS(startDate) : undefined;
+      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyyHHmmS(EndDate) : undefined;
+
+      contract.contractID = result.contractID
+      contract.contractAmount = result.contractAmount
+      contract.contractStartDate = result.contractStartDate
+      contract.contractEndDate = result.contractEndDate
+      contract.oldEjariNumber = result.oldEjariNumber
+      contract.paymentCount = result.paymentCount
+      contract.userReferenceNo = result.userReferenceNo
+     
+
+      return contract;
+
     } catch (ex) {
       console.log(ex);
       return jsonParseNoError(data, payload, jwt);
