@@ -62,7 +62,7 @@ module.exports = {
       return jsonParseNoError(data, payload, jwt);
     }
   },
-  translateIntrumentArrayWithoutIIP: (data, payload, jwt) => {
+  ParseContractDataForPM: (data, payload, jwt) => {
     try {
       let result = JSON.parse(data);
       let startDate = _.get(result, "contractStartDate", undefined);
@@ -79,9 +79,13 @@ module.exports = {
 
         _.set(element, 'contractID', undefined);
         _.set(element, 'documentName', undefined);
-        _.set(element, 'Key', undefined);
+        _.set(element, 'key', undefined);
         _.set(element, 'failureReason', undefined);
       });
+      
+      _.set(result, 'documentName', undefined);
+      _.set(result, 'key', undefined);
+      _.set(result, 'EIDA', undefined);
       _.set(result, 'instrumentList', undefined);
       _.set(result, 'instrumentDetail', undefined);
       _.set(result, 'checkKYCStatus', undefined);
@@ -91,7 +95,56 @@ module.exports = {
       _.set(result, 'terminationDate', undefined);
       _.set(result, 'terminationReason', undefined);
       _.set(result, 'tranDate', undefined);
-      
+
+      return result;
+
+    } catch (ex) {
+      console.log(ex);
+      return jsonParseNoError(data, payload, jwt);
+    }
+  },
+
+  ParseContractDataForBank: (data, payload, jwt) => {
+    try {
+      let result = JSON.parse(data);
+      let startDate = _.get(result, "contractStartDate", undefined);
+      let EndDate = _.get(result, "contractEndDate", undefined);
+      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyyHHmmS(startDate) : undefined;
+      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyyHHmmS(EndDate) : undefined;
+
+      result.paymentInstruments.forEach((element, index) => {
+        element.date = dates.MSddMMyyyyHHmmS(element.date);
+        element.amount = String(element.amount) || "0";
+        element.providerMetaData = element.providerMetaData ? JSON.parse(element.providerMetaData) : undefined;
+        element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
+        element.beneficiaryData = element.beneficiaryData ? JSON.parse(element.beneficiaryData) : undefined;
+
+        _.set(element, 'contractID', undefined);
+        _.set(element, 'documentName', undefined);
+        _.set(element, 'key', undefined);
+        _.set(element, 'failureReason', undefined);
+
+        _.set(element, 'cancellationReason', undefined);
+        _.set(element, 'replacementReason', undefined);
+        _.set(element, 'newInstrumentRefNo', undefined);
+        _.set(element, 'oldInstrumentRefNo', undefined);
+        _.set(element, 'failureDescription', undefined);
+        _.set(element, 'beneficiaryData', undefined);
+      });
+        
+      _.set(result, 'documentName', undefined);
+      _.set(result, 'key', undefined);
+      _.set(result, 'instrumentList', undefined);
+      _.set(result, 'instrumentDetail', undefined);
+      _.set(result, 'checkKYCStatus', undefined);
+      _.set(result, 'contractSignedHash', undefined);
+      _.set(result, 'CRMTicketNo', undefined);
+      _.set(result, 'ejariData.contractID', undefined);
+      _.set(result, 'terminationDate', undefined);
+      _.set(result, 'terminationReason', undefined);
+      _.set(result, 'tranDate', undefined);
+      _.set(result, 'ejariData', undefined);
+
       return result;
 
     } catch (ex) {
@@ -125,7 +178,7 @@ module.exports = {
       contract.oldEjariNumber = result.oldEjariNumber
       contract.paymentCount = result.paymentCount
       contract.userReferenceNo = result.userReferenceNo || ""
-     
+
 
       return contract;
 
