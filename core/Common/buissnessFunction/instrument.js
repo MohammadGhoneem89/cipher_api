@@ -194,9 +194,9 @@ module.exports = {
   },
 
   ParseKYCDetailGDRFA: (data, payload, jwt) => {
+console.log("THIS IS MY VALUE---------->",data);
 
-
-    try {
+    try {    
       let result = JSON.parse(data);
       
       let dateOfBirth = _.get(result, "dateOfBirth", undefined);
