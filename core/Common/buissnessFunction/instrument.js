@@ -157,7 +157,8 @@ module.exports = {
     }
   },
 
-  ParseContractDataForEjari: (result, payload, jwt) => {
+  ParseContractDataForEjari: (data, payload, jwt) => {
+    let result=JSON.parse(data)
     let contract = {}
     let startDate = _.get(result, "contractStartDate", undefined);
     let EndDate = _.get(result, "contractEndDate", undefined);
