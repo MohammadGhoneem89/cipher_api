@@ -56,7 +56,6 @@ module.exports = {
         element.beneficiaryData = element.beneficiaryData ? JSON.parse(element.beneficiaryData) : undefined;
       });
       return result;
-
     } catch (ex) {
       console.log(ex);
       return jsonParseNoError(data, payload, jwt);
@@ -158,39 +157,23 @@ module.exports = {
     }
   },
 
-  ParseContractDataForEjari: (data, payload, jwt) => {
-    let contract = {
-      "contractID": "",
-      "contractAmount": "",
-      "contractStartDate": "",
-      "contractEndDate": "",
-      "oldEjariNumber": "",
-      "paymentCount": "",
-      "userReferenceNo": "",
+  ParseContractDataForEjari: (result, payload, jwt) => {
+    let contract = {     
     }
-
-    try {
-      let result = data;
       let startDate = _.get(result, "contractStartDate", undefined);
       let EndDate = _.get(result, "contractEndDate", undefined);
       result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyyHHmmS(startDate) : undefined;
       result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyyHHmmS(EndDate) : undefined;
-
-      contract.contractID = result.contractID
-      contract.contractAmount = result.contractAmount
-      contract.contractStartDate = result.contractStartDate
-      contract.contractEndDate = result.contractEndDate
-      contract.oldEjariNumber = result.oldEjariNumber
-      contract.paymentCount = result.paymentCount
-      contract.userReferenceNo = result.userReferenceNo || ""
-
+      _.set(contract,'contractID',result.contractID)
+      _.set(contract,'contractAmount',result.contractAmount)
+      _.set(contract,'contractStartDate',result.contractStartDate)
+      _.set(contract,'contractEndDate',result.contractEndDate)
+      _.set(contract,'oldEjariNumber',result.oldEjariNumber)
+      _.set(contract,'paymentCount',result.paymentCount)
+      _.set(contract,'userReferenceNo',result.userReferenceNo,"")
 
       return contract;
-
-    } catch (ex) {
-      console.log(ex);
-      return jsonParseNoError(data, payload, jwt);
-    }
+    
   },
 
   ParseKYCDetailGDRFA: (data, payload, jwt) => {
