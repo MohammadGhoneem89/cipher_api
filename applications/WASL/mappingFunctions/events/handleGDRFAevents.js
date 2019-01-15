@@ -12,21 +12,7 @@ async function handleGDRFAevents(payload, UUIDKey, route, callback, JWToken) {
 
       case "EventOnRequestKYCUpdate":
         {
-          requestKYCDetail()
-            .then(function (body) {
-              // POST succeeded...
-              console.log("EventOnRequestKYCUpdate dispatched", body)
-            })
-            .catch(function (err) {
-              // POST failed...
-              console.log("Error : ", err)
-
-            });
-          callback({
-            error: false,
-            message: "EventOnRequestKYCUpdate dispatched"
-          })
-
+          return getPromise(payload,requestKYCDetail,callback)   
         }
       
       default:
@@ -64,4 +50,14 @@ function requestKYCDetail() {
 
 }
 
-
+async function getPromise(payload,func,callback){
+  func().then(function (body) {
+    console.log(payload.eventName+ " dispatched", body)
+  }).catch(function (err) {
+    console.log("error : ", err)
+  })
+  callback({
+    error: true,
+    message: payload.eventName +" dispatched"
+  })
+}

@@ -13,6 +13,7 @@ async function handleSDGevents(payload, UUIDKey, route, callback, JWToken) {
               error:false,
               message:"AddTenant"
             })
+            break;
           }
         case "Logout":
           {

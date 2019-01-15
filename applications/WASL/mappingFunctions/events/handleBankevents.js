@@ -9,15 +9,7 @@ async function handleBankevents(payload, UUIDKey, route, callback, JWToken) {
 
       case "ProcessInstrument":
         {
-          ProcessInstrument().then(function (body) {
-            console.log("ProcessInstrument dispatched", body)
-          }).catch(function (err) {
-            console.log("error : ", err)
-          })
-          callback({
-            error: true,
-            message: "ProcessInstrument dispatched"
-          })
+          return getPromise(payload,ProcessInstrument,callback)
         }
       case "AssociatePaymentInstruments":
         {
@@ -29,15 +21,7 @@ async function handleBankevents(payload, UUIDKey, route, callback, JWToken) {
         }
       case "UpdatePaymentInstrumentStatus":
         {
-          UpdatePaymentInstrumentStatus().then(function (body) {
-            console.log("UpdatePaymentInstrumentStatus dispatched", body)
-          }).catch(function (err) {
-            console.log("error : ", err)
-          })
-          callback({
-            error: true,
-            message: "UpdatePaymentInstrumentStatus dispatched"
-          })
+          return getPromise(payload,UpdatePaymentInstrumentStatus,callback)
         }
       case "EventOnUpdatePaymentStatus":
         {
@@ -46,11 +30,11 @@ async function handleBankevents(payload, UUIDKey, route, callback, JWToken) {
 
 
       default:
-        callback({
+        return callback({
           error: true,
           message: "invalid case"
         })
-        break;
+        
     }
   }
   catch (err) {
@@ -150,4 +134,16 @@ function UpdatePaymentInstrumentStatus() {
     json: true
   };
   return rp(options);
+}
+
+async function getPromise(payload,func,callback){
+  func().then(function (body) {
+    console.log(payload.eventName+ " dispatched", body)
+  }).catch(function (err) {
+    console.log("error : ", err)
+  })
+  callback({
+    error: true,
+    message: payload.eventName +" dispatched"
+  })
 }

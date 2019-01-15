@@ -18,6 +18,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
             error: false,
             message: "RenewContract"
           })
+         
         }
       case "UpdateContract":
         {
@@ -25,88 +26,35 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
             error: false,
             message: "UpdateContract"
           })
-
+         
         }
       case "EventOnUpdateFirstPaymentStatus":
-        {
-
-          options.body.eventName = payload.eventName
-          //payload is input and based on template we get the revised
-          //transformed json that we can pass to the REST Call
-          rp(options)
-            .then(function (body) {
-              // POST succeeded...
-              return true;
-            })
-            .catch(function (err) {
-              // POST failed...
-              return false;
-            });
+        { 
+          return getPromise(payload,UpdateContract,callback);
+        
         }
       case "EventOnUpdatePaymentStatus":
         {
-
+          return getPromise(payload,UpdateContract,callback);
+          
         }
-      case "EventOnEjariAvailable":
-        {
 
-        }
-      case "ReplacePaymentInstruments":
-        {
-
-        }
-      case "ReplacePaymentInstrumentsBackOffice":
-        {
-
-        }
-      case "TerminateContract":
-        {
-
-        }
-      case "EventOnTerminateContract":
-        {
-
-        }
-      case "EventOnUpdateKYCDetail":
-        {
-
-        }
       case "UpdateKYCDetail":
         {
-
-          updateKYCDetail().then(function (body) {
-            // POST succeeded...
-            console.log("updateKYCDetail dispatched", body)
-          })
-            .catch(function (err) {
-              // POST failed...
-              console.log("Error : ", err)
-
-            });
-          callback({
-            error: false,
-            message: "UpdateKYCDetail dispatched"
-          })
+          return getPromise(payload,updateKYCDetail,callback);
+          
         }
-        case "EjariData":
+      case "EjariData":
         {
-          EjariAvailable().then(function (body) {
-            console.log("EjariAvailable dispatched", body)
-          }).catch(function (err) {
-            console.log("error : ", err)
-          })
-          callback({
-            error: true,
-            message: "EjariAvailable dispatched"
-          })
+          return getPromise(payload,EjariAvailable,callback);
         }
 
       default:
-        callback({
+       return callback({
           error: true,
           message: "invalid case"
         })
-        break;
+        
     }
   }
   catch (err) {
@@ -118,11 +66,11 @@ exports.handlePMevents = handlePMevents
 
 
 
-function updateKYCDetail() {
+function updateKYCDetail(){
 
   let options = {
     method: 'POST',
-    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
+    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain' ,
     qs: { eventName: 'updateKYCDetail' },
     body:
     {
@@ -159,19 +107,59 @@ function updateKYCDetail() {
   return rp(options);
 }
 
-function EjariAvailable() {
-  var options = { method: 'POST',
-  url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
-  qs: { eventName: 'ejariAvailable' },
-  body: 
-   { header: 
-      { username: 'api_user',
-        password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b' },
-     body: 
-      { contractID: '4323940',
+function EjariAvailable(){
+  var options = {
+    method: 'POST',
+    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
+    qs: { eventName: 'ejariAvailable' },
+    body:
+    {
+      header:
+      {
+        username: 'api_user',
+        password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+      },
+      body:
+      {
+        contractID: '4323940',
         ejariID: '389492834',
-        date: '05/11/2018' } },
-  json: true };
+        date: '05/11/2018'
+      }
+    },
+    json: true
+  };
 
   return rp(options);
+}
+
+function UpdateContract(){
+  let options = {
+    method: 'POST',
+    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
+    qs: { eventName: 'updateContract' },
+    body:
+    {
+      header:
+      {
+        username: 'api_user',
+        password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+      },
+      body: { contractID: '389492834', CRMTicketNo: '389492833-11' }
+    },
+    json: true
+  };
+  return rp(options);
+}
+
+
+async function getPromise(payload,func,callback){
+  func().then(function (body) {
+    console.log(payload.eventName+ " dispatched", body)
+  }).catch(function (err) {
+    console.log("error : ", err)
+  })
+  callback({
+    error: true,
+    message: payload.eventName +" dispatched"
+  })
 }

@@ -1,44 +1,26 @@
 
 'use strict';
+let rp=require('request-promise')
 async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
-    console.log(JSON.stringify(payload.eventData, null, 2))
+    console.log(JSON.stringify(payload.eventName, null, 2))
 
-    switch (payload.eventData.eventName) {
+    switch (payload.eventName) {
 
-      case "EventOnRequestEjari":
+      case "EjariTerminationStatus":
         {
-          return callback({
-            error: false,
-            message: "EventOnRequestEjari"
-          })
+          return getPromise(payload,TerminateContract,callback)
         }
+
 
       case "EjariData":
         {
-          EjariAvailable().then(function (body) {
-            console.log("EjariAvailable dispatched", body)
-          }).catch(function (err) {
-            console.log("error : ", err)
-          })
-          callback({
-            error: true,
-            message: "EjariAvailable dispatched"
-          })
+          return getPromise(payload,EjariAvailable,callback)
         }
       case "TerminateContract":
         {
-          TerminateContract().then(function (body) {
-            console.log("TerminateContract dispatched", body)
-          }).catch(function (err) {
-            console.log("error : ", err)
-          })
-          callback({
-            error: true,
-            message: "TerminateContract dispatched"
-          })
-
+          return getPromise(payload,TerminateContract,callback)
         }
       case "EventOnTerminateContract":
         {
@@ -50,11 +32,11 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
 
         }
       default:
-        callback({
+        return callback({
           error: true,
           message: "invalid case"
         })
-        break;
+        
     }
   }
   catch (err) {
@@ -97,13 +79,11 @@ function TerminateContract() {
   };
   return rp(options);
 }
-
-function EjariTerminationStatus() {
+function EjariAvailable(){
   var options = {
     method: 'POST',
     url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
-    qs: { eventName: 'terminateContract' },
-
+    qs: { eventName: 'ejariAvailable' },
     body:
     {
       header:
@@ -114,22 +94,23 @@ function EjariTerminationStatus() {
       body:
       {
         contractID: '4323940',
-        terminationReason: '001',
-        paymentInstruments:
-          [{
-            bankCode: 'ENBD',
-            instrumentID: '987123',
-            cancellationReason: '001'
-          },
-          {
-            bankCode: 'ENBD',
-            instrumentID: '987124',
-            'cancellationReason ': '001'
-          }]
+        ejariID: '389492834',
+        date: '05/11/2018'
       }
     },
     json: true
   };
 
   return rp(options);
+}
+async function getPromise(payload,func,callback){
+  func().then(function (body) {
+    console.log(payload.eventName+ " dispatched", body)
+  }).catch(function (err) {
+    console.log("error : ", err)
+  })
+  callback({
+    error: true,
+    message: payload.eventName +" dispatched"
+  })
 }
