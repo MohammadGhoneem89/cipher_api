@@ -76,9 +76,22 @@ module.exports = {
         element.providerMetaData = element.providerMetaData ? JSON.parse(element.providerMetaData) : undefined;
         element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
         element.beneficiaryData = element.beneficiaryData ? JSON.parse(element.beneficiaryData) : undefined;
+
+        _.set(element, 'contractID', undefined);
+        _.set(element, 'documentName', undefined);
+        _.set(element, 'Key', undefined);
+        _.set(element, 'failureReason', undefined);
       });
       _.set(result, 'instrumentList', undefined);
       _.set(result, 'instrumentDetail', undefined);
+      _.set(result, 'checkKYCStatus', undefined);
+      _.set(result, 'contractSignedHash', undefined);
+      _.set(result, 'CRMTicketNo', undefined);
+      _.set(result, 'ejariData.contractID', undefined);
+      _.set(result, 'terminationDate', undefined);
+      _.set(result, 'terminationReason', undefined);
+      _.set(result, 'tranDate', undefined);
+      
       return result;
 
     } catch (ex) {
@@ -98,9 +111,6 @@ module.exports = {
       "userReferenceNo": "",
     }
 
-
-
-
     try {
       let result = JSON.parse(data);
       let startDate = _.get(result, "contractStartDate", undefined);
@@ -114,7 +124,7 @@ module.exports = {
       contract.contractEndDate = result.contractEndDate
       contract.oldEjariNumber = result.oldEjariNumber
       contract.paymentCount = result.paymentCount
-      contract.userReferenceNo = result.userReferenceNo
+      contract.userReferenceNo = result.userReferenceNo || ""
      
 
       return contract;
