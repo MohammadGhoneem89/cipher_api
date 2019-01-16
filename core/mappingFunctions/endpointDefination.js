@@ -93,7 +93,35 @@ function _list(payload, callback) {
     });
 }
 
+function findByName(payload) {
+  return endpointDefination.findByName({name: payload.name})
+    .then((res) => {
+      return {endpoint: res, data: payload.data};
+    });
+}
+//
+// findByName({name: 'name4', data: {hello: 'world !!!'}})
+//   .then((res) => {
+//     console.log(res);
+//   });
+/*
+* response
+* { endpoint: { _id: 5c3dae875693ce58190769f1,
+ address: 'http://127.0.0.1:3000/endpoint/5c3dae875693ce58190769f1',
+ status: true,
+ protocol: { nonSecure: true, secure: false, custom: false },
+ attachCert: true,
+ certPhrase: 'kashan mirnza',
+ authType: 'noAuth',
+ requestType: 'rest',
+ name: 'name4',
+ __v: 0 },
+ data: { hello: 'world !!!' } }
+ * */
+
+
 exports.list = list;
 exports.findOne = findOne;
 exports.upsert = upsert;
+exports.findByName = findByName;
 
