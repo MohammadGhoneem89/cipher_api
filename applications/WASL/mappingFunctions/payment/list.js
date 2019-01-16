@@ -8,7 +8,7 @@ function list(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function paymentList(payload, callback) {
-    console.log("::::::payload::::::: ", JSON.stringify(payload));
+
     payment.getList(payload)
     .then((res)=>{
              const response = {
