@@ -62,7 +62,7 @@ module.exports = (data) => {
     let toEmit = `
     const dbConfig = await keyVaultRepo.getDBConfig('postgres', '${data.adaptor}');           
   const instance = await client.createClient('sequelize', dbConfig.connection);
-  const Model = instance.define("${data.object.toLowerCase()}", ${fields});
+  const Model = instance.define("${data.object}", ${fields});
   let queryOptions = ${JSON.stringify(queryOptions)};
   queryOptions['attributes'] = queryOptions['attributes'].map(element=>{
     if(element[0].includes('.')){
