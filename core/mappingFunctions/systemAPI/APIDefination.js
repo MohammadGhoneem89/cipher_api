@@ -34,10 +34,13 @@ function LoadConfig() {
     let grouped = _.groupBy(data[1], 'useCase');
     let routeConfig = {};
     data[1].forEach((data) => {
+      let deepData = _.cloneDeep(data);
       let dest = data.useCase + "." + data.route;
-      data.RequestMapping = data.RequestMapping.fields;
-      data.ResponseMapping = data.ResponseMapping.fields;
-      let groupedRoute = _.omit(data, 'route', 'useCase');
+      deepData.RequestMapping = data.RequestMapping.fields;
+      deepData.RequestTransformations = data.RequestMapping.transformations;
+      deepData.ResponseMapping = data.ResponseMapping.fields;
+      deepData.ResponseTransformations = data.ResponseMapping.transformations;
+      let groupedRoute = _.omit(deepData, 'route', 'useCase');
       _.set(routeConfig, dest, groupedRoute);
     });
     global.routeConfig = routeConfig;

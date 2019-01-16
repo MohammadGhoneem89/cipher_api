@@ -6,7 +6,7 @@ const customFunctions = require('../Common/customFunctions.js');
 const validationFunctions = require('../Common/_validationFunctions.js');
 
 module.exports = class ObjectMapper {
-  constructor(req, mappingConfig, typeData, UUID, JWToken, mappingType) {
+  constructor(req, mappingConfig, typeData, UUID, JWToken, mappingType, transformations) {
     this.request = req;
     this.mappingConfig = mappingConfig;
     this.typeData = typeData;
@@ -14,6 +14,7 @@ module.exports = class ObjectMapper {
     this.UUID = UUID;
     this.mappingType = mappingType;
     this.JWToken = JWToken;
+    this.transformations = transformations;
   }
   DataTypeMatchCheck(type, value) {
     if (typeOf(value) === type) {
@@ -85,6 +86,13 @@ module.exports = class ObjectMapper {
       return customFunctions[config.IN_FIELDFUNCTION](data, payload, this.JWToken);
     }
     throw new Error(`${config.IN_FIELDFUNCTION} is not found locally!`)
+  }
+  CustomFunctionsExecutionPostProcessing(functionName, data, payload) {
+    if (customFunctions[functionName] instanceof Function) {
+
+      return customFunctions[functionName](data, payload, this.JWToken);
+    }
+    throw new Error(`${functionName} is not found locally!`);
   }
   CustomValidationCheck(functionName, data) {
     let response = { 'error': false };
@@ -186,6 +194,57 @@ module.exports = class ObjectMapper {
         }
       });
       return fwdMessage;
+    }).then((message) => {
+      try {
+        this.transformations && this.transformations.forEach((data) => {
+          let elem;
+          switch (data.TRAN_FIELDTYPE) {
+            case "delete":
+              _.set(message, data.TRG_FIELD, undefined);
+              break;
+            case "marshall":
+              elem = _.get(message, data.TRG_FIELD, undefined);
+              _.set(message, data.TRG_FIELD, undefined);
+              _.set(message, data.TRAN_FIELD, JSON.stringify(elem));
+              break;
+            case "unmarshall":
+              elem = _.get(message, data.TRG_FIELD, undefined);
+              _.set(message, data.TRG_FIELD, undefined);
+              _.set(message, data.TRAN_FIELD, JSON.parse(elem));
+              break;
+            case "deleteFromArray":
+              let list = _.get(message, data.TRG_FIELD, []);
+              _.set(message, data.TRG_FIELD, undefined);
+              if (list instanceof Array) {
+                list.forEach((e, index) => {
+                  _.set(e, data.TRAN_FIELD, undefined);
+                });
+              }
+              _.set(message, data.TRAN_FIELD, list);
+              break;
+            case "mapTypedata":
+              console.log("mapTypedata to be implemented!!!!!");
+              break;
+            case "rename":
+              elem = _.get(message, data.TRG_FIELD, undefined);
+              _.set(message, data.TRG_FIELD, undefined);
+              _.set(message, data.TRAN_FIELD, elem);
+              break;
+            default:
+              break;
+          }
+          elem = _.get(message, data.TRG_FIELD, '');
+          if (data.TRAN_FIELDFUNCTION !== 'STUB') {
+            _.set(message, data.TRG_FIELD, undefined);
+            let result = this.CustomFunctionsExecutionPostProcessing(data.TRAN_FIELDFUNCTION, elem, message);
+            result && _.set(message, data.TRAN_FIELD, result);
+          };
+        });
+        return message;
+      }
+      catch (ex) {
+        return Promise.reject(ex.message);
+      }
     });
   }
 };
