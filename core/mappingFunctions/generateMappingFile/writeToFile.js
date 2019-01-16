@@ -22,9 +22,7 @@ module.exports = function (useCase, route, file, isActions, callback) {
         try{
             ${file}
             \n${actions}
-            callback({
-                "${route}": {
-                    data:response}});
+            callback(response);
         } catch(err){
             callback({error: err})
         }
