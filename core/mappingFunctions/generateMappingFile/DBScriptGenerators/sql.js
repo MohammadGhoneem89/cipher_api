@@ -5,24 +5,25 @@ module.exports = (data) => {
         if (whereFields.length > 1) {
             whereFields += " , ";
         }
+        whereFields += `"${element.name}::${element.type}":`;
         switch (element.operator) {
             case '=':
-                whereFields += `"${element.name}": payload.${element.value}`;
+                whereFields += `payload.${element.value}`;
                 break;
             case '<':
-                whereFields += `"${element.name}": { $lt: payload.${element.value}}`;
+                whereFields += `{ $lt: payload.${element.value}}`;
                 break;
             case '>':
-                whereFields += `"${element.name}": { $gt: payload.${element.value}}`;
+                whereFields += `{ $gt: payload.${element.value}}`;
                 break;
             case '<>':
-                whereFields += `"${element.name}": { $ne: payload.${element.value}}`;
+                whereFields += `{ $ne: payload.${element.value}}`;
                 break;
             case '<=':
-                whereFields += `"${element.name}": { $lte: payload.${element.value}}`;
+                whereFields += `{ $lte: payload.${element.value}}`;
                 break;
             case '>=':
-                whereFields += `"${element.name}": { $gte: payload.${element.value}}`;
+                whereFields += `{ $gte: payload.${element.value}}`;
                 break;
         }
         if (element.name.includes('.')) {
@@ -33,7 +34,6 @@ module.exports = (data) => {
             fields += `${field[0]} : Sequelize.JSONB`;
         }
     });
-    fields += '}';
     whereFields += '}';
 
     let attributes = [];
@@ -47,6 +47,8 @@ module.exports = (data) => {
             fields += `${field[0]} : Sequelize.JSONB`;
         }
     });
+    fields += '}';
+
 
     const queryOptions = {
         raw: true,
@@ -56,8 +58,16 @@ module.exports = (data) => {
     let toEmit = `
     const dbConfig = await keyVaultRepo.getDBConfig('postgres', '${data.adaptor}');           
   const instance = await client.createClient('sequelize', dbConfig.connection);
-  const Model = instance.define("${data.object}", ${fields});
-  let queryOptions = ${JSON.stringify(queryOptions)};`
+  const Model = instance.define("${data.object.toLowerCase()}", ${fields});
+  let queryOptions = ${JSON.stringify(queryOptions)};
+  queryOptions['attributes'] = queryOptions['attributes'].map(element=>{
+    if(element[0].includes('.')){
+        element[0] =instance.json(element[0]);
+    }
+    return element;
+  });
+  `
+
     if (data.enablePaging) {
         toEmit += `\nqueryOptions["limit"] = parseInt(payload.page.pageSize);
     const offset = (parseInt(payload.page.currentPageNo) - 1) * queryOptions["limit"];

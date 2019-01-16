@@ -30,8 +30,6 @@ function paymentInstrumentReport(payload) {
             }
         }
 
-
-
         let queryfull = `SELECT kyc."tranxData" -> 'SDG' ->> 'emailID' as "email",
                          kyc."tranxData" -> 'SDG' ->> 'mobileNumber' as "mobile",
                          kyc."tranxData" -> 'SDG' ->> 'emiratesID' as "emiratesID",
@@ -41,7 +39,7 @@ function paymentInstrumentReport(payload) {
                          contract."tranxData" ->> 'tranDate'  as "tranDate",
                          payment."tranxData" ->> 'bankCode' as "bank",
                          payment."tranxData" -> 'bankMetaData' ->> 'ApprovalNo' as "DDSPreApproveNo",
-                         payment."tranxData" -> 'bankMetaData' ->> 'amount' as "amount",
+                         payment."tranxData" ->> 'amount' as "amount",
                          payment."tranxData" ->> 'paymentMethod' as "paymentMethod",
                          payment."tranxData" -> 'date' as "dueDate",
                          payment."tranxData" -> 'status' as "status"
@@ -52,7 +50,7 @@ function paymentInstrumentReport(payload) {
         if (criteria.body && criteria.body.toDate && criteria.body.fromDate) {
             let fromdate = criteria.body.fromDate;
             let todate = criteria.body.toDate;
-            queryfull += ` AND cast(contract."tranxData" ->> 'tranDate' as bigint) <= ${todate} OR cast(contract."tranxData" ->> 'tranDate' as bigint) >= ${fromdate} `;
+            queryfull += ` AND (contract."tranxData" ->> 'tranDate')::bigint between ${fromdate} and ${todate}`;
         }
 
         if(!_.isEmpty(criteria.body.contractRef)){
@@ -70,7 +68,6 @@ function paymentInstrumentReport(payload) {
         if (payload.page) {
             queryfull += ` order by contract."tranxData" ->> 'date' desc limit ${criteria.page.pageSize} OFFSET ${criteria.page.pageSize * (criteria.page.currentPageNo - 1)}) as res`;
         }
-
         pg.connection()
             .then((conn) => {
                 Promise.all([
@@ -101,7 +98,9 @@ function paymentInstrumentReport(payload) {
 function formatter(data,typeData1,typeData2){
     let formatedData = [];
     let obj;
+    let date;
     for(let val of data){
+        date = +(_.get(val,'tranDate',0)) * 1000;
                 obj = {};
                 obj.ContractRef = _.get(val,'contractReference','');
                 obj.CRMNo = _.get(val,'CRMNo','');
@@ -111,11 +110,11 @@ function formatter(data,typeData1,typeData2){
                 obj.EmiratesID = _.get(val,'emiratesID','');
                 obj.Bank = _.get(val,'bank','');
                 obj.DOSPreApprovedNo = _.get(val,'DDSPreApproveNo','');
-                obj.Amount = _.get(val,'amount','');
+                obj.Amount =  amountFormat(+_.get(val,'amount',''));
                 obj.InstrumentType =  _.get(_.find(typeData2, {value: _.get(val,'paymentMethod','') }), 'label', '');
                 obj.InstrumentNo = _.get(val,'instrumentNo','');
                 obj.DueDate  = dates.MMddyyyy(+_.get(val,'dueDate',''));
-                obj.TranDate  = dates.MMddyyyy(+_.get(val,'tranDate',0));
+                obj.TransactionDate  = dates.MMddyyyy(date);
                 obj.Status  =_.get(_.find(typeData1, {value: _.get(val,'status','') }), 'label', '');
                 formatedData.push(obj);
             }

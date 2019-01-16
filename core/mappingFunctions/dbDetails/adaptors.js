@@ -1,6 +1,7 @@
 'use strict';
 
 const keyVaultRepo = require('../../../lib/repositories/keyVault');
+const tableFieldsRepo = require('../../../lib/repositories/tableFields');
 const client = require('../../api/client');
 
 function list(payload, UUIDKey, route, callback, JWToken) {
@@ -29,36 +30,23 @@ function _list(payload, callback) {
     });
 }
 const availableObjects = async function (payload, UUIDKey, route, callback, JWToken) {
+
   const response = {
     getAvailableObjectsList: {
       action: payload.action,
       data: []
     }
   };
-  try {
-    let dbConfig = await keyVaultRepo.getDBConfig(payload.database, payload.adaptor);
-    let instance = await client.createClient(payload.database, dbConfig.connection);
-    switch (payload.database) {
-      case 'postgres':
-        const query = {
-          text: `SELECT table_name FROM information_schema.tables WHERE table_schema='public';`,
-          values: []
-        };
-        const data = await instance.query(query);
-        for(let row of data.rows){
-          response.getAvailableObjectsList.data.push({
-            label: row.table_name,
-            value: row.table_name
-          });
-        }
-        break;
-      case 'mongo':
-        break;
-    }
-  } catch (err) {
-    console.log('----- error ', err);
-  }
-  callback(response);
+  let query = {
+    adaptor: payload.adaptor,
+    type: payload.objectType
+  };
+  tableFieldsRepo.find(query)
+    .then((res)=>{
+      response.getAvailableObjectsList.data = res;
+      callback(response);
+    });
+
 };
 
 exports.list = list;
