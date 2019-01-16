@@ -5,7 +5,7 @@ module.exports = (data) => {
         if (whereFields.length > 1) {
             whereFields += " , ";
         }
-        if(element.name.includes('.')){
+        if(element.name.includes('.')&&element.type!=='text'){
             whereFields += `"${element.name}::${element.type}":`;
         } else {
             whereFields += `"${element.name}":`;
