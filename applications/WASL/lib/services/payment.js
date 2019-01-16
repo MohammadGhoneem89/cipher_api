@@ -27,7 +27,10 @@ function getList(payload) {
             response.paymentList = _.get(res, 'documents', []);
             response.actions = _.get(res, 'pageActions', []);
             return response;
-        });
+        })
+        .catch((err) => {
+        console.log("Error : ", JSON.stringify(err));
+        })
 }
 
 function findTypeData() {

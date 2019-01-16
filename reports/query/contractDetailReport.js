@@ -43,11 +43,11 @@ function contractDetailReport(payload) {
                          FROM "Contracts" as contract, "kycCollections" as kyc
                          where contract."tranxData" ->> 'EID' = kyc."tranxData" -> 'SDG' ->> 'emiratesID'`;
 
-        if (criteria.body && criteria.body.toDate && criteria.body.fromDate) {
-            let fromdate = criteria.body.fromDate;
-            let todate = criteria.body.toDate;
-             queryfull += ` AND cast(contract."tranxData" ->> 'tranDate' as bigint) <= ${todate} OR cast(contract."tranxData" ->> 'tranDate' as bigint) >= ${fromdate} `;
-        }
+        // if (criteria.body && criteria.body.toDate && criteria.body.fromDate) {
+        //     let fromdate = criteria.body.fromDate;
+        //     let todate = criteria.body.toDate;
+        //      queryfull += ` AND (contract."tranxData" ->> 'tranDate')::bigint between ${fromdate} and ${todate}`;
+        // }
 
         if(!_.isEmpty(criteria.body.contractRef)){
             queryfull += ` AND contract."tranxData" ->> 'contractReference' = '${criteria.body.contractRef}'`;
@@ -89,8 +89,9 @@ function contractDetailReport(payload) {
 function formatter(data,typeData,typeData2){
     let formatedData = [];
         let obj;
+        let date;
         for(let val of data){
-
+            date = +(_.get(val,'tranDate',0)) * 1000;
             obj = {};
             obj.ContractRef = _.get(val,'contractReference','');
             obj.CRMNo = _.get(val,'CRMNo','');
@@ -99,8 +100,8 @@ function formatter(data,typeData,typeData2){
             obj.Email = _.get(val,'email','');
             obj.EmiratesID = _.get(val,'emiratesID','');
             obj.BusinessPartnerNo = _.get(val,'businessPartnerNumber','');
-            obj.RentAmount = _.get(val,'contractAmount','');
-            obj.TranDate = _.get(val,'tranDate','');
+            obj.RentAmount = amountFormat(+_.get(val,'contractAmount',''));
+            obj.TranDate = dates.MMddyyyy(date);
             obj.PaymentMethod = _.get(_.find(typeData2, {value: _.get(val,'paymentMethod','') }), 'label', '');
             obj.EjariNumber = _.get(val,'ejariNumber','');
             obj.Status = _.get(_.find(typeData, {value: _.get(val,'contractStatus','') }), 'label', '');
