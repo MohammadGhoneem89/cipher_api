@@ -5,7 +5,11 @@ module.exports = (data) => {
         if (whereFields.length > 1) {
             whereFields += " , ";
         }
-        whereFields += `"${element.name}::${element.type}":`;
+        if(element.name.includes('.')){
+            whereFields += `"${element.name}::${element.type}":`;
+        } else {
+            whereFields += `"${element.name}":`;
+        }
         switch (element.operator) {
             case '=':
                 whereFields += `payload.${element.value}`;
