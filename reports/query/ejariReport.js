@@ -4,11 +4,10 @@ const find = require('../../lib/couch/selectWithProjection');
 const _ = require('lodash');
 const date = require('../../lib/helpers/dates');
 const findStatus = require('../../lib/helpers/findStatus');
-const amountFormat = require('../../lib/helpers/amountFormat');
 const func = require('../../applications/WASL/mappingFunctions/ejariData/getEjariData');
 const pg = require('../../core/api/connectors/postgress');
 const typeDataRepo = require('../../lib/repositories/typeData');
-
+const amountFormat = require('../../lib/helpers/amountFormat');
 
 
 function ejariReport(payload) {
@@ -45,14 +44,11 @@ function ejariReport(payload) {
                          FROM "Contracts" as contract, "kycCollections" as kyc
                          where contract."tranxData" ->> 'EID' = kyc."tranxData" -> 'SDG' ->> 'emiratesID'`;
 
-
-
-
-        if (criteria.body && criteria.body.toDate && criteria.body.fromDate) {
-            let fromdate = criteria.body.fromDate;
-            let todate = criteria.body.toDate;
-            queryfull += ` AND cast(contract."tranxData" ->> 'tranDate' as bigint) <= ${todate} OR cast(contract."tranxData" ->> 'tranDate' as bigint) >= ${fromdate} `;
-        }
+        // if (criteria.body && criteria.body.toDate && criteria.body.fromDate) {
+        //     let fromdate = criteria.body.fromDate;
+        //     let todate = criteria.body.toDate;
+        //     queryfull += ` AND (contract."tranxData" ->> 'tranDate')::bigint between ${fromdate} and ${todate}`;
+        // }
 
         if(!_.isEmpty(criteria.body.contractRef)){
             queryfull += ` AND contract."tranxData" ->> 'contractReference' = '${criteria.body.contractRef}'`;
@@ -100,7 +96,7 @@ function formatter(data,typeData){
         obj.EmiratesID = _.get(val,'emiratesID','');
         obj.BusinessPartnerNo = _.get(val,'businessPartnerNumber','');
         obj.ContractStatus = _.get(_.find(typeData, {value: _.get(val,'contractStatus','') }), 'label', '');
-        obj.Amount = _.get(val,'contractAmount','');
+        obj.Amount = amountFormat(+_.get(val,'contractAmount',''));
         obj.EjariNumber =  _.get(val,'ejariNumber','');
         obj.EjariStatus = _.get(val,'ejariStatus','');
         obj.EjariTerminationStatus  = _.get(val,'ejariTerminationStatus','');

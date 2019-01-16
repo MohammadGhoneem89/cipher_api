@@ -67,7 +67,7 @@ function renderReports(jsReport, payload, res, type = 'pdf') {
           }
         },
         data: {
-          currentDate: dates.humanizeDate(),
+          currentDate: dates.dubaiDate(),
           searchResult: resData.couchData,
           basePath: basePath,
           criteria: resData.criteria,
