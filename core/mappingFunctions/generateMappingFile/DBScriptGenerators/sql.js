@@ -5,7 +5,7 @@ module.exports = (data) => {
         if (whereFields.length > 1) {
             whereFields += " , ";
         }
-        whereFields+=`"${element.name}::${element.type}":`;
+        whereFields += `"${element.name}::${element.type}":`;
         switch (element.operator) {
             case '=':
                 whereFields += `payload.${element.value}`;
