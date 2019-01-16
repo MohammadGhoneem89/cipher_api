@@ -18,7 +18,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
             error: false,
             message: "RenewContract"
           })
-         
+
         }
       case "UpdateContract":
         {
@@ -26,35 +26,35 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
             error: false,
             message: "UpdateContract"
           })
-         
+
         }
       case "EventOnUpdateFirstPaymentStatus":
-        { 
-          return getPromise(payload,UpdateContract,callback);
-        
+        {
+          return getPromise(payload, UpdateContractStatus, callback);
+
         }
       case "EventOnUpdatePaymentStatus":
         {
-          return getPromise(payload,UpdateContract,callback);
-          
+          return getPromise(payload, UpdateContractStatus, callback);
+
         }
 
       case "UpdateKYCDetail":
         {
-          return getPromise(payload,updateKYCDetail,callback);
-          
+          return getPromise(payload, updateKYCDetail, callback);
+
         }
       case "EjariData":
         {
-          return getPromise(payload,EjariAvailable,callback);
+          return getPromise(payload, EjariAvailable, callback);
         }
 
       default:
-       return callback({
+        return callback({
           error: true,
           message: "invalid case"
         })
-        
+
     }
   }
   catch (err) {
@@ -66,11 +66,11 @@ exports.handlePMevents = handlePMevents
 
 
 
-function updateKYCDetail(){
+function updateKYCDetail() {
 
   let options = {
     method: 'POST',
-    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain' ,
+    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
     qs: { eventName: 'updateKYCDetail' },
     body:
     {
@@ -107,7 +107,7 @@ function updateKYCDetail(){
   return rp(options);
 }
 
-function EjariAvailable(){
+function EjariAvailable() {
   var options = {
     method: 'POST',
     url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
@@ -132,19 +132,31 @@ function EjariAvailable(){
   return rp(options);
 }
 
-function UpdateContract(){
+function UpdateContractStatus() {
   let options = {
     method: 'POST',
-    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
-    qs: { eventName: 'updateContract' },
+    url: 'http://51.140.250.28/API/PR/UpdateContractStatus',
+    headers:
+    {
+      'Postman-Token': '1cdaa66d-67e1-44bf-afbd-287d33d83b34',
+      'cache-control': 'no-cache',
+      'Content-Type': 'application/json'
+    },
     body:
     {
+      bypassSimu: false,
       header:
       {
-        username: 'api_user',
-        password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+        username: 'waslapi',
+        password: 'aa8dd29e572a64982d7d2bf48325a4951b7c399a1283fb33460ca275e230d5ae308dcd820d808c5ea0d23e047bd2f3e066bf402cb249d989408331566f7ca890'
       },
-      body: { contractID: '389492834', CRMTicketNo: '389492833-11' }
+      body:
+      {
+        EIDA: '784-1984-1234567-9',
+        authToken: '03452837803',
+        contractID: 'DIRC103',
+        orgCode: 'WASL'
+      }
     },
     json: true
   };
@@ -152,14 +164,14 @@ function UpdateContract(){
 }
 
 
-async function getPromise(payload,func,callback){
+async function getPromise(payload, func, callback) {
   func().then(function (body) {
-    console.log(payload.eventName+ " dispatched", body)
+    console.log(payload.eventName + " dispatched", body)
   }).catch(function (err) {
     console.log("error : ", err)
   })
   callback({
     error: true,
-    message: payload.eventName +" dispatched"
+    message: payload.eventName + " dispatched"
   })
 }

@@ -4,7 +4,7 @@ function flatten(data, acc) {
         if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
             let extra = flatten(data[key], []);
             extra = extra.map(label => {
-                return key + '->' + label;
+                return key + '.' + label;
             })
             acc = acc.concat(extra);
         }

@@ -59,7 +59,6 @@ module.exports = function (payload) {
         queryString = `select ${fields} from ${payload.object}(${argString}) ${pagingData};`
     }
     file = `     
-        const dbConfig = await keyVaultRepo.getDBConfig('postgres', '${payload.adaptor}');           
         let instance = await client.createClient('pg', dbConfig.connection);
         const query = {
             text: \`${queryString}\`,

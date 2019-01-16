@@ -17,6 +17,7 @@ module.exports = {
             case 'redis':
                 client = await redis(connectionURL);
                 break;
+            case 'postgres':
             case 'pg':
                 client = await pg(connectionURL);
                 break;
