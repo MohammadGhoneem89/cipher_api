@@ -2,17 +2,7 @@ const client = require('../../api/client');
 let logger = require('../../../lib/helpers/logger')().app;
 const keyVaultRepo = require('../../../lib/repositories/keyVault');
 const postgresProcess = require('./adaptors/postgres');
-const TableFields = require('../../../lib/models/TableFields');
-TableFields.create({
-  name: 'test',
-  adaptor: 'adapter6',
-  fields: [
-    {
-      name: 't2',
-      type: 'string'
-    }
-  ]
-})
+
 const getDBFields = async function (payload, UUIDKey, route, callback, JWToken) {
   const response = {
     getDBFields: {

@@ -29,37 +29,3 @@ const getDBFields = async function (payload, UUIDKey, route, callback, JWToken) 
 }
 
 exports.getDBFields = getDBFields;
-
-let table = [
-  {
-    "name" : "block_num",
-    "type" : {
-        "type" : "BIGINT",
-        "allowNull" : false
-    }
-}, 
-{
-    "name" : "txnid",
-    "typeData" : {
-        "type" : "STRING",
-        "allowNull" : false,
-        "validate" : {}
-    }
-}, 
-{
-    "name" : "status",
-    "typeData" : {
-        "type" : "STRING",
-        "allowNull" : false,
-        "defaultValue" : "INVALID"
-    }
-}, 
-{
-    "name" : "key",
-    "typeData" : {
-        "type" : "STRING",
-        "allowNull" : false,
-        "unique" : true
-    }
-}
-]
