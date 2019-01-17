@@ -3,7 +3,7 @@ MAINTAINER Avanza Innovations <bilal.mahroof@avanzainnovations.com>
 
 RUN useradd -ms /bin/bash avanza
 
-USER avanza
+
 WORKDIR /home/avanza
 
 #RUN rpm -Uvh --insecure http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm 
@@ -19,6 +19,7 @@ COPY package.json .
 COPY . .
 RUN npm install
 
+USER avanza
 EXPOSE 9080
 
 CMD [ "npm", "start"]
