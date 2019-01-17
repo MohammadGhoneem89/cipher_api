@@ -16,7 +16,7 @@ function renderExport(type, gridType, query, jsReport, JWToken, res) {
   let resData;
 
   const func = require(functionPath[gridType]);
-  let recipe = 'chrome-pdf';
+  let recipe = 'phantom-pdf';
   if (type === 'excel') {
     recipe = 'html-to-xlsx';
     basePath = '';

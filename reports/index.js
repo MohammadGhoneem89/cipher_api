@@ -16,7 +16,7 @@ function renderReports(jsReport, payload, res, type = 'pdf') {
   let resData;
 
   //type = 'xlsx';
-  let recipe = 'chrome-pdf';
+  let recipe = 'phantom-pdf';
   if (type === 'excel') {
     recipe = 'html-to-xlsx';
     basePath = '';
