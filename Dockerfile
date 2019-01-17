@@ -8,7 +8,7 @@ WORKDIR /home/avanza
 
 #RUN rpm -Uvh --insecure http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm 
 RUN yum groupinstall -y "Development Tools" && yum clean all && yum install -y tar
-USER avanza
+
 #RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.30.2/install.sh | bash
 ADD https://rpm.nodesource.com/setup_8.x /root/
 #RUN curl -sL https://rpm.nodesource.com/setup_8.x
@@ -19,6 +19,7 @@ yum -y install java-1.8.0-openjdk
 
 RUN node -v
 RUN npm -v
+USER avanza
 RUN mkdir -p /home/avanza/app/logs
 WORKDIR /home/avanza/app
 COPY package.json .
