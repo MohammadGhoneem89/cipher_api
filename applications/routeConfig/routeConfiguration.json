@@ -1,5 +1,5 @@
 {
-  "Wasl": {
+  "PR": {
     "CustomFunctionsLocation": "../../applications/WASL/mappingFunctions/",
     "viewItem": {
       "customMapping": true,
@@ -11,6 +11,24 @@
       "customMapping": true,
       "MappingfunctionName": "handlePMevents",
       "CustomMappingFile": "events/handlePMevents.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "handleDLDevents": {
+      "customMapping": true,
+      "MappingfunctionName": "handleDLDevents",
+      "CustomMappingFile": "events/handleDLDevents.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "handleGDRFAevents": {
+      "customMapping": true,
+      "MappingfunctionName": "handleGDRFAevents",
+      "CustomMappingFile": "events/handleGDRFAevents.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "handleSDGevents": {
+      "customMapping": true,
+      "MappingfunctionName": "handleSDGevents",
+      "CustomMappingFile": "events/handleSDGevents.js",
       "mappingConfigFile": "ePayMapping"
     },
     "getPaymentList" : {
