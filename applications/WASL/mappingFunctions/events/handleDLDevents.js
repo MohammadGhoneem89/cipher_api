@@ -6,7 +6,7 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
     console.log("<<<Request Recieved for Event>>>>")
     console.log(JSON.stringify(payload, null, 2), "========> THIS IS PAYLOAD")
 
-    switch (payload.eventName) {
+    switch (payload.eventData.eventName) {
 
       case "EjariTerminationStatus":
         {
