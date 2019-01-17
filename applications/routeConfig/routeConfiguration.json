@@ -1,16 +1,16 @@
 {
   "PR": {
     "CustomFunctionsLocation": "../../applications/WASL/mappingFunctions/",
-    "viewItem": {
-      "customMapping": true,
-      "MappingfunctionName": "viewItem",
-      "CustomMappingFile": "general/viewItem.js",
-      "mappingConfigFile": "ePayMapping"
-    },
     "handlePMevents": {
       "customMapping": true,
       "MappingfunctionName": "handlePMevents",
       "CustomMappingFile": "events/handlePMevents.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "handleBankevents": {
+      "customMapping": true,
+      "MappingfunctionName": "handleBankevents",
+      "CustomMappingFile": "events/handleBankevents.js",
       "mappingConfigFile": "ePayMapping"
     },
     "handleDLDevents": {
@@ -30,26 +30,35 @@
       "MappingfunctionName": "handleSDGevents",
       "CustomMappingFile": "events/handleSDGevents.js",
       "mappingConfigFile": "ePayMapping"
+    }
+  },
+  "Wasl": {
+    "CustomFunctionsLocation": "../../applications/WASL/mappingFunctions/",
+    "viewItem": {
+      "customMapping": true,
+      "MappingfunctionName": "viewItem",
+      "CustomMappingFile": "general/viewItem.js",
+      "mappingConfigFile": "ePayMapping"
     },
-    "getPaymentList" : {
+    "getPaymentList": {
       "customMapping": true,
       "MappingfunctionName": "list",
       "CustomMappingFile": "payment/list.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getPaymentDetail" : {
+    "getPaymentDetail": {
       "customMapping": true,
       "MappingfunctionName": "detail",
       "CustomMappingFile": "payment/detail.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "insertPayment" : {
+    "insertPayment": {
       "customMapping": true,
       "MappingfunctionName": "create",
       "CustomMappingFile": "payment/insert.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "updatePayment" : {
+    "updatePayment": {
       "customMapping": true,
       "MappingfunctionName": "update",
       "CustomMappingFile": "payment/update.js",
