@@ -3,7 +3,7 @@
 async function handleBankevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
-    console.log(JSON.stringify(payload.eventData, null, 2))
+    console.log(JSON.stringify(payload, null, 2), "========> THIS IS PAYLOAD")
 
     switch (payload.eventData.eventName) {
 

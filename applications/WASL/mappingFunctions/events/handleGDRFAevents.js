@@ -6,7 +6,7 @@ async function handleGDRFAevents(payload, UUIDKey, route, callback, JWToken) {
 
   try {
     console.log("<<<=Request Recieved for Event>>>")
-    //onsole.log(JSON.stringify(payload.eventName, null, 2))
+    console.log(JSON.stringify(payload, null, 2), "========> THIS IS PAYLOAD")
 
     switch (payload.eventName) {
 
