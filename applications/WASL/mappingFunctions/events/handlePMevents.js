@@ -11,7 +11,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
     console.log(JSON.stringify(payload, null, 2), "========> THIS IS PAYLOAD")
 
-    switch (payload.eventData.eventName) {
+    switch (payload.eventName) {
 
       case "RenewContract":
         {
