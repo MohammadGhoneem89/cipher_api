@@ -1,8 +1,9 @@
 
 'use strict';
 //var objectMapper = require('object-mapper');
+let Handlebars = require('handlebars');
 let rp = require('request-promise');
-
+//let jsonTransformTemplates = require('../../../../lib/repositories/jsonTransformTemplates');
 
 async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
@@ -35,18 +36,18 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
         }
       case "EventOnUpdatePaymentStatus":
         {
-          return getPromise(payload, UpdateContractStatus, callback);
+          return await getPromise(payload, UpdateContractStatus, callback);
 
         }
 
       case "UpdateKYCDetail":
         {
-          return getPromise(payload, updateKYCDetail, callback);
+          return await getPromise(payload, updateKYCDetail, callback);
 
         }
       case "EjariData":
         {
-          return getPromise(payload, EjariAvailable, callback);
+          return await getPromise(payload, EjariAvailable, callback);
         }
 
       default:
@@ -136,12 +137,6 @@ function UpdateContractStatus() {
   let options = {
     method: 'POST',
     url: 'http://51.140.250.28/API/PR/UpdateContractStatus',
-    headers:
-    {
-      'Postman-Token': '1cdaa66d-67e1-44bf-afbd-287d33d83b34',
-      'cache-control': 'no-cache',
-      'Content-Type': 'application/json'
-    },
     body:
     {
       bypassSimu: false,
@@ -175,3 +170,21 @@ async function getPromise(payload, func, callback) {
     message: payload.eventName + " dispatched"
   })
 }
+
+function transformTemplate() {
+  // jsonTransformTemplates.findOne({"TemplateId" : "UpdateFirstPaymentStatus"})
+  // .then((res)=>{
+  //   console.log('---------------');
+  //   console.log(res);
+  // });
+
+  let source = {"header": {"username": "username","password": "password"},"body": {"contractID": "{{payload.eventData.contractID}}","eventType":" {{payload.eventType}}","paymentInstruments": {"instrumentID": "ECHEQUE0001","paymentMethod": "001","status": "001","date": "05/11/2018","amount": "5000","bankCode": "ENBD","bankMetaData": {"MICR": "xxxxxxxxxx","paymentID": "ECHEQUE1111"},"failureReasonCode": "","failureDescription": ""}}};
+  let template = Handlebars.compile(JSON.stringify(source));
+
+  let data = {
+    "payload":{"eventData":{"contractID":"TerminateContract"},"eventType":"TC"},
+  };
+  let result = template(data);
+  return result;
+}
+console.log(transformTemplate());
