@@ -11,7 +11,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
     console.log(JSON.stringify(payload, null, 2))
 console.log(payload.eventData.eventName,"===========================> THIS IS PAYLOAD")
-    switch (payload.eventName) {
+    switch (payload.eventData.eventName) {
 
       case "RenewContract":
         {
@@ -161,13 +161,13 @@ function UpdateContractStatus() {
 
 async function getPromise(payload, func, callback) {
   func().then(function (body) {
-    console.log(payload.eventName + " dispatched", body)
+    console.log(payload.eventData.eventName + " dispatched", body)
   }).catch(function (err) {
     console.log("error : ", err)
   })
   callback({
     error: true,
-    message: payload.eventName + " dispatched"
+    message: "Event dispatch failed!"
   })
 }
 
