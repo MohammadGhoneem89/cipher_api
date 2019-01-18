@@ -3,7 +3,7 @@
 //var objectMapper = require('object-mapper');
 let Handlebars = require('handlebars');
 let rp = require('request-promise');
-let jsonTransformTemplates = require('../../../../lib/repositories/jsonTransformTemplates');
+let jsonTransformTemplates = require('../../lib/repositories/jsonTransformTemplate.js');
 
 async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
