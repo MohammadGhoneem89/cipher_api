@@ -3,7 +3,7 @@
 //var objectMapper = require('object-mapper');
 let Handlebars = require('handlebars');
 let rp = require('request-promise');
-//let jsonTransformTemplates = require('../../../../lib/repositories/jsonTransformTemplates');
+let jsonTransformTemplates = require('../../../../lib/repositories/jsonTransformTemplates');
 
 async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
@@ -172,11 +172,11 @@ async function getPromise(payload, func, callback) {
 }
 
 function transformTemplate() {
-  // jsonTransformTemplates.findOne({"TemplateId" : "UpdateFirstPaymentStatus"})
-  // .then((res)=>{
-  //   console.log('---------------');
-  //   console.log(res);
-  // });
+  jsonTransformTemplates.findOne({"TemplateId" : "UpdateFirstPaymentStatus"})
+  .then((res)=>{
+    console.log('---------------');
+    console.log(res);
+  });
 
   let source = {"header": {"username": "username","password": "password"},"body": {"contractID": "{{payload.eventData.contractID}}","eventType":" {{payload.eventType}}","paymentInstruments": {"instrumentID": "ECHEQUE0001","paymentMethod": "001","status": "001","date": "05/11/2018","amount": "5000","bankCode": "ENBD","bankMetaData": {"MICR": "xxxxxxxxxx","paymentID": "ECHEQUE1111"},"failureReasonCode": "","failureDescription": ""}}};
   let template = Handlebars.compile(JSON.stringify(source));
