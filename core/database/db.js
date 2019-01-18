@@ -11,6 +11,7 @@ module.exports = function (callback) {
   const dbURL = crypto.decrypt(config.get('mongodb.url'));
 
   MongoClient.connect(dbURL, function (err, db) {
+    console.log(dbURL,"dbURL-------------------------")
     if (err) {
       logger.app.error({error: err}, 'Unable to connect mongodb...');
       throw new Error('Unable to connect mongodb...');

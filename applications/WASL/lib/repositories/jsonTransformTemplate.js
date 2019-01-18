@@ -10,5 +10,5 @@ module.exports = {
 
 function findOne(query) {
   return JSONTransformTemplates
-    .findOne(query);
+    .find(query);
 }

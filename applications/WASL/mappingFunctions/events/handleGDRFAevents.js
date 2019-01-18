@@ -51,7 +51,7 @@ function requestKYCDetail() {
 }
 
 async function getPromise(payload,func,callback){
-  func().then(function (body) {
+  func().then(function(body) {
     console.log(payload.eventName+ " dispatched", body)
   }).catch(function (err) {
     console.log("error : ", err)

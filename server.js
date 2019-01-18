@@ -45,7 +45,7 @@ const lastSubscription = [];
 global.appDir = __dirname;
 
 mongoDB.connection(config.get('mongodb.url'));
-
+console.log(config.get('mongodb.url'))
 app = expressWs.app;
 
 const routeData = require('./core/mappingFunctions/systemAPI/APIDefination');
