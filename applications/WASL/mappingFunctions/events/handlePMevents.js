@@ -175,7 +175,7 @@ function transformTemplate() {
   jsonTransformTemplates.findOne({"TemplateId" : "UpdateFirstPaymentStatus"})
   .then((res)=>{
     console.log('---------------');
-    console.log(res);
+    console.log(res,"I AM RESSSSSS");
   });
 
   let source = {"header": {"username": "username","password": "password"},"body": {"contractID": "{{payload.eventData.contractID}}","eventType":" {{payload.eventType}}","paymentInstruments": {"instrumentID": "ECHEQUE0001","paymentMethod": "001","status": "001","date": "05/11/2018","amount": "5000","bankCode": "ENBD","bankMetaData": {"MICR": "xxxxxxxxxx","paymentID": "ECHEQUE1111"},"failureReasonCode": "","failureDescription": ""}}};
