@@ -58,13 +58,15 @@ async function getPromise(payload, func, callback) {
     console.log(payload.eventData.eventName + " Dispatched", body);
     callback({
       error: true,
-      message: response
+      message: payload.eventData.eventName + " Dispatched",
+      response: response
     })
   }).catch(err => {
     console.log("error : ", err);
     callback({
       error: false,
-      message: payload.eventData.eventName + " Dispatched"
+      message: payload.eventData.eventName + " Failed",
+      response: err
     })
   });
 }

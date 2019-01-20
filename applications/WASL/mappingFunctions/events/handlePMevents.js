@@ -57,8 +57,6 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
   }
 }
 
-exports.handlePMevents = handlePMevents;
-
 
 function updateKYCDetail(payload) {
   let EventOnUpdateKYCDetail = {
@@ -90,7 +88,7 @@ function updateKYCDetail(payload) {
   };
 
 
-  return ()=>{
+  return () => {
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=updateKYCDetail',
@@ -167,19 +165,21 @@ function UpdateContractStatus() {
 
 
 async function getPromise(payload, func, callback) {
-  func()
-    .then(function (body) {
-      console.log(payload.eventName + " dispatched", body)
-      callback({
-        message: body
-      })
+  func().then(response => {
+    console.log(payload.eventData.eventName + " Dispatched", body);
+    callback({
+      error: true,
+      message: payload.eventData.eventName + " Dispatched",
+      response: response
     })
-    .catch(function (err) {
-      console.log("error : ", err)
-      callback({
-        message: err
-      })
+  }).catch(err => {
+    console.log("error : ", err);
+    callback({
+      error: false,
+      message: payload.eventData.eventName + " Failed",
+      response: err
     })
+  });
 }
 
 
@@ -237,3 +237,6 @@ function transformTemplate(templateName, data) {
 
   return templateCompiler(data);
 }
+
+
+exports.handlePMevents = handlePMevents;

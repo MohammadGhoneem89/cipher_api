@@ -136,14 +136,20 @@ function UpdatePaymentInstrumentStatus() {
   return rp(options);
 }
 
-async function getPromise(payload,func,callback){
-  func().then(function (body) {
-    console.log(payload.eventName+ " dispatched", body)
-  }).catch(function (err) {
-    console.log("error : ", err)
-  })
-  callback({
-    error: true,
-    message: payload.eventName +" dispatched"
-  })
+async function getPromise(payload, func, callback) {
+  func().then(response => {
+    console.log(payload.eventData.eventName + " Dispatched", body);
+    callback({
+      error: true,
+      message: payload.eventData.eventName + " Dispatched",
+      response: response
+    })
+  }).catch(err => {
+    console.log("error : ", err);
+    callback({
+      error: false,
+      message: payload.eventData.eventName + " Failed",
+      response: err
+    })
+  });
 }

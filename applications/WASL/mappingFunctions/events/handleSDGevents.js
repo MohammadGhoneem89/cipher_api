@@ -37,4 +37,23 @@ async function handleSDGevents(payload, UUIDKey, route, callback, JWToken) {
       console.log(err)
     }
   }
-  exports.handleSDGevents = handleSDGevents
+  exports.handleSDGevents = handleSDGevents;
+
+
+async function getPromise(payload, func, callback) {
+  func().then(response => {
+    console.log(payload.eventData.eventName + " Dispatched", body);
+    callback({
+      error: true,
+      message: payload.eventData.eventName + " Dispatched",
+      response: response
+    })
+  }).catch(err => {
+    console.log("error : ", err);
+    callback({
+      error: false,
+      message: payload.eventData.eventName + " Failed",
+      response: err
+    })
+  });
+}
