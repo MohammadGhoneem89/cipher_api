@@ -45,6 +45,10 @@ exports.handleBankevents = handleBankevents
 
 
 function ProcessInstrument() {
+  return Promise.resolve({
+    methodName: "EventOnProcessPaymentInstrument",
+    message: "DUMMY FUNCTION CALLED"
+  });
 
   let options = {
     method: 'POST',
