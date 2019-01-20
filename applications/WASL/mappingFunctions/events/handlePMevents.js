@@ -77,8 +77,8 @@ function updateFirstPaymentStatus(payload) {
   };
 
 
-  let output = transformTemplate(EventOnUpdateFirstPaymentStatus, payload.eventData);
-  console.log("===========>I AM OUTPUT:", typeof output, output);
+  let output = JSON.parse(transformTemplate(EventOnUpdateFirstPaymentStatus, payload.eventData));
+  
 
 
   return () => {
