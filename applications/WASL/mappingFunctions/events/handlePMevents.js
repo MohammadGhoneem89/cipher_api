@@ -28,8 +28,8 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
         })
 
       }
-      case "EventOnUpdateFirstPaymentStatus": {
-        return await getPromise(payload, UpdateContractStatus, callback);
+      case "UpdateFirstPaymentInstrumentStatus": {
+        return await getPromise(payload, updateFirstPaymentStatus(payload), callback);
 
       }
       case "EventOnUpdatePaymentStatus": {
@@ -58,6 +58,38 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
   }
 }
 
+
+function updateFirstPaymentStatus(payload) {
+  let EventOnUpdateFirstPaymentStatus = {
+    "body": {
+      "contractID": "1111",
+      "status": "CANCELLED",
+      "paymentInstrument": [
+        {
+          "bankCode": "",
+          "instrumentID": "987122",
+          "instrumentType": "001",
+          "date": "01/12/2017",
+          "amount": "5000",
+          "status": "CANCELLED"
+        },
+        {
+          "bankCode": "",
+          "instrumentID": "987123",
+          "instrumentType": "001",
+          "date": "04/12/2017",
+          "amount": "5000",
+          "status": "CANCELLED"
+        }
+      ]
+    }
+  };
+
+  return ()=>{
+    return Promise.resolve("");
+  };
+
+}
 
 function updateKYCDetail(payload) {
   let EventOnUpdateKYCDetail = {
