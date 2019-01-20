@@ -10,7 +10,7 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
 
       case "EventOnTerminateContract":
         {
-          return getPromise(payload,TerminateContract,callback)
+          return getPromise(payload,TerminateContract(),callback)
         }
 
       case "TerminateContract":
@@ -43,6 +43,7 @@ exports.handleDLDevents = handleDLDevents;
 
 
 function TerminateContract() {
+
   // var options = {
   //   method: 'POST',
   //   url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
