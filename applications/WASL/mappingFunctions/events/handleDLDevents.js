@@ -83,7 +83,7 @@ function TerminateContract() {
 
 async function getPromise(payload, func, callback) {
   func().then(response => {
-    console.log(payload.eventData.eventName + " dispatched", body);
+    console.log(payload.eventData.eventName + " Dispatched", body);
     callback({
       error: true,
       message: response
@@ -92,7 +92,7 @@ async function getPromise(payload, func, callback) {
     console.log("error : ", err);
     callback({
       error: false,
-      message: payload.eventData.eventName + " dispatched"
+      message: payload.eventData.eventName + " Dispatched"
     })
   });
 }
