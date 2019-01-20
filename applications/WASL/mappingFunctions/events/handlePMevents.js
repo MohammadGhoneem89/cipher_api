@@ -101,7 +101,7 @@ function updateKYCDetail(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: transformTemplate(JSON.stringify(EventOnUpdateKYCDetail), payload.eventData)
+          body: transformTemplate(EventOnUpdateKYCDetail, payload.eventData)
 
         },
       json: true
@@ -184,6 +184,9 @@ async function getPromise(payload, func, callback) {
 
 
 function transformTemplate(templateName, data) {
+  console.log("<====================I AM DATA======================>");
+  console.log(data);
+  console.log("<====================I AM DATA======================>");
   // jsonTransformTemplates.findOne({})
   //   .then((res) => {
   //     console.log('---------------');
