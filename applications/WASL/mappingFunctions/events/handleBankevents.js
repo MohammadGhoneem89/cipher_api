@@ -84,6 +84,11 @@ function ProcessInstrument() {
 }
 
 function UpdatePaymentInstrumentStatus() {
+  return Promise.resolve({
+    methodName: "UpdatePaymentInstrumentStatus",
+    message: "DUMMY FUNCTION CALLED"
+  });
+
   let options = {
     method: 'POST',
     url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
