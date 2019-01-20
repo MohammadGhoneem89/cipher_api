@@ -8,7 +8,7 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
 
     switch (payload.eventData.eventName) {
 
-      case "EjariTerminationStatus":
+      case "EventOnTerminateContract":
         {
           return getPromise(payload,TerminateContract,callback)
         }
@@ -17,15 +17,16 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
         {
           return getPromise(payload,TerminateContract,callback)
         }
-      case "EventOnTerminateContract":
-        {
-
-        }
-      
+      // case "EventOnTerminateContract":
+      //   {
+      //
+      //   }
+      // break;
       case "EventOnUpdateKYCDetail":
         {
 
         }
+        break;
       default:
         return callback({
           error: true,
@@ -38,51 +39,60 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(err)
   }
 }
-exports.handleDLDevents = handleDLDevents
+exports.handleDLDevents = handleDLDevents;
 
 
 function TerminateContract() {
-  var options = {
-    method: 'POST',
-    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
-    qs: { eventName: 'terminateContract' },
-    body:
-    {
-      header:
-      {
-        username: 'api_user',
-        password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-      },
-      body:
-      {
-        contractID: '4323940',
-        terminationReason: '001',
-        paymentInstruments:
-          [{
-            bankCode: 'ENBD',
-            instrumentID: '987123',
-            cancellationReason: '001'
-          },
-          {
-            bankCode: 'ENBD',
-            instrumentID: '987124',
-            'cancellationReason ': '001'
-          }]
-      }
-    },
-    json: true
-  };
-  return rp(options);
+  // var options = {
+  //   method: 'POST',
+  //   url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
+  //   qs: { eventName: 'terminateContract' },
+  //   body:
+  //   {
+  //     header:
+  //     {
+  //       username: 'api_user',
+  //       password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+  //     },
+  //     body:
+  //     {
+  //       contractID: '4323940',
+  //       terminationReason: '001',
+  //       paymentInstruments:
+  //         [{
+  //           bankCode: 'ENBD',
+  //           instrumentID: '987123',
+  //           cancellationReason: '001'
+  //         },
+  //         {
+  //           bankCode: 'ENBD',
+  //           instrumentID: '987124',
+  //           'cancellationReason ': '001'
+  //         }]
+  //     }
+  //   },
+  //   json: true
+  // };
+  // return rp(options);
+
+  return Promise.resolve({
+    methodName: "EventOnTerminateContract",
+    message: "DUMMY FUNCTION CALLED"
+  })
 }
 
-async function getPromise(payload,func,callback){
-  func().then(function (body) {
-    console.log(payload.eventName+ " dispatched", body)
-  }).catch(function (err) {
-    console.log("error : ", err)
-  })
-  callback({
-    error: true,
-    message: payload.eventName +" dispatched"
-  })
+async function getPromise(payload, func, callback) {
+  func().then(response => {
+    console.log(payload.eventData.eventName + " Dispatched", body);
+    callback({
+      error: true,
+      message: response
+    })
+  }).catch(err => {
+    console.log("error : ", err);
+    callback({
+      error: false,
+      message: payload.eventData.eventName + " Dispatched"
+    })
+  });
 }

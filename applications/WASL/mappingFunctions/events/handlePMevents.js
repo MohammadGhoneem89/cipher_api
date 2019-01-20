@@ -1,16 +1,17 @@
 
 'use strict';
 //var objectMapper = require('object-mapper');
+let Handlebars = require('handlebars');
 let rp = require('request-promise');
-
+let jsonTransformTemplates = require('../../lib/repositories/jsonTransformTemplate.js');
 
 async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
   try {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
-    console.log(JSON.stringify(payload, null, 2), "========> THIS IS PAYLOAD")
-
-    switch (payload.eventData.eventName) {
+    console.log(JSON.stringify(payload, null, 2))
+    console.log(payload.eventName, "===========================> THIS IS PAYLOAD")
+    switch (payload.eventName) {
 
       case "RenewContract":
         {
@@ -35,18 +36,18 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
         }
       case "EventOnUpdatePaymentStatus":
         {
-          return getPromise(payload, UpdateContractStatus, callback);
+          return await getPromise(payload, UpdateContractStatus, callback);
 
         }
 
       case "UpdateKYCDetail":
         {
-          return getPromise(payload, updateKYCDetail, callback);
+          return await getPromise(payload, updateKYCDetail, callback);
 
         }
       case "EjariData":
         {
-          return getPromise(payload, EjariAvailable, callback);
+          return await getPromise(payload, EjariAvailable, callback);
         }
 
       default:
@@ -107,7 +108,7 @@ function updateKYCDetail() {
   return rp(options);
 }
 
-function EjariAvailable() {
+function EjariAvailable(payload) {
   var options = {
     method: 'POST',
     url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
@@ -116,12 +117,12 @@ function EjariAvailable() {
     {
       header:
       {
-        username: 'api_user',
-        password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+        username: payload.header.username,
+        password: payload.header.password
       },
       body:
       {
-        contractID: '4323940',
+        contractID: payload.contractID,
         ejariID: '389492834',
         date: '05/11/2018'
       }
@@ -136,12 +137,6 @@ function UpdateContractStatus() {
   let options = {
     method: 'POST',
     url: 'http://51.140.250.28/API/PR/UpdateContractStatus',
-    headers:
-    {
-      'Postman-Token': '1cdaa66d-67e1-44bf-afbd-287d33d83b34',
-      'cache-control': 'no-cache',
-      'Content-Type': 'application/json'
-    },
     body:
     {
       bypassSimu: false,
@@ -165,13 +160,35 @@ function UpdateContractStatus() {
 
 
 async function getPromise(payload, func, callback) {
-  func().then(function (body) {
-    console.log(payload.eventName + " dispatched", body)
-  }).catch(function (err) {
-    console.log("error : ", err)
-  })
-  callback({
-    error: true,
-    message: payload.eventName + " dispatched"
-  })
+  func()
+    .then(function (body) {
+      console.log(payload.eventName + " dispatched", body)
+      callback({
+        message: body
+      })
+    })
+    .catch(function (err) {
+      console.log("error : ", err)
+      callback({
+        message: err
+      })
+    })
 }
+
+function transformTemplate() {
+  jsonTransformTemplates.findOne({})
+    .then((res) => {
+      console.log('---------------');
+      console.log(res, "I AM RESSSSSS");
+    });
+
+  let source = { "header": { "username": "username", "password": "password" }, "body": { "contractID": "{{payload.eventData.contractID}}", "eventType": " {{payload.eventType}}", "paymentInstruments": { "instrumentID": "ECHEQUE0001", "paymentMethod": "001", "status": "001", "date": "05/11/2018", "amount": "5000", "bankCode": "ENBD", "bankMetaData": { "MICR": "xxxxxxxxxx", "paymentID": "ECHEQUE1111" }, "failureReasonCode": "", "failureDescription": "" } } };
+  let template = Handlebars.compile(JSON.stringify(source));
+
+  let data = {
+    "payload": { "eventData": { "contractID": "TerminateContract" }, "eventType": "TC" },
+  };
+  let result = template(data);
+  return result;
+}
+console.log(transformTemplate());

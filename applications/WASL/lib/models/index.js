@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
-  Payment: require('./Payment')
+  Payment: require('./Payment'),
+  JSONTransformTemplates: require('./JSONTransformTemplates')
 };
 
