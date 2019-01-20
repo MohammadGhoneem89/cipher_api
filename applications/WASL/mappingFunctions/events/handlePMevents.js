@@ -184,6 +184,7 @@ async function getPromise(payload, func, callback) {
 
 
 function transformTemplate(templateName, data) {
+  return {};
   console.log("<====================I AM DATA======================>");
   console.log(data);
   console.log("<====================I AM DATA======================>");
