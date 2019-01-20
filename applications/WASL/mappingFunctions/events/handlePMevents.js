@@ -62,7 +62,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 function updateFirstPaymentStatus(payload) {
   let EventOnUpdateFirstPaymentStatus = {
     "contractID": "{{contractID}}",
-    "status": "{{contractID}}",
+    "firstPayment": "true",
     "paymentInstrument": [
       {
         "bankCode": "{{bankCode}}",
