@@ -78,7 +78,8 @@ function updateFirstPaymentStatus(payload) {
 
 
   let output = transformTemplate(EventOnUpdateFirstPaymentStatus, payload.eventData);
-  console.log("===========>I AM OUTPUT:", output);
+  console.log("===========>I AM OUTPUT:", typeof output, output);
+
 
   return () => {
     let options = {
