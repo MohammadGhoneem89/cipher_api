@@ -60,40 +60,36 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
 
 function updateFirstPaymentStatus(payload) {
-  // let EventOnUpdateFirstPaymentStatus = {
-  //   "contractID": "{{contractID}}",
-  //   "firstPayment": "true",
-  //   "paymentInstrument": [
-  //     {
-  //       "bankCode": "{{bankCode}}",
-  //       "instrumentID": "{{instrumentID}}",
-  //       "instrumentType": "{{bankCode}}",
-  //       "internalInstrumentID": "{{internalInstrumentID}}",
-  //       "date": "{{date}}",
-  //       "amount": "{{amount}}",
-  //       "status": "{{status}}"
-  //     }
-  //   ]
-  // };
   let EventOnUpdateFirstPaymentStatus = {
-    "contractID": payload.eventData.contractID,
+    "contractID": "{{contractID}}",
     "firstPayment": "true",
-    "paymentInstrument": [
+    "paymentInstruments": [
       {
-        "bankCode": payload.eventData.bankCode,
-        "instrumentID": payload.eventData.instrumentID,
-        "paymentMethod": payload.eventData.paymentMethod,
-        "internalInstrumentID": payload.eventData.internalInstrumentID,
-        "date": payload.eventData.date,
-        "amount": payload.eventData.amount,
-        "status": payload.eventData.status
+        "bankCode": "{{bankCode}}",
+        "instrumentID": "{{instrumentID}}",
+        "paymentMethod": "{{paymentMethod}}",
+        "internalInstrumentID": "{{internalInstrumentID}}",
+        "date": "{{date}}",
+        "amount": "{{amount}}",
+        "status": "{{status}}"
       }
     ]
   };
-
-
-
-
+  // let EventOnUpdateFirstPaymentStatus = {
+  //   "contractID": payload.eventData.contractID,
+  //   "firstPayment": "true",
+  //   "paymentInstrument": [
+  //     {
+  //       "bankCode": payload.eventData.bankCode,
+  //       "instrumentID": payload.eventData.instrumentID,
+  //       "paymentMethod": payload.eventData.paymentMethod,
+  //       "internalInstrumentID": payload.eventData.internalInstrumentID,
+  //       "date": payload.eventData.date,
+  //       "amount": payload.eventData.amount,
+  //       "status": payload.eventData.status
+  //     }
+  //   ]
+  // };
 
 
   return () => {
@@ -107,8 +103,8 @@ function updateFirstPaymentStatus(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          // body: transformTemplate(EventOnUpdateFirstPaymentStatus, payload.eventData)
-          body: EventOnUpdateFirstPaymentStatus
+          body: transformTemplate(EventOnUpdateFirstPaymentStatus, payload.eventData)
+          // body: EventOnUpdateFirstPaymentStatus
 
         },
       json: true
