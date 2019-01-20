@@ -61,25 +61,19 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
 function updateFirstPaymentStatus(payload) {
   let EventOnUpdateFirstPaymentStatus = {
-    "header": {
-      "username": "api_user",
-      "password": "2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b"
-    },
-    "body": {
-      "contractID": "{{contractID}}",
-      "status": "{{contractID}}",
-      "paymentInstrument": [
-        {
-          "bankCode": "{{bankCode}}",
-          "instrumentID": "{{instrumentID}}",
-          "instrumentType": "{{bankCode}}",
-          "internalInstrumentID": "{{internalInstrumentID}}",
-          "date": "{{date}}",
-          "amount": "{{amount}}",
-          "status": "{{status}}"
-        }
-      ]
-    }
+    "contractID": "{{contractID}}",
+    "status": "{{contractID}}",
+    "paymentInstrument": [
+      {
+        "bankCode": "{{bankCode}}",
+        "instrumentID": "{{instrumentID}}",
+        "instrumentType": "{{bankCode}}",
+        "internalInstrumentID": "{{internalInstrumentID}}",
+        "date": "{{date}}",
+        "amount": "{{amount}}",
+        "status": "{{status}}"
+      }
+    ]
   };
 
   return () => {
@@ -240,8 +234,8 @@ function transformTemplate(templateName, data) {
   //     console.log('---------------');
   //     console.log(res, "I AM RESSSSSS");
   //   });
-  Handlebars.registerHelper('EpochTOHuman', function(d) {
-    console.log("===============>CONVERT DATE: ",typeof (d), d);
+  Handlebars.registerHelper('EpochTOHuman', function (d) {
+    console.log("===============>CONVERT DATE: ", typeof (d), d);
     // return dates.ddMMyyyyslash(d);
     return "25/10/2019";
   });
