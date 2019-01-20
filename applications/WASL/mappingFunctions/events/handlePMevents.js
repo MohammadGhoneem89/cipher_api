@@ -2,6 +2,7 @@
 //var objectMapper = require('object-mapper');
 let Handlebars = require('handlebars');
 let rp = require('request-promise');
+const dates = require('../../../../lib/helpers/dates');
 let jsonTransformTemplates = require('../../lib/repositories/jsonTransformTemplate.js');
 
 
@@ -192,6 +193,9 @@ function transformTemplate(templateName, data) {
   //     console.log('---------------');
   //     console.log(res, "I AM RESSSSSS");
   //   });
+  Handlebars.registerHelper('EpochTOHuman', function(d) {
+    return dates.ddMMyyyyslash(d);
+  });
 
   let templateCompiler = Handlebars.compile(JSON.stringify(templateName));
 
