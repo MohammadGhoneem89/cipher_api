@@ -194,8 +194,9 @@ function transformTemplate(templateName, data) {
   //     console.log(res, "I AM RESSSSSS");
   //   });
   Handlebars.registerHelper('EpochTOHuman', function(d) {
-    console.log("===============>CONVERT DATE: ",d);
-    return dates.ddMMyyyyslash(parseInt(d));
+    console.log("===============>CONVERT DATE: ",typeof (d), d);
+    // return dates.ddMMyyyyslash(d);
+    return "25/10/2019";
   });
 
   let templateCompiler = Handlebars.compile(JSON.stringify(templateName));
