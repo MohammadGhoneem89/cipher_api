@@ -72,6 +72,30 @@ function _findOne(payload, callback) {
     });
 }
 
+function ListView(payload, UUIDKey, route, callback, JWToken) {
+  endpointDefination.findAll(payload)
+    .then((res) => {
+      let result = []
+      res.forEach((element) => {
+        let Elem = {};
+        Elem.text = element.name;
+        Elem.value = element._id;
+        result.push(Elem);
+      });
+
+      const response = {
+        [payload.action]: {
+          action: payload.action,
+          data: result
+        }
+      };
+      callback(response);
+    })
+    .catch((err) => {
+      callback(err);
+    });
+}
+
 function _list(payload, callback) {
   endpointDefination.findPageAndCount(payload)
     .then((res) => {
@@ -94,9 +118,9 @@ function _list(payload, callback) {
 }
 
 function findByName(payload) {
-  return endpointDefination.findByName({name: payload.name})
+  return endpointDefination.findByName({ name: payload.name })
     .then((res) => {
-      return {endpoint: res, data: payload.data};
+      return { endpoint: res, data: payload.data };
     });
 }
 //
@@ -119,7 +143,7 @@ function findByName(payload) {
  data: { hello: 'world !!!' } }
  * */
 
-
+exports.ListView = ListView;
 exports.list = list;
 exports.findOne = findOne;
 exports.upsert = upsert;

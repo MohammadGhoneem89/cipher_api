@@ -37,9 +37,6 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     apiPayloadRepo.create(requestData);
   }
 
-
-
-
   let ResponseCaller = function (data) {
     logger.debug({
       fs: 'RestController.js',
@@ -113,7 +110,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     ResponseCaller(data);
     let millisecondsend = (new Date()).getTime();
     logger.error({ fs: 'RestController.js', func: 'handleExternalRequest' }, `Message Processed In:  ${(millisecondsend - millisecondsstart)} ms`);
-    //logger.error({ fs: 'RestController.js', func: 'handleExternalRequest' }, "Response Recieved: " + JSON.stringify(data));
+    //  logger.error({ fs: 'RestController.js', func: 'handleExternalRequest' }, "Response Recieved: " + JSON.stringify(data));
   });
 };
 

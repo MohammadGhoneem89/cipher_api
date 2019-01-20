@@ -12,6 +12,12 @@
       "CustomMappingFile": "endpointDefination.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getEndpointListView": {
+      "customMapping": true,
+      "MappingfunctionName": "ListView",
+      "CustomMappingFile": "endpointDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "findEndpointDefinationById": {
       "customMapping": true,
       "MappingfunctionName": "findOne",

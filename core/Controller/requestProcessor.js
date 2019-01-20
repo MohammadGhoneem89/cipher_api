@@ -43,9 +43,8 @@ module.exports = class GeneralRequestProcessor {
           __cipherMetaData: constants.errRequestParsing
         };
         resolve(responseObj);
-        console.log("ERROR_API: " + ex);
-        console.log("ERROR_API: " + ex.stack);
       });
     });
   }
-}
+};
+
