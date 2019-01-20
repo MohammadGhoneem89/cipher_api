@@ -61,33 +61,48 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
 function updateFirstPaymentStatus(payload) {
   let EventOnUpdateFirstPaymentStatus = {
+    "header": {
+      "username": "api_user",
+      "password": "2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b"
+    },
     "body": {
-      "contractID": "1111",
-      "status": "CANCELLED",
+      "contractID": "{{contractID}}",
+      "status": "{{contractID}}",
       "paymentInstrument": [
         {
-          "bankCode": "",
-          "instrumentID": "987122",
-          "instrumentType": "001",
-          "date": "01/12/2017",
-          "amount": "5000",
-          "status": "CANCELLED"
-        },
-        {
-          "bankCode": "",
-          "instrumentID": "987123",
-          "instrumentType": "001",
-          "date": "04/12/2017",
-          "amount": "5000",
-          "status": "CANCELLED"
+          "bankCode": "{{bankCode}}",
+          "instrumentID": "{{instrumentID}}",
+          "instrumentType": "{{bankCode}}",
+          "internalInstrumentID": "{{internalInstrumentID}}",
+          "date": "{{date}}",
+          "amount": "{{amount}}",
+          "status": "{{status}}"
         }
       ]
     }
   };
 
-  return ()=>{
-    return Promise.resolve("");
-  };
+  return () => {
+    let options = {
+      method: 'POST',
+      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
+      body:
+        {
+          header:
+            {
+              username: 'api_user',
+              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+            },
+          body: transformTemplate(EventOnUpdateFirstPaymentStatus, payload.eventData)
+
+        },
+      json: true
+    };
+    console.log("<============CALLING PM API================>");
+    console.log(options);
+    console.log("<============CALLING PM API================>");
+    return rp(options);
+  }
 
 }
 
