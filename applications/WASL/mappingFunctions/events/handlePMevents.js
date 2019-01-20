@@ -73,18 +73,18 @@ function updateKYCDetail(payload) {
       "emiratesIDNumber": "{{GDRFA.natID}}",
       "emiratesIDExpiryDate": "{{GDRFA.emiratesIDExpiryDate}}",
       "POBox": "{{GDRFA.poBox}}",
-      "passportExpiryDate": "{{GDRFA.passport.passportExpiryDate}}",
-      "passportIssueDate": "{{GDRFA.passport.passportIssueDate}}",
+      "passportExpiryDate": "{{EpochTOHuman GDRFA.passport.passportExpiryDate}}",
+      "passportIssueDate": "{{EpochTOHuman GDRFA.passport.passportIssueDate}}",
       "passportIssuePlace": "{{GDRFA.passport.passportIssuePlace}}",
       "passportNumber": "{{GDRFA.passport.passportNo}}",
       "phoneNumber": "{{GDRFA.phoneNO}}",
       "gender": "{{GDRFA.gender}}",
       "tenantNameEnglish": "{{GDRFA.tenantNameEn}}",
       "tenantNameArabic": "{{GDRFA.tenantNameAr}}",
-      "visaExpiryDate": "{{GDRFA.visaExpiryDate}}",
+      "visaExpiryDate": "{{EpochTOHuman GDRFA.visaExpiryDate}}",
       "visaNo": "{{GDRFA.visaNo}}",
       "visaStatus": "{{GDRFA.visaStatus}}",
-      "visaStartDate": "{{GDRFA.visaIssueDate}}"
+      "visaStartDate": "{{EpochTOHuman GDRFA.visaIssueDate}}"
     }
   };
 
