@@ -11,7 +11,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
     console.log(JSON.stringify(payload, null, 2))
     console.log(payload.eventName, "===========================> THIS IS PAYLOAD")
-    switch (payload.eventName) {
+    switch (payload.eventData.eventName) {
 
       case "RenewContract": {
         return callback({
@@ -184,7 +184,6 @@ async function getPromise(payload, func, callback) {
 
 
 function transformTemplate(templateName, data) {
-  return {};
   console.log("<====================I AM DATA======================>");
   console.log(data);
   console.log("<====================I AM DATA======================>");
@@ -238,5 +237,3 @@ function transformTemplate(templateName, data) {
 
   return templateCompiler(data);
 }
-
-console.log(transformTemplate());
