@@ -138,7 +138,7 @@ function UpdatePaymentInstrumentStatus() {
 
 async function getPromise(payload, func, callback) {
   func().then(response => {
-    console.log(payload.eventData.eventName + " Dispatched", body);
+    console.log(response, "RESPONSE");
     callback({
       error: true,
       message: payload.eventData.eventName + " Dispatched",
