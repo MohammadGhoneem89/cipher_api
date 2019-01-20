@@ -114,7 +114,7 @@ function updateFirstPaymentStatus(payload) {
       json: true
     };
     console.log("<============CALLING PM API================>");
-    console.log(options);
+    console.log(JSON.stringify(options.body));
     console.log("<============CALLING PM API================>");
     return rp(options);
   }
