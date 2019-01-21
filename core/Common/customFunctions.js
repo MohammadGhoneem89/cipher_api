@@ -21,7 +21,8 @@ module.exports = {
     return dates.ddMMyyyyMS(data);
   },
   ddMMyyyyformat: (data, payload, jwt) => {
-    return dates.ddMMyyyyformat(data);
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>         ",data)
+    return dates.ddMMyyyyformat(data/1000);
   },
   
   MSddMMyyyyHHmmS: (data, payload, jwt) => {
