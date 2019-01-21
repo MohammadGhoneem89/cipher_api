@@ -22,7 +22,7 @@ module.exports = {
   },
   ddMMyyyyformat: (data, payload, jwt) => {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>         ",data)
-    return dates.ddMMyyyyformat(data/1000);
+    return dates.waslDateformat(data/1000);
   },
   
   MSddMMyyyyHHmmS: (data, payload, jwt) => {
