@@ -12,7 +12,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
     console.log(JSON.stringify(payload, null, 2));
-    console.log(payload.eventName, "===========================>handlePMevents THIS IS PAYLOAD");
+    console.log(payload.eventData.eventName, "===========================>handlePMevents THIS IS PAYLOAD");
     switch (payload.eventData.eventName) {
 
       case "RenewContract": {
@@ -88,7 +88,7 @@ function updatePaymentStatus(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: JSON.parse(transformTemplate(EventOnUpdateFirstPaymentStatus, payload.eventData))
+          body: transformTemplate("EventOnUpdatePaymentStatus", payload.eventData)
           // body: EventOnUpdateFirstPaymentStatus
 
         },
