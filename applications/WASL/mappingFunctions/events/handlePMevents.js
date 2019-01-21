@@ -77,7 +77,7 @@ function updatePaymentStatus(payload) {
   };
 
 
-  return () => {
+  return async () => {
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
@@ -88,7 +88,7 @@ function updatePaymentStatus(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: transformTemplate("EventOnUpdatePaymentStatus", payload.eventData)
+          body: await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData)
           // body: EventOnUpdateFirstPaymentStatus
 
         },
@@ -120,7 +120,7 @@ function updateFirstPaymentStatus(payload) {
   };
 
 
-  return () => {
+  return async () => {
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
@@ -131,7 +131,7 @@ function updateFirstPaymentStatus(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: transformTemplate("EventOnUpdateFirstPaymentStatus", payload.eventData, [])
+          body: await transformTemplate("EventOnUpdateFirstPaymentStatus", payload.eventData, [])
         },
       json: true
     };
@@ -173,7 +173,7 @@ function updateKYCDetail(payload) {
   };
 
 
-  return () => {
+  return async () => {
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=updateKYCDetail',
@@ -184,7 +184,7 @@ function updateKYCDetail(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: transformTemplate("EventOnUpdateKYCDetail", payload.eventData)
+          body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData)
 
         },
       json: true
