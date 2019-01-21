@@ -2,6 +2,7 @@
 //var objectMapper = require('object-mapper');
 let Handlebars = require('handlebars');
 let rp = require('request-promise');
+const dates = require('../../../../lib/helpers/dates');
 let jsonTransformTemplates = require('../../lib/repositories/jsonTransformTemplate.js');
 
 
@@ -11,7 +12,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
     console.log(JSON.stringify(payload, null, 2))
     console.log(payload.eventName, "===========================> THIS IS PAYLOAD")
-    switch (payload.eventName) {
+    switch (payload.eventData.eventName) {
 
       case "RenewContract": {
         return callback({
@@ -27,9 +28,12 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
         })
 
       }
-      case "EventOnUpdateFirstPaymentStatus": {
-        return await getPromise(payload, UpdateContractStatus, callback);
+      case "UpdateFirstPaymentInstrumentStatus": {
+        return await getPromise(payload, updateFirstPaymentStatus(payload), callback);
 
+      }
+      case "UpdatePaymentInstrumentStatus": {
+        return await getPromise(payload, updatePaymentStatus(payload), callback);
       }
       case "EventOnUpdatePaymentStatus": {
         return await getPromise(payload, UpdateContractStatus, callback);
@@ -57,8 +61,122 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
   }
 }
 
-exports.handlePMevents = handlePMevents;
 
+function updatePaymentStatus(payload) {
+  let EventOnUpdateFirstPaymentStatus = {
+    "contractID": "{{contractID}}",
+    "firstPayment": "false",
+    "paymentInstruments": [
+      {
+        "bankCode": "{{bankCode}}",
+        "instrumentID": "{{instrumentID}}",
+        "paymentMethod": "{{paymentMethod}}",
+        "internalInstrumentID": "{{internalInstrumentID}}",
+        "date": "{{date}}",
+        "amount": "{{amount}}",
+        "status": "{{status}}"
+      }
+    ]
+  };
+  // let EventOnUpdateFirstPaymentStatus = {
+  //   "contractID": payload.eventData.contractID,
+  //   "firstPayment": "true",
+  //   "paymentInstrument": [
+  //     {
+  //       "bankCode": payload.eventData.bankCode,
+  //       "instrumentID": payload.eventData.instrumentID,
+  //       "paymentMethod": payload.eventData.paymentMethod,
+  //       "internalInstrumentID": payload.eventData.internalInstrumentID,
+  //       "date": payload.eventData.date,
+  //       "amount": payload.eventData.amount,
+  //       "status": payload.eventData.status
+  //     }
+  //   ]
+  // };
+
+
+  return () => {
+    let options = {
+      method: 'POST',
+      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
+      body:
+        {
+          header:
+            {
+              username: 'api_user',
+              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+            },
+          body: JSON.parse(transformTemplate(EventOnUpdateFirstPaymentStatus, payload.eventData))
+          // body: EventOnUpdateFirstPaymentStatus
+
+        },
+      json: true
+    };
+    console.log("<============CALLING PM API================>");
+    console.log(JSON.stringify(options.body));
+    console.log("<============CALLING PM API================>");
+    return rp(options);
+  }
+
+}
+
+function updateFirstPaymentStatus(payload) {
+  let EventOnUpdateFirstPaymentStatus = {
+    "contractID": "{{contractID}}",
+    "firstPayment": "true",
+    "paymentInstruments": [
+      {
+        "bankCode": "{{bankCode}}",
+        "instrumentID": "{{instrumentID}}",
+        "paymentMethod": "{{paymentMethod}}",
+        "internalInstrumentID": "{{internalInstrumentID}}",
+        "date": "{{date}}",
+        "amount": "{{amount}}",
+        "status": "{{status}}"
+      }
+    ]
+  };
+  // let EventOnUpdateFirstPaymentStatus = {
+  //   "contractID": payload.eventData.contractID,
+  //   "firstPayment": "true",
+  //   "paymentInstrument": [
+  //     {
+  //       "bankCode": payload.eventData.bankCode,
+  //       "instrumentID": payload.eventData.instrumentID,
+  //       "paymentMethod": payload.eventData.paymentMethod,
+  //       "internalInstrumentID": payload.eventData.internalInstrumentID,
+  //       "date": payload.eventData.date,
+  //       "amount": payload.eventData.amount,
+  //       "status": payload.eventData.status
+  //     }
+  //   ]
+  // };
+
+
+  return () => {
+    let options = {
+      method: 'POST',
+      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
+      body:
+        {
+          header:
+            {
+              username: 'api_user',
+              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+            },
+          body: JSON.parse(transformTemplate(EventOnUpdateFirstPaymentStatus, payload.eventData))
+          // body: EventOnUpdateFirstPaymentStatus
+
+        },
+      json: true
+    };
+    console.log("<============CALLING PM API================>");
+    console.log(JSON.stringify(options.body));
+    console.log("<============CALLING PM API================>");
+    return rp(options);
+  }
+
+}
 
 function updateKYCDetail(payload) {
   let EventOnUpdateKYCDetail = {
@@ -82,15 +200,15 @@ function updateKYCDetail(payload) {
       "gender": "{{GDRFA.gender}}",
       "tenantNameEnglish": "{{GDRFA.tenantNameEn}}",
       "tenantNameArabic": "{{GDRFA.tenantNameAr}}",
-      "visaExpiryDate": "{{GDRFA.visaExpiryDate}}",
+      "visaExpiryDate": "{{EpochTOHuman GDRFA.visaExpiryDate}}",
       "visaNo": "{{GDRFA.visaNo}}",
       "visaStatus": "{{GDRFA.visaStatus}}",
-      "visaStartDate": "{{GDRFA.visaIssueDate}}"
+      "visaStartDate": "{{EpochTOHuman GDRFA.visaIssueDate}}"
     }
   };
 
 
-  return ()=>{
+  return () => {
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=updateKYCDetail',
@@ -101,7 +219,7 @@ function updateKYCDetail(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: transformTemplate(JSON.stringify(EventOnUpdateKYCDetail), payload.eventData)
+          body: transformTemplate(EventOnUpdateKYCDetail, payload.eventData)
 
         },
       json: true
@@ -167,28 +285,38 @@ function UpdateContractStatus() {
 
 
 async function getPromise(payload, func, callback) {
-  func()
-    .then(function (body) {
-      console.log(payload.eventName + " dispatched", body)
-      callback({
-        message: body
-      })
+  func().then(response => {
+    console.log(response, "RESPONSE");
+    callback({
+      error: false,
+      message: payload.eventData.eventName + " Dispatched",
+      response: response
     })
-    .catch(function (err) {
-      console.log("error : ", err)
-      callback({
-        message: err
-      })
+  }).catch(err => {
+    console.log("error : ", err);
+    callback({
+      error: true,
+      message: payload.eventData.eventName + " Failed",
+      response: err
     })
+  });
 }
 
 
 function transformTemplate(templateName, data) {
+  console.log("<====================I AM DATA======================>");
+  console.log(data);
+  console.log("<====================I AM DATA======================>");
   // jsonTransformTemplates.findOne({})
   //   .then((res) => {
   //     console.log('---------------');
   //     console.log(res, "I AM RESSSSSS");
   //   });
+  Handlebars.registerHelper('EpochTOHuman', function (d) {
+    console.log("===============>CONVERT DATE: ", typeof (d), d);
+    // return dates.ddMMyyyyslash(d);
+    return "25/10/2019";
+  });
 
   let templateCompiler = Handlebars.compile(JSON.stringify(templateName));
 
@@ -235,4 +363,5 @@ function transformTemplate(templateName, data) {
   return templateCompiler(data);
 }
 
-console.log(transformTemplate());
+
+exports.handlePMevents = handlePMevents;

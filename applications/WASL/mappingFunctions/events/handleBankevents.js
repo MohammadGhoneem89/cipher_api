@@ -45,6 +45,10 @@ exports.handleBankevents = handleBankevents
 
 
 function ProcessInstrument() {
+  return Promise.resolve({
+    methodName: "EventOnProcessPaymentInstrument",
+    message: "DUMMY FUNCTION CALLED"
+  });
 
   let options = {
     method: 'POST',
@@ -80,6 +84,11 @@ function ProcessInstrument() {
 }
 
 function UpdatePaymentInstrumentStatus() {
+  return Promise.resolve({
+    methodName: "UpdatePaymentInstrumentStatus",
+    message: "DUMMY FUNCTION CALLED"
+  });
+
   let options = {
     method: 'POST',
     url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
@@ -136,14 +145,20 @@ function UpdatePaymentInstrumentStatus() {
   return rp(options);
 }
 
-async function getPromise(payload,func,callback){
-  func().then(function (body) {
-    console.log(payload.eventName+ " dispatched", body)
-  }).catch(function (err) {
-    console.log("error : ", err)
-  })
-  callback({
-    error: true,
-    message: payload.eventName +" dispatched"
-  })
+async function getPromise(payload, func, callback) {
+  func().then(response => {
+    console.log(response, "RESPONSE");
+    callback({
+      error: false,
+      message: payload.eventData.eventName + " Dispatched",
+      response: response
+    })
+  }).catch(err => {
+    console.log("error : ", err);
+    callback({
+      error: true,
+      message: payload.eventData.eventName + " Failed",
+      response: err
+    })
+  });
 }

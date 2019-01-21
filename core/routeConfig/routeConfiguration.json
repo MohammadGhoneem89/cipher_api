@@ -1,5 +1,17 @@
 {
   "core": {
+    "putTransformationTemplate":{
+      "customMapping": true,
+      "MappingfunctionName": "putTransformationTemplate",
+      "CustomMappingFile": "putTransformationTemplate.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTransformationData":{
+      "customMapping": true,
+      "MappingfunctionName": "getTransformationData",
+      "CustomMappingFile": "getTransformationData.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "generateMappingFile": {
       "customMapping": true,
       "MappingfunctionName": "generateMappingFile",

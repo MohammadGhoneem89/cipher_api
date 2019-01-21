@@ -1,6 +1,6 @@
-
 'use strict';
-let rp=require('request-promise')
+let rp = require('request-promise')
+
 async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<Request Recieved for Event>>>>")
@@ -8,39 +8,50 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
 
     switch (payload.eventData.eventName) {
 
-      case "EventOnTerminateContract":
-        {
-          return getPromise(payload,TerminateContract(),callback)
-        }
+      case "EventOnTerminateContract": {
+        return getPromise(payload, TerminateContract, callback)
+      }
 
-      case "TerminateContract":
-        {
-          return getPromise(payload,TerminateContract,callback)
-        }
+      case "TerminateContract": {
+        return getPromise(payload, TerminateContract, callback)
+      }
+      case "UpdateFirstPaymentInstrumentStatus": {
+        return getPromise(payload, EventOnRequestEjari(payload), callback)
+      }
       // case "EventOnTerminateContract":
       //   {
       //
       //   }
       // break;
-      case "EventOnUpdateKYCDetail":
-        {
+      case "EventOnUpdateKYCDetail": {
 
-        }
+      }
         break;
       default:
         return callback({
           error: true,
           message: "invalid case"
         })
-        
+
     }
   }
   catch (err) {
     console.log(err)
   }
 }
+
 exports.handleDLDevents = handleDLDevents;
 
+
+function EventOnRequestEjari(payload) {
+
+  return () => {
+    return Promise.resolve({
+      methodName: "EventOnTerminateContract",
+      message: "DUMMY FUNCTION CALLED"
+    })
+  }
+}
 
 function TerminateContract() {
 
@@ -84,16 +95,18 @@ function TerminateContract() {
 
 async function getPromise(payload, func, callback) {
   func().then(response => {
-    console.log(payload.eventData.eventName + " Dispatched", body);
+    console.log(response, "RESPONSE");
     callback({
-      error: true,
-      message: response
+      error: false,
+      message: payload.eventData.eventName + " Dispatched",
+      response: response
     })
   }).catch(err => {
     console.log("error : ", err);
     callback({
-      error: false,
-      message: payload.eventData.eventName + " Dispatched"
+      error: true,
+      message: payload.eventData.eventName + " Failed",
+      response: err
     })
   });
 }
