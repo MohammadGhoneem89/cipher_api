@@ -60,23 +60,6 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
 
 function updatePaymentStatus(payload) {
-  let EventOnUpdatePaymentStatus = {
-    "contractID": "{{contractID}}",
-    "firstPayment": "false",
-    "paymentInstruments": [
-      {
-        "bankCode": "{{bankCode}}",
-        "instrumentID": "{{instrumentID}}",
-        "paymentMethod": "{{paymentMethod}}",
-        "internalInstrumentID": "{{internalInstrumentID}}",
-        "date": "{{date}}",
-        "amount": "{{amount}}",
-        "status": "{{status}}"
-      }
-    ]
-  };
-
-
   return async () => {
     let options = {
       method: 'POST',
@@ -94,32 +77,12 @@ function updatePaymentStatus(payload) {
         },
       json: true
     };
-    console.log("<============CALLING PM API================>");
-    console.log(JSON.stringify(options.body));
-    console.log("<============CALLING PM API================>");
     return rp(options);
   }
 
 }
 
 function updateFirstPaymentStatus(payload) {
-  let EventOnUpdateFirstPaymentStatus = {
-    "contractID": "{{contractID}}",
-    "firstPayment": "true",
-    "paymentInstruments": [
-      {
-        "bankCode": "{{bankCode}}",
-        "instrumentID": "{{instrumentID}}",
-        "paymentMethod": "{{paymentMethod}}",
-        "internalInstrumentID": "{{internalInstrumentID}}",
-        "date": "{{date}}",
-        "amount": "{{amount}}",
-        "status": "{{status}}"
-      }
-    ]
-  };
-
-
   return async () => {
     let options = {
       method: 'POST',
@@ -135,44 +98,12 @@ function updateFirstPaymentStatus(payload) {
         },
       json: true
     };
-    console.log("<============CALLING PM API================>");
-    console.log(JSON.stringify(options.body));
-    console.log("<============CALLING PM API================>");
     return rp(options);
   }
 
 }
 
 function updateKYCDetail(payload) {
-  let EventOnUpdateKYCDetail = {
-    "header": {
-      "username": "api_user",
-      "password": "2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b"
-    },
-    "body": {
-      "residenceAddress": "{{GDRFA.residenceAddr}}",
-      "contactPersonMobile": "{{GDRFA.contactPersonMobile}}",
-      "nationality": "{{GDRFA.nationality}}",
-      "dateOfBirth": "{{GDRFA.dateOfBirth}}",
-      "emiratesIDNumber": "{{GDRFA.natID}}",
-      "emiratesIDExpiryDate": "{{GDRFA.emiratesIDExpiryDate}}",
-      "POBox": "{{GDRFA.poBox}}",
-      "passportExpiryDate": "{{GDRFA.passport.passportExpiryDate}}",
-      "passportIssueDate": "{{GDRFA.passport.passportIssueDate}}",
-      "passportIssuePlace": "{{GDRFA.passport.passportIssuePlace}}",
-      "passportNumber": "{{GDRFA.passport.passportNo}}",
-      "phoneNumber": "{{GDRFA.phoneNO}}",
-      "gender": "{{GDRFA.gender}}",
-      "tenantNameEnglish": "{{GDRFA.tenantNameEn}}",
-      "tenantNameArabic": "{{GDRFA.tenantNameAr}}",
-      "visaExpiryDate": "{{EpochTOHuman GDRFA.visaExpiryDate}}",
-      "visaNo": "{{GDRFA.visaNo}}",
-      "visaStatus": "{{GDRFA.visaStatus}}",
-      "visaStartDate": "{{EpochTOHuman GDRFA.visaIssueDate}}"
-    }
-  };
-
-
   return async () => {
     let options = {
       method: 'POST',
@@ -189,9 +120,6 @@ function updateKYCDetail(payload) {
         },
       json: true
     };
-    console.log("<============CALLING PM API================>");
-    console.log(options);
-    console.log("<============CALLING PM API================>");
     return rp(options);
   }
 
