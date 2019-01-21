@@ -142,7 +142,7 @@ function EjariAvailable(payload) {
         },
       json: true
     };
-
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
   }
 }
@@ -176,7 +176,7 @@ function UpdateContractStatus() {
 
 async function getPromise(payload, func, callback) {
   func().then(response => {
-    console.log(response, "RESPONSE");
+    console.log("RESPONSE===============>", response);
     callback({
       error: false,
       message: payload.eventData.eventName + " Dispatched",
