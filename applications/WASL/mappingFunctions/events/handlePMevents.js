@@ -42,7 +42,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
       }
       case "EjariData": {
-        return await getPromise(payload, EjariAvailable, callback);
+        return await getPromise(payload, EjariAvailable(payload), callback);
       }
 
       default:
@@ -71,7 +71,7 @@ function updatePaymentStatus(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData)
+          body: await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData, [])
           // body: EventOnUpdateFirstPaymentStatus
 
         },
@@ -115,7 +115,7 @@ function updateKYCDetail(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData)
+          body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, [])
 
         },
       json: true
@@ -126,28 +126,25 @@ function updateKYCDetail(payload) {
 }
 
 function EjariAvailable(payload) {
-  var options = {
-    method: 'POST',
-    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
-    qs: {eventName: 'ejariAvailable'},
-    body:
-      {
-        header:
-          {
-            username: payload.header.username,
-            password: payload.header.password
-          },
-        body:
-          {
-            contractID: payload.contractID,
-            ejariID: '389492834',
-            date: '05/11/2018'
-          }
-      },
-    json: true
-  };
+  return async () => {
+    let options = {
+      method: 'POST',
+      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=ejariAvailable',
+      qs: {eventName: 'ejariAvailable'},
+      body:
+        {
+          header:
+            {
+              username: 'api_user',
+              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+            },
+          body: await transformTemplate("EventOnEjariAvailable", payload.eventData, [])
+        },
+      json: true
+    };
 
-  return rp(options);
+    return rp(options);
+  }
 }
 
 function UpdateContractStatus() {
@@ -194,24 +191,5 @@ async function getPromise(payload, func, callback) {
     })
   });
 }
-
-//
-// function transformTemplate(templateName, data) {
-//   console.log("<====================I AM DATA======================>");
-//   console.log(data);
-//   console.log("<====================I AM DATA======================>");
-//
-//   Handlebars.registerHelper('EpochTOHuman', function (d) {
-//     console.log("===============>CONVERT DATE: ", typeof (d), d);
-//     // return dates.ddMMyyyyslash(d);
-//     return "25/10/2019";
-//   });
-//
-//   let templateCompiler = Handlebars.compile(JSON.stringify(templateName));
-//
-//
-//   return templateCompiler(data);
-// }
-
 
 exports.handlePMevents = handlePMevents;
