@@ -172,7 +172,7 @@ function EjariTermination(payload) {
   return async () => {
     let options = {
       method: 'POST',
-      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=ejariAvailable',
+      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=terminateContract',
       qs: {eventName: 'ejariAvailable'},
       body:
         {
