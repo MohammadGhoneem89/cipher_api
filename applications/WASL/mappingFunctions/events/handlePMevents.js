@@ -77,6 +77,7 @@ function updatePaymentStatus(payload) {
         },
       json: true
     };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
   }
 
@@ -98,6 +99,7 @@ function updateFirstPaymentStatus(payload) {
         },
       json: true
     };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
   }
 
@@ -120,6 +122,7 @@ function updateKYCDetail(payload) {
         },
       json: true
     };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
   }
 
@@ -170,6 +173,7 @@ function UpdateContractStatus() {
       },
     json: true
   };
+  console.log("REQUEST===============>", options.body, "<===============REQUEST");
   return rp(options);
 }
 
