@@ -3,6 +3,7 @@
 let Handlebars = require('handlebars');
 let rp = require('request-promise');
 const dates = require('../../../../lib/helpers/dates');
+const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 let jsonTransformTemplates = require('../../lib/repositories/jsonTransformTemplate.js');
 
 
@@ -10,8 +11,8 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
   try {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
-    console.log(JSON.stringify(payload, null, 2))
-    console.log(payload.eventName, "===========================> THIS IS PAYLOAD")
+    console.log(JSON.stringify(payload, null, 2));
+    console.log(payload.eventName, "===========================>handlePMevents THIS IS PAYLOAD");
     switch (payload.eventData.eventName) {
 
       case "RenewContract": {
@@ -34,10 +35,6 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
       }
       case "UpdatePaymentInstrumentStatus": {
         return await getPromise(payload, updatePaymentStatus(payload), callback);
-      }
-      case "EventOnUpdatePaymentStatus": {
-        return await getPromise(payload, UpdateContractStatus, callback);
-
       }
 
       case "UpdateKYCDetail": {
@@ -63,7 +60,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
 
 function updatePaymentStatus(payload) {
-  let EventOnUpdateFirstPaymentStatus = {
+  let EventOnUpdatePaymentStatus = {
     "contractID": "{{contractID}}",
     "firstPayment": "false",
     "paymentInstruments": [
@@ -78,21 +75,6 @@ function updatePaymentStatus(payload) {
       }
     ]
   };
-  // let EventOnUpdateFirstPaymentStatus = {
-  //   "contractID": payload.eventData.contractID,
-  //   "firstPayment": "true",
-  //   "paymentInstrument": [
-  //     {
-  //       "bankCode": payload.eventData.bankCode,
-  //       "instrumentID": payload.eventData.instrumentID,
-  //       "paymentMethod": payload.eventData.paymentMethod,
-  //       "internalInstrumentID": payload.eventData.internalInstrumentID,
-  //       "date": payload.eventData.date,
-  //       "amount": payload.eventData.amount,
-  //       "status": payload.eventData.status
-  //     }
-  //   ]
-  // };
 
 
   return () => {
@@ -136,21 +118,6 @@ function updateFirstPaymentStatus(payload) {
       }
     ]
   };
-  // let EventOnUpdateFirstPaymentStatus = {
-  //   "contractID": payload.eventData.contractID,
-  //   "firstPayment": "true",
-  //   "paymentInstrument": [
-  //     {
-  //       "bankCode": payload.eventData.bankCode,
-  //       "instrumentID": payload.eventData.instrumentID,
-  //       "paymentMethod": payload.eventData.paymentMethod,
-  //       "internalInstrumentID": payload.eventData.internalInstrumentID,
-  //       "date": payload.eventData.date,
-  //       "amount": payload.eventData.amount,
-  //       "status": payload.eventData.status
-  //     }
-  //   ]
-  // };
 
 
   return () => {
@@ -164,9 +131,7 @@ function updateFirstPaymentStatus(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: JSON.parse(transformTemplate(EventOnUpdateFirstPaymentStatus, payload.eventData))
-          // body: EventOnUpdateFirstPaymentStatus
-
+          body: transformTemplate("EventOnUpdateFirstPaymentStatus", payload.eventData, [])
         },
       json: true
     };
@@ -219,14 +184,14 @@ function updateKYCDetail(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: transformTemplate(EventOnUpdateKYCDetail, payload.eventData)
+          body: transformTemplate("EventOnUpdateKYCDetail", payload.eventData)
 
         },
       json: true
     };
-    console.log("<============CALLING PM API================>")
+    console.log("<============CALLING PM API================>");
     console.log(options);
-    console.log("<============CALLING PM API================>")
+    console.log("<============CALLING PM API================>");
     return rp(options);
   }
 
@@ -302,66 +267,23 @@ async function getPromise(payload, func, callback) {
   });
 }
 
-
-function transformTemplate(templateName, data) {
-  console.log("<====================I AM DATA======================>");
-  console.log(data);
-  console.log("<====================I AM DATA======================>");
-  // jsonTransformTemplates.findOne({})
-  //   .then((res) => {
-  //     console.log('---------------');
-  //     console.log(res, "I AM RESSSSSS");
-  //   });
-  Handlebars.registerHelper('EpochTOHuman', function (d) {
-    console.log("===============>CONVERT DATE: ", typeof (d), d);
-    // return dates.ddMMyyyyslash(d);
-    return "25/10/2019";
-  });
-
-  let templateCompiler = Handlebars.compile(JSON.stringify(templateName));
-
-  // let data = {
-  //   "GDRFA": {
-  //     "contactPersonMobile": "0557168540",
-  //     "dateOfBirth": 5112000,
-  //     "emiratesIDExpiryDate": 0,
-  //     "gender": "Male",
-  //     "lastSyncDate": "",
-  //     "natID": "784-1984-1234567-17",
-  //     "natIDExpDate": 1541376000000,
-  //     "nationality": "Pakistan",
-  //     "passport": {
-  //       "passportExpiryDate": "01012020",
-  //       "passportIssueDate": "01012010",
-  //       "passportIssuePlace": "Dubai",
-  //       "passportNo": "AB00000"
-  //     },
-  //     "phoneNO": "040000000",
-  //     "poBox": "1000",
-  //     "residenceAddr": "Al Nahda Dubai",
-  //     "tenantNameAr": "الاسم الكامل عربي ",
-  //     "tenantNameEn": "Sandeep Kumar",
-  //     "visaExpiryDate": 1577836800000,
-  //     "visaIssueDate": "1451606400000",
-  //     "visaNo": "2010716123456",
-  //     "visaStatus": "Valid"
-  //   },
-  //   "SDG": {
-  //     "customerName": "Arham Ali",
-  //     "emailID": "arham.ali@avanzainnovation.com",
-  //     "emiratesID": "784-1984-1234567-17",
-  //     "emiratesIDExpiryDate": 1609372800000,
-  //     "mobileNumber": "03452837803",
-  //     "visaExpiryDate": 1638316800000,
-  //     "visaNo": "Visa11111"
-  //   },
-  //   "documentName": "kycCollection",
-  //   "key": "EIDA_784-1984-1234567-17",
-  //   "eventName": "UpdateKYCDetail"
-  // };
-
-  return templateCompiler(data);
-}
+//
+// function transformTemplate(templateName, data) {
+//   console.log("<====================I AM DATA======================>");
+//   console.log(data);
+//   console.log("<====================I AM DATA======================>");
+//
+//   Handlebars.registerHelper('EpochTOHuman', function (d) {
+//     console.log("===============>CONVERT DATE: ", typeof (d), d);
+//     // return dates.ddMMyyyyslash(d);
+//     return "25/10/2019";
+//   });
+//
+//   let templateCompiler = Handlebars.compile(JSON.stringify(templateName));
+//
+//
+//   return templateCompiler(data);
+// }
 
 
 exports.handlePMevents = handlePMevents;
