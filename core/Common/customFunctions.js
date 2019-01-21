@@ -20,6 +20,10 @@ module.exports = {
   ddMMyyyy: (data, payload, jwt) => {
     return dates.ddMMyyyyMS(data);
   },
+  ddMMyyyyformat: (data, payload, jwt) => {
+    return dates.ddMMyyyyformat(data);
+  },
+  
   MSddMMyyyyHHmmS: (data, payload, jwt) => {
     return dates.MSddMMyyyyHHmmS(data);
   },
