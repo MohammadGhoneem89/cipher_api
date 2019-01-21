@@ -30,10 +30,21 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
       }
       case "UpdateFirstPaymentInstrumentStatus": {
+        try{
+          await UpdateContractStatus(payload);
+        }catch (e) {
+          console.log(e);
+        }
+
         return await getPromise(payload, updateFirstPaymentStatus(payload), callback);
 
       }
       case "UpdatePaymentInstrumentStatus": {
+        try{
+          await UpdateContractStatus(payload);
+        }catch (e) {
+          console.log(e);
+        }
         return await getPromise(payload, updatePaymentStatus(payload), callback);
       }
 
@@ -44,7 +55,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
       case "EjariData": {
         return await getPromise(payload, EjariAvailable(payload), callback);
       }
-      case "EjariTerminationStatus":{
+      case "EjariTerminationStatus": {
         return await getPromise(payload, EjariTermination(payload), callback);
       }
 
@@ -179,37 +190,33 @@ function EjariTermination(payload) {
   }
 }
 
-function UpdateContractStatus() {
-
-  let options = {
-    method: 'POST',
-    url: 'http://51.140.250.28/API/PR/UpdateContractStatus',
-    body:
-      {
-        bypassSimu: false,
-        header:
-          {
-            username: 'waslapi',
-            password: 'aa8dd29e572a64982d7d2bf48325a4951b7c399a1283fb33460ca275e230d5ae308dcd820d808c5ea0d23e047bd2f3e066bf402cb249d989408331566f7ca890'
+function UpdateContractStatus(payload) {
+  return async () => {
+    let options = {
+      method: 'POST',
+      url: 'http://51.140.250.28/API/PR/UpdateContractStatus',
+      body:
+        {
+          "header": {
+            "username": "Internal_API",
+            "password": "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
           },
-        body:
-          {
-            EIDA: '784-1984-1234567-9',
-            authToken: '03452837803',
-            contractID: 'DIRC103',
-            orgCode: 'WASL'
+          "body": {
+            "orgCode": "WASL",
+            "contractID": payload.eventData.contractID
           }
-      },
-    json: true
-  };
-  console.log("REQUEST===============>", options.body, "<===============REQUEST");
-  return rp(options);
+        },
+      json: true
+    };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
+    return rp(options);
+  }
 }
 
 
 async function getPromise(payload, func, callback) {
   func().then(response => {
-    console.log("RESPONSE===============>", response);
+    console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
       error: false,
       message: payload.eventData.eventName + " Dispatched",
