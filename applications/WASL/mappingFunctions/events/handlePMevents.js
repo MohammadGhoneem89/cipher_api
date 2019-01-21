@@ -12,7 +12,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
     console.log(JSON.stringify(payload, null, 2));
-    console.log(payload.eventName, "===========================>handlePMevents THIS IS PAYLOAD");
+    console.log(payload.eventData.eventName, "===========================>handlePMevents THIS IS PAYLOAD");
     switch (payload.eventData.eventName) {
 
       case "RenewContract": {
@@ -60,24 +60,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
 
 function updatePaymentStatus(payload) {
-  let EventOnUpdatePaymentStatus = {
-    "contractID": "{{contractID}}",
-    "firstPayment": "false",
-    "paymentInstruments": [
-      {
-        "bankCode": "{{bankCode}}",
-        "instrumentID": "{{instrumentID}}",
-        "paymentMethod": "{{paymentMethod}}",
-        "internalInstrumentID": "{{internalInstrumentID}}",
-        "date": "{{date}}",
-        "amount": "{{amount}}",
-        "status": "{{status}}"
-      }
-    ]
-  };
-
-
-  return () => {
+  return async () => {
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
@@ -88,39 +71,19 @@ function updatePaymentStatus(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: JSON.parse(transformTemplate(EventOnUpdateFirstPaymentStatus, payload.eventData))
+          body: await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData)
           // body: EventOnUpdateFirstPaymentStatus
 
         },
       json: true
     };
-    console.log("<============CALLING PM API================>");
-    console.log(JSON.stringify(options.body));
-    console.log("<============CALLING PM API================>");
     return rp(options);
   }
 
 }
 
 function updateFirstPaymentStatus(payload) {
-  let EventOnUpdateFirstPaymentStatus = {
-    "contractID": "{{contractID}}",
-    "firstPayment": "true",
-    "paymentInstruments": [
-      {
-        "bankCode": "{{bankCode}}",
-        "instrumentID": "{{instrumentID}}",
-        "paymentMethod": "{{paymentMethod}}",
-        "internalInstrumentID": "{{internalInstrumentID}}",
-        "date": "{{date}}",
-        "amount": "{{amount}}",
-        "status": "{{status}}"
-      }
-    ]
-  };
-
-
-  return () => {
+  return async () => {
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
@@ -131,49 +94,17 @@ function updateFirstPaymentStatus(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: transformTemplate("EventOnUpdateFirstPaymentStatus", payload.eventData, [])
+          body: await transformTemplate("EventOnUpdateFirstPaymentStatus", payload.eventData, [])
         },
       json: true
     };
-    console.log("<============CALLING PM API================>");
-    console.log(JSON.stringify(options.body));
-    console.log("<============CALLING PM API================>");
     return rp(options);
   }
 
 }
 
 function updateKYCDetail(payload) {
-  let EventOnUpdateKYCDetail = {
-    "header": {
-      "username": "api_user",
-      "password": "2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b"
-    },
-    "body": {
-      "residenceAddress": "{{GDRFA.residenceAddr}}",
-      "contactPersonMobile": "{{GDRFA.contactPersonMobile}}",
-      "nationality": "{{GDRFA.nationality}}",
-      "dateOfBirth": "{{GDRFA.dateOfBirth}}",
-      "emiratesIDNumber": "{{GDRFA.natID}}",
-      "emiratesIDExpiryDate": "{{GDRFA.emiratesIDExpiryDate}}",
-      "POBox": "{{GDRFA.poBox}}",
-      "passportExpiryDate": "{{GDRFA.passport.passportExpiryDate}}",
-      "passportIssueDate": "{{GDRFA.passport.passportIssueDate}}",
-      "passportIssuePlace": "{{GDRFA.passport.passportIssuePlace}}",
-      "passportNumber": "{{GDRFA.passport.passportNo}}",
-      "phoneNumber": "{{GDRFA.phoneNO}}",
-      "gender": "{{GDRFA.gender}}",
-      "tenantNameEnglish": "{{GDRFA.tenantNameEn}}",
-      "tenantNameArabic": "{{GDRFA.tenantNameAr}}",
-      "visaExpiryDate": "{{EpochTOHuman GDRFA.visaExpiryDate}}",
-      "visaNo": "{{GDRFA.visaNo}}",
-      "visaStatus": "{{GDRFA.visaStatus}}",
-      "visaStartDate": "{{EpochTOHuman GDRFA.visaIssueDate}}"
-    }
-  };
-
-
-  return () => {
+  return async () => {
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=updateKYCDetail',
@@ -184,14 +115,11 @@ function updateKYCDetail(payload) {
               username: 'api_user',
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
-          body: transformTemplate("EventOnUpdateKYCDetail", payload.eventData)
+          body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData)
 
         },
       json: true
     };
-    console.log("<============CALLING PM API================>");
-    console.log(options);
-    console.log("<============CALLING PM API================>");
     return rp(options);
   }
 
