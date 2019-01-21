@@ -60,7 +60,11 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
 
 function updatePaymentStatus(payload) {
+  console.log("PAYLOADY=====================> ", payload.eventData, " <=====================PAYLOADY");
+
+
   return async () => {
+    console.log("OUTPUT=====================> ", await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData, []), " <=====================OUTPUT");
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
