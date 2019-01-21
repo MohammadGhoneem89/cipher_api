@@ -44,6 +44,9 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
       case "EjariData": {
         return await getPromise(payload, EjariAvailable(payload), callback);
       }
+      case "EjariTerminationStatus":{
+        return await getPromise(payload, EjariTermination(payload), callback);
+      }
 
       default:
         return callback({
@@ -136,7 +139,7 @@ function EjariAvailable(payload) {
   return async () => {
     let options = {
       method: 'POST',
-      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=ejariAvailable',
+      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=terminateContract',
       qs: {eventName: 'ejariAvailable'},
       body:
         {
@@ -146,6 +149,28 @@ function EjariAvailable(payload) {
               password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
             },
           body: await transformTemplate("EventOnEjariAvailable", payload.eventData, [])
+        },
+      json: true
+    };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
+    return rp(options);
+  }
+}
+
+function EjariTermination(payload) {
+  return async () => {
+    let options = {
+      method: 'POST',
+      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=ejariAvailable',
+      qs: {eventName: 'ejariAvailable'},
+      body:
+        {
+          header:
+            {
+              username: 'api_user',
+              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+            },
+          body: await transformTemplate("EventOnEjariTerminationStatus", payload.eventData, [])
         },
       json: true
     };
