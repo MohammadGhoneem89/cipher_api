@@ -70,6 +70,7 @@
     "pg": "^7.4.3",
     "pg-promise": "^8.5.1",
     "process-nextick-args": "^2.0.0",
+    "promised-handlebars": "^2.0.1",
     "redis": "^2.8.0",
     "request-json": "^0.6.3",
     "request-promise": "^4.2.2",
