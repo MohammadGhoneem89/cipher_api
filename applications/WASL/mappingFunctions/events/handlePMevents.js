@@ -151,7 +151,6 @@ function EjariAvailable(payload) {
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=terminateContract',
-      qs: {eventName: 'ejariAvailable'},
       body:
         {
           header:
@@ -173,7 +172,6 @@ function EjariTermination(payload) {
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=terminateContract',
-      qs: {eventName: 'ejariAvailable'},
       body:
         {
           header:
