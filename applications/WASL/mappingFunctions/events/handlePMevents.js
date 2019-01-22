@@ -25,33 +25,49 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
       }
       case "UpdateFirstPaymentInstrumentStatus": {
-        try{
+        try {
           await UpdateContractStatus(payload);
-        }catch (e) {
+          await getPromise(payload, updateFirstPaymentStatus(payload), callback);
+        } catch (e) {
           console.log(e);
         }
-
-        return await getPromise(payload, updateFirstPaymentStatus(payload), callback);
-
+        break;
       }
       case "UpdatePaymentInstrumentStatus": {
-        try{
+        try {
           await UpdateContractStatus(payload);
-        }catch (e) {
+          await getPromise(payload, updatePaymentStatus(payload), callback);
+        } catch (e) {
           console.log(e);
         }
-        return await getPromise(payload, updatePaymentStatus(payload), callback);
+        break;
       }
 
       case "UpdateKYCDetail": {
-        return await getPromise(payload, updateKYCDetail(payload), callback);
-
+        try {
+          await getPromise(payload, updateKYCDetail(payload), callback);
+        }
+        catch (e) {
+          console.log(e);
+        }
+        break;
       }
       case "EjariData": {
-        return await getPromise(payload, EjariAvailable(payload), callback);
+        try {
+         await getPromise(payload, EjariAvailable(payload), callback);
+        }
+        catch (e) {
+          console.log(e);
+        }
+        break;
       }
       case "EjariTerminationStatus": {
-        return await getPromise(payload, EjariTermination(payload), callback);
+        try {
+          await getPromise(payload, EjariTermination(payload), callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
       }
 
       default:
@@ -78,16 +94,16 @@ function updatePaymentStatus(payload) {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
       body:
+      {
+        header:
         {
-          header:
-            {
-              username: 'api_user',
-              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-            },
-          body: await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData, [])
-          // body: EventOnUpdateFirstPaymentStatus
-
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
         },
+        body: await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData, [])
+        // body: EventOnUpdateFirstPaymentStatus
+
+      },
       json: true
     };
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
@@ -102,14 +118,14 @@ function updateFirstPaymentStatus(payload) {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
       body:
+      {
+        header:
         {
-          header:
-            {
-              username: 'api_user',
-              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-            },
-          body: await transformTemplate("EventOnUpdateFirstPaymentStatus", payload.eventData, [])
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
         },
+        body: await transformTemplate("EventOnUpdateFirstPaymentStatus", payload.eventData, [])
+      },
       json: true
     };
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
@@ -124,15 +140,15 @@ function updateKYCDetail(payload) {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=updateKYCDetail',
       body:
+      {
+        header:
         {
-          header:
-            {
-              username: 'api_user',
-              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-            },
-          body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, [])
-
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
         },
+        body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, [])
+
+      },
       json: true
     };
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
@@ -147,14 +163,14 @@ function EjariAvailable(payload) {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=terminateContract',
       body:
+      {
+        header:
         {
-          header:
-            {
-              username: 'api_user',
-              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-            },
-          body: await transformTemplate("EventOnEjariAvailable", payload.eventData, [])
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
         },
+        body: await transformTemplate("EventOnEjariAvailable", payload.eventData, [])
+      },
       json: true
     };
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
@@ -168,14 +184,14 @@ function EjariTermination(payload) {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=terminateContract',
       body:
+      {
+        header:
         {
-          header:
-            {
-              username: 'api_user',
-              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-            },
-          body: await transformTemplate("EventOnEjariTerminationStatus", payload.eventData, [])
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
         },
+        body: await transformTemplate("EventOnEjariTerminationStatus", payload.eventData, [])
+      },
       json: true
     };
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
@@ -189,16 +205,16 @@ function UpdateContractStatus(payload) {
       method: 'POST',
       url: 'http://51.140.250.28/API/PR/UpdateContractStatus',
       body:
-        {
-          "header": {
-            "username": "Internal_API",
-            "password": "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
-          },
-          "body": {
-            "orgCode": "WASL",
-            "contractID": payload.eventData.contractID
-          }
+      {
+        "header": {
+          "username": "Internal_API",
+          "password": "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
         },
+        "body": {
+          "orgCode": "WASL",
+          "contractID": payload.eventData.contractID
+        }
+      },
       json: true
     };
     console.log("REQUEST===============>", options.body, "<===============REQUEST");

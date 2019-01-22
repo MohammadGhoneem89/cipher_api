@@ -21,7 +21,7 @@ async function handleBankevents(payload, UUIDKey, route, callback, JWToken) {
         }
       case "UpdatePaymentInstrumentStatus":
         {
-         // return getPromise(payload,UpdatePaymentInstrumentStatus,callback)
+          return getPromise(payload,UpdatePaymentInstrumentStatus,callback)
         }
       case "EventOnUpdatePaymentStatus":
         {
@@ -82,7 +82,7 @@ function ProcessInstrument() {
   };
   return rp(options);
 }
-
+function UpdatePaymentInstrumentStatus(){}
 async function getPromise(payload, func, callback) {
   func().then(response => {
     console.log(response, "RESPONSE");
