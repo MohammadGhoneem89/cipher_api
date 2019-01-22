@@ -10,7 +10,7 @@ const url = require('url');
 const cors = require('cors');
 const rp = require('request-promise');
 const renderExport = require('./exports');
-// const generateReports = require('./reports');
+//  const generateReports = require('./reports');
 let app = express();
 const expressWs = require('express-ws')(app);
 const crypto = require('./lib/helpers/crypto');
@@ -24,9 +24,7 @@ const permissions = require('./lib/middleware/permissions');
 const docPermissions = require('./lib/middleware/docPermission');
 const requestLog = require('./lib/middleware/requesLog');
 const authUser = require('./lib/auth/user');
-
 const logger = require('./core/api/connectors/logger').app;
-
 const serverStats = require('./lib/services/serverStats');
 const notification = require('./core/mappingFunctions/notification/list');
 
