@@ -1,11 +1,6 @@
 'use strict';
-//var objectMapper = require('object-mapper');
-let Handlebars = require('handlebars');
 let rp = require('request-promise');
-const dates = require('../../../../lib/helpers/dates');
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
-let jsonTransformTemplates = require('../../lib/repositories/jsonTransformTemplate.js');
-
 
 async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
