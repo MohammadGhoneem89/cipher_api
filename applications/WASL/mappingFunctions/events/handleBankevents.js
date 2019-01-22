@@ -82,69 +82,7 @@ function ProcessInstrument() {
   };
   return rp(options);
 }
-
-function UpdatePaymentInstrumentStatus() {
-  return Promise.resolve({
-    methodName: "UpdatePaymentInstrumentStatus",
-    message: "DUMMY FUNCTION CALLED"
-  });
-
-  let options = {
-    method: 'POST',
-    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
-    qs: { eventName: 'paymentStatus' },
-    body:
-    {
-      header:
-      {
-        username: 'api_user',
-        password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-      },
-      body:
-      {
-        contractID: '4323940',
-        firstPayment: 'false',
-        'paymentInstruments ':
-          [{
-            bankCode: 'ENBD',
-            paymentMethod: '001',
-            instrumentID: 'ECHEQUE0001',
-            status: '001',
-            date: '01/01/2017',
-            amount: '15000'
-          },
-          {
-            bankCode: 'ENBD',
-            paymentMethod: '001',
-            instrumentID: 'ECHEQUE0002',
-            status: '001',
-            date: '01/04/2017',
-            amount: '15000'
-          },
-          {
-            bankCode: 'ENBD',
-            paymentMethod: '001',
-            instrumentID: 'ECHEQUE0003',
-            status: '001',
-            date: '01/07/2017',
-            amount: '15000'
-          },
-          {
-            bankCode: 'ENBD',
-            paymentMethod: '001',
-            instrumentID: 'ECHEQUE0004',
-            status: '001',
-            comments: '',
-            date: '01/10/2017',
-            amount: '15000'
-          }]
-      }
-    },
-    json: true
-  };
-  return rp(options);
-}
-
+function UpdatePaymentInstrumentStatus(){}
 async function getPromise(payload, func, callback) {
   func().then(response => {
     console.log(response, "RESPONSE");
