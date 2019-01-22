@@ -10,19 +10,20 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
 
       case "TerminateContract": {
         try {
-          await EventOnTerminateContract(payload);
+         await getPromise(payload, EventOnTerminateContract(payload), callback);
+          return;
         } catch (e) {
           console.log(e);
         }
-        return await getPromise(payload, EventOnTerminateContract(payload), callback);
       }
       case "EventOnRequestEjari": {
         try {
-          await EventOnRequestEjari(payload);
+           await getPromise(payload, EventOnRequestEjari(payload), callback);
+           return;
         } catch (e) {
           console.log(e);
         }
-        return await getPromise(payload, EventOnRequestEjari(payload), callback);
+        //return 
       }
       default:
         return callback({
