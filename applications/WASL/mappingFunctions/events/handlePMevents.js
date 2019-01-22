@@ -15,14 +15,12 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
           error: false,
           message: "RenewContract"
         })
-
       }
       case "UpdateContract": {
         return callback({
           error: false,
           message: "UpdateContract"
         })
-
       }
       case "UpdateFirstPaymentInstrumentStatus": {
         try {

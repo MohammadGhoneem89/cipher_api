@@ -24,6 +24,15 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
         }
         break;
       }
+      case "UpdateFirstPaymentInstrumentStatus": {
+        try {
+          
+          await getPromise(payload, updateFirstPaymentStatus(payload), callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
+      }
       default:
         return callback({
           error: true,
@@ -94,7 +103,27 @@ function EventOnTerminateContract(payload) {
     return rp(options);
   }
 }
+function updateFirstPaymentStatus(payload) {
+  return async () => {
+    let options = {
+      method: 'POST',
+      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
+      body:
+      {
+        header:
+        {
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+        },
+        body: await transformTemplate("EventOnUpdateFirstPaymentStatus", payload.eventData, [])
+      },
+      json: true
+    };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
+    return rp(options);
+  }
 
+}
 async function getPromise(payload, func, callback) {
   func().then(response => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
