@@ -1,6 +1,7 @@
 'use strict';
 
 const apiTemplate = require('../../lib/repositories/apiTemplate');
+const apiTemplateHelper = require('../../lib/helpers/transformTemplate');
 
 function upsert(payload, UUIDKey, route, callback, JWToken) {
   _upsert(payload, callback);
@@ -14,6 +15,10 @@ function list(payload, UUIDKey, route, callback, JWToken) {
   _list(payload, callback);
 }
 
+function test(payload, UUIDKey, route, callback, JWToken) {
+  _test(payload, callback);
+}
+
 function _upsert(payload, callback) {
   apiTemplate.upsert(payload)
     .then((user) => {
@@ -25,7 +30,7 @@ function _upsert(payload, callback) {
               status: 'OK',
               errorDescription: 'API Template updated successfully',
               displayToUser: true,
-              newPageURL: '/endpoint'
+              newPageURL: '/apiTemplate'
             }
           }
         }
@@ -93,7 +98,20 @@ function _list(payload, callback) {
     });
 }
 
+async function _test(payload, callback) {
+  const response = {
+    [payload.action]: {
+      action: payload.action,
+      data: {}
+    }
+  };
+  response[payload.action].data = await apiTemplateHelper(payload.name, payload.data, []);
+  callback(response);
+
+}
+
 exports.list = list;
 exports.findOne = findOne;
 exports.upsert = upsert;
+exports.test = test;
 

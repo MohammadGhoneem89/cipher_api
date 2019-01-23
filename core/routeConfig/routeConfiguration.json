@@ -60,6 +60,12 @@
       "CustomMappingFile": "apiTemplate.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "testAPITemplate": {
+      "customMapping": true,
+      "MappingfunctionName": "test",
+      "CustomMappingFile": "apiTemplate.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getDBFields": {
       "customMapping": true,
       "MappingfunctionName": "getDBFields",
