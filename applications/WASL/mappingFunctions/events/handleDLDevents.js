@@ -51,7 +51,7 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
 
 function EventOnUpdateKYCDetail(payload) {
   console.log("PAYLOAD=====================> ",
-    payload.eventData, " <=====================PAYLOAD", payload.eventData.status, "<<<<<<<<<payload status");
+    payload.eventData, " <=====================PAYLOAD");
   return async () => {
     console.log("OUTPUT=====================> ",
       await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, []),
@@ -77,7 +77,8 @@ function EventOnUpdateKYCDetail(payload) {
 }
 function EventOnRequestEjari(payload) {
   console.log("PAYLOAD=====================> ",
-    payload.eventData, " <=====================PAYLOAD", payload.eventData.status, "<<<<<<<<<payload status");
+    payload.eventData, " <=====================PAYLOAD",
+     payload.eventData.status, "<<<<<<<<<payload status");
   if (payload.eventData.status == '006') {
     return async () => {
       console.log("OUTPUT=====================> ",
