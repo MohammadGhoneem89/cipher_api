@@ -66,8 +66,8 @@ module.exports = {
       let result = JSON.parse(data);
       let startDate = _.get(result, "contractStartDate", undefined);
       let EndDate = _.get(result, "contractEndDate", undefined);
-      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyyHHmmS(startDate) : undefined;
-      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyyHHmmS(EndDate) : undefined;
+      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyy(startDate) : undefined;
+      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyy(EndDate) : undefined;
 
       result.paymentInstruments.forEach((element, index) => {
         element.date = dates.MSddMMyyyyHHmmS(element.date);
@@ -89,7 +89,6 @@ module.exports = {
       _.set(result, 'instrumentDetail', undefined);
       _.set(result, 'checkKYCStatus', undefined);
       _.set(result, 'contractSignedHash', undefined);
-      _.set(result, 'CRMTicketNo', undefined);
       _.set(result, 'ejariData.contractID', undefined);
       _.set(result, 'terminationDate', undefined);
       _.set(result, 'terminationReason', undefined);

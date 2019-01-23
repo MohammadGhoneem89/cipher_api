@@ -1,11 +1,6 @@
 'use strict';
-//var objectMapper = require('object-mapper');
-let Handlebars = require('handlebars');
 let rp = require('request-promise');
-const dates = require('../../../../lib/helpers/dates');
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
-let jsonTransformTemplates = require('../../lib/repositories/jsonTransformTemplate.js');
-
 
 async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
@@ -20,29 +15,57 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
           error: false,
           message: "RenewContract"
         })
-
       }
       case "UpdateContract": {
         return callback({
           error: false,
           message: "UpdateContract"
         })
-
       }
       case "UpdateFirstPaymentInstrumentStatus": {
-        return await getPromise(payload, updateFirstPaymentStatus(payload), callback);
-
+        try {
+          await UpdateContractStatus(payload);
+          await getPromise(payload, updateFirstPaymentStatus(payload), callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
       }
       case "UpdatePaymentInstrumentStatus": {
-        return await getPromise(payload, updatePaymentStatus(payload), callback);
+        try {
+          await UpdateContractStatus(payload);
+          await getPromise(payload, updatePaymentStatus(payload), callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
       }
 
       case "UpdateKYCDetail": {
-        return await getPromise(payload, updateKYCDetail(payload), callback);
-
+        try {
+          await getPromise(payload, updateKYCDetail(payload), callback);
+        }
+        catch (e) {
+          console.log(e);
+        }
+        break;
       }
       case "EjariData": {
-        return await getPromise(payload, EjariAvailable, callback);
+        try {
+         await getPromise(payload, EjariAvailable(payload), callback);
+        }
+        catch (e) {
+          console.log(e);
+        }
+        break;
+      }
+      case "EjariTerminationStatus": {
+        try {
+          await getPromise(payload, EjariTermination(payload), callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
       }
 
       default:
@@ -60,23 +83,28 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
 
 function updatePaymentStatus(payload) {
+  console.log("PAYLOADY=====================> ", payload.eventData, " <=====================PAYLOADY");
+
+
   return async () => {
+    console.log("OUTPUT=====================> ", await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData, []), " <=====================OUTPUT");
     let options = {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
       body:
+      {
+        header:
         {
-          header:
-            {
-              username: 'api_user',
-              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-            },
-          body: await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData)
-          // body: EventOnUpdateFirstPaymentStatus
-
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
         },
+        body: await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData, [])
+        // body: EventOnUpdateFirstPaymentStatus
+
+      },
       json: true
     };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
   }
 
@@ -88,16 +116,17 @@ function updateFirstPaymentStatus(payload) {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
       body:
+      {
+        header:
         {
-          header:
-            {
-              username: 'api_user',
-              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-            },
-          body: await transformTemplate("EventOnUpdateFirstPaymentStatus", payload.eventData, [])
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
         },
+        body: await transformTemplate("EventOnUpdateFirstPaymentStatus", payload.eventData, [])
+      },
       json: true
     };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
   }
 
@@ -109,77 +138,92 @@ function updateKYCDetail(payload) {
       method: 'POST',
       url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=updateKYCDetail',
       body:
+      {
+        header:
         {
-          header:
-            {
-              username: 'api_user',
-              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-            },
-          body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData)
-
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
         },
+        body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, [])
+
+      },
       json: true
     };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
   }
 
 }
 
 function EjariAvailable(payload) {
-  var options = {
-    method: 'POST',
-    url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain',
-    qs: {eventName: 'ejariAvailable'},
-    body:
+  return async () => {
+    let options = {
+      method: 'POST',
+      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=terminateContract',
+      body:
       {
         header:
-          {
-            username: payload.header.username,
-            password: payload.header.password
-          },
-        body:
-          {
-            contractID: payload.contractID,
-            ejariID: '389492834',
-            date: '05/11/2018'
-          }
+        {
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+        },
+        body: await transformTemplate("EventOnEjariAvailable", payload.eventData, [])
       },
-    json: true
-  };
-
-  return rp(options);
+      json: true
+    };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
+    return rp(options);
+  }
 }
 
-function UpdateContractStatus() {
-
-  let options = {
-    method: 'POST',
-    url: 'http://51.140.250.28/API/PR/UpdateContractStatus',
-    body:
+function EjariTermination(payload) {
+  return async () => {
+    let options = {
+      method: 'POST',
+      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=terminateContract',
+      body:
       {
-        bypassSimu: false,
         header:
-          {
-            username: 'waslapi',
-            password: 'aa8dd29e572a64982d7d2bf48325a4951b7c399a1283fb33460ca275e230d5ae308dcd820d808c5ea0d23e047bd2f3e066bf402cb249d989408331566f7ca890'
-          },
-        body:
-          {
-            EIDA: '784-1984-1234567-9',
-            authToken: '03452837803',
-            contractID: 'DIRC103',
-            orgCode: 'WASL'
-          }
+        {
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+        },
+        body: await transformTemplate("EventOnEjariTerminationStatus", payload.eventData, [])
       },
-    json: true
-  };
-  return rp(options);
+      json: true
+    };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
+    return rp(options);
+  }
+}
+
+function UpdateContractStatus(payload) {
+  return async () => {
+    let options = {
+      method: 'POST',
+      url: 'http://51.140.250.28/API/PR/UpdateContractStatus',
+      body:
+      {
+        "header": {
+          "username": "Internal_API",
+          "password": "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
+        },
+        "body": {
+          "orgCode": "WASL",
+          "contractID": payload.eventData.contractID
+        }
+      },
+      json: true
+    };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
+    return rp(options);
+  }
 }
 
 
 async function getPromise(payload, func, callback) {
   func().then(response => {
-    console.log(response, "RESPONSE");
+    console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
       error: false,
       message: payload.eventData.eventName + " Dispatched",
@@ -194,24 +238,5 @@ async function getPromise(payload, func, callback) {
     })
   });
 }
-
-//
-// function transformTemplate(templateName, data) {
-//   console.log("<====================I AM DATA======================>");
-//   console.log(data);
-//   console.log("<====================I AM DATA======================>");
-//
-//   Handlebars.registerHelper('EpochTOHuman', function (d) {
-//     console.log("===============>CONVERT DATE: ", typeof (d), d);
-//     // return dates.ddMMyyyyslash(d);
-//     return "25/10/2019";
-//   });
-//
-//   let templateCompiler = Handlebars.compile(JSON.stringify(templateName));
-//
-//
-//   return templateCompiler(data);
-// }
-
 
 exports.handlePMevents = handlePMevents;
