@@ -8,8 +8,8 @@ module.exports = {
   STUB: (data, payload, jwt) => {
     return data;
   },
-  // ...inst
-  // ,
+  ...inst
+  ,
   getDate: (data, payload, jwt) => {
     let format = 'YYYY/MM/DD HH:mm:ss ZZ';
     return moment().format(format);
