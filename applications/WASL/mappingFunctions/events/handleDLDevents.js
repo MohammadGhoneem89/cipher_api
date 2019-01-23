@@ -44,7 +44,7 @@ function EventOnRequestEjari(payload) {
   console.log("PAYLOADY=====================> ",
     payload.eventData, " <=====================PAYLOADY");
   return async () => {
-    if (payload.status === '006') {
+    //if (payload.status === '006') {
       console.log("OUTPUT=====================> ",
         await transformTemplate("EventOnRequestEjari", payload.eventData, []),
         " <=====================OUTPUT");
@@ -63,10 +63,10 @@ function EventOnRequestEjari(payload) {
         json: true
       };
       console.log("REQUEST===============>", options.body, "<===============REQUEST");
-
+      return rp(options);
     }
-    return rp(options);
-  }
+    
+ // }
 }
 
 function EventOnTerminateContract(payload) {
