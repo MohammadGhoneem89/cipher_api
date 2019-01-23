@@ -40,12 +40,9 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(err)
   }
 }
-
 function EventOnRequestEjari(payload) {
-
   console.log("PAYLOADY=====================> ",
     payload.eventData, " <=====================PAYLOADY");
-
   return async () => {
     console.log("OUTPUT=====================> ",
 
@@ -69,8 +66,9 @@ function EventOnRequestEjari(payload) {
         json: true
       };
       console.log("REQUEST===============>", options.body, "<===============REQUEST");
-      return rp(options);
+      
     }
+    return rp(options);
   }
 }
 
