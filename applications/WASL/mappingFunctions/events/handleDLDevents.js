@@ -27,6 +27,14 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
         }
         break;
       }
+      case "UpdateKYCDetail": {
+        try {
+          await getPromise(payload, EventOnUpdateKYCDetail(payload), callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
+      }
 
       default:
         return callback({
@@ -40,9 +48,36 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(err)
   }
 }
+
+function EventOnUpdateKYCDetail(payload) {
+  console.log("PAYLOAD=====================> ",
+    payload.eventData, " <=====================PAYLOAD", payload.eventData.status, "<<<<<<<<<payload status");
+  return async () => {
+    console.log("OUTPUT=====================> ",
+      await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, []),
+      " <=====================OUTPUT");
+    let options = {
+      method: 'POST',
+      url: 'http://qa.dubailand.gov.ae:8885/v1/TenancyContracts/EventOnUpdateKYCDetail',
+      body:
+      {
+        header:
+        {
+          username: "",
+          password: ""
+        },
+        body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, [])
+      },
+      json: true
+    };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
+    return rp(options);
+  }
+
+}
 function EventOnRequestEjari(payload) {
   console.log("PAYLOAD=====================> ",
-    payload.eventData, " <=====================PAYLOAD" , payload.eventData.status , "<<<<<<<<<payload status");
+    payload.eventData, " <=====================PAYLOAD", payload.eventData.status, "<<<<<<<<<payload status");
   if (payload.eventData.status == '006') {
     return async () => {
       console.log("OUTPUT=====================> ",
