@@ -8,8 +8,8 @@ module.exports = {
   STUB: (data, payload, jwt) => {
     return data;
   },
-  ...inst
-  ,
+  // ...inst
+  // ,
   getDate: (data, payload, jwt) => {
     let format = 'YYYY/MM/DD HH:mm:ss ZZ';
     return moment().format(format);
@@ -21,7 +21,6 @@ module.exports = {
     return dates.ddMMyyyyMS(data);
   },
   ddMMyyyyformat: (data, payload, jwt) => {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  ",data)
     let e=parseInt(data)/1000
     return dates.waslDateformat(e);
   },
