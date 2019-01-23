@@ -19,7 +19,7 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
         break;
       }
 
-      case "UpdatePaymentInstrumentStatus": {
+      case "UpdateFirstPaymentInstrumentStatus": {
         try {
 
           await getPromise(payload, EventOnRequestEjari(payload), callback);
