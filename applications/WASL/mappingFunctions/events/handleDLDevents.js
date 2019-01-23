@@ -21,13 +21,13 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
 
       case "UpdateFirstPaymentInstrumentStatus": {
         try {
-
           await getPromise(payload, EventOnRequestEjari(payload), callback);
         } catch (e) {
           console.log(e);
         }
         break;
       }
+
       default:
         return callback({
           error: true,
@@ -41,9 +41,9 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
   }
 }
 function EventOnRequestEjari(payload) {
-  console.log("PAYLOADY=====================> ",
-    payload.eventData, " <=====================PAYLOADY");
-  if (payload.status === '006') {
+  console.log("PAYLOAD=====================> ",
+    payload.eventData, " <=====================PAYLOAD" , payload.eventData.paymentInstruments.status , "<<<<<<<<<payload status");
+  if (payload.eventData.paymentInstruments.status == '006') {
     return async () => {
       console.log("OUTPUT=====================> ",
         await transformTemplate("EventOnRequestEjari", payload.eventData, []),
