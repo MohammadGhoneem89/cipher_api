@@ -1,29 +1,41 @@
 'use strict';
 let rp = require('request-promise')
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
+
 async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<Request Recieved for Event>>>>")
-    console.log(JSON.stringify(payload, null, 2), "========> THIS IS PAYLOAD")
+    console.log(JSON.stringify(payload, null, 2));
+    console.log(payload.eventData.eventName, "===========================>handleDLDevents THIS IS PAYLOAD");
 
     switch (payload.eventData.eventName) {
 
       case "TerminateContract": {
         try {
-         await getPromise(payload, EventOnTerminateContract(payload), callback);
+          await getPromise(payload, EventOnTerminateContract(payload), callback);
         } catch (e) {
           console.log(e);
         }
         break;
       }
-      case "EventOnRequestEjari": {
+
+      case "UpdateFirstPaymentInstrumentStatus": {
         try {
-           await getPromise(payload, EventOnRequestEjari(payload), callback);
+          await getPromise(payload, EventOnRequestEjari(payload), callback);
         } catch (e) {
           console.log(e);
         }
         break;
       }
+      case "UpdateKYCDetail": {
+        try {
+          await getPromise(payload, EventOnUpdateKYCDetail(payload), callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
+      }
+
       default:
         return callback({
           error: true,
@@ -36,34 +48,58 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(err)
   }
 }
-function EventOnRequestEjari(payload) {
 
-  console.log("PAYLOADY=====================> ",
-    payload.eventData, " <=====================PAYLOADY");
-
+function EventOnUpdateKYCDetail(payload) {
+  console.log("PAYLOAD=====================> ",
+    payload.eventData, " <=====================PAYLOAD", payload.eventData.status, "<<<<<<<<<payload status");
   return async () => {
     console.log("OUTPUT=====================> ",
-      await transformTemplate("EventOnRequestEjari", payload.eventData, []),
+      await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, []),
       " <=====================OUTPUT");
-
     let options = {
       method: 'POST',
-      url: 'http://qa.dubailand.gov.ae:8885/v1/TenancyContracts/EventOnRequestEjari',
+      url: 'http://qa.dubailand.gov.ae:8885/v1/TenancyContracts/EventOnUpdateKYCDetail',
       body:
       {
         header:
         {
-          username: 'api_user',
-          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+          username: "",
+          password: ""
         },
-        body: await transformTemplate("EventOnRequestEjari", payload.eventData, [])
-        // body: EventOnUpdateFirstPaymentStatus
-
+        body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, [])
       },
       json: true
     };
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
+  }
+
+}
+function EventOnRequestEjari(payload) {
+  console.log("PAYLOAD=====================> ",
+    payload.eventData, " <=====================PAYLOAD", payload.eventData.status, "<<<<<<<<<payload status");
+  if (payload.eventData.status == '006') {
+    return async () => {
+      console.log("OUTPUT=====================> ",
+        await transformTemplate("EventOnRequestEjari", payload.eventData, []),
+        " <=====================OUTPUT");
+      let options = {
+        method: 'POST',
+        url: 'http://qa.dubailand.gov.ae:8885/v1/TenancyContracts/EventOnRequestEjari',
+        body:
+        {
+          header:
+          {
+            username: "",
+            password: ""
+          },
+          body: await transformTemplate("EventOnRequestEjari", payload.eventData, [])
+        },
+        json: true
+      };
+      console.log("REQUEST===============>", options.body, "<===============REQUEST");
+      return rp(options);
+    }
   }
 }
 
@@ -95,6 +131,7 @@ function EventOnTerminateContract(payload) {
   }
 }
 
+
 async function getPromise(payload, func, callback) {
   func().then(response => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
@@ -112,4 +149,5 @@ async function getPromise(payload, func, callback) {
     })
   });
 }
+
 exports.handleDLDevents = handleDLDevents;

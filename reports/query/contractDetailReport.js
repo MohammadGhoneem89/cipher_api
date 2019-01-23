@@ -41,7 +41,7 @@ function contractDetailReport(payload) {
                          contract."tranxData" ->> 'contractStatus'  as "contractStatus",
                          contract."tranxData" -> 'ejariData' ->> 'ejariNumber' as "ejariNumber"
                          FROM "Contracts" as contract, "kycCollections" as kyc
-                         where contract."tranxData" ->> 'EID' = kyc."tranxData" -> 'SDG' ->> 'emiratesID'`;
+                         where contract."tranxData" ->> 'EIDA' = kyc."tranxData" -> 'SDG' ->> 'emiratesID'`;
 
         // if (criteria.body && criteria.body.toDate && criteria.body.fromDate) {
         //     let fromdate = criteria.body.fromDate;
