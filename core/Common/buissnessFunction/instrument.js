@@ -66,8 +66,8 @@ module.exports = {
       let result = JSON.parse(data);
       let startDate = _.get(result, "contractStartDate", undefined);
       let EndDate = _.get(result, "contractEndDate", undefined);
-      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyyHHmmS(startDate) : undefined;
-      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyyHHmmS(EndDate) : undefined;
+      result.contractStartDate = startDate >= 0 ? dates.ddMMyyyy(startDate) : undefined;
+      result.contractEndDate = EndDate >= 0 ? dates.ddMMyyyy(EndDate) : undefined;
 
       result.paymentInstruments.forEach((element, index) => {
         element.date = dates.MSddMMyyyyHHmmS(element.date);
