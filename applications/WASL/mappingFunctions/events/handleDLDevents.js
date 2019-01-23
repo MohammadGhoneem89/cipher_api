@@ -51,7 +51,7 @@ function EventOnRequestEjari(payload) {
 
       await transformTemplate("EventOnRequestEjari", payload.eventData, []),
       " <=====================OUTPUT");
-    if (payload.paymentInstruments.status == '006') {
+    if (payload.status == '006') {
       let options = {
         method: 'POST',
         url: 'http://qa.dubailand.gov.ae:8885/v1/TenancyContracts/EventOnRequestEjari',
