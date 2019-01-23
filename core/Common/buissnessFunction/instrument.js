@@ -70,7 +70,7 @@ module.exports = {
       result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyy(EndDate) : undefined;
 
       result.paymentInstruments.forEach((element, index) => {
-        element.date = dates.MSddMMyyyyHHmmS(element.date);
+        element.date = dates.MSddMMyyyy(element.date);
         element.amount = String(element.amount) || "0";
         element.providerMetaData = element.providerMetaData ? JSON.parse(element.providerMetaData) : undefined;
         element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
