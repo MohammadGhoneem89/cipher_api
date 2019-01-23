@@ -9,7 +9,7 @@ async function handleBankevents(payload, UUIDKey, route, callback, JWToken) {
 
       case "ProcessInstrument":
         {
-          return getPromise(payload,ProcessInstrument,callback)
+          return getPromise(payload, ProcessInstrument, callback)
         }
       case "AssociatePaymentInstruments":
         {
@@ -19,27 +19,33 @@ async function handleBankevents(payload, UUIDKey, route, callback, JWToken) {
         {
 
         }
-      case "UpdatePaymentInstrumentStatus":
-        {
-          return getPromise(payload,UpdatePaymentInstrumentStatus,callback)
+      case "UpdatePaymentInstrumentStatus": {
+        try {
+          //await UpdateContractStatus(payload);
+          await getPromise(payload, updatePaymentStatus(payload), callback);
+        } catch (e) {
+          console.log(e);
         }
+        break;
+      }
+    
       case "EventOnUpdatePaymentStatus":
-        {
+    {
 
-        }
+    }
 
 
       default:
-        return callback({
-          error: true,
-          message: "invalid case"
-        })
-        
-    }
+    return callback({
+      error: true,
+      message: "invalid case"
+    })
+
+  }
   }
   catch (err) {
-    console.log(err)
-  }
+  console.log(err)
+}
 }
 exports.handleBankevents = handleBankevents
 
@@ -82,7 +88,33 @@ function ProcessInstrument() {
   };
   return rp(options);
 }
-function UpdatePaymentInstrumentStatus(){}
+function updatePaymentStatus(payload) {
+  console.log("PAYLOADY=====================> ", payload.eventData, " <=====================PAYLOADY");
+
+
+  return async () => {
+    console.log("OUTPUT=====================> ", await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData, []), " <=====================OUTPUT");
+    let options = {
+      method: 'POST',
+      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
+      body:
+      {
+        header:
+        {
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+        },
+        body: await transformTemplate("EventOnUpdatePaymentStatus", payload.eventData, [])
+        // body: EventOnUpdateFirstPaymentStatus
+
+      },
+      json: true
+    };
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
+    return rp(options);
+  }
+
+}
 async function getPromise(payload, func, callback) {
   func().then(response => {
     console.log(response, "RESPONSE");
