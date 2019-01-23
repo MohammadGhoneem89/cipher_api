@@ -18,18 +18,11 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
         }
         break;
       }
-      case "EventOnRequestEjari": {
-        try {
-          await getPromise(payload, EventOnRequestEjari(payload), callback);
-        } catch (e) {
-          console.log(e);
-        }
-        break;
-      }
+
       case "UpdateFirstPaymentInstrumentStatus": {
         try {
 
-          await getPromise(payload, updateFirstPaymentStatus(payload), callback);
+          await getPromise(payload, EventOnRequestEjari(payload), callback);
         } catch (e) {
           console.log(e);
         }
@@ -55,27 +48,29 @@ function EventOnRequestEjari(payload) {
 
   return async () => {
     console.log("OUTPUT=====================> ",
+
       await transformTemplate("EventOnRequestEjari", payload.eventData, []),
       " <=====================OUTPUT");
-
-    let options = {
-      method: 'POST',
-      url: 'http://qa.dubailand.gov.ae:8885/v1/TenancyContracts/EventOnRequestEjari',
-      body:
+    if (payload.paymentInstruments.status == '006') {
+      let options = {
+        method: 'POST',
+        url: 'http://qa.dubailand.gov.ae:8885/v1/TenancyContracts/EventOnRequestEjari',
+        body:
         {
           header:
-            {
-              username: 'api_user',
-              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-            },
+          {
+            username: 'api_user',
+            password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
+          },
           body: await transformTemplate("EventOnRequestEjari", payload.eventData, [])
           // body: EventOnUpdateFirstPaymentStatus
 
         },
-      json: true
-    };
-    console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return rp(options);
+        json: true
+      };
+      console.log("REQUEST===============>", options.body, "<===============REQUEST");
+      return rp(options);
+    }
   }
 }
 
@@ -90,16 +85,16 @@ function EventOnTerminateContract(payload) {
       method: 'POST',
       url: 'http://qa.dubailand.gov.ae:8885/v1/TenancyContracts/EventOnTerminateContract',
       body:
+      {
+        header:
         {
-          header:
-            {
-              username: 'api_user',
-              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-            },
-          body: await transformTemplate("EventOnTerminateContract", payload.eventData, [])
-          // body: EventOnUpdateFirstPaymentStatus
-
+          username: 'api_user',
+          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
         },
+        body: await transformTemplate("EventOnTerminateContract", payload.eventData, [])
+        // body: EventOnUpdateFirstPaymentStatus
+
+      },
       json: true
     };
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
@@ -107,27 +102,6 @@ function EventOnTerminateContract(payload) {
   }
 }
 
-function updateFirstPaymentStatus(payload) {
-  return async () => {
-    let options = {
-      method: 'POST',
-      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=paymentStatus',
-      body:
-        {
-          header:
-            {
-              username: 'api_user',
-              password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-            },
-          body: await transformTemplate("EventOnUpdateFirstPaymentStatus", payload.eventData, [])
-        },
-      json: true
-    };
-    console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return rp(options);
-  }
-
-}
 
 async function getPromise(payload, func, callback) {
   func().then(response => {
