@@ -1,5 +1,7 @@
 
 'use strict';
+let rp = require('request-promise');
+const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 async function handleBankevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
