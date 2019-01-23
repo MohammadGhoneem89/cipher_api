@@ -44,9 +44,10 @@ function EventOnRequestEjari(payload) {
   console.log("PAYLOADY=====================> ",
     payload.eventData, " <=====================PAYLOADY");
   return async () => {
-
     if (payload.status === '006') {
-      console.log(await transformTemplate("EventOnRequestEjari", payload.eventData, [])," <=====================OUTPUT");
+      console.log("OUTPUT=====================> ",
+        await transformTemplate("EventOnRequestEjari", payload.eventData, []),
+        " <=====================OUTPUT");
       let options = {
         method: 'POST',
         url: 'http://qa.dubailand.gov.ae:8885/v1/TenancyContracts/EventOnRequestEjari',
@@ -62,7 +63,7 @@ function EventOnRequestEjari(payload) {
         json: true
       };
       console.log("REQUEST===============>", options.body, "<===============REQUEST");
-      
+
     }
     return rp(options);
   }
