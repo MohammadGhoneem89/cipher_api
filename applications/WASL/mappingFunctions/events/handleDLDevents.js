@@ -42,8 +42,8 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
 }
 function EventOnRequestEjari(payload) {
   console.log("PAYLOAD=====================> ",
-    payload.eventData, " <=====================PAYLOAD" , payload.eventData.paymentInstruments.status , "<<<<<<<<<payload status");
-  if (payload.eventData.paymentInstruments.status == '006') {
+    payload.eventData, " <=====================PAYLOAD" , payload.eventData.status , "<<<<<<<<<payload status");
+  if (payload.eventData.status == '006') {
     return async () => {
       console.log("OUTPUT=====================> ",
         await transformTemplate("EventOnRequestEjari", payload.eventData, []),
