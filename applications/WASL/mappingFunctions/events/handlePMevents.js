@@ -144,7 +144,7 @@ function updateKYCDetail(payload) {
           username: 'api_user',
           password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
         },
-        body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, [])
+        body: await transformTemplate("EventOnUpdateKYCDetail-WASL", payload.eventData, [])
 
       },
       json: true

@@ -55,7 +55,7 @@ function EventOnUpdateKYCDetail(payload) {
     payload.eventData, " <=====================PAYLOAD");
   return async () => {
     console.log("OUTPUT=====================> ",
-      await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, []),
+      await transformTemplate("EventOnUpdateKYCDetail-DLD", payload.eventData, []),
       " <=====================OUTPUT");
     let options = {
       method: 'POST',
@@ -67,7 +67,7 @@ function EventOnUpdateKYCDetail(payload) {
           username: "",
           password: ""
         },
-        body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, [])
+        body: await transformTemplate("EventOnUpdateKYCDetail-DLD", payload.eventData, [])
       },
       json: true
     };
