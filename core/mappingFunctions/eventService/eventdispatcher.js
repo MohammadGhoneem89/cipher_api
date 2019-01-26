@@ -213,7 +213,7 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function updateEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
-  let queryData = `update eventdispatchqueue set status=0 WHERE internalid=${payload.eventID}`;
+  let queryData = `update eventdispatchqueue set status=0, retrycount=0 WHERE internalid=${payload.eventID}`;
   let resp = {
     "responseMessage": {
       "action": "upsertEventDispatcher",
