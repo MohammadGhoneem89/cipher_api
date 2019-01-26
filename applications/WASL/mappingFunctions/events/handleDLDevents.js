@@ -1,6 +1,7 @@
 'use strict';
 let rp = require('request-promise')
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
+const typeData = require('../../../../lib/services/typeData.js')
 
 async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
   try {
@@ -45,16 +46,16 @@ async function handleDLDevents(payload, UUIDKey, route, callback, JWToken) {
     }
   }
   catch (err) {
-    console.log(err)
+    console.log(err);
   }
 }
 
 function EventOnUpdateKYCDetail(payload) {
   console.log("PAYLOAD=====================> ",
-    payload.eventData, " <=====================PAYLOAD", payload.eventData.status, "<<<<<<<<<payload status");
+    payload.eventData, " <=====================PAYLOAD");
   return async () => {
     console.log("OUTPUT=====================> ",
-      await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, []),
+      await transformTemplate("EventOnUpdateKYCDetail-DLD", payload.eventData, []),
       " <=====================OUTPUT");
     let options = {
       method: 'POST',
@@ -66,7 +67,7 @@ function EventOnUpdateKYCDetail(payload) {
           username: "",
           password: ""
         },
-        body: await transformTemplate("EventOnUpdateKYCDetail", payload.eventData, [])
+        body: await transformTemplate("EventOnUpdateKYCDetail-DLD", payload.eventData, [])
       },
       json: true
     };
@@ -75,11 +76,16 @@ function EventOnUpdateKYCDetail(payload) {
   }
 
 }
+
 function EventOnRequestEjari(payload) {
   console.log("PAYLOAD=====================> ",
-    payload.eventData, " <=====================PAYLOAD", payload.eventData.status, "<<<<<<<<<payload status");
-  if (payload.eventData.status == '006') {
-    return async () => {
+    payload.eventData, " <=====================PAYLOAD",
+    payload.eventData.status, "<<<<<<<<<payload status");
+
+  return async () => {
+    let paid = await getStatusfromTypeData();
+    if (payload.eventData.status === paid) {
+      console.log("Contract Status received is PAID  !!!!!!!!!!!!!!!!!!!!!")
       console.log("OUTPUT=====================> ",
         await transformTemplate("EventOnRequestEjari", payload.eventData, []),
         " <=====================OUTPUT");
@@ -100,7 +106,11 @@ function EventOnRequestEjari(payload) {
       console.log("REQUEST===============>", options.body, "<===============REQUEST");
       return rp(options);
     }
+    else {
+      return Promise.reject("First Payment is not Paid");
+    }
   }
+
 }
 
 function EventOnTerminateContract(payload) {
@@ -131,7 +141,6 @@ function EventOnTerminateContract(payload) {
   }
 }
 
-
 async function getPromise(payload, func, callback) {
   func().then(response => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
@@ -149,5 +158,17 @@ async function getPromise(payload, func, callback) {
     })
   });
 }
-
+async function getStatusfromTypeData() {
+  let getStatusfromTypeData = "";
+  let test = await typeData.getTypeData("InstrumentStatus")
+  let JSONtest = JSON.stringify(test.data.InstrumentStatus);
+  let parseJSONtest = JSON.parse(JSONtest)
+  for (let i = 0; i < parseJSONtest.length; i++) {
+    if (parseJSONtest[i].label === "PAID") {
+      //console.log(parseJSONtest[i].label, "JSONVALUEEEEEEEEEEEEEEEEEEEEEEEEE")
+      getStatusfromTypeData = parseJSONtest[i].value;
+      return getStatusfromTypeData;
+    }
+  }
+}
 exports.handleDLDevents = handleDLDevents;
