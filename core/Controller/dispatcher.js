@@ -160,15 +160,22 @@ module.exports = class Dispatcher {
     _.set(this.request, 'Header.tranType', "0200");
     _.set(this.request, 'Header.UUID', this.UUID);
     _.set(this.request, 'Header.timeStamp', today.toISOString());
+
+    let ServiceURL = "";
+    if (this.configdata.endpointName && this.configdata.endpointName._id) {
+      ServiceURL = `${this.configdata.endpointName.address}${this.configdata.ServiceURL}`
+    }
+    else {
+      ServiceURL = this.configdata.ServiceURL;
+    }
     let rpOptions = {
       method: 'POST',
-      url: this.configdata.ServiceURL,
+      url: ServiceURL,
       body: this.request,
       headers: this.configdata.ServiceHeaders,
       timeout: 10000, //  configurable
       json: true
     };
-    console.log(JSON.stringify(rpOptions, null, 2))
     return rp(rpOptions).then((data) => {
       let generalResponse = {
         "error": true,
