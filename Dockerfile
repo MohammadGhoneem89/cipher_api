@@ -22,7 +22,7 @@ COPY . .
 RUN bash -c "npm install -p"
 RUN bash -c "npm install -g npm latest"
 RUN bash -c "npm cache clean --force "
-RUN bash -c "npm list -g --depth=0. | awk -F ' ' '{print $2}' | awk -F '@' '{print $1}'  | sudo xargs npm remove -g"
+RUN bash -c "npm list -g --depth=0. | awk -F ' ' '{print $2}' | awk -F '@' '{print $1}'  | xargs npm remove -g"
 
 #RUN npm install
 USER 1001
