@@ -84,7 +84,31 @@ function ListView(payload, UUIDKey, route, callback, JWToken) {
       });
 
       const response = {
-        [payload.action]: {
+        getEndpointListView: {
+          action: payload.action,
+          data: result
+        }
+      };
+      callback(response);
+    })
+    .catch((err) => {
+      callback(err);
+    });
+}
+
+function TemplatesListView(payload, UUIDKey, route, callback, JWToken) {
+  endpointDefination.findAllTemplates(payload)
+    .then((res) => {
+      let result = []
+      res.forEach((element) => {
+        let Elem = {};
+        Elem.text = element.name;
+        Elem.value = element._id;
+        result.push(Elem);
+      });
+
+      const response = {
+        getTemplatesListView: {
           action: payload.action,
           data: result
         }
@@ -142,7 +166,7 @@ function findByName(payload) {
  __v: 0 },
  data: { hello: 'world !!!' } }
  * */
-
+exports.TemplatesListView = TemplatesListView;
 exports.ListView = ListView;
 exports.list = list;
 exports.findOne = findOne;

@@ -21,7 +21,6 @@ module.exports = {
     return dates.ddMMyyyyMS(data);
   },
   ddMMyyyyformat: (data, payload, jwt) => {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  ",data)
     let e=parseInt(data)/1000
     return dates.waslDateformat(e);
   },

@@ -46,10 +46,10 @@ module.exports = {
       let result = JSON.parse(data);
       let startDate = _.get(result, "contractStartDate", undefined);
       let EndDate = _.get(result, "contractEndDate", undefined);
-      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyyHHmmS(startDate) : undefined;
-      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyyHHmmS(EndDate) : undefined;
+      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyy(startDate) : undefined;
+      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyy(EndDate) : undefined;
       result.paymentInstruments.forEach((element, index) => {
-        element.date = dates.MSddMMyyyyHHmmS(element.date);
+        element.date = dates.MSddMMyyyy(element.date);
         element.amount = String(element.amount) || "0";
         element.providerMetaData = element.providerMetaData ? JSON.parse(element.providerMetaData) : undefined;
         element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
@@ -66,11 +66,11 @@ module.exports = {
       let result = JSON.parse(data);
       let startDate = _.get(result, "contractStartDate", undefined);
       let EndDate = _.get(result, "contractEndDate", undefined);
-      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyyHHmmS(startDate) : undefined;
-      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyyHHmmS(EndDate) : undefined;
+      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyy(startDate) : undefined;
+      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyy(EndDate) : undefined;
 
       result.paymentInstruments.forEach((element, index) => {
-        element.date = dates.MSddMMyyyyHHmmS(element.date);
+        element.date = dates.MSddMMyyyy(element.date);
         element.amount = String(element.amount) || "0";
         element.providerMetaData = element.providerMetaData ? JSON.parse(element.providerMetaData) : undefined;
         element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
@@ -89,7 +89,6 @@ module.exports = {
       _.set(result, 'instrumentDetail', undefined);
       _.set(result, 'checkKYCStatus', undefined);
       _.set(result, 'contractSignedHash', undefined);
-      _.set(result, 'CRMTicketNo', undefined);
       _.set(result, 'ejariData.contractID', undefined);
       _.set(result, 'terminationDate', undefined);
       _.set(result, 'terminationReason', undefined);
@@ -113,11 +112,11 @@ module.exports = {
       let result = JSON.parse(data);
       let startDate = _.get(result, "contractStartDate", undefined);
       let EndDate = _.get(result, "contractEndDate", undefined);
-      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyyHHmmS(startDate) : undefined;
-      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyyHHmmS(EndDate) : undefined;
+      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyy(startDate) : undefined;
+      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyy(EndDate) : undefined;
 
       result.paymentInstruments.forEach((element, index) => {
-        element.date = dates.MSddMMyyyyHHmmS(element.date);
+        element.date = dates.MSddMMyyyy(element.date);
         element.amount = String(element.amount) || "0";
         element.providerMetaData = element.providerMetaData ? JSON.parse(element.providerMetaData) : undefined;
         element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
@@ -162,8 +161,8 @@ module.exports = {
     let contract = {};
     let startDate = _.get(result, "contractStartDate", undefined);
     let EndDate = _.get(result, "contractEndDate", undefined);
-    result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyyHHmmS(startDate) : undefined;
-    result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyyHHmmS(EndDate) : undefined;
+    result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyy(startDate) : undefined;
+    result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyy(EndDate) : undefined;
     _.set(contract, 'contractID', result.contractID||"");
     _.set(contract, 'contractAmount', result.contractAmount||"");
     _.set(contract, 'contractStartDate', result.contractStartDate||"");
@@ -192,13 +191,13 @@ module.exports = {
 
 
 
-      _.get(result, "dateOfBirth", dateOfBirth >= 0 ? dates.MSddMMyyyyHHmmS(dateOfBirth) : undefined);
-      _.get(result, "natIdExpDate", natIdExpDate >= 0 ? dates.MSddMMyyyyHHmmS(natIdExpDate) : undefined);
-      _.get(result, "passport.passportIssueDate", passportIssueDate >= 0 ? dates.MSddMMyyyyHHmmS(passportIssueDate) : undefined);
-      _.get(result, "passport.passportExpiryDate", passportExpiryDate >= 0 ? dates.MSddMMyyyyHHmmS(passportExpiryDate) : undefined);
-      _.get(result, "visaIssueDate", visaIssueDate >= 0 ? dates.MSddMMyyyyHHmmS(visaIssueDate) : undefined);
-      _.get(result, "visaExpiryDate", visaExpiryDate >= 0 ? dates.MSddMMyyyyHHmmS(visaExpiryDate) : undefined);
-      _.get(result, "lastSyncDate", lastSyncDate >= 0 ? dates.MSddMMyyyyHHmmS(lastSyncDate) : undefined);
+      _.get(result, "dateOfBirth", dateOfBirth >= 0 ? dates.MSddMMyyyy(dateOfBirth) : undefined);
+      _.get(result, "natIdExpDate", natIdExpDate >= 0 ? dates.MSddMMyyyy(natIdExpDate) : undefined);
+      _.get(result, "passport.passportIssueDate", passportIssueDate >= 0 ? dates.MSddMMyyyy(passportIssueDate) : undefined);
+      _.get(result, "passport.passportExpiryDate", passportExpiryDate >= 0 ? dates.MSddMMyyyy(passportExpiryDate) : undefined);
+      _.get(result, "visaIssueDate", visaIssueDate >= 0 ? dates.MSddMMyyyy(visaIssueDate) : undefined);
+      _.get(result, "visaExpiryDate", visaExpiryDate >= 0 ? dates.MSddMMyyyy(visaExpiryDate) : undefined);
+      _.get(result, "lastSyncDate", lastSyncDate >= 0 ? dates.MSddMMyyyy(lastSyncDate) : undefined);
 
 
       _.set(result, 'emiratesIDExpiryDate', undefined);
@@ -226,7 +225,7 @@ module.exports = {
     try {
       let result = data;
       let sdgVisaExpiryDate = _.get(result, "visaExpiryDate", undefined);
-      _.set(result, "visaExpiryDate", sdgVisaExpiryDate >= 0 ? dates.MSddMMyyyyHHmmS(sdgVisaExpiryDate) : undefined);
+      _.set(result, "visaExpiryDate", sdgVisaExpiryDate >= 0 ? dates.MSddMMyyyy(sdgVisaExpiryDate) : undefined);
       return result;
 
     } catch (ex) {

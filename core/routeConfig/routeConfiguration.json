@@ -24,9 +24,21 @@
       "CustomMappingFile": "endpointDefination.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "upsertAPITemplate": {
+      "customMapping": true,
+      "MappingfunctionName": "upsert",
+      "CustomMappingFile": "apiTemplate.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getEndpointListView": {
       "customMapping": true,
       "MappingfunctionName": "ListView",
+      "CustomMappingFile": "endpointDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTemplatesListView": {
+      "customMapping": true,
+      "MappingfunctionName": "TemplatesListView",
       "CustomMappingFile": "endpointDefination.js",
       "mappingConfigFile": "ePayMapping"
     },
@@ -40,6 +52,24 @@
       "customMapping": true,
       "MappingfunctionName": "list",
       "CustomMappingFile": "endpointDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "findAPITemplate": {
+      "customMapping": true,
+      "MappingfunctionName": "list",
+      "CustomMappingFile": "apiTemplate.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "findAPITemplateById": {
+      "customMapping": true,
+      "MappingfunctionName": "findOne",
+      "CustomMappingFile": "apiTemplate.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "testAPITemplate": {
+      "customMapping": true,
+      "MappingfunctionName": "test",
+      "CustomMappingFile": "apiTemplate.js",
       "mappingConfigFile": "ePayMapping"
     },
     "getDBFields": {
