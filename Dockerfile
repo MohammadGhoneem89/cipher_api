@@ -30,8 +30,9 @@ RUN bash -c "npm -g install qs@latest"
 RUN bash -c "npm -g install stringstream@latest"
 RUN bash -c "npm -g install ssri@latest"
 RUN bash -c "npm -g install mime@latest"
+RUN bash -c "npm -g install npm@latest"
 RUN bash -c "npm cache clean --force "
-RUN bash -c "npm -g remove npm"
+
 
 #RUN npm install
 USER 1001
