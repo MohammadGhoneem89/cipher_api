@@ -8,8 +8,8 @@ MAINTAINER Avanza Innovations <bilal.mahroof@avanzainnovations.com>
 #RUN yum -y module install nodejs:8/development
 
 
-RUN  useradd -ms /bin/bash 1001
-
+#RUN  useradd -ms /bin/bash 1001
+RUN adduser -S 1001
 #WORKDIR /home/avanza
 RUN bash -c "npm --version"
 #RUN node -v
