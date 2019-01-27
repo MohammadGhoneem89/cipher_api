@@ -907,6 +907,14 @@
       "mappingConfigFile": "ePayMapping"
     }
   },
+  "IPFS": {
+    "view": {
+      "customMapping": true,
+      "MappingfunctionName": "view",
+      "CustomMappingFile": "ipfs/view.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
   "Quorum": {
     "sendSignedTransaction": {
       "customMapping": true,
