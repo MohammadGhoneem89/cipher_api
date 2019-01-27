@@ -21,6 +21,9 @@ COPY package.json .
 COPY . .
 RUN bash -c "npm install -p"
 RUN bash -c "npm install -g npm latest"
+RUN bash -c "npm cache clean --force "
+RUN bash -c "npm list -g --depth=0. | awk -F ' ' '{print $2}' | awk -F '@' '{print $1}'  | sudo xargs npm remove -g"
+
 #RUN npm install
 USER 1001
 EXPOSE 9080
