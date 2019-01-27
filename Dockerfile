@@ -1,5 +1,5 @@
-#FROM registry.access.redhat.com/rhscl/nodejs-8-rhel7
-FROM risingstack/alpine:3.7-v8.10.0-4.8.0
+FROM registry.access.redhat.com/rhscl/nodejs-8-rhel7
+#FROM risingstack/alpine:3.7-v8.10.0-4.8.0
 MAINTAINER Avanza Innovations <bilal.mahroof@avanzainnovations.com>
 #RUN subscription-manager attach --auto
 #RUN yum repolist
@@ -9,7 +9,7 @@ MAINTAINER Avanza Innovations <bilal.mahroof@avanzainnovations.com>
 
 
 #RUN  useradd -ms /bin/bash 1001
-RUN adduser -S 1001
+#RUN adduser -S 1001
 #WORKDIR /home/avanza
 # RUN bash -c "npm --version"
 #RUN node -v
@@ -19,7 +19,9 @@ RUN adduser -S 1001
 WORKDIR /opt/app-root
 COPY package.json .
 COPY . .
-# RUN bash -c "npm install"
-RUN npm install
+RUN bash -c "npm install -p"
+RUN bash -c "npm install -g npm latest"
+#RUN npm install
 USER 1001
 EXPOSE 9080
+CMD ["node","app"]
