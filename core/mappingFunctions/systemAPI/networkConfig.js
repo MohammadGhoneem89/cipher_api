@@ -155,8 +155,34 @@ function getPeerList(payload, UUIDKey, route, callback, JWToken) {
     callback(err);
   });
 }
+
+function getNetworkConfigList(payload, UUIDKey, route, callback, JWToken) {
+  const response = {};
+  networkConfig.find({})
+    .then((data) => {
+      let res = {};
+      for (let item of data) {
+        res[item.name] = item;
+      }
+      response[payload.action] = {
+        action: payload.action,
+        data: res
+      };
+      callback(response);
+    })
+    .catch((err) => {
+      response[payload.action] = {
+        action: payload.action,
+        data: {},
+        error: err
+      };
+      callback(response);
+    });
+}
+
 exports.updateNetworkConfig = updateNetworkConfig;
 exports.getNetworkConfig = getNetworkConfig;
 exports.getNetworkConfigByID = getNetworkConfigByID;
 exports.getServiceList = getServiceList;
 exports.getPeerList = getPeerList;
+exports.getNetworkConfigList = getNetworkConfigList;
