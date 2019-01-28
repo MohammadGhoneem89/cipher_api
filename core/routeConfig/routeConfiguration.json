@@ -920,6 +920,12 @@
       "CustomMappingFile": "ipfs/info.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "put": {
+      "customMapping": true,
+      "MappingfunctionName": "put",
+      "CustomMappingFile": "ipfs/put.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "view": {
       "customMapping": true,
       "MappingfunctionName": "view",
