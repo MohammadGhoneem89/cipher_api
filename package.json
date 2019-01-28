@@ -14,7 +14,6 @@
   "dependencies": {
     "amqplib": "~0.5.1",
     "amqplib-auto-recovery": "^0.1.0",
-    "async": "^2.6.0",
     "atob": "^2.1.2",
     "body-parser": "^1.18.3",
     "body-parser-xml": "^1.1.0",
@@ -63,11 +62,9 @@
     "sha256": "^0.2.0",
     "sha512": "0.0.1",
     "soap": "^0.25.0",
-    "source-map-support": "^0.5.3",
     "typeof": "^1.0.0",
     "url": "^0.11.0",
     "uuid": "^3.0.0",
-    "validate-promise": "^2.2.3",
     "validator": "^9.4.1",
     "when": "^3.7.7"
   },
