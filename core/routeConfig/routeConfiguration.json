@@ -908,6 +908,12 @@
     }
   },
   "IPFS": {
+    "info": {
+      "customMapping": true,
+      "MappingfunctionName": "info",
+      "CustomMappingFile": "ipfs/info.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "view": {
       "customMapping": true,
       "MappingfunctionName": "view",
