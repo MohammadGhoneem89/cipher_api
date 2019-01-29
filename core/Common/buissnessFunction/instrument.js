@@ -22,9 +22,11 @@ module.exports = {
       }
       element.date = dates.ddMMyyyyslash(element.date);
       element.amount = parseFloat(element.amount) || 0;
+      element.installmentNumber = element.InstallmentNumber;
       element.providerMetaData = element.providerMetaData ? JSON.stringify(element.providerMetaData) : undefined;
       element.bankMetaData = element.bankMetaData ? JSON.stringify(element.bankMetaData) : undefined;
       element.beneficiaryData = element.beneficiaryData ? JSON.stringify(element.beneficiaryData) : undefined;
+       
     });
 
     data = _.orderBy(data, ['date'], ['asc']);
