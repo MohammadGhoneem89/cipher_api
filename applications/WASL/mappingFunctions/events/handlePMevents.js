@@ -2,7 +2,7 @@
 let rp = require('request-promise');
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 
-async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
+async function handlePMevents(payload, route, callback, JWToken) {
 
   try {
     console.log("<<<<<<<<< Request Recieved for Event >>>>>>>>")
@@ -10,18 +10,6 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(payload.eventData.eventName, "===========================>handlePMevents THIS IS PAYLOAD");
     switch (payload.eventData.eventName) {
 
-      case "RenewContract": {
-        return callback({
-          error: false,
-          message: "RenewContract"
-        })
-      }
-      case "UpdateContract": {
-        return callback({
-          error: false,
-          message: "UpdateContract"
-        })
-      }
       case "UpdateFirstPaymentInstrumentStatus": {
         try {
           await UpdateContractStatus(payload);

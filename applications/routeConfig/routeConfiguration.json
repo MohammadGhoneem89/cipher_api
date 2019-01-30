@@ -1,34 +1,10 @@
 {
   "PR": {
     "CustomFunctionsLocation": "../../applications/WASL/mappingFunctions/",
-    "handlePMevents": {
+    "generalEventHandler": {
       "customMapping": true,
-      "MappingfunctionName": "handlePMevents",
-      "CustomMappingFile": "events/handlePMevents.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "handleBankevents": {
-      "customMapping": true,
-      "MappingfunctionName": "handleBankevents",
-      "CustomMappingFile": "events/handleBankevents.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "handleDLDevents": {
-      "customMapping": true,
-      "MappingfunctionName": "handleDLDevents",
-      "CustomMappingFile": "events/handleDLDevents.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "handleGDRFAevents": {
-      "customMapping": true,
-      "MappingfunctionName": "handleGDRFAevents",
-      "CustomMappingFile": "events/handleGDRFAevents.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "handleSDGevents": {
-      "customMapping": true,
-      "MappingfunctionName": "handleSDGevents",
-      "CustomMappingFile": "events/handleSDGevents.js",
+      "MappingfunctionName": "generalEventHandler",
+      "CustomMappingFile": "events/index.js",
       "mappingConfigFile": "ePayMapping"
     }
   },
