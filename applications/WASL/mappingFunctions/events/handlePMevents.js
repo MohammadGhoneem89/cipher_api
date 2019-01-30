@@ -29,33 +29,6 @@ async function handlePMevents(payload, route, callback, JWToken) {
         break;
       }
 
-      case "UpdateKYCDetail": {
-        try {
-          await getPromise(payload, updateKYCDetail(payload), callback);
-        }
-        catch (e) {
-          console.log(e);
-        }
-        break;
-      }
-      case "EjariData": {
-        try {
-         await getPromise(payload, EjariAvailable(payload), callback);
-        }
-        catch (e) {
-          console.log(e);
-        }
-        break;
-      }
-      case "EjariTerminationStatus": {
-        try {
-          await getPromise(payload, EjariTermination(payload), callback);
-        } catch (e) {
-          console.log(e);
-        }
-        break;
-      }
-
       default:
         return callback({
           error: true,
@@ -118,71 +91,6 @@ function updateFirstPaymentStatus(payload) {
     return rp(options);
   }
 
-}
-
-function updateKYCDetail(payload) {
-  return async () => {
-    let options = {
-      method: 'POST',
-      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=updateKYCDetail',
-      body:
-      {
-        header:
-        {
-          username: 'api_user',
-          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-        },
-        body: await transformTemplate("EventOnUpdateKYCDetail-WASL", payload.eventData, [])
-
-      },
-      json: true
-    };
-    console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return rp(options);
-  }
-
-}
-
-function EjariAvailable(payload) {
-  return async () => {
-    let options = {
-      method: 'POST',
-      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=terminateContract',
-      body:
-      {
-        header:
-        {
-          username: 'api_user',
-          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-        },
-        body: await transformTemplate("EventOnEjariAvailable", payload.eventData, [])
-      },
-      json: true
-    };
-    console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return rp(options);
-  }
-}
-
-function EjariTermination(payload) {
-  return async () => {
-    let options = {
-      method: 'POST',
-      url: 'https://ecservicesqa.wasl.ae/sap/bc/zblckchain?eventName=terminateContract',
-      body:
-      {
-        header:
-        {
-          username: 'api_user',
-          password: '2c4e9365c231754b208647854e1f608b8db6014d8a28c02a850162963f28ca5b'
-        },
-        body: await transformTemplate("EventOnEjariTerminationStatus", payload.eventData, [])
-      },
-      json: true
-    };
-    console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return rp(options);
-  }
 }
 
 function UpdateContractStatus(payload) {
