@@ -4,10 +4,11 @@ let handlePMevent = require('./handlePMevents');
 
 async function generalEventHandler(payload, UUIDKey, route, callback, JWToken) {
   console.log(payload,"+++++++++++++++++++++++++++++++++")
-  callback({
-    message: payload.eventData.eventName + " Dispatched",
+  
+  handlePMevent(payload, route, callback, JWToken)
+  .callback({
+    message: payload.eventName + " Dispatched",
   })
-  //handlePMevent(payload, route, callback, JWToken);
 
 }
 exports.generalEventHandler = generalEventHandler;
