@@ -11,12 +11,12 @@ async function handlePMevents(payload, route, callback, JWToken) {
     switch (payload.eventData.eventName) {
       case "UpdateFirstPaymentInstrumentStatus": {
         await UpdateContractStatus(payload.eventData.contractID);
-        await getPromise(payload, createMessage(payload), callback);
+        await getPromise(payload, await createMessage(payload), callback);
         break;
       }
       case "UpdatePaymentInstrumentStatus": {
         await UpdateContractStatus(payload.eventData.contractID);
-        await getPromise(payload, createMessage(payload), callback);
+        await getPromise(payload, await createMessage(payload), callback);
         break;
       }
       default:
@@ -82,7 +82,7 @@ function updateFirstPaymentStatus(payload) {
 
 }
 
-async function UpdateContractStatus(contractID) {
+function UpdateContractStatus(contractID) {
   console.log("UpdateContractStatus===============><===============UpdateContractStatus");
 
   let message = {
@@ -101,7 +101,7 @@ async function UpdateContractStatus(contractID) {
     },
     json: true
   };
-  return Promise.resolve(message);
+  return rp(message);
 }
 
 
@@ -123,7 +123,7 @@ async function createMessage(payload) {
 }
 
 async function getPromise(payload, message, callback) {
-  rp( await  message).then(response => {
+  rp(message).then(response => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
       error: false,
