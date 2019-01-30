@@ -71,8 +71,14 @@ async function handlePMevents(payload, route, callback, JWToken) {
     })
   }
   catch (err) {
-    console.log(err)
+    console.log(err);
+    callback({
+      error: true,
+      message: err,
+      response: {request: payload, response:{}}
+    })
   }
+
 }
 
 function updatePaymentStatus(payload) {
