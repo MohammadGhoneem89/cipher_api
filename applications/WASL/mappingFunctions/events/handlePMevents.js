@@ -11,12 +11,12 @@ async function handlePMevents(payload, route, callback, JWToken) {
     switch (payload.eventData.eventName) {
       case "UpdateFirstPaymentInstrumentStatus": {
         await UpdateContractStatus(payload.eventData.contractID);
-        await getPromise(payload, updateFirstPaymentStatus(payload), callback);
+        await getPromise(payload, createMessage(payload), callback);
         break;
       }
       case "UpdatePaymentInstrumentStatus": {
         await UpdateContractStatus(payload.eventData.contractID);
-        await getPromise(payload, updatePaymentStatus(payload), callback);
+        await getPromise(payload, createMessage(payload), callback);
         break;
       }
       default:
@@ -82,44 +82,60 @@ function updateFirstPaymentStatus(payload) {
 
 }
 
-function UpdateContractStatus(contractID) {
+async function UpdateContractStatus(contractID) {
   console.log("UpdateContractStatus===============><===============UpdateContractStatus");
-  return async () => {
-    let options = {
-      method: 'POST',
-      url: 'http://51.140.250.28/API/PR/UpdateContractStatus',
-      body:
+
+  let message = {
+    method: 'POST',
+    url: 'http://51.140.250.28/API/PR/UpdateContractStatus',
+    body: {
+      header:
         {
-          "header": {
-            "username": "Internal_API",
-            "password": "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
-          },
-          "body": {
-            "orgCode": "WASL",
-            "contractID": contractID
-          }
+          username: "Internal_API",
+          password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
         },
-      json: true
-    };
-    console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return {message: options.body, func: rp(options)};
-  }
+      body: {
+        "orgCode": "WASL",
+        "contractID": contractID
+      }
+    },
+    json: true
+  };
+  return Promise.resolve(message);
 }
 
-async function getPromise(payload, {message, func}, callback) {
-  func.then(response => {
+
+async function createMessage(payload) {
+
+  return await {
+    method: 'POST',
+    url: payload.endpoint.address,
+    body: {
+      header:
+        {
+          username: payload.header.username,
+          password: payload.header.password
+        },
+      body: await transformTemplate(payload.template.data, payload.eventData, [])
+    },
+    json: true
+  };
+}
+
+async function getPromise(payload, message, callback) {
+  rp( await  message).then(response => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
       error: false,
       message: payload.eventData.eventName + " Dispatched",
-      response: {request:message, response}
+      response: {request: message.body, response}
     })
-  }).catch(err => {
+  }).catch(error => {
     console.log("error : ", err);
     callback({
       error: true,
       message: payload.eventData.eventName + " Failed",
-      response: err
+      response: {request: message.body, error}
     })
   });
 }
