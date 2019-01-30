@@ -198,6 +198,7 @@ function EjariTermination(payload) {
 }
 
 function UpdateContractStatus(payload) {
+  console.log("UpdateContractStatus===============>", options.body, "<===============UpdateContractStatus");
   return async () => {
     let options = {
       method: 'POST',
