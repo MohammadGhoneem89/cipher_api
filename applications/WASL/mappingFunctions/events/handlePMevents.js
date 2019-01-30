@@ -67,7 +67,7 @@ async function handlePMevents(payload, route, callback, JWToken) {
     callback({
       error: false,
       message: payload.eventData.eventName + " Dispatched",
-      response: {request: payload, response:{}}
+      response: {request: "THIS IS REQUEST", response:"THIS IS RESPONSE"}
     })
   }
   catch (err) {
@@ -75,7 +75,7 @@ async function handlePMevents(payload, route, callback, JWToken) {
     callback({
       error: true,
       message: err,
-      response: {request: payload, response:{}}
+      response: {request: "THIS IS REQUEST", response:"THIS IS RESPONSE"}
     })
   }
 
