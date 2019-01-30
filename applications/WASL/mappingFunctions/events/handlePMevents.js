@@ -8,61 +8,67 @@ async function handlePMevents(payload, route, callback, JWToken) {
     console.log("<<<<<<<<< Request Recieved for PM Event >>>>>>>>");
     console.log(JSON.stringify(payload, null, 2));
     console.log(payload.eventData.eventName, "===========================>handlePMevents THIS IS PAYLOAD");
-    switch (payload.eventData.eventName) {
+    // switch (payload.eventData.eventName) {
+    //
+    //   case "UpdateFirstPaymentInstrumentStatus": {
+    //     try {
+    //       await UpdateContractStatus(payload);
+    //       await getPromise(payload, updateFirstPaymentStatus(payload), callback);
+    //     } catch (e) {
+    //       console.log(e);
+    //     }
+    //     break;
+    //   }
+    //   case "UpdatePaymentInstrumentStatus": {
+    //     try {
+    //       await UpdateContractStatus(payload);
+    //       await getPromise(payload, updatePaymentStatus(payload), callback);
+    //     } catch (e) {
+    //       console.log(e);
+    //     }
+    //     break;
+    //   }
+    //
+    //   case "UpdateKYCDetail": {
+    //     try {
+    //       await getPromise(payload, updateKYCDetail(payload), callback);
+    //     }
+    //     catch (e) {
+    //       console.log(e);
+    //     }
+    //     break;
+    //   }
+    //   case "EjariData": {
+    //     try {
+    //       await getPromise(payload, EjariAvailable(payload), callback);
+    //     }
+    //     catch (e) {
+    //       console.log(e);
+    //     }
+    //     break;
+    //   }
+    //   case "EjariTerminationStatus": {
+    //     try {
+    //       await getPromise(payload, EjariTermination(payload), callback);
+    //     } catch (e) {
+    //       console.log(e);
+    //     }
+    //     break;
+    //   }
+    //
+    //   default:
+    //     return callback({
+    //       error: true,
+    //       message: "invalid case"
+    //     })
+    //
+    // }
 
-      case "UpdateFirstPaymentInstrumentStatus": {
-        try {
-          await UpdateContractStatus(payload);
-          await getPromise(payload, updateFirstPaymentStatus(payload), callback);
-        } catch (e) {
-          console.log(e);
-        }
-        break;
-      }
-      case "UpdatePaymentInstrumentStatus": {
-        try {
-          await UpdateContractStatus(payload);
-          await getPromise(payload, updatePaymentStatus(payload), callback);
-        } catch (e) {
-          console.log(e);
-        }
-        break;
-      }
-
-      case "UpdateKYCDetail": {
-        try {
-          await getPromise(payload, updateKYCDetail(payload), callback);
-        }
-        catch (e) {
-          console.log(e);
-        }
-        break;
-      }
-      case "EjariData": {
-        try {
-          await getPromise(payload, EjariAvailable(payload), callback);
-        }
-        catch (e) {
-          console.log(e);
-        }
-        break;
-      }
-      case "EjariTerminationStatus": {
-        try {
-          await getPromise(payload, EjariTermination(payload), callback);
-        } catch (e) {
-          console.log(e);
-        }
-        break;
-      }
-
-      default:
-        return callback({
-          error: true,
-          message: "invalid case"
-        })
-
-    }
+    callback({
+      error: false,
+      message: payload.eventData.eventName + " Dispatched",
+      response: {request: payload, response:{}}
+    })
   }
   catch (err) {
     console.log(err)
