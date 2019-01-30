@@ -101,7 +101,10 @@ function UpdateContractStatus(contractID) {
     },
     json: true
   };
-  return rp(message);
+  return rp(message).then(result=>{
+    console.log("Update Contract Status Response===========>",result,"<===========Update Contract Status Response");
+    return Promise.resolve(true);
+  });
 }
 
 
