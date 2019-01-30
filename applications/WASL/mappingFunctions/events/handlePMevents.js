@@ -134,7 +134,7 @@ async function getPromise(payload, message, callback) {
       response: {request: message.body, response}
     })
   }).catch(error => {
-    console.log("error : ", err);
+    console.log("error : ", error);
     callback({
       error: true,
       message: payload.eventData.eventName + " Failed",
