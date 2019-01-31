@@ -2,5 +2,6 @@
   "entityTransactionDetail": "./query/entityTransactionDetail",
   "contractDetailReport": "./query/contractDetailReport",
   "paymentInstrumentReport": "./query/paymentInstrumentReport",
-  "ejariReport": "./query/ejariReport"
+  "ejariReport": "./query/ejariReport",
+  "APIDefFullReport": "./query/APIDefFullReport"
 }

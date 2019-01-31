@@ -8,10 +8,10 @@
 </head>
 <body style="font-family: verdana">
 <div>
-    <h2 class="panel-title" style="text-align: center; color:#5882FA, padding-bottom: 15px">{{:searchResult.useCaseLabel}} - API Documentation for {{:searchResult.organization}}</h2>
-	</br>
-	</br>
-    {^{for searchResult.finalData}}
+    <h2 class="panel-title" style="text-align: center; color:#5882FA, padding-bottom: 15px">API Documentation</h2>
+    </br>
+    </br>
+    {^{for searchResult}}
 
     <div>
         <div>
@@ -28,19 +28,19 @@
                 <p><strong>Authentication: </strong>&nbsp;{{:authorization}}</p>
             </div>
             <div style="padding-top: 5px">
-                <p><strong>URL: </strong>&nbsp;{IP Address: Port}/API/{{:basePath}}{{:url}}</p>
+                <p><strong>URL: </strong>&nbsp;{IP Address: Port}/{{:basePath}}{{:url}}</p>
             </div>
         </div>
     </div>
 
     <div class="box">
-       
+
         <div style="padding-top: 10px">
             {{if requestSchema}}
             <div>
                 <h4>Request</h4>
                 <pre class="jsonBox">
-                <code style="font-size: x-large;font-style: initial">{{:requestSchema}}</code>
+                <code>{{:requestSchema}}</code>
             </pre>
             </div>
             {{/if}}
@@ -48,7 +48,7 @@
             <div>
                 <h4>Response</h4>
                 <pre class="jsonBox">
-                <code style="font-size: x-large;font-style: initial">{{:responseSchema}}</code>
+                <code>{{:responseSchema}}</code>
             </pre>
             </div>
             {{/if}}
@@ -60,14 +60,14 @@
     <div class="box">
         <div style="padding-top: 10px">
             <h3>Sample Response</h3>
-        </div>      
+        </div>
         <div style="padding-top: 20px">
             {{if simucases}}
             {^{for simucases}}
             <div>
                 <h5>{{:RuleName}}</h5>
                 <pre class="jsonBox">
-                <code style="font-size: x-large; font-style: initial">{{:SimulatorResponse}}</code>
+                <code>{{:SimulatorResponse}}</code>
                 </pre>
             </div>
             {{/for}}
@@ -83,7 +83,7 @@
                 <div class="panel panel-default">
                     <div class="">
                         <h4 class="">Request Body Parameter</h4>
-						<br/>
+                        <br/>
                     </div>
                     <div class="panel-body">
                         <div class="table-responsive">
@@ -118,7 +118,7 @@
                 <div class="panel panel-default">
                     <div class="">
                         <h4 class="panel-title">Response Body Parameter</h4>
-						<br/>
+                        <br/>
                     </div>
                     <div class="panel-body">
                         <div class="table-responsive">
@@ -143,7 +143,7 @@
         </div>
     </div>
     <P style="page-break-before: always">
-    {{/for}}
+        {{/for}}
 </div>
 
 
