@@ -39,17 +39,13 @@
             {{if requestSchema}}
             <div>
                 <h4>Request</h4>
-                <pre class="jsonBox">
-                <code style="font-size: x-large;font-style: initial">{{:requestSchema}}</code>
-            </pre>
+                <textarea style="width: 90%; padding: 10px; border: 0; min-height: 10rem; font-family: 'Lucida Console', Monaco, monospace; font-size: 0.8rem; line-height: 1.2;">{{:requestSchema}}</textarea>
             </div>
             {{/if}}
             {{if responseSchema}}
             <div>
                 <h4>Response</h4>
-                <pre class="jsonBox">
-                <code style="font-size: x-large;font-style: initial">{{:responseSchema}}</code>
-            </pre>
+                     <textarea style="width: 90%; padding: 10px; border: 0; min-height: 10rem; font-family: 'Lucida Console', Monaco, monospace; font-size: 0.8rem; line-height: 1.2;">{{:responseSchema}}</textarea>
             </div>
             {{/if}}
         </div>
@@ -66,9 +62,7 @@
             {^{for simucases}}
             <div>
                 <h5>{{:RuleName}}</h5>
-                <pre class="jsonBox">
-                <code style="font-size: x-large; font-style: initial">{{:SimulatorResponse}}</code>
-                </pre>
+                     <textarea style="width: 90%; padding: 10px; border: 0; min-height: 10rem; font-family: 'Lucida Console', Monaco, monospace; font-size: 0.8rem; line-height: 1.2;">{{:SimulatorResponse}}</textarea>
             </div>
             {{/for}}
             {{/if}}
