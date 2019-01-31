@@ -1,0 +1,21 @@
+type RenewContract struct{
+	AuthToken string `json:"authToken"`
+EIDA string `json:"EIDA"`
+ContractID string `json:"contractID"`
+ContractReference string `json:"contractReference"`
+LastContractID string `json:"lastContractID"`
+ContractStartDate string `json:"contractStartDate"`
+ContractEndDate string `json:"contractEndDate"`
+TenantName string `json:"tenantName"`
+PropertyReferenceNumber string `json:"propertyReferenceNumber"`
+OldeEjariNumber string `json:"oldeEjariNumber"`
+BusinessPartnerNo string `json:"businessPartnerNo"`
+ContractSignedHash string `json:"contractSignedHash"`
+PaymentMethod string `json:"paymentMethod"`
+UserReferenceNumber string `json:"userReferenceNumber"`
+CheckKYCStatus string `json:"checkKYCStatus"`
+Installments array `json:"installments"`
+ContractAmount string `json:"contractAmount"`
+PaymentCount number `json:"paymentCount"`
+IsLegacyContract boolean `json:"isLegacyContract"`
+}

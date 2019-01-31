@@ -6,13 +6,8 @@ const typeData = require('../../../lib/repositories/typeData');
 const fs = require('fs');
 
 function updateRequestStub(payload, route, useCase) {
-  let query = {
-    'sampleRequest': payload
-  };
-  APIDefinitation.update({
-    route: route,
-    useCase: useCase
-  }, query).then((data) => {
+  let query = { 'sampleRequest': payload };
+  APIDefinitation.update({ route: route, useCase: useCase }, query).then((data) => {
     console.log("request Sample Updated!");
   });
 }
@@ -57,16 +52,17 @@ function LoadConfig() {
 
 function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
   APIDefinitation.findPageAndCount(payload).then((data) => {
-    let actions = [{
-      "value": "1003",
-      "type": "componentAction",
-      "label": "View",
-      "params": "",
-      "iconName": "icon-docs",
-      "URI": [
-        "/APIDefScreen/"
-      ]
-    }];
+    let actions = [
+      {
+        "value": "1003",
+        "type": "componentAction",
+        "label": "View",
+        "params": "",
+        "iconName": "icon-docs",
+        "URI": [
+          "/APIDefScreen/"
+        ]
+      }];
 
     data[0].forEach((element) => {
       element.actions = actions;
@@ -147,10 +143,7 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
         resp.responseMessage.data.message.errorDescription = "route & useCase already exist!";
         return callback(resp);
       }
-      return APIDefinitation.update({
-        route: payload.route,
-        useCase: payload.useCase
-      }, payload).then((data) => {
+      return APIDefinitation.update({ route: payload.route, useCase: payload.useCase }, payload).then((data) => {
 
         resp.responseMessage.data.message.status = "OK";
         console.log(data);
@@ -170,7 +163,8 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
       console.log(err);
       return callback(resp);
     });
-  } else {
+  }
+  else {
     resp.responseMessage.data.message.status = "ERROR";
     resp.responseMessage.data.message.errorDescription = "route & useCase is required!";
     resp.responseMessage.data.message.newPageURL = "";
@@ -278,12 +272,10 @@ function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
-
-
 function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let chainCodeData = [];
   let responses = [];
-  console.log(payload.query, "IQRA");
+  console.log(payload, "IQRA");
 
   let request = {
     "action": "mappingData",
@@ -295,7 +287,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   };
   APIDefinitation.findPageAndCount(request)
     .then((data) => {
-      // console.log(data)
+       console.log(data)
       data[0].map(item => {
         if (item.isSmartContract === true && item.isActive === true) {
           chainCodeData.push({
@@ -323,11 +315,13 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         {
           response = {
             "MSP": chainCodeData[i].MSP,
-            "APIList": [{
-              "route": chainCodeData[i].route,
-              "purpose": chainCodeData[i].description
+            "APIList": [
+              {
+                "route": chainCodeData[i].route,
+                "purpose": chainCodeData[i].description
 
-            }]
+              }
+            ]
           };
 
           responses[0].ApiListData.APIdata.push(response)
@@ -372,29 +366,21 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       responses[0].ApiListData.APIdata = uniqueMSP;
       // console.log(responses)
 
-      let updateIndex = "",
-        newData = ""
-      let mData = "",
-        mData2 = "",
-        mData3 = "",
-        wData = "";
+      let updateIndex = "", newData = ""
+      let mData = "", mData2 = "", mData3 = "", wData = "";
       let mData1 = ""
-
       function findFnLogicIndex(data) {
         let funcLogicStart = data.search("//<<Function Validation Logic-Start>>");
         let funcLogicEnd = data.search("//<<Function Validation Logic - End>>")
         updateIndex = data.substring(funcLogicStart, funcLogicEnd);
         return updateIndex;
       }
-
       function mspFunctionsLogic(data) {
         let getUpdatedInd = findFnLogicIndex(data)
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
           wData = ""
 
-          if (i > 0) {
-            newData = "\n"
-          }
+          if (i > 0) { newData = "\n" }
           newData += getUpdatedInd.replace(/<<MSP>>/g, responses[0].ApiListData.APIdata[i].MSP)
 
           mData = newData.search("//<<FunctionCases-Start>>")
@@ -416,14 +402,12 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
       let xData = "";
       let fData = ""
-
       function findFnDescInd(data) {
         let IndxFnDef = data.search("//<<FunctionDefinition - Start>>");
         let IndxFnDefEnd = data.search("//<<FunctionDefinition - End>>");
         let GetData = data.substring(IndxFnDef, IndxFnDefEnd);
         return GetData;
       }
-
       function mspFunctionDesc(data) {
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
 
@@ -474,16 +458,19 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         var response = {
           "ApiListData": {
             "useCase": "",
-            "APIdata": [{
-              "MSP": "",
-              "APIList": [{
-                  "route": "",
-                  "purpose": ""
+            "APIdata": [
+              {
+                "MSP": "",
+                "APIList": [
+                  {
+                    "route": "",
+                    "purpose": ""
 
-                }
+                  }
 
-              ]
-            }]
+                ]
+              }
+            ]
           }
         }
         // console.log(response)
@@ -492,6 +479,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
     });
 
 }
+
+
 exports.downloadChainCode = downloadChainCode;
 exports.getAPIDefinition = getAPIDefinition;
 exports.getAPIDefinitionID = getAPIDefinitionID;
