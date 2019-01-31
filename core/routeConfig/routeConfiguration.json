@@ -311,6 +311,12 @@
       "MappingfunctionName": "downloadChainCode",
       "CustomMappingFile": "systemAPI/APIDefination.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "createDynamicStruct":{
+      "customMapping": true,
+      "MappingfunctionName": "createDynamicStruct",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "UI": {

@@ -266,6 +266,28 @@ function getTypeDataList(payload, UUIDKey, route, callback, JWToken) {
     callback(resp);
   });
 }
+
+function createDynamicStruct(payload, UUIDKey, route, callback, JWToken) {
+  //console.log(payload.query, "IQRA");
+  console.log(payload, "IQRA");
+  // let request = {
+  //   "action": "mappingData",
+  //   "searchCriteria": payload.query.searchCriteria,
+  //   "page": {
+  //     "currentPageNo": 1,
+  //     "pageSize": 10
+  //   }
+
+  MappingConfig.findPageAndCount(request)
+    .then((data) => {
+      if (data) {
+        callback(data);
+      }
+
+    }).catch((err) => {
+      callback(err);
+    });
+}
 exports.getMappingConfig = getMappingConfig;
 exports.getMappingConfigByID = getMappingConfigByID;
 exports.upsertMappingConfig = upsertMappingConfig;
@@ -273,3 +295,4 @@ exports.getServiceList = getServiceList;
 exports.getListFunction = getListFunction;
 exports.getTypeDataList = getTypeDataList;
 exports.getMappingConfigOrgFieldData = getMappingConfigOrgFieldData;
+exports.createDynamicStruct = createDynamicStruct;
