@@ -7,20 +7,20 @@ let validationFunctions = require('../../Common/_validationFunctions.js');
 const groupPermission = require('../../../lib/services/group');
 let apiDefination = require('./APIDefination');
 const _ = require('lodash');
+
 function getMappingConfig(payload, UUIDKey, route, callback, JWToken) {
 
   MappingConfig.findPageAndCount(payload).then((data) => {
-    let actions = [
-      {
-        "value": "1003",
-        "type": "componentAction",
-        "label": "View",
-        "params": "",
-        "iconName": "icon-docs",
-        "URI": [
-          "/editMapping/"
-        ]
-      }];
+    let actions = [{
+      "value": "1003",
+      "type": "componentAction",
+      "label": "View",
+      "params": "",
+      "iconName": "icon-docs",
+      "URI": [
+        "/editMapping/"
+      ]
+    }];
 
     data[0].forEach((element) => {
       element.actions = actions;
@@ -67,7 +67,7 @@ function getMappingConfigOrgFieldData(payload, UUIDKey, route, callback, JWToken
     let result = [];
     if (data[0].fields) {
       data[0].fields.forEach((elem, index) => {
-        if (elem.IN_FIELDTYPE === 'OrgIdentifier' || elem.IN_FIELDTYPE === 'JWTORG' ) {
+        if (elem.IN_FIELDTYPE === 'OrgIdentifier' || elem.IN_FIELDTYPE === 'JWTORG') {
           result.push(elem);
         }
       });
@@ -85,7 +85,6 @@ function getMappingConfigOrgFieldData(payload, UUIDKey, route, callback, JWToken
     callback(err);
   });
 }
-
 
 function getMappingConfigByID(payload, UUIDKey, route, callback, JWToken) {
   Promise.all([
@@ -130,7 +129,9 @@ function upsertMappingConfig(payload, UUIDKey, route, callback, JWToken) {
         resp.responseMessage.data.message.errorDescription = "mappingName already exist!";
         return callback(resp);
       }
-      MappingConfig.update({ mappingName: payload.mappingName }, payload).then((data) => {
+      MappingConfig.update({
+        mappingName: payload.mappingName
+      }, payload).then((data) => {
 
         resp.responseMessage.data.message.status = "OK";
         console.log(data);
@@ -241,7 +242,6 @@ function getListFunction(payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
-
 function getTypeDataList(payload, UUIDKey, route, callback, JWToken) {
   let resp = {
     "enumList": {
@@ -268,11 +268,13 @@ function getTypeDataList(payload, UUIDKey, route, callback, JWToken) {
     callback(resp);
   });
 }
-
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(find, 'g'), replace);
+}
 function createDynamicStruct(payload, UUIDKey, route, callback, JWToken) {
-  //console.log(payload.query, "IQRA");
+  // console.log(payload.query, "IQRA");
   console.log(payload, "IQRA");
- 
+
   let request = {
     "action": "mappingData",
     "searchCriteria": payload.searchCriteria,
@@ -285,56 +287,59 @@ function createDynamicStruct(payload, UUIDKey, route, callback, JWToken) {
   MappingConfig.findPageAndCount(request)
     .then((data) => {
       if (data) {
-        console.log(JSON.stringify(data[0][0].fields),"fieldssssssssss");
-        
+        console.log(JSON.stringify(data), "fieldssssssssss");
+
         fs.readFile('structTemplate.txt', 'utf8', function (err, fileData) {
           if (err) {
             return console.log(err);
           }
-          console.log(fileData);
-          let ifileData = fileData.replace('<<structName>>' ,payload.searchCriteria.mappingName);
+          console.log(fileData, "fileDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 
-          function findInd(fileData,data) {
-            let mgenerateStruct = "";
-            let IndxFnDef = fileData.search("<<field1>>");
-            let IndxFnDefEnd = fileData.search("}");
-            let GetfileData = fileData.substring(IndxFnDef, IndxFnDefEnd);
-          console.log(GetfileData,"FileDataaaaaaaaaaaaaSUBSTRING")
-            for(let i =0 ; i< data[0][0].fields.length ; i++)
-          {
-          
-            let getSlicedFieldName = data[0][0].fields[i].IN_FIELD.split(".");
-             let mSlicedFieldName = getSlicedFieldName[1];
-             
-            let  mfileData = GetfileData.replace('<<field1>>', mSlicedFieldName.charAt(0).toUpperCase()+ mSlicedFieldName.slice(1));
-           mfileData = mfileData.replace('<<fieldType>>>',data[0][0].fields[i].IN_FIELDDT);
-           mfileData = mfileData.replace('<<field1JSON>>',mSlicedFieldName)
-           mgenerateStruct += mfileData; 
+          let ifileData = replaceAll(fileData, '<<structName>>', payload.searchCriteria.mappingName);
+          // let ifileData = fileData.replaceAll('<<structName>>', payload.searchCriteria.mappingName);
+          console.log(ifileData, "iiiiiiiiiiiiiiiifffffffffffffffffffffffffffff");
+          function findIndex(fileData) {
+            let startIndex = fileData.search("<<field1>>");
+            let endIndex = fileData.search("structEnd}");
+            let GetfileData = fileData.substring(startIndex, endIndex);
+            return GetfileData;
           }
-          return  mgenerateStruct;
-        }
+          function findnReplaceStruct(fileData, data) {
+            let mgenerateStruct = "";
+            let GetfileData = findIndex(fileData);
+            console.log(GetfileData, "FileDataaaaaaaaaaaaaSUBSTRING");
+            for (let i = 0; i < data[0][0].fields.length; i++) {
 
-        let IndxFnDef = ifileData.search("<<field1>>");
-        let IndxFnDefEnd = ifileData.search("}");
-        let GetfileData = ifileData.substring(IndxFnDef, IndxFnDefEnd);
-        ifileData = ifileData.replace(GetfileData,findInd(fileData,data))
-       
+              let getSlicedFieldName = data[0][0].fields[i].IN_FIELD.split(".");
+              let mSlicedFieldName = getSlicedFieldName[1];
+
+              let mfileData = GetfileData.replace('<<field1>>', mSlicedFieldName.charAt(0).toUpperCase() + mSlicedFieldName.slice(1));
+              mfileData = mfileData.replace('<<fieldType>>', data[0][0].fields[i].IN_FIELDDT);
+              mfileData = mfileData.replace('<<field1JSON>>', mSlicedFieldName);
+              mgenerateStruct += mfileData;
+            }
+            return mgenerateStruct;
+          }
+
+          let GetfileData = findIndex(fileData);
+          ifileData = ifileData.replace(GetfileData, findnReplaceStruct(fileData, data));
+
           fs.writeFile('struct.go', ifileData, 'utf8', function (err) {
             if (err) return console.log(err);
-             console.log("========================fileData written\n\n\n", ifileData)
-        });
-        // callback(ifileData, (responseCallback) => {
+            console.log("========================fileData written\n\n\n", ifileData);
+          });
+          // callback(ifileData, (responseCallback) => {
 
-        //   responseCallback.set({
-        //     'Content-Type': 'application/octet-stream',
-        //     'Content-Disposition': 'attachment; filename=' + "Struct.go",
-        //   });
-        // });
-        
-    });
-  }
+          //   responseCallback.set({
+          //     'Content-Type': 'application/octet-stream',
+          //     'Content-Disposition': 'attachment; filename=' + "Struct.go",
+          //   });
+          // });
+
+        });
+      }
     }).catch((err) => {
-      console.log(err,"errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+      console.log(err, "errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
       callback(err);
     });
 }

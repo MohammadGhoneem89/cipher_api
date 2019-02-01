@@ -1,21 +1,18 @@
-type RenewContract struct{
-	AuthToken string `json:"authToken"`
-EIDA string `json:"EIDA"`
-ContractID string `json:"contractID"`
-ContractReference string `json:"contractReference"`
-LastContractID string `json:"lastContractID"`
-ContractStartDate string `json:"contractStartDate"`
-ContractEndDate string `json:"contractEndDate"`
-TenantName string `json:"tenantName"`
-PropertyReferenceNumber string `json:"propertyReferenceNumber"`
-OldeEjariNumber string `json:"oldeEjariNumber"`
-BusinessPartnerNo string `json:"businessPartnerNo"`
-ContractSignedHash string `json:"contractSignedHash"`
-PaymentMethod string `json:"paymentMethod"`
-UserReferenceNumber string `json:"userReferenceNumber"`
-CheckKYCStatus string `json:"checkKYCStatus"`
-Installments array `json:"installments"`
-ContractAmount string `json:"contractAmount"`
-PaymentCount number `json:"paymentCount"`
-IsLegacyContract boolean `json:"isLegacyContract"`
+
+type AddTenant struct{
+	OrgCode string `json:"orgCode"`
+OrgID string `json:"orgID"`
+EmiratesID string `json:"emiratesID"`
+CustomerName string `json:"customerName"`
+MobileNumber string `json:"mobileNumber"`
+EmailID string `json:"emailID"`
+VisaNo string `json:"visaNo"`
+VisaExpiryDate string `json:"visaExpiryDate"`
+EmiratesIDExpiryDate string `json:"emiratesIDExpiryDate"`
+AuthToken string `json:"authToken"`
+Timestamp string `json:"timestamp"`
+structEnd}
+AddTenant := &AddTenant{
+		
+		<<field1>>:   sanitize(<<args[currentNo]>>, "<<fieldType>>").(<<fieldType>>)
 }
