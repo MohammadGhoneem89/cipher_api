@@ -3,7 +3,7 @@ let rp = require('request-promise');
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 
 async function handlePMevents(payload, route, callback, JWToken) {
-  console.log("======>TYPE OF:", typeof callback);
+  console.log("======>TYPE OF:", callback);
 
   try {
     console.log("<<<<<<<<< Request Recieved for PM Event >>>>>>>>");
@@ -67,7 +67,7 @@ function UpdateContractStatus(contractID) {
 
 
 async function createMessage(payload) {
-  console.log("THIS IS TEMPLATE", payload.template.data);
+
   return await {
     method: 'POST',
     url: payload.endpoint.address,
