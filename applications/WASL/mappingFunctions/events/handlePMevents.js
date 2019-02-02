@@ -30,8 +30,12 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(err.message);
     callback({
       error: true,
-      message: "ERROR",
-      response: {request: "THIS IS REQUEST", response: err}
+      message: err.message,
+
+      response: {
+        request: err.options || "THIS IS REQUEST",
+        response: err.error || err
+      }
     });
     return Promise.resolve(true);
   }
@@ -57,8 +61,8 @@ function UpdateContractStatus(contractID) {
     },
     json: true
   };
-  return rp(message).then(result=>{
-    console.log("Update Contract Status Response===========>",result,"<===========Update Contract Status Response");
+  return rp(message).then(result => {
+    console.log("Update Contract Status Response===========>", result, "<===========Update Contract Status Response");
     return Promise.resolve(true);
   });
 }
@@ -82,12 +86,12 @@ async function createMessage(payload) {
 }
 
 async function getPromise(payload, message, callback) {
-  return rp(message).then(response => {
+  return rp(message).then(result => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
       error: false,
       message: payload.eventData.eventName + " Dispatched",
-      response: {request: message.body, response}
+      response: {request: message.body, result}
     })
   });
 }
