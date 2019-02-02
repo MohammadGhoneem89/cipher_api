@@ -3,6 +3,7 @@ let rp = require('request-promise');
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 
 async function handlePMevents(payload, route, callback, JWToken) {
+  console.log("======>TYPE OF:", typeof callback);
 
   try {
     console.log("<<<<<<<<< Request Recieved for PM Event >>>>>>>>");
