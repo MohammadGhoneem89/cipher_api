@@ -3,7 +3,7 @@ let rp = require('request-promise');
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 
 async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
-  
+
   try {
     console.log("<<<<<<<<< Request Recieved for PM Event >>>>>>>>");
     console.log(JSON.stringify(payload, null, 2));
