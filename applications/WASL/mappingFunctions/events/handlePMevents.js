@@ -7,7 +7,6 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<<<<<<< Request Recieved for PM Event >>>>>>>>");
     console.log(JSON.stringify(payload, null, 2));
-    console.log(payload.eventData.eventName, "===========================>handlePMevents THIS IS PAYLOAD");
     switch (payload.eventData.eventName) {
       case "UpdateFirstPaymentInstrumentStatus": {
         await UpdateContractStatus(payload.eventData.contractID);
@@ -28,7 +27,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
     return Promise.resolve(true);
   }
   catch (err) {
-    console.log(err);
+    console.log(err.message);
     callback({
       error: true,
       message: "ERROR",
@@ -83,19 +82,12 @@ async function createMessage(payload) {
 }
 
 async function getPromise(payload, message, callback) {
-  rp(message).then(response => {
+  return rp(message).then(response => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
       error: false,
       message: payload.eventData.eventName + " Dispatched",
       response: {request: message.body, response}
-    })
-  }).catch(error => {
-    console.log("error : ", error);
-    callback({
-      error: true,
-      message: payload.eventData.eventName + " Failed",
-      response: {request: message.body, error}
     })
   });
 }
