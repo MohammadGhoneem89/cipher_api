@@ -20,12 +20,12 @@ async function handlePMevents(payload, route, callback, JWToken) {
         break;
       }
       default:
-        return callback({
+        callback({
           error: true,
           message: "invalid case"
         })
-
     }
+    return Promise.resolve(true);
   }
   catch (err) {
     console.log(err);
@@ -33,51 +33,8 @@ async function handlePMevents(payload, route, callback, JWToken) {
       error: true,
       message: "ERROR",
       response: {request: "THIS IS REQUEST", response: err}
-    })
-  }
-
-}
-
-function updatePaymentStatus(payload) {
-  return async () => {
-    let options = {
-      method: 'POST',
-      url: payload.endpoint.address,
-      body:
-        {
-          header:
-            {
-              username: payload.header.username,
-              password: payload.header.password
-            },
-          body: await transformTemplate(payload.template.data, payload.eventData, [])
-        },
-      json: true
-    };
-    console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return rp(options);
-  }
-
-}
-
-function updateFirstPaymentStatus(payload) {
-  return async () => {
-    let options = {
-      method: 'POST',
-      url: payload.endpoint.address,
-      body:
-        {
-          header:
-            {
-              username: payload.header.username,
-              password: payload.header.password
-            },
-          body: await transformTemplate(payload.template.data, payload.eventData, [])
-        },
-      json: true
-    };
-    console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return {message: options.body, func: rp(options)};
+    });
+    return Promise.resolve(true);
   }
 
 }
