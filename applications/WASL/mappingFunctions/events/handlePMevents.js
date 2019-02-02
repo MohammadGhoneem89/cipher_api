@@ -66,7 +66,7 @@ function UpdateContractStatus(contractID) {
 
 
 async function createMessage(payload) {
-
+  console.log("THIS IS TEMPLATE", payload.template.data);
   return await {
     method: 'POST',
     url: payload.endpoint.address,
