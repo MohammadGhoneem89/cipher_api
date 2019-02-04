@@ -151,7 +151,7 @@ function upsertMappingConfig(payload, UUIDKey, route, callback, JWToken) {
       });
     });
   }
- else {
+  else {
     resp.responseMessage.data.message.status = "ERROR";
     resp.responseMessage.data.message.errorDescription = "mappingName is required!";
     resp.responseMessage.data.message.newPageURL = "";
