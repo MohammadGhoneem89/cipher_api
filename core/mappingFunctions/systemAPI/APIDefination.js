@@ -495,6 +495,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList.length; j++) {
 
             wData += mData3.replace(/<<FunctionName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route);
+            // ifileData = ifileData.replace(findIn(ifileData), fillStruct(ifileData, data));
+
             if (j === responses[0].ApiListData.APIdata[i].APIList.length - 1) {
               mData1 += newData.replace(mData3, wData);
             }
@@ -522,7 +524,10 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList.length; j++) {
             {
               let gData = sData.replace(/<<FunctionName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route);
-              fData = gData.replace(/<<FunctionDescription>>/g, responses[0].ApiListData.APIdata[i].APIList[j].purpose);
+
+              if (responses[0].ApiListData.APIdata[i].APIList[j].route == data[0][j].route)
+              // ifileData = ifileData.replace(findIn(ifileData), fillStruct(ifileData, data));
+              {fData = gData.replace(/<<FunctionDescription>>/g, responses[0].ApiListData.APIdata[i].APIList[j].purpose);}
 
             }
 
@@ -538,14 +543,14 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
         }
         let fData = data.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase);
-        let ov = mspFunctionsLogic(data);
-        let ovt = mspFunctionDesc(data);
+        let overWrite = mspFunctionsLogic(data);
+        let overWriteAgain = mspFunctionDesc(data);
 
         let getFnLogicInd = findFnLogicIndex(fData);
-        let Ldata = fData.replace(getFnLogicInd, ov);
+        let Ldata = fData.replace(getFnLogicInd, overWrite);
 
         let getFnDescInd = findFnDescInd(fData);
-        let hData = Ldata.replace(getFnDescInd, ovt);
+        let hData = Ldata.replace(getFnDescInd, overWriteAgain);
         fs.writeFile('chaincode.go', hData, 'utf8', function (err) {
           if (err) return console.log(err);
           console.log("writeen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
