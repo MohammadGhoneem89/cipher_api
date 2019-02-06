@@ -88,7 +88,8 @@ async function getPromise(payload, message, callback) {
     callback({
       error: false,
       message: payload.eventData.eventName + " Dispatched",
-      response: {request: message.body, result}
+      request: message.body,
+      response: result
     })
   });
 }
