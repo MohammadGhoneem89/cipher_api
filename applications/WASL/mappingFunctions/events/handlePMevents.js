@@ -84,6 +84,7 @@ async function getPromise(payload, message, callback) {
   console.log("REQUEST===============>", message, "<===============REQUEST");
   return rp(message).then(result => {
     console.log("RESPONSE===============>", result, "<===============RESPONSE");
+    message.body && _.set(message.body, 'header.password', "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
     callback({
       error: false,
       message: payload.eventData.eventName + " Dispatched",
