@@ -1,5 +1,6 @@
 'use strict';
 let rp = require('request-promise');
+const config = require('../config');
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 
 async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
@@ -44,16 +45,15 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
 function UpdateContractStatus(contractID) {
   console.log("UpdateContractStatus===============><===============UpdateContractStatus");
-
+  let url = config.get('URLRestInterface') || "http://0.0.0.0/";
   let message = {
     method: 'POST',
-    url: 'http://51.140.250.28/API/PR/UpdateContractStatus',
+    url: `${url}API/PR/UpdateContractStatus`,
     body: {
-      header:
-        {
-          username: "Internal_API",
-          password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
-        },
+      header: config.get('eventService.Avanza_ISC') || {
+        username: "Internal_API",
+        password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
+      },
       body: {
         "orgCode": "WASL",
         "contractID": contractID
@@ -86,6 +86,7 @@ async function createMessage(payload) {
 }
 
 async function getPromise(payload, message, callback) {
+  console.log("REQUEST===============>", message, "<===============REQUEST");
   return rp(message).then(result => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
