@@ -74,11 +74,7 @@ async function createMessage(payload) {
     method: 'POST',
     url: payload.endpoint.address,
     body: {
-      header:
-        {
-          username: payload.header.username,
-          password: payload.header.password
-        },
+      header: payload.endpoint.auth,
       body: await transformTemplate(payload.template.data, payload.eventData, [])
     },
     json: true
