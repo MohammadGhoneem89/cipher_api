@@ -1,6 +1,6 @@
 'use strict';
 let rp = require('request-promise');
-const config = require('../config');
+const config = require('../../../../config');
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 
 async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
