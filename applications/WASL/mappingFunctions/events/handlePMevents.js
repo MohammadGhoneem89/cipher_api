@@ -22,7 +22,9 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
       default:
         callback({
           error: true,
-          message: "invalid case"
+          message: "invalid case",
+          request: "",
+          response: "invalid case"
         })
     }
     return Promise.resolve(true);
