@@ -1,5 +1,6 @@
 'use strict';
 let rp = require('request-promise');
+const _ = require('lodash');
 const config = require('../../../../config');
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 
