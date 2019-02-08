@@ -1,27 +1,30 @@
 
 type GetContractDataTemp struct{
-	orgCode string `json:"orgCode"`
-contractID string `json:"contractID"`
-orgCode string `json:"orgCode"`
+	OrgCode string `json:"orgCode"`
 EIDA string `json:"EIDA"`
+AuthToken string `json:"authToken"`
+ContractID string `json:"contractID"`
  }
 
-GetContractDataTemp := &GetContractDataTemp{	
-		orgCode:   sanitize(args[0], "string").(string)
-contractID:   sanitize(args[1], "string").(string)
-orgCode:   sanitize(args[0], "string").(string)
+GetContractDataTemp := GetContractDataTemp{
+	OrgCode:   sanitize(args[0], "string").(string)
 EIDA:   sanitize(args[1], "string").(string)
+AuthToken:   sanitize(args[2], "string").(string)
+ContractID:   sanitize(args[3], "string").(string)
   }
-type AddTenant struct{
-	orgCode string `json:"orgCode"`
-contractID string `json:"contractID"`
-orgCode string `json:"orgCode"`
-EIDA string `json:"EIDA"`
+
+type GetContract struct{
+	IIIIIIIIIIIIIIIIIIIIIIIIIIII string `json:"IIIIIIIIIIIIIIIIIIIIIIIIIIII"`
+EEEEEEEEEEEEEEEEEEEEEE string `json:"EEEEEEEEEEEEEEEEEEEEEE"`
+GGGGGGGGGGGGGGGGGG string `json:"GGGGGGGGGGGGGGGGGG"`
+OOOOOOOOOOOOOOOOOOOOOO string `json:"OOOOOOOOOOOOOOOOOOOOOO"`
+RRRRRRRRRRRRRRRRRRRRR string `json:"RRRRRRRRRRRRRRRRRRRRR"`
  }
 
-AddTenant := &AddTenant{	
-		orgCode:   sanitize(args[0], "string").(string)
-contractID:   sanitize(args[1], "string").(string)
-orgCode:   sanitize(args[0], "string").(string)
-EIDA:   sanitize(args[1], "string").(string)
+GetContract := GetContract{
+	IIIIIIIIIIIIIIIIIIIIIIIIIIII:   sanitize(args[0], "string").(string)
+EEEEEEEEEEEEEEEEEEEEEE:   sanitize(args[1], "string").(string)
+GGGGGGGGGGGGGGGGGG:   sanitize(args[2], "string").(string)
+OOOOOOOOOOOOOOOOOOOOOO:   sanitize(args[3], "string").(string)
+RRRRRRRRRRRRRRRRRRRRR:   sanitize(args[4], "string").(string)
   }

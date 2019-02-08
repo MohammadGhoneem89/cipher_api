@@ -112,7 +112,10 @@ func (t *<<UseCase>>ChainCode) <<FunctionName>>(stub shim.ChaincodeStubInterface
 		return shim.Error("Invalid Argument")
 	}
 	
-	//Business Logic to be added here	
+	//Business Logic to be added here
+		
+<<structName>> := &<<structName>>{	
+		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
 
 	logger.Debug("<<FunctionName>> function executed successfully.")
 	

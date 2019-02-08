@@ -162,7 +162,10 @@ func (t *PRChainCode) AddTenant(stub shim.ChaincodeStubInterface, args []string,
 		return shim.Error("Invalid Argument")
 	}
 	
-	//Business Logic to be added here	
+	//Business Logic to be added here
+		
+AddTenant := &AddTenant{	
+		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
 
 	logger.Debug("AddTenant function executed successfully.")
 	
@@ -182,7 +185,10 @@ func (t *PRChainCode) AssociatePaymentInstruments(stub shim.ChaincodeStubInterfa
 		return shim.Error("Invalid Argument")
 	}
 	
-	//Business Logic to be added here	
+	//Business Logic to be added here
+		
+AssociatePaymentInstruments := &AssociatePaymentInstruments{	
+		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
 
 	logger.Debug("AssociatePaymentInstruments function executed successfully.")
 	
@@ -202,7 +208,10 @@ func (t *PRChainCode) AssociatePaymentInstrumentsTemp(stub shim.ChaincodeStubInt
 		return shim.Error("Invalid Argument")
 	}
 	
-	//Business Logic to be added here	
+	//Business Logic to be added here
+		
+AssociatePaymentInstrumentsTemp := &AssociatePaymentInstrumentsTemp{	
+		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
 
 	logger.Debug("AssociatePaymentInstrumentsTemp function executed successfully.")
 	
@@ -222,7 +231,10 @@ func (t *PRChainCode) BLANK(stub shim.ChaincodeStubInterface, args []string, fun
 		return shim.Error("Invalid Argument")
 	}
 	
-	//Business Logic to be added here	
+	//Business Logic to be added here
+		
+BLANK := &BLANK{	
+		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
 
 	logger.Debug("BLANK function executed successfully.")
 	
@@ -242,7 +254,10 @@ func (t *PRChainCode) EjariTerminationStatus(stub shim.ChaincodeStubInterface, a
 		return shim.Error("Invalid Argument")
 	}
 	
-	//Business Logic to be added here	
+	//Business Logic to be added here
+		
+EjariTerminationStatus := &EjariTerminationStatus{	
+		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
 
 	logger.Debug("EjariTerminationStatus function executed successfully.")
 	

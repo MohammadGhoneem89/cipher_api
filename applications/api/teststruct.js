@@ -1,187 +1,204 @@
 'use strict';
 let fs = require('fs');
-let payload = {
-  searchCriteria: {
-    mappingName: "AddTenant"
-  }
-};
 let data = [
-  [{
-    route: 'GetContractDataTemp',
-    RequestMapping: {
-      id: "1",
-      fields: [{
-        Sequence: 1,
-        IN_FIELD: 'body.orgCode',
-        IN_FIELDVALUE: '',
-        IN_FIELDTYPE: 'data',
-        IN_FIELDDT: 'string',
-        IN_FIELDFUNCTION: 'STUB',
-        IN_FIELDVALIDATION: 'bypass',
-        IN_FIELDDESCRIPTION: '',
-        IN_ISREQUIRED: 'Y',
-        MAP_FIELD: 'orgCode',
-        MAP_FIELDDT: 'string',
-        IN_FIELDTYPEDATA: ''
-      },
-      {
-        Sequence: 2,
-        IN_FIELD: 'body.contractID',
-        IN_FIELDVALUE: '',
-        IN_FIELDTYPE: 'data',
-        IN_FIELDDT: 'string',
-        IN_FIELDFUNCTION: 'STUB',
-        IN_FIELDVALIDATION: 'bypass',
-        IN_FIELDDESCRIPTION: '',
-        IN_ISREQUIRED: 'Y',
-        MAP_FIELD: 'contractID',
-        MAP_FIELDDT: 'string',
-        IN_FIELDTYPEDATA: ''
+  [
+    {
+      route: 'GetContractDataTemp',
+      RequestMapping: {
+        id: "1",
+        fields: [
+          { Sequence: 1,
+            IN_FIELD: 'body.orgCode',
+            IN_FIELDVALUE: '',
+            IN_FIELDTYPE: 'data',
+            IN_FIELDDT: 'string',
+            IN_FIELDFUNCTION: 'STUB',
+            IN_FIELDVALIDATION: 'bypass',
+            IN_FIELDDESCRIPTION: '',
+            IN_ISREQUIRED: 'N',
+            MAP_FIELD: 'orgCode',
+            MAP_FIELDDT: 'string',
+            IN_FIELDTYPEDATA: '' },
+          { Sequence: 2,
+            IN_FIELD: 'body.EIDA',
+            IN_FIELDVALUE: '',
+            IN_FIELDTYPE: 'data',
+            IN_FIELDDT: 'string',
+            IN_FIELDFUNCTION: 'STUB',
+            IN_FIELDVALIDATION: 'bypass',
+            IN_FIELDDESCRIPTION: '',
+            IN_ISREQUIRED: 'Y',
+            MAP_FIELD: 'EIDA',
+            MAP_FIELDDT: 'string',
+            IN_FIELDTYPEDATA: '' },
+          { Sequence: 3,
+            IN_FIELD: 'body.authToken',
+            IN_FIELDVALUE: '',
+            IN_FIELDTYPE: 'data',
+            IN_FIELDDT: 'string',
+            IN_FIELDFUNCTION: 'STUB',
+            IN_FIELDVALIDATION: 'bypass',
+            IN_FIELDDESCRIPTION: 'UAE Pass auth token to validate it from Blockchain',
+            IN_ISREQUIRED: 'Y',
+            MAP_FIELD: 'authToken',
+            MAP_FIELDDT: 'string',
+            IN_FIELDTYPEDATA: '' },
+          { Sequence: 4,
+            IN_FIELD: 'body.contractID',
+            IN_FIELDVALUE: '',
+            IN_FIELDTYPE: 'data',
+            IN_FIELDDT: 'string',
+            IN_FIELDFUNCTION: 'STUB',
+            IN_FIELDVALIDATION: 'bypass',
+            IN_FIELDDESCRIPTION: 'Contract ID in WASL’s system',
+            IN_ISREQUIRED: 'Y',
+            MAP_FIELD: 'contractID',
+            MAP_FIELDDT: 'string',
+            IN_FIELDTYPEDATA: '' }
+        ]
       }
-      ]
-    }
-  },
-  {
-    route: 'AddTenant',
-    RequestMapping: {
-      id: "2",
-      fields: [{
-        Sequence: 1,
-        IN_FIELD: 'body.orgCode',
-        IN_FIELDVALUE: '',
-        IN_FIELDTYPE: 'data',
-        IN_FIELDDT: 'string',
-        IN_FIELDFUNCTION: 'STUB',
-        IN_FIELDVALIDATION: 'bypass',
-        IN_FIELDDESCRIPTION: '',
-        IN_ISREQUIRED: 'N',
-        MAP_FIELD: 'orgCode',
-        MAP_FIELDDT: 'string',
-        IN_FIELDTYPEDATA: ''
-      },
-      {
-        Sequence: 2,
-        IN_FIELD: 'body.EIDA',
-        IN_FIELDVALUE: '',
-        IN_FIELDTYPE: 'data',
-        IN_FIELDDT: 'string',
-        IN_FIELDFUNCTION: 'STUB',
-        IN_FIELDVALIDATION: 'bypass',
-        IN_FIELDDESCRIPTION: '',
-        IN_ISREQUIRED: 'Y',
-        MAP_FIELD: 'EIDA',
-        MAP_FIELDDT: 'string',
-        IN_FIELDTYPEDATA: ''
+    },
+    {
+      route: 'GetContract',
+      RequestMapping: {
+        id: "2",
+        fields: [{ Sequence: 1,
+          IN_FIELD: 'body.IIIIIIIIIIIIIIIIIIIIIIIIIIII',
+          IN_FIELDVALUE: '',
+          IN_FIELDTYPE: 'OrgIdentifier',
+          IN_FIELDDT: 'string',
+          IN_FIELDFUNCTION: 'STUB',
+          IN_FIELDVALIDATION: 'bypass',
+          IN_FIELDDESCRIPTION: '',
+          IN_ISREQUIRED: 'Y',
+          MAP_FIELD: 'IIIIIIIIIIIIIIIIIIIIIIIIIIII',
+          MAP_FIELDDT: 'array',
+          IN_FIELDTYPEDATA: '' },
+        { Sequence: 2,
+          IN_FIELD: 'body.',
+          IN_FIELDVALUE: '',
+          IN_FIELDTYPE: 'data',
+          IN_FIELDDT: 'string',
+          IN_FIELDFUNCTION: 'STUB',
+          IN_FIELDVALIDATION: 'bypass',
+          IN_FIELDDESCRIPTION: '',
+          IN_ISREQUIRED: 'Y',
+          MAP_FIELD: 'EEEEEEEEEEEEEEEEEEEEEE',
+          MAP_FIELDDT: 'array',
+          IN_FIELDTYPEDATA: '' },
+        { Sequence: 3,
+          IN_FIELD: 'body.authToken',
+          IN_FIELDVALUE: '',
+          IN_FIELDTYPE: 'data',
+          IN_FIELDDT: 'string',
+          IN_FIELDFUNCTION: 'STUB',
+          IN_FIELDVALIDATION: 'bypass',
+          IN_FIELDDESCRIPTION: 'UAE Pass auth token to validate it from Blockchain',
+          IN_ISREQUIRED: 'Y',
+          MAP_FIELD: 'GGGGGGGGGGGGGGGGGG',
+          MAP_FIELDDT: 'array',
+          IN_FIELDTYPEDATA: '' },
+        { Sequence: 4,
+          IN_FIELD: 'body.contractID',
+          IN_FIELDVALUE: '',
+          IN_FIELDTYPE: 'data',
+          IN_FIELDDT: 'string',
+          IN_FIELDFUNCTION: 'STUB',
+          IN_FIELDVALIDATION: 'bypass',
+          IN_FIELDDESCRIPTION: 'Contract ID in WASL’s system',
+          IN_ISREQUIRED: 'Y',
+          MAP_FIELD: 'OOOOOOOOOOOOOOOOOOOOOO',
+          MAP_FIELDDT: 'array',
+          IN_FIELDTYPEDATA: '' },
+        { Sequence: 6,
+          IN_FIELD: '__JWTORG',
+          IN_FIELDVALUE: '',
+          IN_FIELDTYPE: 'data',
+          IN_FIELDDT: 'string',
+          IN_FIELDFUNCTION: 'STUB',
+          IN_FIELDVALIDATION: 'bypass',
+          IN_FIELDDESCRIPTION: '',
+          IN_ISREQUIRED: 'N',
+          MAP_FIELD: 'RRRRRRRRRRRRRRRRRRRRR',
+          MAP_FIELDDT: 'array',
+          IN_FIELDTYPEDATA: '' }
+        ]
       }
-      ]
     }
-  }
   ]
 
 ];
-
-function replaceAll(str, find, replace) {
-  return str.replace(new RegExp(find, 'g'), replace);
-}
-
-function findIndex(fileData) {
-  let startIndex = fileData.search("<<field1>>");
-  let endIndex = fileData.search(" }");
-  let GetfileData = fileData.substring(startIndex, endIndex);
-  return GetfileData;
-}
-
-function findIn(ifileData) {
-  let startIndex = ifileData.search("<<field1>>");
-  let endIndex = ifileData.search("  }");
-  let GetData = ifileData.substring(startIndex, endIndex);
-  //
-  return GetData;
-}
-
-function createStruct(data) {
-
-  function checkDataType(i) {
-    // console.log(i, "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-    if (data[0][0].RequestMapping.fields[i].IN_FIELDDT === "number") {
-      data[0][0].RequestMapping.fields[i].IN_FIELDDT = "int64";
-      // console.log(data[0][0].fields[i].IN_FIELDDT);
-      return data[0][0].RequestMapping.fields[i].IN_FIELDDT;
-    }
-    if (data[0][0].RequestMapping.fields[i].IN_FIELDDT === "boolean") {
-      data[0][0].RequestMapping.fields[i].IN_FIELDDT = "bool";
-      return data[0][0].RequestMapping.fields[i].IN_FIELDDT;
-    }
-
-    return data[0][0].RequestMapping.fields[i].IN_FIELDDT;
-
+fs.readFile('structTemplate.txt', 'utf8', function (err, fileData) {
+  if (err) {
+    return console.log(err);
+  }
+  let mfileData = ""; let gData = "";
+  function findIn(ifileData) {
+    let startIndex = ifileData.search("<<field1>>");
+    let endIndex = ifileData.search(" }");
+    let GetData = ifileData.substring(startIndex, endIndex);
+    //
+    return GetData;
   }
 
-  function findnReplaceStruct(fileData, data) {
-    let mgenerateStruct = "";
-    let GetfileData = findIndex(fileData);
-    // console.log(GetfileData, "FileDataaaaaaaaaaaaaSUBSTRING");
-    for (let j = 0; j < data[0].length; j++) {
-      for (let i = 0; i < data[0][j].RequestMapping.fields.length; i++) {
+  function findIndex(ifileData) {
+    let startIndex = ifileData.search("<<field>>");
+    let endIndex = ifileData.search("  }");
+    let GetData = ifileData.substring(startIndex, endIndex);
+    //
+    return GetData;
+  }
 
-        let getSlicedFieldName = data[0][j].RequestMapping.fields[i].IN_FIELD.split(".");
-        let mSlicedFieldName = getSlicedFieldName[1];
-        let mfileData = replaceAll(GetfileData, '<<field1>>', mSlicedFieldName /* .charAt(0).toUpperCase() + mSlicedFieldName.slice(1)*/);
-        mfileData = replaceAll(mfileData, '<<fieldType>>', checkDataType(i));
-        mfileData = mfileData.replace('<<field1JSON>>', mSlicedFieldName);
-        mgenerateStruct += mfileData + "\n";
+
+  // console.log("kkkkkkkkkkkkkkkkkkkkkkk", findIndex(fileData), "kkkkkkkkkkkkkkkkkkkkkkk");
+  function replaceM(fileData) {
+    let yData = "";
+    let iData = findIn(fileData);
+    let tData = findIndex(fileData);
+    let ufileData = ""; let comData = ""; let fData = "";
+    for (let i = 0; i < data[0].length; i++) {
+
+      // console.log(i, "iiiiiiiiiiiiiiiiii");
+      // console.log(data[0][i].route);
+      ufileData = fileData.replace('<<structName>>', data[0][i].route);
+      // console.log(ufileData);
+      gData = "";
+      for (let j = 0; j < data[0][i].RequestMapping.fields.length; j++) {
+        mfileData = iData.replace('<<field1>>', data[0][i].RequestMapping.fields[j].MAP_FIELD.charAt(0).toUpperCase() + data[0][i].RequestMapping.fields[j].MAP_FIELD.slice(1)); /* .charAt(0).toUpperCase() + mSlicedFieldName.slice(1)*/
+        mfileData = mfileData.replace('<<fieldType>>', data[0][i].RequestMapping.fields[j].IN_FIELDDT);
+        mfileData = mfileData.replace('<<field1JSON>>', data[0][i].RequestMapping.fields[j].MAP_FIELD);
+
+        gData += mfileData + "\n";
       }
-    }
-    return mgenerateStruct;
-  }
+      ufileData = ufileData.replace(iData, gData);
+      ufileData = ufileData.replace(/<<structName>>/g, data[0][i].route);
+      // comData += ufileData;
+      // ufileData = ufileData.replace(tData, repAgain(fileData));
+      for (let j = 0; j < data[0][i].RequestMapping.fields.length; j++) {
 
-  function fillStruct(ifileData, data) {
-    let GetfileData = findIn(ifileData);
-    // console.log("findIndex", findIndex(ifileData), "oooooo");
-    // console.log("getfiledata", GetfileData, "ttttttttttt");
-    let imgenerateStruct = "";
-    for (let j = 0; j < data[0].length; j++) {
-      for (let i = 0; i < data[0][j].RequestMapping.fields.length; i++) {
-
-        // console.log(data[0][0].fields.length, "dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        let getSlicedFieldName = data[0][j].RequestMapping.fields[i].IN_FIELD.split(".");
-        let mSlicedFieldName = getSlicedFieldName[1];
-        // console.log(checkDataType(i) + "datatypeeeeeeeeeeeeeeeeeeee");
-        // cDDT = checkDataType(i);
-
-        let iData = replaceAll(GetfileData, '<<field1>>', mSlicedFieldName /* .charAt(0).toUpperCase() + mSlicedFieldName.slice(1)*/);
-
-        iData = replaceAll(iData, '<<fieldType>>', data[0][j].RequestMapping.fields[i].IN_FIELDDT);
-        iData = iData.replace('<<currentNo>>', i);
-        imgenerateStruct += iData + "\n";
+        let hData = tData.replace('<<field>>', data[0][i].RequestMapping.fields[j].MAP_FIELD.charAt(0).toUpperCase() + data[0][i].RequestMapping.fields[j].MAP_FIELD.slice(1));
+        hData = hData.replace(/<<fieldType>>/g, data[0][i].RequestMapping.fields[j].IN_FIELDDT);
+        hData = hData.replace('<<currentNo>>', j);
+        fData += hData + "\n";
+        if (j === data[0][i].RequestMapping.fields.length - 1) {
+          yData = fData;
+          console.log(fData);
+          fData = "";
+        }
       }
+      ufileData = ufileData.replace(tData, yData);
+      comData += ufileData;
     }
-    return imgenerateStruct;
+    return comData;
   }
 
-  fs.readFile('structTemplate.txt', 'utf8', function (err, fileData) {
-    if (err) {
-      return console.log(err);
-    }
-    let ifileData = "";
-    let iData = "";
-    for (let j = 0; j < data[0].length; j++) {
-      ifileData = replaceAll(fileData, '<<structName>>', data[0][j].route);
-      ifileData = ifileData.replace(findIndex(fileData), findnReplaceStruct(fileData, data));
-      ifileData = ifileData.replace(findIn(ifileData), fillStruct(ifileData, data));
+  // console.log(repAgain(fileData));
+  let readf = replaceM(fileData);
 
-      iData += ifileData;
-
-    }
-
-    fs.writeFile('struct.go', iData, 'utf8', function (err) {
-      if (err) return console.log(err);
-      console.log("========================fileData written\n\n\n", iData);
-    });
-    // }
-
+  fs.writeFile('struct.go', readf, 'utf8', function (err) {
+    if (err) return console.log(err);
+    console.log("========================fileData written\n", readf);
   });
 
-}
+});
 
-createStruct(data);
