@@ -268,9 +268,11 @@ function getTypeDataList(payload, UUIDKey, route, callback, JWToken) {
     callback(resp);
   });
 }
+
 function replaceAll(str, find, replace) {
   return str.replace(new RegExp(find, 'g'), replace);
 }
+
 function createDynamicStruct(payload, UUIDKey, route, callback, JWToken) {
   // console.log(payload.query, "IQRA");
   console.log(payload, "IQRA");
@@ -293,30 +295,47 @@ function createDynamicStruct(payload, UUIDKey, route, callback, JWToken) {
           if (err) {
             return console.log(err);
           }
-          console.log(fileData, "fileDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+          // console.log(fileData, "fileDATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 
           let ifileData = replaceAll(fileData, '<<structName>>', payload.searchCriteria.mappingName);
           // let ifileData = fileData.replaceAll('<<structName>>', payload.searchCriteria.mappingName);
-          console.log(ifileData, "iiiiiiiiiiiiiiiifffffffffffffffffffffffffffff");
+          // console.log(ifileData, "iiiiiiiiiiiiiiiifffffffffffffffffffffffffffff");
+
           function findIndex(fileData) {
             let startIndex = fileData.search("<<field1>>");
-            let endIndex = fileData.search("structEnd}");
+            let endIndex = fileData.search(" }");
             let GetfileData = fileData.substring(startIndex, endIndex);
             return GetfileData;
           }
+
+          function checkDataType(i) {
+            // console.log(i, "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+            if (data[0][0].fields[i].IN_FIELDDT === "number") {
+              data[0][0].fields[i].IN_FIELDDT = "int64";
+              // console.log(data[0][0].fields[i].IN_FIELDDT);
+              return data[0][0].fields[i].IN_FIELDDT;
+            }
+            if (data[0][0].fields[i].IN_FIELDDT === "boolean") {
+              data[0][0].fields[i].IN_FIELDDT = "bool";
+              return data[0][0].fields[i].IN_FIELDDT;
+            }
+
+            return data[0][0].fields[i].IN_FIELDDT;
+
+          }
+
           function findnReplaceStruct(fileData, data) {
             let mgenerateStruct = "";
             let GetfileData = findIndex(fileData);
-            console.log(GetfileData, "FileDataaaaaaaaaaaaaSUBSTRING");
+            // console.log(GetfileData, "FileDataaaaaaaaaaaaaSUBSTRING");
             for (let i = 0; i < data[0][0].fields.length; i++) {
 
               let getSlicedFieldName = data[0][0].fields[i].IN_FIELD.split(".");
               let mSlicedFieldName = getSlicedFieldName[1];
-
-              let mfileData = GetfileData.replace('<<field1>>', mSlicedFieldName.charAt(0).toUpperCase() + mSlicedFieldName.slice(1));
-              mfileData = mfileData.replace('<<fieldType>>', data[0][0].fields[i].IN_FIELDDT);
+              let mfileData = replaceAll(GetfileData, '<<field1>>', mSlicedFieldName.charAt(0).toUpperCase() + mSlicedFieldName.slice(1));
+              mfileData = replaceAll(mfileData, '<<fieldType>>', checkDataType(i));
               mfileData = mfileData.replace('<<field1JSON>>', mSlicedFieldName);
-              mgenerateStruct += mfileData;
+              mgenerateStruct += mfileData + "\n";
             }
             return mgenerateStruct;
           }
@@ -324,20 +343,48 @@ function createDynamicStruct(payload, UUIDKey, route, callback, JWToken) {
           let GetfileData = findIndex(fileData);
           ifileData = ifileData.replace(GetfileData, findnReplaceStruct(fileData, data));
 
+          function findIn(ifileData) {
+            let startIndex = ifileData.search("<<field1>>");
+            let endIndex = ifileData.search("  }");
+            let GetData = ifileData.substring(startIndex, endIndex);
+            //
+            return GetData;
+          }
+
+          function fillStruct(ifileData, data) {
+            let GetfileData = findIn(ifileData);
+            // console.log("findIndex", findIndex(ifileData), "oooooo");
+            // console.log("getfiledata", GetfileData, "ttttttttttt");
+            let imgenerateStruct = "";
+            let cDDT = "";
+            for (let i = 0; i < data[0][0].fields.length; i++) {
+
+              // console.log(data[0][0].fields.length, "dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+              let getSlicedFieldName = data[0][0].fields[i].IN_FIELD.split(".");
+              let mSlicedFieldName = getSlicedFieldName[1];
+              // console.log(checkDataType(i) + "datatypeeeeeeeeeeeeeeeeeeee");
+              // cDDT = checkDataType(i);
+
+              let iData = replaceAll(GetfileData, '<<field1>>', mSlicedFieldName.charAt(0).toUpperCase() + mSlicedFieldName.slice(1));
+
+              iData = replaceAll(iData, '<<fieldType>>', data[0][0].fields[i].IN_FIELDDT);
+              iData = iData.replace('<<currentNo>>', i);
+              imgenerateStruct += iData + "\n";
+            }
+
+            return imgenerateStruct;
+          }
+          let wData = fillStruct(ifileData, data);
+          ifileData = ifileData.replace(findIn(ifileData), wData);
+          console.log("========================fileData written\n\n\n", ifileData);
           fs.writeFile('struct.go', ifileData, 'utf8', function (err) {
             if (err) return console.log(err);
-            console.log("========================fileData written\n\n\n", ifileData);
-          });
-          // callback(ifileData, (responseCallback) => {
 
-          //   responseCallback.set({
-          //     'Content-Type': 'application/octet-stream',
-          //     'Content-Disposition': 'attachment; filename=' + "Struct.go",
-          //   });
-          // });
+          });
 
         });
       }
+
     }).catch((err) => {
       console.log(err, "errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
       callback(err);

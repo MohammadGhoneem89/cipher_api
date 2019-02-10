@@ -6,8 +6,13 @@ const typeData = require('../../../lib/repositories/typeData');
 const fs = require('fs');
 
 function updateRequestStub(payload, route, useCase) {
-  let query = { 'sampleRequest': payload };
-  APIDefinitation.update({ route: route, useCase: useCase }, query).then((data) => {
+  let query = {
+    'sampleRequest': payload
+  };
+  APIDefinitation.update({
+    route: route,
+    useCase: useCase
+  }, query).then((data) => {
     console.log("request Sample Updated!");
   });
 }
@@ -52,17 +57,16 @@ function LoadConfig() {
 
 function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
   APIDefinitation.findPageAndCount(payload).then((data) => {
-    let actions = [
-      {
-        "value": "1003",
-        "type": "componentAction",
-        "label": "View",
-        "params": "",
-        "iconName": "icon-docs",
-        "URI": [
-          "/APIDefScreen/"
-        ]
-      }];
+    let actions = [{
+      "value": "1003",
+      "type": "componentAction",
+      "label": "View",
+      "params": "",
+      "iconName": "icon-docs",
+      "URI": [
+        "/APIDefScreen/"
+      ]
+    }];
 
     data[0].forEach((element) => {
       element.actions = actions;
@@ -143,7 +147,10 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
         resp.responseMessage.data.message.errorDescription = "route & useCase already exist!";
         return callback(resp);
       }
-      return APIDefinitation.update({ route: payload.route, useCase: payload.useCase }, payload).then((data) => {
+      return APIDefinitation.update({
+        route: payload.route,
+        useCase: payload.useCase
+      }, payload).then((data) => {
 
         resp.responseMessage.data.message.status = "OK";
         console.log(data);
@@ -217,7 +224,7 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
     let resp = {};
     data.forEach((data) => {
       let dest = data.useCase + "." + data.route;
-      let reqMap = []
+      let reqMap = [];
       data.RequestMapping.fields.forEach((field) => {
         if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData" || field.IN_FIELDTYPE === "OrgIdentifier") {
           reqMap.push(field);
@@ -272,6 +279,10 @@ function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(find, 'g'), replace);
+}
+
 function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let chainCodeData = [];
   let responses = [];
@@ -279,7 +290,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
   let request = {
     "action": "mappingData",
-    "searchCriteria": payload.query.searchCriteria,
+    "searchCriteria": payload.searchCriteria,
     "page": {
       "currentPageNo": 1,
       "pageSize": 10
@@ -287,8 +298,81 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   };
   APIDefinitation.findPageAndCount(request)
     .then((data) => {
-       console.log(data)
-      data[0].map(item => {
+
+
+      function findIndex(ifileData) {
+        let startIndex = ifileData.search("<<field>>");
+        let endIndex = ifileData.search("  }");
+        let GetData = ifileData.substring(startIndex, endIndex);
+        //
+        return GetData;
+      }
+
+      function replaceM(fileData) {
+        let mfileData = ""; let gData = "";
+
+        let yData = "";
+        let iData = findIn(fileData);
+        let tData = findIndex(fileData);
+        let ufileData = ""; let comData = ""; let fData = "";
+        for (let i = 0; i < data[0].length; i++) {
+
+          // console.log(i, "iiiiiiiiiiiiiiiiii");
+          // console.log(data[0][i].route);
+          ufileData = fileData.replace('<<structName>>', data[0][i].route);
+          // console.log(ufileData);
+          gData = "";
+          for (let j = 0; j < data[0][i].RequestMapping.fields.length; j++) {
+            mfileData = iData.replace('<<field1>>', data[0][i].RequestMapping.fields[j].IN_FIELD.charAt(0).toUpperCase() + data[0][i].RequestMapping.fields[j].IN_FIELD.slice(1)); /* .charAt(0).toUpperCase() + mSlicedFieldName.slice(1)*/
+            mfileData = mfileData.replace('<<fieldType>>', data[0][i].RequestMapping.fields[j].IN_FIELDDT);
+            mfileData = mfileData.replace('<<field1JSON>>', data[0][i].RequestMapping.fields[j].IN_FIELD);
+
+            gData += mfileData + "\n";
+          }
+          ufileData = ufileData.replace(iData, gData);
+          ufileData = ufileData.replace(/<<structName>>/g, data[0][i].route);
+
+          for (let j = 0; j < data[0][i].RequestMapping.fields.length; j++) {
+
+            let hData = tData.replace('<<field>>', data[0][i].RequestMapping.fields[j].IN_FIELD.charAt(0).toUpperCase() + data[0][i].RequestMapping.fields[j].IN_FIELD.slice(1));
+            hData = hData.replace(/<<fieldType>>/g, data[0][i].RequestMapping.fields[j].IN_FIELDDT);
+            hData = hData.replace('<<currentNo>>', j);
+            fData += hData + "\n";
+            if (j === data[0][i].RequestMapping.fields.length - 1) {
+              yData = fData;
+              // console.log(fData);
+              fData = "";
+            }
+          }
+          ufileData = ufileData.replace(tData, yData);
+          comData += ufileData;
+        }
+        return comData;
+      }
+
+      function findIn(ifileData) {
+        let startIndex = ifileData.search("<<field1>>");
+        let endIndex = ifileData.search(" }");
+        let GetData = ifileData.substring(startIndex, endIndex);
+        //
+        return GetData;
+      }
+
+      fs.readFile('structTemplate.txt', 'utf8', function (err, fileData) {
+        if (err) {
+          return console.log(err);
+        }
+
+        let readUpdatedFile = replaceM(fileData);
+
+        fs.writeFile('struct.go', readUpdatedFile, 'utf8', function (err) {
+          if (err) return console.log(err);
+          // console.log("========================fileData written\n", readUpdatedFile);
+        });
+
+      });
+      // console.log("%%%%%%%%%%%",getFilledStruct(),"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+      data[0].map((item) => {
         if (item.isSmartContract === true && item.isActive === true) {
           chainCodeData.push({
             'isActive': item.isActive,
@@ -301,15 +385,30 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         }
       });
 
-
       {
         responses.push({
           ApiListData: {
             useCase: chainCodeData[0].useCase,
-            APIdata: []
+            APIdata: [],
+            RequestMapping: [
+              {
+              route: "",
+              fields: []
+            }
+          ]
           }
-        })
+        });
       }
+
+      // for (let i = 0; i < data[0].length; i++) {
+      //   console.log("\n\n" + data[0][i].route);
+      //   responses[0].RequestMapping[i].route.push(data[0][i].route)
+      //   for (let j = 0; j < data[0][i].RequestMapping.fields.length; j++) {
+      //     console.log(data[0][i].RequestMapping.fields[j]);
+      //     responses[0].RequestMapping[i].fields[j].push(data[0][i].route)
+      //   }
+      // }
+      // console.log(responses[0].RequestMapping);
       let response = {};
       for (let i = 0; i < chainCodeData.length; i++) {
         {
@@ -324,12 +423,11 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
             ]
           };
 
-          responses[0].ApiListData.APIdata.push(response)
+          responses[0].ApiListData.APIdata.push(response);
         }
 
       }
       // console.log(responses[0].ApiListData.APIdata)
-
 
       let DupIndex = [];
 
@@ -351,111 +449,153 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       }
 
       let uniqueMSP = removeDuplicatesBy(function (a, b) {
-        return a.MSP === b.MSP
+        return a.MSP === b.MSP;
       }, responses[0].ApiListData.APIdata);
       // console.log("unique : \n", uniqueMSP, "\n DupIndex :", DupIndex)
 
-      for (let m = 0; m < responses[0].ApiListData.APIdata.length; m++)
+      for (let m = 0; m < responses[0].ApiListData.APIdata.length; m++) {
         for (let k = 0; k < DupIndex.length; k++) {
           if (responses[0].ApiListData.APIdata[m].MSP == responses[0].ApiListData.APIdata[DupIndex[k]].MSP) {
-            responses[0].ApiListData.APIdata[m].APIList.push(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0])
+            responses[0].ApiListData.APIdata[m].APIList.push(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0]);
 
           }
         }
+      }
 
       responses[0].ApiListData.APIdata = uniqueMSP;
-      // console.log(responses)
+      //console.log(responses[0].ApiListData.APIdata)
 
-      let updateIndex = "", newData = ""
+      let newData = "", updateIndex = "";
       let mData = "", mData2 = "", mData3 = "", wData = "";
-      let mData1 = ""
+      let mData1 = "";
       function findFnLogicIndex(data) {
         let funcLogicStart = data.search("//<<Function Validation Logic-Start>>");
-        let funcLogicEnd = data.search("//<<Function Validation Logic - End>>")
+        let funcLogicEnd = data.search("//<<Function Validation Logic - End>>");
         updateIndex = data.substring(funcLogicStart, funcLogicEnd);
         return updateIndex;
       }
       function mspFunctionsLogic(data) {
-        let getUpdatedInd = findFnLogicIndex(data)
+        let getUpdatedInd = findFnLogicIndex(data);
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
-          wData = ""
+          wData = "";
 
-          if (i > 0) { newData = "\n" }
-          newData += getUpdatedInd.replace(/<<MSP>>/g, responses[0].ApiListData.APIdata[i].MSP)
+          if (i > 0) { newData = "\n"; }
+          newData += getUpdatedInd.replace(/<<MSP>>/g, responses[0].ApiListData.APIdata[i].MSP);
 
-          mData = newData.search("//<<FunctionCases-Start>>")
-          mData2 = newData.search("//<<FunctionCases-End>>")
-          mData3 = newData.substring(mData, mData2)
+          mData = newData.search("//<<FunctionCases-Start>>");
+          mData2 = newData.search("//<<FunctionCases-End>>");
+          mData3 = newData.substring(mData, mData2);
 
           for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList.length; j++) {
 
-            wData += mData3.replace(/<<FunctionName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route)
-            if (j == responses[0].ApiListData.APIdata[i].APIList.length - 1) {
-              mData1 += newData.replace(mData3, wData)
+            wData += mData3.replace(/<<FunctionName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route);
+            // ifileData = ifileData.replace(findIn(ifileData), fillStruct(ifileData, data));
+
+            if (j === responses[0].ApiListData.APIdata[i].APIList.length - 1) {
+              mData1 += newData.replace(mData3, wData);
             }
           }
 
         }
-        return mData1
+        return mData1;
 
       }
 
-      let xData = "";
-      let fData = ""
+      //
+      let xData = "";// let gData = "";
+      let fData = ""; let tData = ""; let fileData = "";
       function findFnDescInd(data) {
         let IndxFnDef = data.search("//<<FunctionDefinition - Start>>");
         let IndxFnDefEnd = data.search("//<<FunctionDefinition - End>>");
         let GetData = data.substring(IndxFnDef, IndxFnDefEnd);
         return GetData;
       }
-      function mspFunctionDesc(data) {
+      function mspFunctionDesc(tdata) {
+        let yData = "";
+        let fiData = ""; let qData = ""
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
 
-          let getFnDescInd = findFnDescInd(data)
-          let sData = getFnDescInd.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase)
-
+          let getFnDescInd = findFnDescInd(tdata, data);
+          let sData = getFnDescInd.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase);
+          // console.log(gData, "rrrrrrrrrrrrrrrrrrrrrrr");
           for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList.length; j++) {
             {
-              let gData = sData.replace(/<<FunctionName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route)
-              fData = gData.replace(/<<FunctionDescription>>/g, responses[0].ApiListData.APIdata[i].APIList[j].purpose)
+              let gData = sData.replace(/<<FunctionName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route);
+              gData = gData.replace(/<<structName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route);
 
+              fData = gData.replace(/<<FunctionDescription>>/g, responses[0].ApiListData.APIdata[i].APIList[j].purpose);
+
+              // tData = findIndex(fData);
+              // for (let k = 0; k < data[0].length; k++) {
+
+              //   for (let j = 0; j < data[0][k].RequestMapping.fields.length; j++) {
+
+              //     let hData = tData.replace('<<field>>', data[0][k].RequestMapping.fields[j].IN_FIELD.charAt(0).toUpperCase() + data[0][k].RequestMapping.fields[j].IN_FIELD.slice(1));
+              //     hData = hData.replace(/<<fieldType>>/g, data[0][k].RequestMapping.fields[j].IN_FIELDDT);
+              //     hData = hData.replace('<<currentNo>>', j);
+              //     //console.log("***********",hData,"***********")
+              //     fiData += hData + "\n";
+
+              //     if (j === data[0][k].RequestMapping.fields.length - 1) {
+
+              //       yData += fiData + "\n";
+
+              //       fiData = "";
+              //     }
+              //   }
+              //   if (k === data[0].length - 1) {
+
+              //     //yconsole.log(yData)
+              //     // return yData;
+              //   }
+              // }
+              // console.log("@@@@@@@@2t", newData, "@@@@@@@@@@@@@@@@@@@@\n\n");
+              // fData += fData.replace(tData, fData);
             }
+            //console.log(yData) 
+            // console.log("~~~~~~~~~~~~~~~~~~"+ fData +"~~~~~~~~~~~~~~~~~~")
+            //fData = fData.replace(tData, fData);
 
-            xData += fData
+            xData += fData;
+
           }
         }
-        return xData
+
+        return xData;
       }
 
-
-      fs.readFile('ChaincodeTemplate.txt', 'utf8', function (err, data) {
+      fs.readFile('ChaincodeTemplate.txt', 'utf8', function (err, tdata) {
         if (err) {
           return console.log(err);
 
         }
-        let fData = data.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase)
-        let ov = mspFunctionsLogic(data)
-        let ovt = mspFunctionDesc(data)
+        let fData = tdata.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase);
+        let overWrite = mspFunctionsLogic(tdata);
+        let overWriteAgain = mspFunctionDesc(tdata, data);
 
-        let getFnLogicInd = findFnLogicIndex(fData)
-        let Ldata = fData.replace(getFnLogicInd, ov)
+        let getFnLogicInd = findFnLogicIndex(fData);
+        let Ldata = fData.replace(getFnLogicInd, overWrite);
 
-        let getFnDescInd = findFnDescInd(fData)
-        let hData = Ldata.replace(getFnDescInd, ovt)
+        let getFnDescInd = findFnDescInd(fData);
+        let hData = Ldata.replace(getFnDescInd, overWriteAgain);
 
-        callback(hData, (responseCallback) => {
-
-          responseCallback.set({
-            'Content-Type': 'application/octet-stream',
-            'Content-Disposition': 'attachment; filename=' + "PRChainCode.go",
-          });
+        fs.writeFile('chaincode.go', hData, 'utf8', function (err) {
+          if (err) return console.log(err);
+          //  console.log(hData, "writeen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         });
+        // callback(hData, (responseCallback) => {
+
+        //   responseCallback.set({
+        //     'Content-Type': 'application/octet-stream',
+        //     'Content-Disposition': 'attachment; filename=' + "PRChainCode.go"
+        //   });
+        // });
       });
     }).catch((err) => {
-      console.log(err)
+      console.log(err);
       console.log(JSON.stringify(err));
       for (let i = 0; i < chainCodeData.length; i++) {
-        var response = {
+        let response = {
           "ApiListData": {
             "useCase": "",
             "APIdata": [
@@ -472,14 +612,16 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
               }
             ]
           }
-        }
+        };
         // console.log(response)
+        // }).catch((err) => {
+        //   console.log(err, "errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+        //   callback(err);
+        // });
+
       }
-      callback(response);
     });
-
 }
-
 
 exports.downloadChainCode = downloadChainCode;
 exports.getAPIDefinition = getAPIDefinition;
@@ -490,3 +632,4 @@ exports.getActiveAPIList = getActiveAPIList;
 exports.LoadConfig = LoadConfig;
 exports.updateRequestStub = updateRequestStub;
 exports.getActiveAPIs = getActiveAPIs;
+
