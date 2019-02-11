@@ -202,8 +202,7 @@ AssociatePaymentInstruments := &AssociatePaymentInstruments{
 		AuthToken:   sanitize(args[0], "string").(string)
 EIDA:   sanitize(args[1], "string").(string)
 ContractID:   sanitize(args[2], "string").(string)
-PaymentInstruments:   sanitize(args[3], "array").(array)
-OrgCode:   sanitize(args[4], "string").(string)
+OrgCode:   sanitize(args[3], "string").(string)
   }
 
 	logger.Debug("AssociatePaymentInstruments function executed successfully.")
@@ -230,8 +229,7 @@ AssociatePaymentInstrumentsTemp := &AssociatePaymentInstrumentsTemp{
 		AuthToken:   sanitize(args[0], "string").(string)
 EIDA:   sanitize(args[1], "string").(string)
 ContractID:   sanitize(args[2], "string").(string)
-PaymentInstruments:   sanitize(args[3], "array").(array)
-OrgCode:   sanitize(args[4], "string").(string)
+OrgCode:   sanitize(args[3], "string").(string)
   }
 
 	logger.Debug("AssociatePaymentInstrumentsTemp function executed successfully.")
@@ -255,8 +253,7 @@ func (t *PRChainCode) BLANK(stub shim.ChaincodeStubInterface, args []string, fun
 	//Business Logic to be added here
 		
 BLANK := &BLANK{	
-		undefined:   sanitize(args[0], "object").(object)
-  }
+		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
 
 	logger.Debug("BLANK function executed successfully.")
 	

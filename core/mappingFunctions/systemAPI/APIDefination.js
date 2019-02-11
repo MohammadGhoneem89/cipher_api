@@ -4,7 +4,7 @@ const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
 const fs = require('fs');
-
+ 
 function updateRequestStub(payload, route, useCase) {
   let query = {
     'sampleRequest': payload
@@ -279,10 +279,6 @@ function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
-function replaceAll(str, find, replace) {
-  return str.replace(new RegExp(find, 'g'), replace);
-}
-
 function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let chainCodeData = [];
   let responses = [];
@@ -304,7 +300,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let startIndex = ifileData.search("<<field>>");
         let endIndex = ifileData.search("  }");
         let GetData = ifileData.substring(startIndex, endIndex);
-        //
         return GetData;
       }
 
@@ -317,8 +312,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let ufileData = ""; let comData = ""; let fData = "";
         for (let i = 0; i < data[0].length; i++) {
 
-          // console.log(i, "iiiiiiiiiiiiiiiiii");
-          // console.log(data[0][i].route);
           ufileData = fileData.replace('<<structName>>', data[0][i].route);
           // console.log(ufileData);
           gData = "";
@@ -354,7 +347,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let startIndex = ifileData.search("<<field1>>");
         let endIndex = ifileData.search(" }");
         let GetData = ifileData.substring(startIndex, endIndex);
-        //
         return GetData;
       }
 
@@ -362,16 +354,12 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         if (err) {
           return console.log(err);
         }
-
         let readUpdatedFile = replaceM(fileData);
-
         fs.writeFile('struct.go', readUpdatedFile, 'utf8', function (err) {
           if (err) return console.log(err);
-          // console.log("========================fileData written\n", readUpdatedFile);
         });
 
       });
-      // console.log("%%%%%%%%%%%",getFilledStruct(),"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
       data[0].map((item) => {
         if (item.isSmartContract === true && item.isActive === true) {
           chainCodeData.push({
@@ -394,16 +382,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           }
         });
       }
-
-      // for (let i = 0; i < data[0].length; i++) {
-      //   console.log("\n\n" + data[0][i].route);
-      //   responses[0].RequestMapping[i].route.push(data[0][i].route)
-      //   for (let j = 0; j < data[0][i].RequestMapping.fields.length; j++) {
-      //     console.log(data[0][i].RequestMapping.fields[j]);
-      //     responses[0].RequestMapping[i].fields[j].push(data[0][i].route)
-      //   }
-      // }
-      // console.log(responses[0].RequestMapping);
       let response = {};
       for (let i = 0; i < chainCodeData.length; i++) {
         {
@@ -423,31 +401,11 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
       }
       for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
-        //for (let i = 0; i < responses[0].ApiListData.APIdata[j].RequestMapping.fields.length; i++) {
-          //   if (responses[0].ApiListData.APIdata[j].RequestMapping.fields[i].IN_FIELDDT === "array") {
-          //     responses[0].ApiListData.APIdata[j].RequestMapping.fields[i] = "";
-          //  console.log("*******", responses[0].ApiListData.APIdata[j].RequestMapping.fields[i])
-
-          responses[0].ApiListData.APIdata[j].RequestMapping.fields = responses[0].ApiListData.APIdata[j].RequestMapping.fields.filter(function (item) {
-            if(item.IN_FIELDDT !== "array" ||item.IN_FIELDDT !== "object" )  
-            return item.IN_FIELDDT;
+          responses[0].ApiListData.APIdata[j].RequestMapping.fields = responses[0].ApiListData.APIdata[j].RequestMapping.fields.filter(function (item) {   
+            return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object' );
           });
           console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
-        //}
-        //console.log("********",responses[0].ApiListData.APIdata,"*********");
       }
-
-
-
-      // for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
-      //   for (let i = 0; i < responses[0].ApiListData.APIdata[j].RequestMapping.fields.length; i++) {
-      //     if (responses[0].ApiListData.APIdata[j].RequestMapping.fields[i].IN_FIELDDT === "array") {
-      //       //responses[0].ApiListData.APIdata[j].RequestMapping.fields[i].push(responses[0].ApiListData.APIdata[j].RequestMapping.fields[i])
-      //     //  console.log("*******", responses[0].ApiListData.APIdata[j].RequestMapping.fields[i])
-      //     }
-      //   }
-      //   console.log("*******");
-      // }
 
       let DupIndex = [];
 
