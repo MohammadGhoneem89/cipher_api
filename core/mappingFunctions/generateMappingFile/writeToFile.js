@@ -1,18 +1,31 @@
 const fs = require('fs');
 const path = require('path')
-module.exports = function (useCase, route, file, isActions, callback) {
-    const name = useCase+"_"+route;
+module.exports = function (useCase, route, file, isActions, componentActions, callback) {
+    const name = useCase + "_" + route;
     let actions = '';
+    componentActions = componentActions.map(component => {
+        if(component.URI[0]){
+
+        }
+        return component;
+    });
     if (isActions) {
-        actions = `for(let i=0;i<response.length;i++){
-            response[i]['actions']=[{
-                "actionType": "COMPONENT_FUNCTION",
-                "iconName": "fa fa-eye",
-                "label": "View",
-                "URI": [
-                    "/"
-                ]
-            }]
+        actions = `
+        const actions = ${JSON.stringify(componentActions)};
+        let regexp = /%[a-zA-Z0-9]{0,100}%/ig;
+        for(let i=0;i<response.length;i++){
+            response[i]['actions'] = [];
+            const item = response[i];
+            for(let j=0;j<actions.length;j++){
+                let newAction = JSON.stringify(actions[j]);
+                let toBeReplaced = newAction.match(regexp);
+                if(toBeReplaced.length>0){
+                    let field = toBeReplaced[0].replace('%','').replace('%','');
+                    let toReplace = item[field]
+                    newAction = newAction.replace(toBeReplaced,toReplace);
+                }
+                response[i]['actions'].push(JSON.parse(newAction))
+            }
         }`
     }
     let overall = `  const Sequelize = require('sequelize');\n

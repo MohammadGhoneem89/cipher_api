@@ -6,14 +6,17 @@ const generateMappingFile = async function (payload, UUIDKey, route, callback, J
     try {
         switch (payload.database) {
             case 'postgres':
-                file = sql(payload);
+                file = sql('postgres', payload);
+                break;
+            case 'mssql':
+                file = sql('mssql', payload);
                 break;
             case 'mongo':
                 break;
             default:
                 throw 'Not found';
         }
-        generateFileContent(payload.useCase,payload.route,file, payload.enableActions, callback);
+        generateFileContent(payload.useCase, payload.route, file, payload.enableActions, payload.actions, callback);
     } catch (err) {
         //logger.debug(" [ DB ] ERROR : " + err);
         console.log(err)
