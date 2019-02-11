@@ -380,7 +380,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
             'description': item.description,
             'route': item.route,
             'useCase': item.useCase,
-            'isSmartContract': item.isSmartContract
+            'isSmartContract': item.isSmartContract,
+            'RequestMapping': item.RequestMapping
           });
         }
       });
@@ -389,13 +390,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         responses.push({
           ApiListData: {
             useCase: chainCodeData[0].useCase,
-            APIdata: [],
-            RequestMapping: [
-              {
-              route: "",
-              fields: []
-            }
-          ]
+            APIdata: []
           }
         });
       }
@@ -420,14 +415,39 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
                 "purpose": chainCodeData[i].description
 
               }
-            ]
+            ],
+            "RequestMapping": chainCodeData[i].RequestMapping
           };
-
           responses[0].ApiListData.APIdata.push(response);
         }
 
       }
-      // console.log(responses[0].ApiListData.APIdata)
+      for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
+        //for (let i = 0; i < responses[0].ApiListData.APIdata[j].RequestMapping.fields.length; i++) {
+          //   if (responses[0].ApiListData.APIdata[j].RequestMapping.fields[i].IN_FIELDDT === "array") {
+          //     responses[0].ApiListData.APIdata[j].RequestMapping.fields[i] = "";
+          //  console.log("*******", responses[0].ApiListData.APIdata[j].RequestMapping.fields[i])
+
+          responses[0].ApiListData.APIdata[j].RequestMapping.fields = responses[0].ApiListData.APIdata[j].RequestMapping.fields.filter(function (item) {
+            if(item.IN_FIELDDT !== "array" ||item.IN_FIELDDT !== "object" )  
+            return item.IN_FIELDDT;
+          });
+          console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
+        //}
+        //console.log("********",responses[0].ApiListData.APIdata,"*********");
+      }
+
+
+
+      // for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
+      //   for (let i = 0; i < responses[0].ApiListData.APIdata[j].RequestMapping.fields.length; i++) {
+      //     if (responses[0].ApiListData.APIdata[j].RequestMapping.fields[i].IN_FIELDDT === "array") {
+      //       //responses[0].ApiListData.APIdata[j].RequestMapping.fields[i].push(responses[0].ApiListData.APIdata[j].RequestMapping.fields[i])
+      //     //  console.log("*******", responses[0].ApiListData.APIdata[j].RequestMapping.fields[i])
+      //     }
+      //   }
+      //   console.log("*******");
+      // }
 
       let DupIndex = [];
 
@@ -525,37 +545,33 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
               fData = gData.replace(/<<FunctionDescription>>/g, responses[0].ApiListData.APIdata[i].APIList[j].purpose);
 
-              // tData = findIndex(fData);
-              // for (let k = 0; k < data[0].length; k++) {
-
-              //   for (let j = 0; j < data[0][k].RequestMapping.fields.length; j++) {
-
-              //     let hData = tData.replace('<<field>>', data[0][k].RequestMapping.fields[j].IN_FIELD.charAt(0).toUpperCase() + data[0][k].RequestMapping.fields[j].IN_FIELD.slice(1));
-              //     hData = hData.replace(/<<fieldType>>/g, data[0][k].RequestMapping.fields[j].IN_FIELDDT);
-              //     hData = hData.replace('<<currentNo>>', j);
-              //     //console.log("***********",hData,"***********")
-              //     fiData += hData + "\n";
-
-              //     if (j === data[0][k].RequestMapping.fields.length - 1) {
-
-              //       yData += fiData + "\n";
-
-              //       fiData = "";
-              //     }
-              //   }
-              //   if (k === data[0].length - 1) {
-
-              //     //yconsole.log(yData)
-              //     // return yData;
-              //   }
-              // }
-              // console.log("@@@@@@@@2t", newData, "@@@@@@@@@@@@@@@@@@@@\n\n");
-              // fData += fData.replace(tData, fData);
+              tData = findIndex(fData);
+              String.prototype.capitalize = function() {
+                return this.charAt(0).toUpperCase() + this.slice(1);
             }
-            //console.log(yData) 
-            // console.log("~~~~~~~~~~~~~~~~~~"+ fData +"~~~~~~~~~~~~~~~~~~")
-            //fData = fData.replace(tData, fData);
 
+              for (let j = 0; j < responses[0].ApiListData.APIdata[i].RequestMapping.fields.length; j++) {
+                let getSlicedFieldName = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split(".");
+               let updateField = getSlicedFieldName[1]
+               if(updateField != undefined)
+               updateField = updateField.capitalize();
+                //let fieldNameCapitalized = mSlicedFieldName.capitalizeFirstLetter();
+                  //console.log(mSlicedFieldName)
+                let hData = tData.replace('<<field>>', updateField);
+                hData = hData.replace(/<<fieldType>>/g, responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELDDT);
+                hData = hData.replace('<<currentNo>>', j);
+                // console.log(yData) 
+                fiData += hData + "\n";
+
+
+                if (j === responses[0].ApiListData.APIdata[i].RequestMapping.fields.length - 1) {
+                  //console.log("***********", fiData, "***********")
+                  fData = fData.replace(tData, fiData);
+                  // yData += fiData + "\n";
+                  fiData = "";
+                }
+              }
+            }
             xData += fData;
 
           }
@@ -563,7 +579,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
         return xData;
       }
-
+      console.log("DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
       fs.readFile('ChaincodeTemplate.txt', 'utf8', function (err, tdata) {
         if (err) {
           return console.log(err);
