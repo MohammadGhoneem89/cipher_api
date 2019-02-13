@@ -165,7 +165,18 @@ func (t *PRChainCode) AddTenant(stub shim.ChaincodeStubInterface, args []string,
 	//Business Logic to be added here
 		
 AddTenant := &AddTenant{	
-		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
+		OrgCode:   sanitize(args[0], "string").(string)
+OrgID:   sanitize(args[1], "string").(string)
+EmiratesID:   sanitize(args[2], "string").(string)
+CustomerName:   sanitize(args[3], "string").(string)
+MobileNumber:   sanitize(args[4], "string").(string)
+EmailID:   sanitize(args[5], "string").(string)
+VisaNo:   sanitize(args[6], "string").(string)
+VisaExpiryDate:   sanitize(args[7], "string").(string)
+EmiratesIDExpiryDate:   sanitize(args[8], "string").(string)
+AuthToken:   sanitize(args[9], "string").(string)
+Timestamp:   sanitize(args[10], "string").(string)
+  }
 
 	logger.Debug("AddTenant function executed successfully.")
 	
@@ -188,7 +199,11 @@ func (t *PRChainCode) AssociatePaymentInstruments(stub shim.ChaincodeStubInterfa
 	//Business Logic to be added here
 		
 AssociatePaymentInstruments := &AssociatePaymentInstruments{	
-		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
+		AuthToken:   sanitize(args[0], "string").(string)
+EIDA:   sanitize(args[1], "string").(string)
+ContractID:   sanitize(args[2], "string").(string)
+OrgCode:   sanitize(args[3], "string").(string)
+  }
 
 	logger.Debug("AssociatePaymentInstruments function executed successfully.")
 	
@@ -211,7 +226,11 @@ func (t *PRChainCode) AssociatePaymentInstrumentsTemp(stub shim.ChaincodeStubInt
 	//Business Logic to be added here
 		
 AssociatePaymentInstrumentsTemp := &AssociatePaymentInstrumentsTemp{	
-		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
+		AuthToken:   sanitize(args[0], "string").(string)
+EIDA:   sanitize(args[1], "string").(string)
+ContractID:   sanitize(args[2], "string").(string)
+OrgCode:   sanitize(args[3], "string").(string)
+  }
 
 	logger.Debug("AssociatePaymentInstrumentsTemp function executed successfully.")
 	
@@ -257,7 +276,10 @@ func (t *PRChainCode) EjariTerminationStatus(stub shim.ChaincodeStubInterface, a
 	//Business Logic to be added here
 		
 EjariTerminationStatus := &EjariTerminationStatus{	
-		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
+		OrgCode:   sanitize(args[0], "string").(string)
+ContractID:   sanitize(args[1], "string").(string)
+EjariTerminationStatus:   sanitize(args[2], "string").(string)
+  }
 
 	logger.Debug("EjariTerminationStatus function executed successfully.")
 	

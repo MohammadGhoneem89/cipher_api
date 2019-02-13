@@ -4,7 +4,7 @@ const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
 const fs = require('fs');
-
+ 
 function updateRequestStub(payload, route, useCase) {
   let query = {
     'sampleRequest': payload
@@ -279,10 +279,6 @@ function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
-function replaceAll(str, find, replace) {
-  return str.replace(new RegExp(find, 'g'), replace);
-}
-
 function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let chainCodeData = [];
   let responses = [];
@@ -304,7 +300,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let startIndex = ifileData.search("<<field>>");
         let endIndex = ifileData.search("  }");
         let GetData = ifileData.substring(startIndex, endIndex);
-        //
         return GetData;
       }
 
@@ -317,8 +312,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let ufileData = ""; let comData = ""; let fData = "";
         for (let i = 0; i < data[0].length; i++) {
 
-          // console.log(i, "iiiiiiiiiiiiiiiiii");
-          // console.log(data[0][i].route);
           ufileData = fileData.replace('<<structName>>', data[0][i].route);
           // console.log(ufileData);
           gData = "";
@@ -354,7 +347,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let startIndex = ifileData.search("<<field1>>");
         let endIndex = ifileData.search(" }");
         let GetData = ifileData.substring(startIndex, endIndex);
-        //
         return GetData;
       }
 
@@ -362,16 +354,12 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         if (err) {
           return console.log(err);
         }
-
         let readUpdatedFile = replaceM(fileData);
-
         fs.writeFile('struct.go', readUpdatedFile, 'utf8', function (err) {
           if (err) return console.log(err);
-          // console.log("========================fileData written\n", readUpdatedFile);
         });
 
       });
-      // console.log("%%%%%%%%%%%",getFilledStruct(),"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
       data[0].map((item) => {
         if (item.isSmartContract === true && item.isActive === true) {
           chainCodeData.push({
@@ -380,7 +368,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
             'description': item.description,
             'route': item.route,
             'useCase': item.useCase,
-            'isSmartContract': item.isSmartContract
+            'isSmartContract': item.isSmartContract,
+            'RequestMapping': item.RequestMapping
           });
         }
       });
@@ -389,26 +378,10 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         responses.push({
           ApiListData: {
             useCase: chainCodeData[0].useCase,
-            APIdata: [],
-            RequestMapping: [
-              {
-              route: "",
-              fields: []
-            }
-          ]
+            APIdata: []
           }
         });
       }
-
-      // for (let i = 0; i < data[0].length; i++) {
-      //   console.log("\n\n" + data[0][i].route);
-      //   responses[0].RequestMapping[i].route.push(data[0][i].route)
-      //   for (let j = 0; j < data[0][i].RequestMapping.fields.length; j++) {
-      //     console.log(data[0][i].RequestMapping.fields[j]);
-      //     responses[0].RequestMapping[i].fields[j].push(data[0][i].route)
-      //   }
-      // }
-      // console.log(responses[0].RequestMapping);
       let response = {};
       for (let i = 0; i < chainCodeData.length; i++) {
         {
@@ -420,14 +393,19 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
                 "purpose": chainCodeData[i].description
 
               }
-            ]
+            ],
+            "RequestMapping": chainCodeData[i].RequestMapping
           };
-
           responses[0].ApiListData.APIdata.push(response);
         }
 
       }
-      // console.log(responses[0].ApiListData.APIdata)
+      for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
+          responses[0].ApiListData.APIdata[j].RequestMapping.fields = responses[0].ApiListData.APIdata[j].RequestMapping.fields.filter(function (item) {   
+            return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object' );
+          });
+          console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
+      }
 
       let DupIndex = [];
 
@@ -525,37 +503,33 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
               fData = gData.replace(/<<FunctionDescription>>/g, responses[0].ApiListData.APIdata[i].APIList[j].purpose);
 
-              // tData = findIndex(fData);
-              // for (let k = 0; k < data[0].length; k++) {
-
-              //   for (let j = 0; j < data[0][k].RequestMapping.fields.length; j++) {
-
-              //     let hData = tData.replace('<<field>>', data[0][k].RequestMapping.fields[j].IN_FIELD.charAt(0).toUpperCase() + data[0][k].RequestMapping.fields[j].IN_FIELD.slice(1));
-              //     hData = hData.replace(/<<fieldType>>/g, data[0][k].RequestMapping.fields[j].IN_FIELDDT);
-              //     hData = hData.replace('<<currentNo>>', j);
-              //     //console.log("***********",hData,"***********")
-              //     fiData += hData + "\n";
-
-              //     if (j === data[0][k].RequestMapping.fields.length - 1) {
-
-              //       yData += fiData + "\n";
-
-              //       fiData = "";
-              //     }
-              //   }
-              //   if (k === data[0].length - 1) {
-
-              //     //yconsole.log(yData)
-              //     // return yData;
-              //   }
-              // }
-              // console.log("@@@@@@@@2t", newData, "@@@@@@@@@@@@@@@@@@@@\n\n");
-              // fData += fData.replace(tData, fData);
+              tData = findIndex(fData);
+              String.prototype.capitalize = function() {
+                return this.charAt(0).toUpperCase() + this.slice(1);
             }
-            //console.log(yData) 
-            // console.log("~~~~~~~~~~~~~~~~~~"+ fData +"~~~~~~~~~~~~~~~~~~")
-            //fData = fData.replace(tData, fData);
 
+              for (let j = 0; j < responses[0].ApiListData.APIdata[i].RequestMapping.fields.length; j++) {
+                let getSlicedFieldName = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split(".");
+               let updateField = getSlicedFieldName[1]
+               if(updateField != undefined)
+               updateField = updateField.capitalize();
+                //let fieldNameCapitalized = mSlicedFieldName.capitalizeFirstLetter();
+                  //console.log(mSlicedFieldName)
+                let hData = tData.replace('<<field>>', updateField);
+                hData = hData.replace(/<<fieldType>>/g, responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELDDT);
+                hData = hData.replace('<<currentNo>>', j);
+                // console.log(yData) 
+                fiData += hData + "\n";
+
+
+                if (j === responses[0].ApiListData.APIdata[i].RequestMapping.fields.length - 1) {
+                  //console.log("***********", fiData, "***********")
+                  fData = fData.replace(tData, fiData);
+                  // yData += fiData + "\n";
+                  fiData = "";
+                }
+              }
+            }
             xData += fData;
 
           }
@@ -563,7 +537,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
         return xData;
       }
-
+      console.log("DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
       fs.readFile('ChaincodeTemplate.txt', 'utf8', function (err, tdata) {
         if (err) {
           return console.log(err);
