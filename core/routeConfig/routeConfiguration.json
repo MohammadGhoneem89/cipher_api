@@ -1,5 +1,17 @@
 {
   "core": {
+    "generateConfig":{
+      "customMapping": true,
+      "MappingfunctionName": "generateConfig",
+      "CustomMappingFile": "vaultgenerator/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getElementList":{
+      "customMapping": true,
+      "MappingfunctionName": "getElementList",
+      "CustomMappingFile": "vaultgenerator/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },  
     "putTransformationTemplate":{
       "customMapping": true,
       "MappingfunctionName": "putTransformationTemplate",
