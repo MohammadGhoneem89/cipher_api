@@ -1,10 +1,11 @@
 'use strict';
 
-const path = require('path');    
-let readfileFromPath = path.join(__dirname, './Chaincode/ChaincodeTemplate.txt');
-let writefileToPath = path.join(__dirname, './Chaincode/chaincode.go');
-let readfileFromPathStruct = path.join(__dirname, './Chaincode/structTemplate.txt');
-let writefileToPathStruct = path.join(__dirname, './Chaincode/struct.go');
+const path = require('path'); 
+const zipafolder = require('zip-a-folder');   
+const readfileFromPath = path.join(__dirname, './Chaincode/ChaincodeTemplate.txt');
+const writefileToPath = path.join(__dirname, './Chaincode/chaincode.go');
+const readfileFromPathStruct = path.join(__dirname, './Chaincode/structTemplate.txt');
+const writefileToPathStruct = path.join(__dirname, './Chaincode/struct.go');
 const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
@@ -572,6 +573,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         //   });
         // });
       });
+      main();
     }).catch((err) => {
       console.log(err);
       console.log(JSON.stringify(err));
@@ -604,6 +606,9 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
     });
 }
 
+async  function main (){
+  await zipafolder.zip('./core/mappingFunctions/systemAPI/Chaincode', './core/mappingFunctions/systemAPI/Chaincode.zip');
+}
 exports.downloadChainCode = downloadChainCode;
 exports.getAPIDefinition = getAPIDefinition;
 exports.getAPIDefinitionID = getAPIDefinitionID;
