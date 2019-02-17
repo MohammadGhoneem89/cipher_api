@@ -1,10 +1,16 @@
 'use strict';
 
+const path = require('path'); 
+const zipafolder = require('zip-a-folder');   
+const readfileFromPath = path.join(__dirname, './Chaincode/ChaincodeTemplate.txt');
+const writefileToPath = path.join(__dirname, './Chaincode/chaincode.go');
+const readfileFromPathStruct = path.join(__dirname, './Chaincode/structTemplate.txt');
+const writefileToPathStruct = path.join(__dirname, './Chaincode/struct.go');
 const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
 const fs = require('fs');
- 
+
 function updateRequestStub(payload, route, useCase) {
   let query = {
     'sampleRequest': payload
@@ -295,7 +301,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   APIDefinitation.findPageAndCount(request)
     .then((data) => {
 
-
+      console.log(readfileFromPath,"pathhhhhhhhhhhh")
+      console.log(readfileFromPathStruct,"lllllllllll")
       function findIndex(ifileData) {
         let startIndex = ifileData.search("<<field>>");
         let endIndex = ifileData.search("  }");
@@ -350,12 +357,12 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         return GetData;
       }
 
-      fs.readFile('structTemplate.txt', 'utf8', function (err, fileData) {
+      fs.readFile(readfileFromPathStruct, 'utf8', function (err, fileData) {
         if (err) {
           return console.log(err);
         }
         let readUpdatedFile = replaceM(fileData);
-        fs.writeFile('struct.go', readUpdatedFile, 'utf8', function (err) {
+        fs.writeFile(writefileToPathStruct, readUpdatedFile, 'utf8', function (err) {
           if (err) return console.log(err);
         });
 
@@ -404,7 +411,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           responses[0].ApiListData.APIdata[j].RequestMapping.fields = responses[0].ApiListData.APIdata[j].RequestMapping.fields.filter(function (item) {   
             return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object' );
           });
-          console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
+         // console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
       }
 
       let DupIndex = [];
@@ -537,8 +544,9 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
         return xData;
       }
-      console.log("DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-      fs.readFile('ChaincodeTemplate.txt', 'utf8', function (err, tdata) {
+      //console.log("DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+     
+      fs.readFile(readfileFromPath, 'utf8', function (err, tdata) {
         if (err) {
           return console.log(err);
 
@@ -553,7 +561,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let getFnDescInd = findFnDescInd(fData);
         let hData = Ldata.replace(getFnDescInd, overWriteAgain);
 
-        fs.writeFile('chaincode.go', hData, 'utf8', function (err) {
+        fs.writeFile(writefileToPath, hData, 'utf8', function (err) {
           if (err) return console.log(err);
           //  console.log(hData, "writeen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         });
@@ -565,6 +573,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         //   });
         // });
       });
+      main();
     }).catch((err) => {
       console.log(err);
       console.log(JSON.stringify(err));
@@ -597,6 +606,9 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
     });
 }
 
+async  function main (){
+  await zipafolder.zip('./core/mappingFunctions/systemAPI/Chaincode', './core/mappingFunctions/systemAPI/Chaincode.zip');
+}
 exports.downloadChainCode = downloadChainCode;
 exports.getAPIDefinition = getAPIDefinition;
 exports.getAPIDefinitionID = getAPIDefinitionID;
