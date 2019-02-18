@@ -1,0 +1,21 @@
+{
+  "logger": {
+    "console": {
+      "transport": "file",
+      "level": "debug",
+      "filename": "logs/reporter-debug.log",
+      "enabled": false
+    },
+    "file": {
+      "transport": "file",
+      "level": "info",
+      "filename": "logs/reporter-info.log",
+      "enabled": false
+    },
+    "error": {
+      "transport": "file",
+      "level": "error",
+      "filename": "logs/reporter-error.log"
+    }
+  }
+}

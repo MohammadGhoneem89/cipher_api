@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}/css/reportLayout.css">
+    {{/if}}
+</head>
+<body>
+
+<br/>
+
+<div class="row">
+    <span class="pull-left margin-left">
+        <h4>Contract Ref : {{:criteria.contractRef}}</h4>
+        <h4>Status : {{:criteria.instrumentStatusValues}}</h4>
+        <h4>Payment Method : {{:criteria.paymentMethodValues}}</h4>
+    </span>
+    <span class="pull-right margin-right">
+        <h4>From Date : {{:criteria.fromDate}} </h4>
+        <h4>To Date :  {{:criteria.toDate}} </h4>
+    </span>
+    <div class="clearfix"></div>
+</div>
+
+<br/>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Payment Instrument Report</h3>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>No.</th>
+                            <th>Contract Ref</th>
+                            <th>CRM No</th>
+                            <th>Tenant Name</th>
+                            <th>Mobile</th>
+                            <th>Email</th>
+                            <th>Emirates ID</th>
+                            <th>Bank</th>
+                            <th>DDS PreApproved No</th>
+                            <th>Amount</th>
+                            <th>Instrument Type</th>
+                            <th>Instrument No</th>
+                            <th>Due Date</th>
+                            <th>Transaction Date</th>
+                            <th>Status</th>
+                        </tr>
+                        {^{for searchResult}}
+                        <tr>
+                            <td class="border-right border-left">{{: #index + 1}}</td>
+                            <td class="border-right border-left">{{:ContractRef}}</td>
+                            <td class="border-right border-left">{{:CRMNo}}</td>
+                            <td class="border-right border-left">{{:TenantName}}</td>
+                            <td class="border-right border-left">{{:Mobile}}</td>
+                            <td class="border-right border-left">{{:Email}}</td>
+                            <td class="border-right border-left">{{:EmiratesID}}</td>
+                            <td class="border-right border-left">{{:Bank}}</td>
+                            <td class="border-right border-left">{{:DOSPreApprovedNo}}</td>
+                            <td class="border-right border-left text-right">{{:Amount}}</td>
+                            <td class="border-right border-left">{{:InstrumentType}}</td>
+                            <td class="border-right border-left">{{:InstrumentNo}}</td>
+                            <td class="border-right border-left">{{:DueDate}}</td>
+                            <td class="border-right border-left">{{:TransactionDate}}</td>
+                            <td class="border-right border-left">{{:Status}}</td>
+                        </tr>
+                        {{/for}}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="display:none">
+        <img src="{{:images.wasl}}"/>
+
+    </span>
+</body>
+</html>

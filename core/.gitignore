@@ -1,0 +1,9 @@
+.idea
+node_modules
+logs
+_lib
+package-lock.json
+uploads
+epayqnfs
+!core/mappingFunctions/generated/.gitkeep
+core/mappingFunctions/generated/*

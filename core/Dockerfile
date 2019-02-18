@@ -1,0 +1,40 @@
+FROM registry.access.redhat.com/rhscl/nodejs-8-rhel7
+#FROM risingstack/alpine:3.7-v8.10.0-4.8.0
+MAINTAINER Avanza Innovations <bilal.mahroof@avanzainnovations.com>
+#RUN subscription-manager attach --auto
+#RUN yum repolist
+#RUN yum repolist enabled
+#RUN yum -y groupinstall `Development Tools`
+#RUN yum -y module install nodejs:8/development
+
+
+#RUN  useradd -ms /bin/bash 1001
+#RUN adduser -S 1001
+#WORKDIR /home/avanza
+# RUN bash -c "npm --version"
+#RUN node -v
+#RUN npm -v
+#RUN bash -c "mkdir -p /home/1001/app/logs"
+#RUN bash -c "mkdir -p /home/1001/app/dist"
+WORKDIR /opt/app-root
+COPY package.json .
+COPY . .
+RUN bash -c "npm install -p"
+
+RUN bash -c "npm list -g --depth=0. | awk -F ' ' '{print $2}' | awk -F '@' '{print $1}'  | xargs npm remove -g"
+RUN bash -c "npm -g install fresh@latest"
+RUN bash -c "npm -g install https-proxy-agent@latest"
+RUN bash -c "npm -g install https-proxy-agent@latest"
+RUN bash -c "npm -g install hoek@latest"
+RUN bash -c "npm -g install qs@latest"
+RUN bash -c "npm -g install stringstream@latest"
+RUN bash -c "npm -g install ssri@latest"
+RUN bash -c "npm -g install mime@latest"
+RUN bash -c "npm -g install npm@latest"
+RUN bash -c "npm cache clean --force "
+
+
+#RUN npm install
+USER 1001
+EXPOSE 9080
+CMD ["node","app"]

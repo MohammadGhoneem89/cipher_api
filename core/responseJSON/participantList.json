@@ -1,0 +1,21 @@
+{
+  "participantList": {
+    "action": "participantList",
+    "pageData": {
+      "currentPageNo": 1,
+      "pageSize": 1,
+      "totalRecords": 5
+    },
+    "rows": [
+      {
+        "name": "Latifa Tower",
+        "address": "Latifa Tower"
+
+      },
+      {
+        "name": "Blue Tower",
+        "address": "Blue Tower"
+      }
+    ]
+  }
+}

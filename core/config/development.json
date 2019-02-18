@@ -1,0 +1,21 @@
+{
+  "port": 10051,
+  "mongodb": {
+    "url": "b17777bc97da3c563d39d40193ab245d4b0f2a4aea7ccb3259275c2be91cf17edf931ddfc45453"
+  },
+  "URLRestInterface": "http://104.211.198.150:10051/",
+  "amqp": {
+    "url": "bd7568abc291711e73748359c9f76153175f7a1dad3a947723275c2ff21eef2c98d24d8398372fe795a133d87b"
+  },
+  "defaultImage": "/epayqanfs/application/cipher-api/public/images/default.jpg",
+  "soapHost": "https://10.0.0.4/SOAP",
+  "couch": {
+    "host": "104.211.189.150"
+  },
+   "email":{
+    "enabled": false,
+    "address": "dubaipay-no-reply@smartdubai.ae",
+    "host": "smtp.dubai.gov.ae",
+    "port": 25
+  }
+}

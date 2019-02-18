@@ -1,0 +1,151 @@
+* {
+	margin: 0px;
+	padding: 0px
+}
+body {
+	font-family: verdana;
+}
+body[dir="rtl"] strong, body[dir="rtl"] p {
+	direction: rtl;
+	unicode-bidi: embed;
+}
+.row {
+	padding: 20px 20px 0px;
+}
+.table {
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+td {
+	font-size: 12px;
+	color: #2F2F2F;
+	padding: 4px 2px;
+	text-align: center;
+	border-bottom: 1px solid #ccc;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	word-wrap: break-word;
+}
+.container {
+	margin-top: 20px
+}
+.centered {
+	text-align: center
+}
+.panel-default > .panel-heading {
+	color: #fff;
+	background-color: #1daeeb;
+	border-color: #1d5e79;
+	padding: 10px;
+	text-align: center;
+	text-transform: uppercase;
+}
+.container {
+	padding: 20px;
+}
+hr {
+	margin: 20px 0px;
+	border: 1px solid #efefef !important;
+}
+.panel-body {
+	padding: 0px;
+}
+th {
+	background: #1a2951;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 700;
+	padding: 4px 2px;
+	text-align: center;
+	word-wrap: break-word;
+}
+.col-xs-5 {
+	width: 350px;
+	font-size: 14px
+}
+.pull-right {
+	float: right
+}
+.pull-left {
+	float: left
+}
+.clearfix {
+	clear: both
+}
+.border-right{
+	border-right: 1px solid #ccc !important;
+}
+.border-left{
+	border-left: 1px solid #ccc !important;
+}
+.upper-line {
+	border-top: 1px solid #ccc !important;
+	border-bottom: 0px !important;
+}
+.no-upper-line {
+	border-bottom: 0px !important;
+}
+.no-line{
+	border: 0px !important;
+}
+.footer .pull-right strong {
+	color: #333;
+	font-size: 12px
+}
+.thick-line {
+	border-top: 2px solid;
+}
+.text-right {
+	text-align: right !important;
+}
+.text-left {
+	text-align: left !important;
+}
+.ltr {
+	direction: ltr !important;
+	unicode-bidi: embed !important;
+}
+.heading {
+	color: #fff;
+	background-color: #1daeeb;
+	border-color: #1d5e79;
+	padding: 10px;
+	text-transform: uppercase;
+	font-weight: 700;
+	font-size: 18px;
+}
+.font-20{
+	font-size: 20px;
+	font-weight: 900 !important
+}
+.margin-left{
+	margin-left: 20%;
+}
+.margin-right{
+	margin-right: 20%;
+}
+
+.shadowBox {
+	background-color: #FFFFFF;
+	margin : 15px;
+	padding: 10px;
+}
+.jsonBox {
+	background-color: #FFFFFF;
+	margin : 15px;
+	padding: 20px;
+	border: 1px;
+
+}
+
+.box {
+	background-color: #F2F2F2;
+	margin : 15px;
+	padding: 20px;
+}
+
+.codeBox{
+	padding: 10px;
+	margin: 10px;
+}
