@@ -1,0 +1,70 @@
+{
+    "workingCalendarDetail": {
+        "action": "workingCalendarDetail",
+        "data": {
+            "weekStartDay": "Monday",
+            "weekEndDay": "Friday",
+            "exceptionList": [
+                {
+					"title": "All Day Event",
+					"start": "2017-10-01"
+				},
+				{
+					"title": "Long Event",
+					"start": "2017-10-07",
+					"end": "2017-10-10"
+				},
+				{
+					"id": 999,
+					"title": "Repeating Event",
+					"start": "2017-10-09"
+				},
+				{
+					"id": 999,
+					"title": "Repeating Event",
+					"start": "2017-10-16"
+				},
+				{
+					"title": "Conference",
+					"start": "2017-10-11",
+					"end": "2017-10-13"
+				},
+				{
+					"title": "Meeting",
+					"start": "2017-10-12",
+					"end": "2017-10-12"
+				},
+				{
+					"title": "Lunch",
+					"start": "2017-10-12"
+				},
+				{
+					"title": "Meeting",
+					"start": "2017-10-12"
+				},
+				{
+					"title": "Happy Hour",
+					"start": "2017-10-12"
+				},
+				{
+					"title": "Dinner",
+					"start": "2017-10-12"
+				},
+				{
+					"title": "Birthday Party",
+					"start": "2017-10-13"
+				}
+				
+            ],
+            "actions": [
+                {
+                    "actionID": 24,
+                    "name": "WCD_Save",
+                    "actionURI": "/workingCalendarave",
+                    "params": "",
+                    "icon": "icon-docs"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    {{if basePath}}
+    <link rel="stylesheet" href="{{:basePath}}css/reportLayout.css">
+    {{/if}}
+</head>
+<body style="font-family: verdana">
+<div>
+    <h2 class="panel-title" style="text-align: center; color:#5882FA, padding-bottom: 15px">API Documentation</h2>
+    </br>
+    </br>
+    {^{for searchResult}}
+
+    <div>
+        <div>
+            <h3>&nbsp;{{:#index + 1}})&nbsp;{{:route}}</h3>
+        </div>
+        <div class="shadowBox">
+            <div style="padding-top: 5px">
+                <p><strong>Route: </strong>&nbsp;{{:route}}</p>
+            </div>
+            <div style="padding-top: 5px">
+                <p><strong>Description: </strong>&nbsp;{{:description}}</p>
+            </div>
+            <div style="padding-top: 5px">
+                <p><strong>Authentication: </strong>&nbsp;{{:authorization}}</p>
+            </div>
+            <div style="padding-top: 5px">
+                <p><strong>URL: </strong>&nbsp;{IP Address: Port}/{{:basePath}}{{:url}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+
+        <div style="padding-top: 10px">
+            {{if requestSchema}}
+            <div>
+                <h4>Request</h4>
+                <pre class="jsonBox">
+                <code>{{:requestSchema}}</code>
+            </pre>
+            </div>
+            {{/if}}
+            {{if responseSchema}}
+            <div>
+                <h4>Response</h4>
+                <pre class="jsonBox">
+                <code>{{:responseSchema}}</code>
+            </pre>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+
+    <br/>
+
+    <div class="box">
+        <div style="padding-top: 10px">
+            <h3>Sample Response</h3>
+        </div>
+        <div style="padding-top: 20px">
+            {{if simucases}}
+            {^{for simucases}}
+            <div>
+                <h5>{{:RuleName}}</h5>
+                <pre class="jsonBox">
+                <code>{{:SimulatorResponse}}</code>
+                </pre>
+            </div>
+            {{/for}}
+            {{/if}}
+        </div>
+    </div>
+
+    <br/>
+
+    <div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="">
+                        <h4 class="">Request Body Parameter</h4>
+                        <br/>
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table table-condensed">
+                                <tr>
+                                    <th>Field Name</th>
+                                    <th>Field Type</th>
+                                    <th>Description</th>
+                                    <th>Required</th>
+                                </tr>
+                                {^{for RequestMapping}}
+                                <tr>
+                                    <td>{{:IN_FIELD}}</td>
+                                    <td>{{:IN_FIELDDT}}</td>
+                                    <td>{{:IN_FIELDDESCRIPTION}}</td>
+                                    <td>{{:IN_ISREQUIRED}}</td>
+                                </tr>
+                                {{/for}}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br/>
+
+    <div style="padding-top: 10px">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="">
+                        <h4 class="panel-title">Response Body Parameter</h4>
+                        <br/>
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table table-condensed">
+                                <tr>
+                                    <th>Field Name</th>
+                                    <th>Field Type</th>
+                                    <th>Description</th>
+                                </tr>
+                                {^{for ResponseMapping}}
+                                <tr>
+                                    <td>{{:MAP_FIELD}}</td>
+                                    <td>{{:MAP_FIELDDT}}</td>
+                                    <td>{{:IN_FIELDDESCRIPTION}}</td>
+                                </tr>
+                                {{/for}}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <P style="page-break-before: always">
+        {{/for}}
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,154 @@
+{
+    "sampleListData": {
+        "action": "sampleListData",
+        "gridData": {
+            "pageData": {
+                "PageSize": 5,
+                "currentPage": 1,
+                "totalRecords": 50
+            },
+            "rows": [
+                {
+                    "recordID": "SampleID",
+                    "columnValue1": {
+                        "name": "Value 1",
+                        "imageURL": "/images/05a29de0-b9d7-11e7-8e40-4914fe72b15d.png"
+                    },
+                    "columnValue2": "14/01/2018",
+                    "columnValue3": "10",
+                    "columnValue4": "20",
+                    "columnValue5": "30",
+                    "columnValue6": "1533024830",
+                    "status": {
+                        "value": "SUCCESS",
+                        "type": "SUCCESS"
+                    },
+                    "actions": [
+                        {
+                            "value": "1003",
+                            "type": "componentAction",
+                            "label": "View",
+                            "params": "",
+                            "iconName": "icon-docs",
+                            "URI": [
+                                "/sampleDetailPage/"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "recordID": "SampleID",
+                    "columnValue1": {
+                        "name": "Vaule 2",
+                        "imageURL": "/images/13ad9660-b9d7-11e7-8e40-4914fe72b15d.png"
+                    },
+                    "columnValue2": "14/01/2018",
+                    "columnValue3": "10",
+                    "columnValue4": "20",
+                    "columnValue5": "30",
+                    "columnValue6": "1533024830",
+                    "status": {
+                        "value": "SUCCESS",
+                        "type": "SUCCESS"
+                    },
+                    "actions": [
+                        {
+                            "value": "1003",
+                            "type": "componentAction",
+                            "label": "View",
+                            "params": "",
+                            "iconName": "icon-docs",
+                            "URI": [
+                                "/sampleDetailPage/"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "recordID": "SampleID",
+                    "columnValue1": {
+                        "name": "Vaule 3",
+                        "imageURL": "/images/13ad9660-b9d7-11e7-8e40-4914fe72b15d.png"
+                    },
+                    "columnValue2": "14/01/2018",
+                    "columnValue3": "10",
+                    "columnValue4": "20",
+                    "columnValue5": "30",
+                    "columnValue6": "1533024830",
+                    "status": {
+                        "value": "FAILED",
+                        "type": "ERROR"
+                    },
+                    "actions": [
+                        {
+                            "value": "1003",
+                            "type": "componentAction",
+                            "label": "View",
+                            "params": "",
+                            "iconName": "icon-docs",
+                            "URI": [
+                                "/sampleDetailPage/"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "recordID": "SampleID",
+                    "columnValue1": {
+                        "name": "Vaule 4",
+                        "imageURL": "/images/13ad9660-b9d7-11e7-8e40-4914fe72b15d.png"
+                    },
+                    "columnValue2": "14/01/2018",
+                    "columnValue3": "10",
+                    "columnValue4": "20",
+                    "columnValue5": "30",
+                    "columnValue6": "1533024830",
+                    "status": {
+                        "value": "FAILED",
+                        "type": "ERROR"
+                    },
+                    "actions": [
+                        {
+                            "value": "1003",
+                            "type": "componentAction",
+                            "label": "View",
+                            "params": "",
+                            "iconName": "icon-docs",
+                            "URI": [
+                                "/sampleDetailPage/"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "recordID": "SampleID",
+                    "columnValue1": {
+                        "name": "Vaule 5",
+                        "imageURL": "/images/13ad9660-b9d7-11e7-8e40-4914fe72b15d.png"
+                    },
+                    "columnValue2": "14/01/2018",
+                    "columnValue3": "10",
+                    "columnValue4": "20",
+                    "columnValue5": "30",
+                    "columnValue6": "1533024830",
+                    "status": {
+                        "value": "SUCCESS",
+                        "type": "SUCCESS"
+                    },
+                    "actions": [
+                        {
+                            "value": "1003",
+                            "type": "componentAction",
+                            "label": "View",
+                            "params": "",
+                            "iconName": "icon-docs",
+                            "URI": [
+                                "/sampleDetailPage/"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
