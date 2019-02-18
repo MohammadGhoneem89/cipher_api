@@ -248,7 +248,12 @@ function Status(tranStatus) {
     "type": "INFO"
   };
   if (tranStatus == 0) {
-    vs.value = 'Penfing',
+    vs.value = 'Pending',
+      vs.type = 'WARNING';
+  }
+  
+  if (tranStatus == 4) {
+     vs.value = 'Waiting',
       vs.type = 'WARNING';
   }
   else if (tranStatus == 1) {
