@@ -2,6 +2,8 @@
 
 const projection = require('../projection');
 const APIDefinition = require('../../../lib/repositories/apiDefination');
+const groupRepo = require('../../../lib/repositories/group');
+const userRepo = require('../../../lib/repositories/user');
 const dates = require('../../../lib/helpers/dates');
 const _ = require('lodash');
 
@@ -25,37 +27,81 @@ function getActiveAPIs(body,JWT) {
     if (_.isEmpty(body.orgTypes)) {
         return resp;
     }
-    return APIDefinition.getActiveAPIsData(body)
-        .then((data) => {
-        let resp = {};
-        data.forEach((data) => {
-            let dest = data.useCase + "." + data.route;
-            let reqMap = [];
-            data.RequestMapping.fields.forEach((field) => {
-                if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData") {
-                    reqMap.push(field);
+
+    function checkGroupRoutes(response, apiDef, groups){
+        if(_.isEmpty(apiDef)){
+            return Promise.resolve(response);
+        }
+        let api = apiDef.splice(0,1);
+        api = api[0] || {};
+        let uri = '/'+_.get(api, 'route', '');
+        let query = {
+            _id: {
+                $in: groups
+            },
+            permissions: {
+                $elemMatch: {
+                    children: {
+                        $elemMatch: {
+                            URI: uri
+                        }
+                    }
                 }
-            });
-            let resMap = [];
-            data.ResponseMapping.fields.forEach((field) => {
-                resMap.push(field);
-            });
-            data.ResponseMapping = resMap;
-            data.RequestMapping = reqMap;
-            let groupedRoute = _.omit(data, 'route', 'useCase');
-            _.set(resp, dest, groupedRoute);
-        });
-
-        let finalData = getMappingField(resp);
-        finalData = formating(finalData);
-
-        return {
-            useCaseLabel : body.useCaseLabel,
-            organization : body.orgTypes,
-            finalData : finalData,
-            entityLabel : body.entityLabel
-
+            }
         };
+        return groupRepo.find(query)
+            .then((res) =>{
+                if(!_.isEmpty(res)){
+                    response.push(api);
+                }
+                return checkGroupRoutes(response, apiDef, groups);
+            });
+    }
+
+
+    return Promise.all([
+            APIDefinition.getActiveAPIsData({useCase : body.useCase}),
+            userRepo.findAll({orgType : body.orgTypes})
+        ])
+        .then((data) => {
+
+            let groups = _.flatMap(_.map(_.get(data, '[1]', []), 'groups'));
+            let routes = _.get(data, '[0]', []);
+
+            return checkGroupRoutes([], routes, groups)
+                .then((res)=>{
+                    let resp = {};
+                    res.forEach((data) => {
+                        let dest = data.useCase + "." + data.route;
+                        let reqMap = [];
+                        data.RequestMapping.fields.forEach((field) => {
+                            if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData") {
+                                reqMap.push(field);
+                            }
+                        });
+                        let resMap = [];
+                        data.ResponseMapping.fields.forEach((field) => {
+                            resMap.push(field);
+                        });
+                        data.ResponseMapping = resMap;
+                        data.RequestMapping = reqMap;
+                        let groupedRoute = _.omit(data, 'route', 'useCase');
+                        _.set(resp, dest, groupedRoute);
+                    });
+
+                    let finalData = getMappingField(resp);
+                    finalData = formating(finalData);
+
+                    return {
+                        useCaseLabel : body.useCaseLabel,
+                         organization : body.orgTypes,
+                         finalData : finalData,
+                         entityLabel : body.entityLabel
+
+                    };
+
+                });
+
 
     }).catch((err) => {
         return err;
@@ -134,6 +180,8 @@ function formating(APIsData){
 
     return finalData;
 }
+
+
 
 module.exports = getActiveAPIs;
 
