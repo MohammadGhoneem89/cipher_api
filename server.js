@@ -1,18 +1,16 @@
 'use strict';
-var request = require('request');
+
 const config = require('./config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const uuid = require('uuid/v1');
 const db = require('./core/database/db')(); // eslint-disable-line
-//const jsReport = require('jsreport');
+// const jsReport = require('jsreport');
 const url = require('url');
 const cors = require('cors');
 const rp = require('request-promise');
 const renderExport = require('./exports');
-var router = express.Router();
-
-// const generateReports = require('./reports');
+//  const generateReports = require('./reports');
 let app = express();
 const expressWs = require('express-ws')(app);
 const crypto = require('./lib/helpers/crypto');
@@ -26,9 +24,7 @@ const permissions = require('./lib/middleware/permissions');
 const docPermissions = require('./lib/middleware/docPermission');
 const requestLog = require('./lib/middleware/requesLog');
 const authUser = require('./lib/auth/user');
-
 const logger = require('./core/api/connectors/logger').app;
-
 const serverStats = require('./lib/services/serverStats');
 const notification = require('./core/mappingFunctions/notification/list');
 
@@ -47,17 +43,21 @@ const lastSubscription = [];
 global.appDir = __dirname;
 
 mongoDB.connection(config.get('mongodb.url'));
-
+console.log(config.get('mongodb.url'))
 app = expressWs.app;
 
-const appServer = app.listen(config.get('port'), function () {
-  logger.info({
-    fs: 'app.js ',
-    func: 'index'
-  }, 'server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
-  console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
+const routeData = require('./core/mappingFunctions/systemAPI/APIDefination');
+let appServer;
+routeData.LoadConfig().then(() => {
+  console.log('Configurations Loaded For Request Processing!!');
+  appServer = app.listen(config.get('port'), function () {
+    logger.info({
+      fs: 'app.js ',
+      func: 'index'
+    }, 'server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
+    console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
+  });
 });
-
 // let HealthCheckHelper = require('./core/utils/health.js');
 // let heathService = new HealthCheckHelper("REST", 10000, crypto.decrypt(config.get('amqp.url')));
 
