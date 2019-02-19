@@ -639,7 +639,7 @@ function apiCallsHandler(req, res){
   payload.token = JWToken;
   const action = req.params.action;
   const channel = req.params.channel;
-  
+
   const url_parts = url.parse(req.url, true);
   const query = url_parts.query;
   logger.info({ fs: 'app.js', func: 'API' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
