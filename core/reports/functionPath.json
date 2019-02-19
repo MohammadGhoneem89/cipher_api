@@ -1,7 +1,0 @@
-{
-  "entityTransactionDetail": "./query/entityTransactionDetail",
-  "contractDetailReport": "./query/contractDetailReport",
-  "paymentInstrumentReport": "./query/paymentInstrumentReport",
-  "ejariReport": "./query/ejariReport",
-  "APIDefFullReport": "./query/APIDefFullReport"
-}
