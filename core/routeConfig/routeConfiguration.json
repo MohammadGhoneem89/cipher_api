@@ -1,5 +1,18 @@
 {
   "core": {
+    
+    "upsertAPIImport":{
+      "customMapping": true,
+      "MappingfunctionName": "upsertAPIImport",
+      "CustomMappingFile": "systemAPI/apiImport.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getImport":{
+      "customMapping": true,
+      "MappingfunctionName": "getImport",
+      "CustomMappingFile": "systemAPI/apiImport.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "generateConfig":{
       "customMapping": true,
       "MappingfunctionName": "generateConfig",

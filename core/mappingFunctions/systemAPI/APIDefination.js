@@ -4,7 +4,7 @@ const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
 const fs = require('fs');
- 
+
 function updateRequestStub(payload, route, useCase) {
   let query = {
     'sampleRequest': payload
@@ -26,6 +26,7 @@ function LoadConfig() {
     APIDefinitation.getAPIConfig()
   ]).then((data) => {
     let typeObj = {};
+    let objectList = [];
     data[0].forEach((element) => {
       for (let key in element.data) {
         let arrEnum = [];
@@ -401,10 +402,10 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
       }
       for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
-          responses[0].ApiListData.APIdata[j].RequestMapping.fields = responses[0].ApiListData.APIdata[j].RequestMapping.fields.filter(function (item) {   
-            return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object' );
-          });
-          console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
+        responses[0].ApiListData.APIdata[j].RequestMapping.fields = responses[0].ApiListData.APIdata[j].RequestMapping.fields.filter(function (item) {
+          return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object');
+        });
+        console.log("********", responses[0].ApiListData.APIdata[j].RequestMapping.fields, "******");
       }
 
       let DupIndex = [];
@@ -504,17 +505,17 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
               fData = gData.replace(/<<FunctionDescription>>/g, responses[0].ApiListData.APIdata[i].APIList[j].purpose);
 
               tData = findIndex(fData);
-              String.prototype.capitalize = function() {
+              String.prototype.capitalize = function () {
                 return this.charAt(0).toUpperCase() + this.slice(1);
-            }
+              }
 
               for (let j = 0; j < responses[0].ApiListData.APIdata[i].RequestMapping.fields.length; j++) {
                 let getSlicedFieldName = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split(".");
-               let updateField = getSlicedFieldName[1]
-               if(updateField != undefined)
-               updateField = updateField.capitalize();
+                let updateField = getSlicedFieldName[1]
+                if (updateField != undefined)
+                  updateField = updateField.capitalize();
                 //let fieldNameCapitalized = mSlicedFieldName.capitalizeFirstLetter();
-                  //console.log(mSlicedFieldName)
+                //console.log(mSlicedFieldName)
                 let hData = tData.replace('<<field>>', updateField);
                 hData = hData.replace(/<<fieldType>>/g, responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELDDT);
                 hData = hData.replace('<<currentNo>>', j);
@@ -537,11 +538,10 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
         return xData;
       }
-      console.log("DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+      console.log("DONE!")
       fs.readFile('ChaincodeTemplate.txt', 'utf8', function (err, tdata) {
         if (err) {
           return console.log(err);
-
         }
         let fData = tdata.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase);
         let overWrite = mspFunctionsLogic(tdata);

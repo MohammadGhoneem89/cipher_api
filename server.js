@@ -77,7 +77,6 @@ if (config.get('enableMQRead') == '1') {
   MQ.start(ReadIncomingMessage);
 }
 
-
 // jsReport({
 //     express: { app: app, server: appServer },
 //     appPath: '/reporting'
@@ -86,13 +85,10 @@ if (config.get('enableMQRead') == '1') {
 //         logger.error(e, 'JS report error');
 //     });
 
-
-
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(requestLog);
-
 
 function unsubscribeOnClosedConnection(subscriberId) {
   try {
