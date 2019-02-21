@@ -54,6 +54,12 @@ function upsertAPIImport(payload, UUIDKey, route, callback, JWToken) {
     console.log("Record Updated Success, for Request / Response Mapping!!!");
     let requestMappingId = data[0]._id;
     let responseMappingId = data[1]._id
+    let sampleJSON;
+    if (payload.sampleResJSON && _.isEmpty(payload.sampleResJSON)) {
+      sampleJSON = "{ \"messageStatus\":\"OK\", \"errorCode\":200, \"errorDescription\":\"\", \"cipherMessageId\":\"c0a43490-df3f-11e7-a27c-4beb2ae22916\", \"timestamp\":\"22/09/2018 22:24:16.000\"}"
+    } else {
+      sampleJSON = JSON.stringify(payload.sampleResJSON)
+    }
     let request = {
       "route": payload.route,
       "useCase": payload.useCase,
@@ -70,13 +76,13 @@ function upsertAPIImport(payload, UUIDKey, route, callback, JWToken) {
       "isCustomMapping": false,
       "isRouteOveride": false,
       "isSimulated": true,
-      "isValBypass": true,
+      "isValBypass": false,
       "requestServiceQueue": "BLA_Input_Queue",
       "responseQueue": "UI_Input_Queue",
       "simulatorResponse": "{\n                    \"messageStatus\": \"OK\",\n                    \"errorCode\": 200,\n                    \"errorDescription\": \"\",\n                    \"cipherMessageId\": \"c0a43490-df3f-11e7-a27c-4beb2ae22916\",\n                    \"timestamp\": \"22/09/2018 22:24:16.000\"\n}",
       "simucases": [
         {
-          "SimulatorResponse": JSON.stringify(payload.sampleResJSON) || "{ \"messageStatus\":\"OK\", \"errorCode\":200, \"errorDescription\":\"\", \"cipherMessageId\":\"c0a43490-df3f-11e7-a27c-4beb2ae22916\", \"timestamp\":\"22/09/2018 22:24:16.000\"}",
+          "SimulatorResponse": sampleJSON,
           "SimuValue": "*",
           "SimuField": "*",
           "RuleName": "general",
