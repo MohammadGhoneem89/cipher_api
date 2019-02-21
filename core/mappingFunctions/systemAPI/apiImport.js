@@ -70,7 +70,7 @@ function upsertAPIImport(payload, UUIDKey, route, callback, JWToken) {
       "isCustomMapping": false,
       "isRouteOveride": false,
       "isSimulated": true,
-      "isValBypass": false,
+      "isValBypass": true,
       "requestServiceQueue": "BLA_Input_Queue",
       "responseQueue": "UI_Input_Queue",
       "simulatorResponse": "{\n                    \"messageStatus\": \"OK\",\n                    \"errorCode\": 200,\n                    \"errorDescription\": \"\",\n                    \"cipherMessageId\": \"c0a43490-df3f-11e7-a27c-4beb2ae22916\",\n                    \"timestamp\": \"22/09/2018 22:24:16.000\"\n}",
