@@ -19,7 +19,6 @@ function getNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
       element.actions = actions;
       element.createdBy = element.createdBy ? element.createdBy.userID : '';
     });
-
     let response = {
       "NetworkList": {
         "action": "NetworkList",
@@ -71,7 +70,6 @@ function getNetworkConfigByID(payload, UUIDKey, route, callback, JWToken) {
 }
 function updateNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
   payload.createdBy = JWToken._id;
-
   let resp = {
     "responseMessage": {
       "action": "updateNetworkConfig",
@@ -157,26 +155,62 @@ function getPeerList(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function getNetworkConfigList(payload, UUIDKey, route, callback, JWToken) {
-  const response = {};
-  networkConfig.find({})
-    .then((data) => {
-      let res = {};
-      for (let item of data) {
-        res[item.name] = item;
-      }
-      response[payload.action] = {
-        action: payload.action,
-        data: res
-      };
-      callback(response);
+
+  networkConfig.find({ type: payload.type })
+    .then((arrayList) => {
+      let result = {};
+      arrayList.forEach((data) => {
+        console.log(JSON.stringify(data, null, 2));
+        let response = {
+          "users": [{
+            "username": data.username,
+            "secret": data.secret
+          }],
+          "GOPATH": "../chaincode",
+          "request-timeout": 12000000,
+          "orderer": {
+            "url": data.orderer.url,
+            "server-hostname": data.orderer.serverHostname,
+            "isFile": false,
+            "tls_cacerts": data.orderer.tlsCacerts
+          },
+          "org": {
+            "name": data.mspid,
+            "mspid": data.mspid,
+            "ca": data.ca
+          }
+        };
+        data.peerUser.forEach((dataPeerUser) => {
+          let blockchainUsers = {
+            "isFile": false,
+            "key": dataPeerUser.key,
+            "cert": dataPeerUser.cert
+          };
+          _.set(response, `org.${dataPeerUser.userName}`, blockchainUsers)
+        });
+        data.peerList.forEach((dataPeerList, index) => {
+          let peer = {
+            "isFile": false,
+            "peerName": dataPeerList.peerName,
+            "requests": dataPeerList.requests,
+            "events": dataPeerList.events,
+            "server-hostname": dataPeerList.server_hostname,
+            "tls_cacerts": dataPeerList.tls_cacerts
+          };
+          _.set(response, `org.peer${index + 1}`, peer);
+        });
+        _.set(result, `${data.networkName}`, response);
+      });
+      callback(result);
     })
     .catch((err) => {
-      response[payload.action] = {
-        action: payload.action,
-        data: {},
-        error: err
-      };
-      callback(response);
+      console.log(err);
+      // response[payload.action] = {
+      //   action: payload.action,
+      //   data: {},
+      //   error: err
+      // };
+      // callback(response);
     });
 }
 

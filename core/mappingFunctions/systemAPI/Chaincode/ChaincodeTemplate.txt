@@ -1,0 +1,160 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/hyperledger/fabric/core/chaincode/lib/cid"
+	"github.com/hyperledger/fabric/core/chaincode/shim"
+	pb "github.com/hyperledger/fabric/protos/peer"
+)
+
+//<<Standard Code Section - Start>>
+
+/* ===================================================================================
+	This is the system generated code section. Please don't make any change in this section
+  ===================================================================================*/
+
+//Struct For Chain Code
+type PRChainCode struct {
+}
+
+var logger = shim.NewLogger("PR")
+
+//Standard Functions
+func main() {
+	fmt.Println("PR ChainCode Started")
+	err := shim.Start(new(PRChainCode))
+	if err != nil {
+		fmt.Println("Error starting PR chaincode: %s", err)
+	}
+}
+
+//Init is called during chaincode instantiation to initialize any data.
+func (t *PRChainCode) Init(stub shim.ChaincodeStubInterface) pb.Response {
+	fmt.Println("PR ChainCode Initiated")
+
+	_, args := stub.GetFunctionAndParameters()
+	fmt.Println("Init: %v", args)
+	if len(args[0]) <= 0 {
+		return shim.Error("MSP Mapping information is required for initiating the chain code")
+	}
+
+	var MSPListUnmarshaled []MSPList
+	err := json.Unmarshal([]byte(args[0]), &MSPListUnmarshaled)
+
+	if err != nil {
+		return shim.Error("An error occurred while Unmarshiling MSPMapping: " + err.Error())
+	}
+	MSPMappingJSONasBytes, err := json.Marshal(MSPListUnmarshaled)
+	if err != nil {
+		return shim.Error("An error occurred while Marshiling MSPMapping :" + err.Error())
+	}
+
+	_Key := "MSPMapping"
+	err = stub.PutState(_Key, []byte(MSPMappingJSONasBytes))
+	if err != nil {
+		return shim.Error("An error occurred while inserting MSPMapping:" + err.Error())
+	}
+	return shim.Success(nil)
+}
+
+//Invoke is called per transaction on the chaincode
+func (t *PRChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
+
+	//getting MSP
+	certOrgType, err := cid.GetMSPID(stub)
+	if err != nil {
+		return shim.Error("Enrolment mspid Type invalid!!! " + err.Error())
+	}
+	fmt.Println("MSP:" + certOrgType)
+
+	orgType, err := getOrgTypeByMSP(stub, string(certOrgType))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	function, _ := stub.GetFunctionAndParameters()
+	fmt.Println("Invoke is running for function: " + function)
+
+	args, errTrans := getArguments(stub)
+	if errTrans != nil {
+		return shim.Error(errTrans.Error())
+	}
+	fmt.Println("Arguments Loaded Successfully!!")
+
+	//<<Function Validation Logic-Start>>
+	if orgType == "<<MSP>>" {						
+		switch functionName := function; functionName {
+		//<<FunctionCases-Start>>
+		
+		case "<<FunctionName>>":
+			return t.<<FunctionName>>(stub, args,"<<FunctionName>>")
+					
+		//<<FunctionCases-End>>
+		
+		default:
+			logger.Warning("Invoke did not find function: " + function)
+			return shim.Error("Received unknown function invocation: " + function)
+		}
+	} else //<<Function Validation Logic - End>>
+	{
+		return shim.Error("Invalid MSP: " + orgType)
+	}
+	
+}
+
+func insertDataAndRaiseEvent(stub shim.ChaincodeStubInterface,key string,eventType string,data []byte) error {
+	
+	err := stub.PutState(key, data)
+	if err != nil {
+		return err
+	}
+	logger.Debug("Successfully Put State for Key: " + key)
+		
+	err = stub.SetEvent(eventType, []byte(data))
+	if err != nil {
+		return err
+	}
+	logger.Debug("Successfully Raised Chain Code for Event Type: " + eventType)
+	return nil
+}
+
+//<<Standard Code Section - End>>
+
+//<<Custom Function Section - Start>>
+
+/* ===================================================================================
+ 	All the customs functions for all organization will be added here
+===================================================================================== */
+
+//Structs for Custom Functions to be added here
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:<<FunctionName>>
+	Description: <<FunctionDescription>>
+*/
+func (t *<<UseCase>>ChainCode) <<FunctionName>>(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("<<FunctionName>>: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+<<structName>> := &<<structName>>{	
+		<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>),  }
+
+fmt.Println(<<getStructName>>)
+	logger.Debug("<<FunctionName>> function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - End>>
+
+//<<Custom Function Section - End>>

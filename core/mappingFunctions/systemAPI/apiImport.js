@@ -262,7 +262,7 @@ function parseAndProcess(payload) {
           "IN_ISREQUIRED": requireVal,
           "MAP_FIELD": "Body.arguments",
           "MAP_FIELDDT": "array",
-          "IN_FIELDTYPEDATA": typeName + "_AGEN"
+          "IN_FIELDTYPEDATA": typeName != "" ? typeName + "_AGEN" : ""
         };
         let obj;
         obj = sampleJSON;

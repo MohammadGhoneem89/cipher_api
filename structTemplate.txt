@@ -1,0 +1,13 @@
+package main
+
+import "fmt"
+
+type MSPList struct {
+	OrgType string `json:"orgType"`
+	MSP     string `json:"MSP"`
+	ID      string `json:"ID"`
+}
+type  <<structName>> struct{
+	<<field1>> <<fieldType>> `json:"<<field1JSON>>"` }
+
+
