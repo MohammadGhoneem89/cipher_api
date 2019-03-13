@@ -70,7 +70,8 @@
     "url": "^0.11.0",
     "uuid": "^3.0.0",
     "validator": "^9.4.1",
-    "when": "^3.7.7"
+    "when": "^3.7.7",
+    "zip-a-folder": "0.0.7"
   },
   "devDependencies": {
     "eslint": "^4.19.1"

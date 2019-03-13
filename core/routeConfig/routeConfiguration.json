@@ -931,6 +931,12 @@
       "customMapping": false,
       "mappingConfigFile": "InvokeMapping"
     },
+    "quorumConnect": {
+      "customMapping": true,
+      "MappingfunctionName": "generalNetworkOps",
+      "CustomMappingFile": "quorum/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "hyperledgerConnect": {
       "customMapping": true,
       "MappingfunctionName": "generalNetworkOps",
