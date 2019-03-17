@@ -1,53 +1,5 @@
 {
   "core": {
-    "getOnBoardingList": {
-      "customMapping": true,
-      "MappingfunctionName": "list",
-      "CustomMappingFile": "onBoarding/list.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getOnBoardingDetail": {
-      "customMapping": true,
-      "MappingfunctionName": "detail",
-      "CustomMappingFile": "onBoarding/detail.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "insertOnBoarding": {
-      "customMapping": true,
-      "MappingfunctionName": "create",
-      "CustomMappingFile": "onBoarding/insert.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "updateOnBoarding": {
-      "customMapping": true,
-      "MappingfunctionName": "update",
-      "CustomMappingFile": "onBoarding/update.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getOnBoardingProStructList": {
-      "customMapping": true,
-      "MappingfunctionName": "list",
-      "CustomMappingFile": "onBoardingProfileStruct/list.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getOnBoardingProStructDetail": {
-      "customMapping": true,
-      "MappingfunctionName": "detail",
-      "CustomMappingFile": "onBoardingProfileStruct/detail.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "insertOnBoardingProStruct": {
-      "customMapping": true,
-      "MappingfunctionName": "create",
-      "CustomMappingFile": "onBoardingProfileStruct/insert.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "updateOnBoardingProStruct": {
-      "customMapping": true,
-      "MappingfunctionName": "update",
-      "CustomMappingFile": "onBoardingProfileStruct/update.js",
-      "mappingConfigFile": "ePayMapping"
-    },
     "upsertAPIImport": {
       "customMapping": true,
       "MappingfunctionName": "upsertAPIImport",
@@ -392,6 +344,54 @@
     }
   },
   "UI": {
+    "getOnBoardingList": {
+      "customMapping": true,
+      "MappingfunctionName": "list",
+      "CustomMappingFile": "onBoarding/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getOnBoardingDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "detail",
+      "CustomMappingFile": "onBoarding/detail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "insertOnBoarding": {
+      "customMapping": true,
+      "MappingfunctionName": "create",
+      "CustomMappingFile": "onBoarding/insert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateOnBoarding": {
+      "customMapping": true,
+      "MappingfunctionName": "update",
+      "CustomMappingFile": "onBoarding/update.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getOnBoardingProStructList": {
+      "customMapping": true,
+      "MappingfunctionName": "list",
+      "CustomMappingFile": "onBoardingProfileStruct/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getOnBoardingProStructDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "detail",
+      "CustomMappingFile": "onBoardingProfileStruct/detail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "insertOnBoardingProStruct": {
+      "customMapping": true,
+      "MappingfunctionName": "create",
+      "CustomMappingFile": "onBoardingProfileStruct/insert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateOnBoardingProStruct": {
+      "customMapping": true,
+      "MappingfunctionName": "update",
+      "CustomMappingFile": "onBoardingProfileStruct/update.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "permission": {
       "customMapping": true,
       "MappingfunctionName": "getList",
