@@ -18,7 +18,7 @@ function onBoardingCreate(payload, callback) {
                             status: 'OK',
                             errorDescription: 'On Boarding inserted successfully',
                             displayToUser: true,
-                            newPageURL: '/paymentSearch'
+                            newPageURL: '/onBoardingProfile'
                         }
                     }
                 }
