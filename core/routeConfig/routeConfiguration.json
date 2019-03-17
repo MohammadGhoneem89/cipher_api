@@ -1,37 +1,84 @@
 {
   "core": {
-    
-    "upsertAPIImport":{
+    "getOnBoardingList": {
+      "customMapping": true,
+      "MappingfunctionName": "list",
+      "CustomMappingFile": "onBoarding/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getOnBoardingDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "detail",
+      "CustomMappingFile": "onBoarding/detail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "insertOnBoarding": {
+      "customMapping": true,
+      "MappingfunctionName": "create",
+      "CustomMappingFile": "onBoarding/insert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateOnBoarding": {
+      "customMapping": true,
+      "MappingfunctionName": "update",
+      "CustomMappingFile": "onBoarding/update.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getOnBoardingProStructList": {
+      "customMapping": true,
+      "MappingfunctionName": "list",
+      "CustomMappingFile": "onBoardingProfileStruct/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getOnBoardingProStructDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "detail",
+      "CustomMappingFile": "onBoardingProfileStruct/detail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "insertOnBoardingProStruct": {
+      "customMapping": true,
+      "MappingfunctionName": "create",
+      "CustomMappingFile": "onBoardingProfileStruct/insert.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateOnBoardingProStruct": {
+      "customMapping": true,
+      "MappingfunctionName": "update",
+      "CustomMappingFile": "onBoardingProfileStruct/update.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "upsertAPIImport": {
       "customMapping": true,
       "MappingfunctionName": "upsertAPIImport",
       "CustomMappingFile": "systemAPI/apiImport.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getImport":{
+    "getImport": {
       "customMapping": true,
       "MappingfunctionName": "getImport",
       "CustomMappingFile": "systemAPI/apiImport.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "generateConfig":{
+    "generateConfig": {
       "customMapping": true,
       "MappingfunctionName": "generateConfig",
       "CustomMappingFile": "vaultgenerator/index.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getElementList":{
+    "getElementList": {
       "customMapping": true,
       "MappingfunctionName": "getElementList",
       "CustomMappingFile": "vaultgenerator/index.js",
       "mappingConfigFile": "ePayMapping"
-    },  
-    "putTransformationTemplate":{
+    },
+    "putTransformationTemplate": {
       "customMapping": true,
       "MappingfunctionName": "putTransformationTemplate",
       "CustomMappingFile": "putTransformationTemplate.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getTransformationData":{
+    "getTransformationData": {
       "customMapping": true,
       "MappingfunctionName": "getTransformationData",
       "CustomMappingFile": "getTransformationData.js",
@@ -337,7 +384,7 @@
       "CustomMappingFile": "systemAPI/APIDefination.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "createDynamicStruct":{
+    "createDynamicStruct": {
       "customMapping": true,
       "MappingfunctionName": "createDynamicStruct",
       "CustomMappingFile": "systemAPI/mappingConfig.js",
