@@ -127,6 +127,12 @@
       "CustomMappingFile": "systemAPI/consortium.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getConsortiumConfigByDetailID": {
+      "customMapping": true,
+      "MappingfunctionName": "getConsortiumConfigByDetailID",
+      "CustomMappingFile": "systemAPI/consortium.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getConsortiumConfigByID": {
       "customMapping": true,
       "MappingfunctionName": "getConsortiumConfigByID",
@@ -196,6 +202,12 @@
     "updateNetworkConfig": {
       "customMapping": true,
       "MappingfunctionName": "updateNetworkConfig",
+      "CustomMappingFile": "systemAPI/networkConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    }, 
+    "getUserList": {
+      "customMapping": true,
+      "MappingfunctionName": "getUserList",
       "CustomMappingFile": "systemAPI/networkConfig.js",
       "mappingConfigFile": "ePayMapping"
     },

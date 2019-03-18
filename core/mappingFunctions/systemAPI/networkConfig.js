@@ -112,7 +112,7 @@ function getServiceList(payload, UUIDKey, route, callback, JWToken) {
       }
     };
     Promise.all([
-      networkConfig.getList()
+      networkConfig.getList(payload)
     ]).then((data) => {
       data[0].forEach((key) => {
         let obj = {
@@ -214,6 +214,53 @@ function getNetworkConfigList(payload, UUIDKey, route, callback, JWToken) {
     });
 }
 
+function getUserList(payload, UUIDKey, route, callback, JWToken) {
+  networkConfig.find({})
+    .then((arrayList) => {
+      let result = {
+        hyperledger: [],
+        quorrum: []
+      };
+      arrayList.forEach((data) => {
+        let tuppleList = [];
+
+        data.peerUser.forEach((elem) => {
+          let tupple = {
+            label: `${data.networkName}-${elem.userName}`,
+            value: elem.userName
+          };
+          tuppleList.push(tupple);
+        });
+        if (data.type == "Quorum") {
+          tuppleList.forEach((elem) => {
+            result.quorrum.push(elem);
+          });
+        }
+        else {
+          tuppleList.forEach((elem) => {
+            result.hyperledger.push(elem);
+          });
+        }
+      });
+      let resp = {
+        "NetworkUserTypeData": {
+          "action": "NetworkTypeData",
+          "data": result
+        }
+      };
+      callback(resp);
+    })
+    .catch((err) => {
+      console.log(err);
+      // response[payload.action] = {
+      //   action: payload.action,
+      //   data: {},
+      //   error: err
+      // };
+      // callback(response);
+    });
+}
+exports.getUserList = getUserList;
 exports.updateNetworkConfig = updateNetworkConfig;
 exports.getNetworkConfig = getNetworkConfig;
 exports.getNetworkConfigByID = getNetworkConfigByID;

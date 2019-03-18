@@ -17,7 +17,7 @@ let main = function (payload, UUIDKey, route, callback, JWToken) {
     Header: {
       tranType: "0200",
       tranCode: payload.function,
-      userID: "STUB",
+      userID: JWToken.quorrumUser,
       network: payload.network || 'network1',
       timeStamp: (new Date()).toTimeString(),
       UUID: UUIDKey,
@@ -55,7 +55,7 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
     Header: {
       tranType: "0200",
       tranCode: payload.function,
-      userID: JWToken.userID || "STUB",
+      userID: JWToken.quorrumUser,
       network: payload.network,
       timeStamp: (new Date()).toTimeString(),
       UUID: UUIDKey,

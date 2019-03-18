@@ -21,6 +21,11 @@ module.exports = class Dispatcher {
       let smartContractName = "";
       let smartContractFunc = "";
       let tranCode = "0002";
+      let userID;
+      let endorsementPolicy;
+      let abi;
+      let contractAddress;
+
       rules.forEach((elem) => {
         let flags = [];
         elem.ruleList.forEach((element) => {
@@ -63,6 +68,19 @@ module.exports = class Dispatcher {
           }
         });
         if (isMatched === false && flagRuleApproved === true) {
+
+          if (elem.channel.type == "Quorrum" || elem.channel.type == "Quorum") {
+            userID = JWTtoken && JWTtoken.quorrumUser ? JWTtoken.quorrumUser : "admindefault";
+          }
+          else {
+            userID = JWTtoken && JWTtoken.hypUser ? JWTtoken.hypUser : "admindefault";
+          }
+
+          if (elem.smartcontractid) {
+            endorsementPolicy = _.get(elem.smartcontractid, 'endorsementPolicy', undefined);
+            abi = _.get(elem.smartcontractid, 'abi', undefined);
+            contractAddress = _.get(elem.smartcontractid, 'contractAddress', undefined);
+          }
           channelName = elem.channel.channelName;
           networkName = elem.channel.networkName;
           smartContractName = elem.smartcontract;
@@ -75,13 +93,17 @@ module.exports = class Dispatcher {
         throw new Error(`blockchain routing error | matching rule not found!!!`);
       }
       else {
-        let userID = JWTtoken && JWTtoken.userID ? JWTtoken.userID : "admin";
+
         _.set(MappeedRequest, 'Header.tranCode', tranCode || "0002");
         _.set(MappeedRequest, 'Header.userID', userID);
         _.set(MappeedRequest, 'Header.network', networkName);
         _.set(MappeedRequest, 'BCData.channelName', channelName);
         _.set(MappeedRequest, 'BCData.smartContractName', smartContractName);
         _.set(MappeedRequest, 'Body.fcnName', smartContractFunc);
+        //  Quorrum details
+        _.set(MappeedRequest, 'BCData.privateFor', endorsementPolicy);
+        _.set(MappeedRequest, 'BCData.abi', abi);
+        _.set(MappeedRequest, 'BCData.contractAddress', contractAddress);
 
       }
     }
@@ -160,7 +182,7 @@ module.exports = class Dispatcher {
     _.set(this.request, 'Header.tranType', "0200");
     _.set(this.request, 'Header.UUID', this.UUID);
     _.set(this.request, 'Header.timeStamp', today.toISOString());
-
+    console.log(JSON.stringify(this.configdata.endpointName, null, 2));
     let ServiceURL = "";
     if (this.configdata.endpointName && this.configdata.endpointName._id) {
       ServiceURL = `${this.configdata.endpointName.address}${this.configdata.ServiceURL}`
