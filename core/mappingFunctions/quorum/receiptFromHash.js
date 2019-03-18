@@ -1,10 +1,11 @@
 'use strict';
-let config = require('../../api/connectors/quorum.json');
+let config = require('../../../config');
+const grpcConfig = config.get('rpcQuorum')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
 exports.receiptFromHash = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'];
+    let URL = grpcConfig;
     URL += '/blockchain/getTxByHash';
     let options = {
         method: 'POST',

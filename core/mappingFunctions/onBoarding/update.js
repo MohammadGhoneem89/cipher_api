@@ -25,7 +25,7 @@ function onBoardingUpdate(payload, callback) {
                     status: 'OK',
                     errorDescription: 'On Boarding Updated Successfully',
                     displayToUser: true,
-                    newPageURL: '/onBoardingProfile'
+                    newPageURL: '/paymentSearch'
                 }
             }
             const response = {

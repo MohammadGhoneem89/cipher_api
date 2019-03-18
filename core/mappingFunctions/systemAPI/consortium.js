@@ -23,7 +23,7 @@ function getConsortiumConfig(payload, UUIDKey, route, callback, JWToken) {
         "params": "",
         "iconName": "icon-docs",
         "URI": [
-          "/cipher/consortiumSetup/view/5aae6dfda832a4d7bf2c8b41/"
+          "/cipher/consortiumSetup/view/"
         ]
       }];
 
@@ -86,6 +86,30 @@ function getConsortiumConfigByID(payload, UUIDKey, route, callback, JWToken) {
         "action": "AddUpdateConsortium",
         "data": {
           "ConsortiumConfig": {}
+        }
+      }
+    };
+    callback(response);
+  });
+}
+function getConsortiumConfigByDetailID(payload, UUIDKey, route, callback, JWToken) {
+
+  Promise.all([
+    consortiumConfig.findByIdDetail(payload)
+  ]).then((data) => {
+    let response = {
+      "viewConsortium": {
+        "action": "ViewConsortium",
+        "data": data[0]
+      }
+    };
+    callback(response);
+  }).catch((err) => {
+    console.log(err);
+    let response = {
+      "viewConsortium": {
+        "action": "ViewConsortium",
+        "data": {
         }
       }
     };
@@ -187,7 +211,7 @@ function getServiceList(payload, UUIDKey, route, callback, JWToken) {
       data.forEach((element) => {
         let obj = {
           "label": `${element.smartContract}`,
-          "value": element.smartContract
+          "value": element._id
         };
         resp.ConsortiumTypeData.data.smartcontract.push(obj);
       });
@@ -205,3 +229,4 @@ exports.updateConsortiumConfig = updateConsortiumConfig;
 exports.getConsortiumConfig = getConsortiumConfig;
 exports.getConsortiumConfigByID = getConsortiumConfigByID;
 exports.getServiceList = getServiceList;
+exports.getConsortiumConfigByDetailID = getConsortiumConfigByDetailID;

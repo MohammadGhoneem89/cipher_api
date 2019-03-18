@@ -1,10 +1,11 @@
 'use strict';
-var config = require('../../api/connectors/quorum.json')
+let config = require('../../../config');
+const grpcConfig = config.get('rpcQuorum');
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
 exports.sendSignedTransaction = function (payload, UUIDKey, route, callback, JWToken) {
-    let URL = config['host'] + '/blockchain/sendSignedTransaction/';
+    let URL = grpcConfig + '/blockchain/sendSignedTransaction/';
     var options = {
         method: 'POST',
         uri: URL,

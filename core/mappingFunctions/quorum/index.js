@@ -3,8 +3,10 @@ const log4js = require('log4js');
 const logger = log4js.getLogger('hypmonitor');
 const pointer = require('json-pointer');
 const config = require('../../../config');
-const grpcConfig = config.get('grpc');
+const grpcConfig = config.get('rpcQuorum');
 const rp = require('request-promise');
+const _ = require('lodash');
+const smartContract = require('../systemAPI/smartcontract.js');
 const fs = require('fs');
 
 let main = function (payload, UUIDKey, route, callback, JWToken) {
@@ -15,7 +17,7 @@ let main = function (payload, UUIDKey, route, callback, JWToken) {
     Header: {
       tranType: "0200",
       tranCode: payload.function,
-      userID: JWToken.hypUser,
+      userID: JWToken.quorrumUser,
       network: payload.network || 'network1',
       timeStamp: (new Date()).toTimeString(),
       UUID: UUIDKey,
@@ -38,23 +40,7 @@ let main = function (payload, UUIDKey, route, callback, JWToken) {
 };
 
 let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
-  if (!payload.function) {
-    return callback(errorResponse("Invalid Arguments!!! ", UUIDKey));
-  }
-
-  let envelope;
   let chainpack;
-
-  if (payload.channelConfigPath) {
-    try {
-      envelope = fs.readFileSync(payload.channelConfigPath);
-    }
-    catch (ex) {
-      console.log(ex);
-      return callback(errorResponse("Invalid Channel File Path!!! ", UUIDKey));
-    }
-  }
-
   if (payload.smartContractPackPath) {
     try {
       chainpack = fs.readFileSync(payload.smartContractPackPath);
@@ -64,11 +50,12 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
       return callback(errorResponse("Invalid Chain Pack File Path!!! ", UUIDKey));
     }
   }
+  console.log(">>>>>>>>>>>>>", JSON.stringify(payload, null, 2))
   let RPCRequest = {
     Header: {
       tranType: "0200",
       tranCode: payload.function,
-      userID: JWToken.hypUser || "STUB",
+      userID: JWToken.quorrumUser,
       network: payload.network,
       timeStamp: (new Date()).toTimeString(),
       UUID: UUIDKey,
@@ -77,32 +64,73 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
     BCData: {
       "channelName": payload.channelName,
       "smartContractName": payload.smartContractName,
-      "channelConfig": envelope,
       "smartContractPackage": chainpack,
       'smartContractVersion': payload.smartContractVersion,
       'actionType': payload.actionType,
+      "privateFor": payload.privateFor,
+      "abi": payload.abi,
+      "contractAddress": payload.contractAddress,
       'channelConfigPath': payload.channelConfigPath
     },
     Body: {
-      fcnName: payload.smartContractMethod,
+      fcnName: payload.smartContractMethod || "Constructor",
       arguments: payload.smartContractArgs
     }
   };
-  sendRequestBLA(grpcConfig, RPCRequest, UUIDKey, (data) => {
-    let response = {
-      HyperledgerConnect: {
-        action: 'generalNetworkOps',
-        data: data,
-      }
-    };
-    callback(response);
+  // console.log(JSON.stringify(payload));
+  sendRequestBLA(grpcConfig, RPCRequest, UUIDKey, (response) => {
+    if (response.tranCode) {
+      return callback({
+        HyperledgerConnect: {
+          action: 'generalNetworkOps',
+          data: response
+        }
+      });
+    }
+
+    let retVal = {};
+    if (response && response.success == true) {
+
+      let NewPayload = payload.savePayload;
+      _.set(NewPayload, 'abi', response.data[0].abi);
+      _.set(NewPayload, 'contractAddress', response.data[0].address);
+      _.set(NewPayload, 'code', response.data[0].code);
+      smartContract.updateSmartContractConfig(NewPayload, UUIDKey, route, (data) => {
+        console.log(JSON.stringify(NewPayload));
+
+        let resp = {
+          responseMessage: data.responseMessage,
+          HyperledgerConnect: {
+            data: {
+              success: true,
+              contractAddress: response.data[0].address
+            }
+          }
+        };
+        if (NewPayload._id) {
+          _.set(resp, 'responseMessage', undefined);
+        };
+        callback(resp);
+      }, JWToken);
+    }
+    else {
+      console.log("Failure!!!");
+      let resp = {
+        HyperledgerConnect: {
+          action: 'generalNetworkOps',
+          data: response
+        }
+      };
+      callback(resp);
+    }
+
   });
 };
 
 function sendRequestBLA(srvcAddressNPort, Request, UUIDKey, responseCallback) {
   logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, ' [sendGRPCRequest] srvc Address and Port: ' + srvcAddressNPort);
   logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, ' [sendGRPCRequest] Sending query to Micservice');
-  let url = `http://${srvcAddressNPort}/process`;
+  let url = `${srvcAddressNPort}/contract/process`;
   let rpOptions = {
     method: 'POST',
     url,
@@ -121,7 +149,7 @@ function sendRequestBLA(srvcAddressNPort, Request, UUIDKey, responseCallback) {
         data: {
           message: {
             status: 'ERROR',
-            errorDescription: " Hyperledger Connect Failed!!! ",
+            errorDescription: " Quorum Connect Failed!!! ",
             displayToUser: true
           },
           error: " GRPC Connection Failed!!! "

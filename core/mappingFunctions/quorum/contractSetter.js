@@ -1,10 +1,11 @@
 'use strict';
-let config = require('../../api/connectors/quorum.json');
+let config = require('../../../config');
+const grpcConfig = config.get('rpcQuorum')
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
 exports.contractSetter = function (payload, UUIDKey, route, callback, JWToken) {
-    const URL = config['host'] + '/contract/'+payload['address']+'/set/'+payload['functionName'];
+    const URL = grpcConfig + '/contract/'+payload['address']+'/set/'+payload['functionName'];
     console.log(payload);
     let options = {
         method: 'POST',
