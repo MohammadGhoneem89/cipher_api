@@ -1,10 +1,11 @@
 'use strict';
-let config = require('../../api/connectors/quorum.json');
+let config = require('../../../config');
+const grpcConfig = config.get('rpcQuorum');
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
 exports.getCode = function (payload, UUIDKey, route, callback, JWToken) {
-    const URL = config['host'] + '/contract/code/'+payload['address'];
+    const URL = grpcConfig + '/contract/code/'+payload['address'];
     let options = {
         method: 'GET',
         uri: URL,

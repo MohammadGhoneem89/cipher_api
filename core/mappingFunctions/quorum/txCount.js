@@ -1,11 +1,12 @@
 'use strict';
-let config = require('../../api/connectors/quorum.json');
+let config = require('../../../config');
+const grpcConfig = config.get('rpcQuorum');
 const rp = require('request-promise');
 const logger = require('../../../lib/helpers/logger')().app;
 
 exports.txCount = function (payload, UUIDKey, route, callback, JWToken) {
     
-    let URL = config['host'] + '/blockchain/block/' + payload['blockNumber'] + '/count';
+    let URL = grpcConfig + '/blockchain/block/' + payload['blockNumber'] + '/count';
     let options = {
         method: 'GET',
         uri: URL,

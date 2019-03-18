@@ -130,7 +130,7 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
 function sendRequestBLA(srvcAddressNPort, Request, UUIDKey, responseCallback) {
   logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, ' [sendGRPCRequest] srvc Address and Port: ' + srvcAddressNPort);
   logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, ' [sendGRPCRequest] Sending query to Micservice');
-  let url = `http://${srvcAddressNPort}/contract/process`;
+  let url = `${srvcAddressNPort}/contract/process`;
   let rpOptions = {
     method: 'POST',
     url,
