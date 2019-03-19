@@ -1,6 +1,6 @@
 {
   "keyVault": {
-    "env": "training",
+    "env": "DPW",
     "header":{
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
