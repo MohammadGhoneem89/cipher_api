@@ -5,7 +5,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const uuid = require('uuid/v1');
 const db = require('./core/database/db')(); // eslint-disable-line
-// const jsReport = require('jsreport');
+ const jsReport = require('jsreport');
 const url = require('url');
 const cors = require('cors');
 const rp = require('request-promise');
@@ -742,45 +742,45 @@ app.post('/passOn', function (req, res) {
 
 
 
-// const generateReports = require('./reports');
-// app.get('/reports/:channel/:action', function(req, res) {
-//     if(checkbadinput(req)){
-//         let resperr={'error':"illeagal character found in request"};
-//         res.send(resperr);
-//         return;
-//     }
-//     const url_parts = url.parse(req.url, true);
-//     let id = url_parts.query.id;
-//     const type = url_parts.query.reportFormat;
-//     const JWToken = url_parts.query.JWT;
-//     let language = url_parts.query.language;
-//     let query = url_parts.query.searchCriteria || '';
-//     query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
-//     language = language ? JSON.parse(new Buffer(language, 'base64')) : {};
+const generateReports = require('./reports');
+app.get('/reports/:channel/:action', function(req, res) {
+    if(checkbadinput(req)){
+        let resperr={'error':"illeagal character found in request"};
+        res.send(resperr);
+        return;
+    }
+    const url_parts = url.parse(req.url, true);
+    let id = url_parts.query.id;
+    const type = url_parts.query.reportFormat;
+    const JWToken = url_parts.query.JWT;
+    let language = url_parts.query.language;
+    let query = url_parts.query.searchCriteria || '';
+    query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
+    language = language ? JSON.parse(new Buffer(language, 'base64')) : {};
 
-//     let decoded ;
-//     try{
-//         decoded = crypto.decrypt(JWToken);
-//     }
-//     catch(err){
-//         return sendError(req, res);
-//     }
-//     if(!decoded || !JWToken){
-//         return sendError(req, res);
-//     }
+    let decoded ;
+    try{
+        decoded = crypto.decrypt(JWToken);
+    }
+    catch(err){
+        return sendError(req, res);
+    }
+    if(!decoded || !JWToken){
+        return sendError(req, res);
+    }
 
-//     const payload = {
-//         filters: query,
-//         reportsCriteriaId: id,
-//         JWT: decoded,
-//         nationalization: language
-//     };
-//     try {
-//         generateReports(jsReport, payload, res, type);
-//     }
-//     catch (e) {
-//         res.send(e);
-//         return res.end();
-//     }
-// });
+    const payload = {
+        filters: query,
+        reportsCriteriaId: id,
+        JWT: decoded,
+        nationalization: language
+    };
+    try {
+        generateReports(jsReport, payload, res, type);
+    }
+    catch (e) {
+        res.send(e);
+        return res.end();
+    }
+});
 
