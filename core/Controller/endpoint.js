@@ -33,12 +33,15 @@ module.exports = class Endpoint {
           return Promise.resolve(generalResponse);
         };
         return this.executeEndpoint(endpoint.auth.endpoint, true).then((data) => {
+          console.info("-------------BEGIN Authorization Response--------------");
+          console.info(JSON.stringify(data, null, 2));
+          console.info("-------------END Authorization Response--------------");
           let tokenValue = _.get(endpoint, tokenfield, undefined);
           if (!tokenValue) {
             generalResponse.error = true;
             generalResponse.message = `Not able to fetch field from success authentication response | field : ${tokenfield}`;
             generalResponse.data = data;
-            return generalResponse;
+            return Promise.resolve(generalResponse);
           }
           return this.executeBarerAuthEndpoint(endpoint, this._requestBody, ServiceURL, tokenValue).then((resp) => {
             if (resp.error === true) {
@@ -47,7 +50,7 @@ module.exports = class Endpoint {
             generalResponse.error = false;
             generalResponse.message = `Processed Ok!`;
             generalResponse.data = resp;
-            return generalResponse;
+            return Promise.resolve(generalResponse);
           });
         }).catch((ex) => {
           console.log(ex);
