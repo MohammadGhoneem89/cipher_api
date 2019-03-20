@@ -32,7 +32,7 @@ module.exports = class Endpoint {
           generalResponse.message = "Token field not available Please Check Endpoint!!";
           return Promise.resolve(generalResponse);
         };
-        return this.executeEndpoint(endpoint.auth.endpoint, true).then((data) => {
+        return Promise.resolve().then(this.executeEndpoint(endpoint.auth.endpoint, true).then((data) => {
           let tokenValue = _.get(data, `data.tokenfield`, undefined);
           if (!tokenValue) {
             generalResponse.error = true;
@@ -56,7 +56,7 @@ module.exports = class Endpoint {
           generalResponse.error = true;
           generalResponse.message = ex.message;
           return generalResponse;
-        });
+        }));
       case "noAuth":
         return this.executeNoAuthEndpoint(endpoint, this._requestBody, ServiceURL).then((resp) => {
           generalResponse.error = false;
@@ -70,15 +70,11 @@ module.exports = class Endpoint {
           return generalResponse;
         });
       case "basicAuth":
+        console.log("Calling function callWebService");
         return this.executeBasicAuthEndpoint(endpoint, this._requestBody, ServiceURL).then((resp) => {
           generalResponse.error = false;
           generalResponse.message = `Processed Ok!`;
           generalResponse.data = resp;
-          return generalResponse;
-        }).catch((ex) => {
-          console.log(ex);
-          generalResponse.error = true;
-          generalResponse.message = ex.message;
           return generalResponse;
         });
       default:
@@ -104,6 +100,7 @@ module.exports = class Endpoint {
       headers: header
     });
   }
+
   executeBasicAuthEndpoint(endpoint, body, url) {
     let authorizationHeader;
     if (!endpoint.auth || endpoint.auth.username || endpoint.auth.password) {
