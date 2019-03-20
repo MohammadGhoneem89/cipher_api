@@ -104,15 +104,12 @@ module.exports = class Endpoint {
 
   executeBasicAuthEndpoint(endpoint, body, url) {
     let authorizationHeader;
-    if (!endpoint.auth || endpoint.auth.username || endpoint.auth.password) {
-      generalResponse.error = true;
-      generalResponse.message = "Basic Authorization Credentials are required!!";
-      return Promise.resolve(generalResponse);
+    if (!endpoint.auth || !endpoint.auth.username || !endpoint.auth.password) {
+      throw new Error("Basic Authorization Credentials are required!!");
     }
     authorizationHeader = `Basic ${Base64.encode(`${endpoint.auth.username}:${endpoint.auth.password}`)}`;
     let header = this.computeHeaders(endpoint);
     _.set(header, 'Authorization', authorizationHeader);
-    console.log("Calling function callWebService");
     return this.callWebService({
       serviceURL: url,
       body: body,
