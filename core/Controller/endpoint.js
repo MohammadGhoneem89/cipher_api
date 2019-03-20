@@ -14,10 +14,10 @@ module.exports = class Endpoint {
   executeEndpoint(endpoint, ServiceURI, ignoreBody) {
     let ServiceURL = "";
     if (endpoint.endpointName && endpoint._id) {
-      ServiceURL = `${endpoint.address}${this.configdata.ServiceURI}`;
+      ServiceURL = `${endpoint.address}${ServiceURI == '/' ? "" : ServiceURI}`;
     }
     else {
-      ServiceURL = this.configdata.ServiceURL;
+      ServiceURL = ServiceURI;
     }
     switch (endpoint.authType) {
       case "bearer":
