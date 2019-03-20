@@ -185,9 +185,9 @@ module.exports = class Dispatcher {
     _.set(this.request, 'Header.UUID', this.UUID);
     _.set(this.request, 'Header.timeStamp', today.toISOString());
     // }
-    console.log(JSON.stringify(this.configdata.endpointName, null, 2));
+    console.log(JSON.stringify(this.configdata, null, 2));
     let _endpoint = new Endpoint(this.request);
-    return _endpoint.executeEndpoint(this.configdata.endpointName, this.configdata.ServiceURL).then((resp) => {
+    return _endpoint.executeEndpoint(this.configdata.endpointName, this.configdata.ServiceURL || "").then((resp) => {
       if (resp) {
         if (resp.success === false || resp.error === true) {
           throw new Error(resp.message);
