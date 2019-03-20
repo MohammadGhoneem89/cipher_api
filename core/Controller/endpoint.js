@@ -112,6 +112,7 @@ module.exports = class Endpoint {
     authorizationHeader = `Basic ${Base64.encode(`${endpoint.auth.username}:${endpoint.auth.password}`)}`;
     let header = this.computeHeaders(endpoint);
     _.set(header, 'Authorization', authorizationHeader);
+    console.log("Calling function callWebService");
     return this.callWebService({
       serviceURL: url,
       body: body,
@@ -184,7 +185,7 @@ module.exports = class Endpoint {
     }).catch((ex) => {
       console.log("-------------BEGIN Exception On Call --------------");
       console.log(ex);
-      console.log("-------------END Exception On Call --------------");
+      console.info("-------------END Exception On Call --------------");
       generalResponse.error = true;
       generalResponse.message = ex.message;
       return generalResponse;
