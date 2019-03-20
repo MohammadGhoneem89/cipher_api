@@ -33,6 +33,7 @@ module.exports = class Endpoint {
           return Promise.resolve(generalResponse);
         };
         return this.executeEndpoint(endpoint.auth.endpoint, true).then((data) => {
+          return data
           let tokenValue = _.get(data, `data.tokenfield`, undefined);
           if (!tokenValue) {
             generalResponse.error = true;
