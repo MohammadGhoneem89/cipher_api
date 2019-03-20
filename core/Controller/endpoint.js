@@ -21,7 +21,7 @@ module.exports = class Endpoint {
     }
     switch (endpoint.authType) {
       case "bearer":
-        if (!endpoint.auth.endpoint.auth.endpoint) {
+        if (endpoint.auth.endpoint.auth.endpoint) {
           generalResponse.error = true;
           generalResponse.message = "Circualr JWT Request Cannot be Processed Please Check Endpoint!!";
           return Promise.resolve(generalResponse);
@@ -128,7 +128,7 @@ module.exports = class Endpoint {
             _.set(header, elem.headerKey, elem.headerPrefix);
             break;
           case "Datetime":
-            let format = elem.headerPrefix || "DD/MM/YYYY hh:mm:ss"
+            let format = elem.headerPrefix || "DD/MM/YYYY hh:mm:ss";
             let datetime = moment(requestDate).format(format)
             _.set(header, elem.headerKey, `${datetime}`);
             break;
