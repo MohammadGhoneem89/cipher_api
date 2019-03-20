@@ -33,7 +33,7 @@ module.exports = class Endpoint {
           return Promise.resolve(generalResponse);
         };
         return this.executeEndpoint(endpoint.auth.endpoint, true).then((data) => {
-          let tokenValue = _.get(endpoint, tokenfield, undefined);
+          let tokenValue = _.get(data, tokenfield, undefined);
           if (!tokenValue) {
             generalResponse.error = true;
             generalResponse.message = `Not able to fetch field from success authentication response | field : ${tokenfield}`;
