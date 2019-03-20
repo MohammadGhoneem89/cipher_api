@@ -32,7 +32,7 @@ module.exports = class Endpoint {
           generalResponse.message = "Token field not available Please Check Endpoint!!";
           return Promise.resolve(generalResponse);
         };
-        return Promise.resolve().then(this.executeEndpoint(endpoint.auth.endpoint, true).then((data) => {
+        return this.executeEndpoint(endpoint.auth.endpoint, true).then((data) => {
           let tokenValue = _.get(data, `data.tokenfield`, undefined);
           if (!tokenValue) {
             generalResponse.error = true;
@@ -56,7 +56,7 @@ module.exports = class Endpoint {
           generalResponse.error = true;
           generalResponse.message = ex.message;
           return generalResponse;
-        }));
+        });
       case "noAuth":
         return this.executeNoAuthEndpoint(endpoint, this._requestBody, ServiceURL).then((resp) => {
           generalResponse.error = false;
