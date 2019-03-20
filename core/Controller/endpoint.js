@@ -158,6 +158,9 @@ module.exports = class Endpoint {
       "error": true,
       "message": "Failed to get response"
     };
+    console.log("-------------BEGIN External Request--------------");
+    console.log(JSON.stringify(options, null, 2));
+    console.log("-------------END External Request--------------");
     let rpOptions = {
       method: 'POST',
       url: options.serviceURL,
@@ -168,9 +171,9 @@ module.exports = class Endpoint {
       json: true
     };
     return rp(rpOptions).then((data) => {
-      console.info("-------------BEGIN External Response--------------");
-      console.info(JSON.stringify(data, null, 2));
-      console.info("-------------END External Response--------------");
+      console.log("-------------BEGIN External Response--------------");
+      console.log(JSON.stringify(data, null, 2));
+      console.log("-------------END External Response--------------");
       if (data) {
         if (data.success === false) {
           throw new Error(data.message);
@@ -179,9 +182,9 @@ module.exports = class Endpoint {
       }
       return generalResponse;
     }).catch((ex) => {
-      console.info("-------------BEGIN Exception On Call --------------");
-      console.info(ex);
-      console.info("-------------END Exception On Call --------------");
+      console.log("-------------BEGIN Exception On Call --------------");
+      console.log(ex);
+      console.log("-------------END Exception On Call --------------");
       generalResponse.error = true;
       generalResponse.message = ex.message;
       return generalResponse;
