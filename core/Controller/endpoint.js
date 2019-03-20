@@ -32,7 +32,13 @@ module.exports = class Endpoint {
           generalResponse.message = "Token field not available Please Check Endpoint!!";
           return Promise.resolve(generalResponse);
         };
-        return this.executeEndpoint(endpoint.auth.endpoint, true).then((data) => {
+        // return this.executeEndpoint(endpoint.auth.endpoint, true)
+        return this.executeBasicAuthEndpoint(endpoint.auth.endpoint, this._requestBody, ServiceURL).then((resp) => {
+          generalResponse.error = false;
+          generalResponse.message = `Processed Ok!`;
+          generalResponse.data = resp;
+          return generalResponse;
+        }).then((data) => {
           let tokenValue = _.get(data, tokenfield, undefined);
           if (!tokenValue) {
             generalResponse.error = true;
