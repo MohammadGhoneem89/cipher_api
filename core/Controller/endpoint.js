@@ -107,7 +107,7 @@ module.exports = class Endpoint {
     if (!endpoint.auth || endpoint.auth.username || endpoint.auth.password) {
       generalResponse.error = true;
       generalResponse.message = "Basic Authorization Credentials are required!!";
-      return generalResponse;
+      return Promise.resolve(generalResponse);
     }
     authorizationHeader = `Basic ${Base64.encode(`${endpoint.auth.username}:${endpoint.auth.password}`)}`;
     let header = this.computeHeaders(endpoint);
