@@ -188,7 +188,7 @@ module.exports = class Endpoint {
       json: !options.ignoreBody
     };
     if (!options.ignoreBody) {
-      _.set(rpOptions, 'body', options.body)
+      _.set(rpOptions, 'body', options.body);
     }
     console.log("-------------BEGIN External Request--------------");
     console.log(JSON.stringify(rpOptions, null, 2));
