@@ -33,9 +33,6 @@ module.exports = class Endpoint {
           return Promise.resolve(generalResponse);
         };
         return this.executeEndpoint(endpoint.auth.endpoint, true).then((data) => {
-          console.info("-------------BEGIN Authorization Response--------------");
-          console.info(JSON.stringify(data, null, 2));
-          console.info("-------------END Authorization Response--------------");
           let tokenValue = _.get(endpoint, tokenfield, undefined);
           if (!tokenValue) {
             generalResponse.error = true;
@@ -171,12 +168,22 @@ module.exports = class Endpoint {
       json: true
     };
     return rp(rpOptions).then((data) => {
+      console.info("-------------BEGIN External Response--------------");
+      console.info(JSON.stringify(data, null, 2));
+      console.info("-------------END External Response--------------");
       if (data) {
         if (data.success === false) {
           throw new Error(data.message);
         }
         return data;
       }
+      return generalResponse;
+    }).catch((ex) => {
+      console.info("-------------BEGIN Exception On Call --------------");
+      console.info(ex);
+      console.info("-------------END Exception On Call --------------");
+      generalResponse.error = true;
+      generalResponse.message = ex.message;
       return generalResponse;
     });
   }
