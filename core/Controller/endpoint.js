@@ -33,7 +33,7 @@ module.exports = class Endpoint {
           return Promise.resolve(generalResponse);
         };
         return this.executeEndpoint(endpoint.auth.endpoint, true).then((data) => {
-          return data
+          console.log("Calling function DONE");
           let tokenValue = _.get(data, `data.tokenfield`, undefined);
           if (!tokenValue) {
             generalResponse.error = true;
@@ -71,7 +71,7 @@ module.exports = class Endpoint {
           return generalResponse;
         });
       case "basicAuth":
-        console.log("Calling function callWebService");
+        console.log("Calling function BASIC");
         return this.executeBasicAuthEndpoint(endpoint, this._requestBody, ServiceURL).then((resp) => {
           generalResponse.error = false;
           generalResponse.message = `Processed Ok!`;
