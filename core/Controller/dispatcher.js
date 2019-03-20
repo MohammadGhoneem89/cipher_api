@@ -180,7 +180,7 @@ module.exports = class Dispatcher {
 
   connectRestService() {
     let today = new Date();
-    if (this.configData.isBlockchain === true) {
+    if (this.configData.isBlockchain && this.configData.isBlockchain === true) {
       _.set(this.request, 'Header.tranType', "0200");
       _.set(this.request, 'Header.UUID', this.UUID);
       _.set(this.request, 'Header.timeStamp', today.toISOString());
