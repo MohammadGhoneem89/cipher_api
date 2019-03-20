@@ -39,7 +39,7 @@ module.exports = class Endpoint {
           generalResponse.data = resp;
           return generalResponse;
         }).then((data) => {
-          let tokenValue = _.get(data, tokenfield, undefined);
+          let tokenValue = _.get(data, `data.tokenfield`, undefined);
           if (!tokenValue) {
             generalResponse.error = true;
             generalResponse.message = `Not able to fetch field from success authentication response | field : ${tokenfield}`;
