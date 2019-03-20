@@ -128,7 +128,7 @@ module.exports = class Dispatcher {
           reject(ex);
         });
       } else if (this.configdata.communicationMode === 'REST') {
-        this.connectRestService().then((data) => {
+        this.connectRestService(this.configdata).then((data) => {
           resolve(data);
         }).catch((ex) => {
           reject(ex);
@@ -178,16 +178,16 @@ module.exports = class Dispatcher {
     });
   }
 
-  connectRestService() {
+  connectRestService(configdata) {
     let today = new Date();
-    let isBLK = _.get(this.configdata, 'isBlockchain', false);
+    let isBLK = _.get(configdata, 'isBlockchain', false);
     if (isBLK === true) {
       _.set(this.request, 'Header.tranType', "0200");
       _.set(this.request, 'Header.UUID', this.UUID);
       _.set(this.request, 'Header.timeStamp', today.toISOString());
     }
-    // console.log(JSON.stringify(this.configdata, null, 2));
-    let _endpoint = new Endpoint(this.request);
+    let req = _.cloneDeep(this.request);
+    let _endpoint = new Endpoint(req);
     let ServiceURL = _.get(this.configdata, 'ServiceURL', "");
     return _endpoint.executeEndpoint(this.configdata.endpointName, ServiceURL).then((resp) => {
       if (resp) {

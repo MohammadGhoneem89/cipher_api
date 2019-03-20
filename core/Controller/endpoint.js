@@ -13,12 +13,9 @@ module.exports = class Endpoint {
   }
   executeEndpoint(endpoint, ServiceURI, ignoreBody) {
     let ServiceURL = "";
-    if (endpoint.endpointName && endpoint._id) {
-      ServiceURL = `${endpoint.address}${ServiceURI == '/' ? "" : ServiceURI}`;
-    }
-    else {
-      ServiceURL = ServiceURI;
-    }
+    let postfix = ServiceURI == '/' ? "" : ServiceURI;
+    ServiceURL = `${endpoint.address}${postfix}`;
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", ServiceURL);
     switch (endpoint.authType) {
       case "bearer":
         if (endpoint.auth.endpoint.auth.endpoint) {
@@ -32,15 +29,15 @@ module.exports = class Endpoint {
           generalResponse.message = "Token field not available Please Check Endpoint!!";
           return Promise.resolve(generalResponse);
         };
-        return this.executeEndpoint(endpoint.auth.endpoint, true).then((data) => {
-          console.log("Calling function DONE");
-          let tokenValue = _.get(data, `data.tokenfield`, undefined);
+        return this.executeEndpoint(endpoint.auth.endpoint, "/", 1).then((data) => {
+          let tokenValue = _.get(data, `data.${tokenfield}`, undefined);
           if (!tokenValue) {
             generalResponse.error = true;
             generalResponse.message = `Not able to fetch field from success authentication response | field : ${tokenfield}`;
             generalResponse.data = data;
             return Promise.resolve(generalResponse);
-          } else if (data.error && data.error == true) {
+          }
+          else if (data.error && data.error == true) {
             return Promise.resolve(data);
           }
           return this.executeBarerAuthEndpoint(endpoint, this._requestBody, ServiceURL, tokenValue).then((resp) => {
@@ -72,7 +69,14 @@ module.exports = class Endpoint {
         });
       case "basicAuth":
         console.log("Calling function BASIC");
-        return this.executeBasicAuthEndpoint(endpoint, this._requestBody, ServiceURL).then((resp) => {
+        return this.executeBasicAuthEndpoint(endpoint, this._requestBody, ServiceURL, ignoreBody).then((resp) => {
+          generalResponse.error = false;
+          generalResponse.message = `Processed Ok!`;
+          generalResponse.data = resp;
+          return generalResponse;
+        });
+      case "passCredHeaderBody":
+        return this.executeCredHeaderBody(endpoint, this._requestBody, ServiceURL).then((resp) => {
           generalResponse.error = false;
           generalResponse.message = `Processed Ok!`;
           generalResponse.data = resp;
@@ -101,8 +105,26 @@ module.exports = class Endpoint {
       headers: header
     });
   }
+  executeCredHeaderBody(endpoint, body, url) {
+    let authorizationHeader;
+    if (!endpoint.auth || !endpoint.auth.username || !endpoint.auth.password) {
+      throw new Error("Cred Header Authorization Credentials are required!!");
+    }
+    let header = this.computeHeaders(endpoint);
+    _.set(body, 'username', endpoint.auth.username);
+    _.set(body, 'password', endpoint.auth.password);
+    _.set(header, 'username', endpoint.auth.username);
+    _.set(header, 'password', endpoint.auth.password);
+    authorizationHeader = `Basic ${Base64.encode(`${endpoint.auth.username}:${endpoint.auth.password}`)}`;
 
-  executeBasicAuthEndpoint(endpoint, body, url) {
+    _.set(header, 'Authorization', authorizationHeader);
+    return this.callWebService({
+      serviceURL: url,
+      body: body,
+      headers: header
+    });
+  }
+  executeBasicAuthEndpoint(endpoint, body, url, ignoreBody) {
     let authorizationHeader;
     if (!endpoint.auth || !endpoint.auth.username || !endpoint.auth.password) {
       throw new Error("Basic Authorization Credentials are required!!");
@@ -113,7 +135,8 @@ module.exports = class Endpoint {
     return this.callWebService({
       serviceURL: url,
       body: body,
-      headers: header
+      headers: header,
+      ignoreBody
     });
   }
   computeHeaders(endpoint) {
@@ -156,29 +179,44 @@ module.exports = class Endpoint {
       "error": true,
       "message": "Failed to get response"
     };
-    console.log("-------------BEGIN External Request--------------");
-    console.log(JSON.stringify(options, null, 2));
-    console.log("-------------END External Request--------------");
+
     let rpOptions = {
       method: 'POST',
       url: options.serviceURL,
-      body: options.body,
-      // body: this.request,
       headers: options.headers,
-      timeout: 10000, //  configurable
-      json: true
+      timeout: 10000,
+      json: !options.ignoreBody
     };
+    if (!options.ignoreBody) {
+      _.set(rpOptions, 'body', options.body)
+    }
+    console.log("-------------BEGIN External Request--------------");
+    console.log(JSON.stringify(rpOptions, null, 2));
+    console.log("-------------END External Request--------------");
     return rp(rpOptions).then((data) => {
       console.log("-------------BEGIN External Response--------------");
       console.log(JSON.stringify(data, null, 2));
       console.log("-------------END External Response--------------");
+      let parse = false;
+      if (!options.ignoreBody) {
+        parse = !options.ignoreBody;
+      }
       if (data) {
         if (data.success === false) {
           throw new Error(data.message);
         }
+        generalResponse.error = false;
+        generalResponse.message = 'Processed Ok!';
+        generalResponse.data = data;
+        if (options.ignoreBody) {
+          return JSON.parse(data);
+        }
         return data;
       }
-      return generalResponse;
+      if (options.ignoreBody) {
+        return JSON.parse(data);
+      }
+      return data;
     }).catch((ex) => {
       console.log("-------------BEGIN Exception On Call --------------");
       console.log(ex);
