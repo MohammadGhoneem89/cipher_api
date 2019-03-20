@@ -180,14 +180,16 @@ module.exports = class Dispatcher {
 
   connectRestService() {
     let today = new Date();
-    // if (this.configData.isBlockchain && this.configData.isBlockchain === true) {
-    _.set(this.request, 'Header.tranType', "0200");
-    _.set(this.request, 'Header.UUID', this.UUID);
-    _.set(this.request, 'Header.timeStamp', today.toISOString());
-    // }
+    let isBLK = _.get(this.configdata, 'isBlockchain', false);
+    if (isBLK === true) {
+      _.set(this.request, 'Header.tranType', "0200");
+      _.set(this.request, 'Header.UUID', this.UUID);
+      _.set(this.request, 'Header.timeStamp', today.toISOString());
+    }
     console.log(JSON.stringify(this.configdata, null, 2));
     let _endpoint = new Endpoint(this.request);
-    return _endpoint.executeEndpoint(this.configdata.endpointName, this.configdata.ServiceURL || "").then((resp) => {
+    let ServiceURL = _.get(this.configdata, 'ServiceURL', "");
+    return _endpoint.executeEndpoint(this.configdata.endpointName, ServiceURL).then((resp) => {
       if (resp) {
         if (resp.success === false || resp.error === true) {
           throw new Error(resp.message);
