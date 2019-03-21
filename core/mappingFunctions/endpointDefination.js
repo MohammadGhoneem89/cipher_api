@@ -1,7 +1,7 @@
 'use strict';
 
 const endpointDefination = require('../../lib/repositories/endpointDefination');
-
+const _ = require('lodash');
 function upsert(payload, UUIDKey, route, callback, JWToken) {
   _upsert(payload, callback);
 }
@@ -15,6 +15,10 @@ function list(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function _upsert(payload, callback) {
+  if (!payload.auth.endpoint) {
+    _.set(payload, 'auth.endpoint', undefined);
+  }
+  console.log(JSON.stringify(payload))
   endpointDefination.upsert(payload)
     .then((user) => {
       const response = {

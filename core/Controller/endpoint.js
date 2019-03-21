@@ -49,11 +49,6 @@ module.exports = class Endpoint {
             generalResponse.data = resp;
             return Promise.resolve(generalResponse);
           });
-        }).catch((ex) => {
-          console.log(ex);
-          generalResponse.error = true;
-          generalResponse.message = ex.message;
-          return generalResponse;
         });
       case "noAuth":
         return this.executeNoAuthEndpoint(endpoint, this._requestBody, ServiceURL).then((resp) => {
@@ -61,12 +56,7 @@ module.exports = class Endpoint {
           generalResponse.message = `Processed Ok!`;
           generalResponse.data = resp;
           return generalResponse;
-        }).catch((ex) => {
-          console.log(ex);
-          generalResponse.error = true;
-          generalResponse.message = ex.message;
-          return generalResponse;
-        });
+        })
       case "basicAuth":
         console.log("Calling function BASIC");
         return this.executeBasicAuthEndpoint(endpoint, this._requestBody, ServiceURL, ignoreBody).then((resp) => {
@@ -179,7 +169,6 @@ module.exports = class Endpoint {
       "error": true,
       "message": "Failed to get response"
     };
-
     let rpOptions = {
       method: 'POST',
       url: options.serviceURL,
@@ -217,14 +206,7 @@ module.exports = class Endpoint {
         return JSON.parse(data);
       }
       return data;
-    }).catch((ex) => {
-      console.log("-------------BEGIN Exception On Call --------------");
-      console.log(ex);
-      console.info("-------------END Exception On Call --------------");
-      generalResponse.error = true;
-      generalResponse.message = ex.message;
-      return generalResponse;
-    });
+    })
   }
 
 };
