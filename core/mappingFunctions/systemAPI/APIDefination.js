@@ -44,7 +44,6 @@ function LoadConfig() {
         _.set(typeObj, key, arrEnum);
       }
     });
-
     let grouped = _.groupBy(data[1], 'useCase');
     let routeConfig = {};
     data[1].forEach((data) => {

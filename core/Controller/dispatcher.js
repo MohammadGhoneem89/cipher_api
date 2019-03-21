@@ -1,6 +1,7 @@
 'use strict';
 const _ = require('lodash');
 const Simulator = require('./simulator');
+const Endpoint = require('./endpoint');
 const rp = require('request-promise');
 const path = require('path');
 const fs = require('fs');
@@ -127,7 +128,7 @@ module.exports = class Dispatcher {
           reject(ex);
         });
       } else if (this.configdata.communicationMode === 'REST') {
-        this.connectRestService().then((data) => {
+        this.connectRestService(this.configdata).then((data) => {
           resolve(data);
         }).catch((ex) => {
           reject(ex);
@@ -177,39 +178,25 @@ module.exports = class Dispatcher {
     });
   }
 
-  connectRestService() {
+  connectRestService(configdata) {
     let today = new Date();
-    _.set(this.request, 'Header.tranType', "0200");
-    _.set(this.request, 'Header.UUID', this.UUID);
-    _.set(this.request, 'Header.timeStamp', today.toISOString());
-    console.log(JSON.stringify(this.configdata.endpointName, null, 2));
-    let ServiceURL = "";
-    if (this.configdata.endpointName && this.configdata.endpointName._id) {
-      ServiceURL = `${this.configdata.endpointName.address}${this.configdata.ServiceURL}`
+    let isBLK = _.get(configdata, 'isBlockchain', false);
+    if (isBLK === true) {
+      _.set(this.request, 'Header.tranType', "0200");
+      _.set(this.request, 'Header.UUID', this.UUID);
+      _.set(this.request, 'Header.timeStamp', today.toISOString());
     }
-    else {
-      ServiceURL = this.configdata.ServiceURL;
-    }
-    let rpOptions = {
-      method: 'POST',
-      url: ServiceURL,
-      body: this.request,
-      headers: this.configdata.ServiceHeaders,
-      timeout: 10000, //  configurable
-      json: true
-    };
-    return rp(rpOptions).then((data) => {
-      let generalResponse = {
-        "error": true,
-        "message": "Failed to get response"
-      };
-      if (data) {
-        if (data.success === false) {
-          throw new Error(data.message);
+    let req = _.cloneDeep(this.request);
+    let _endpoint = new Endpoint(req);
+    let ServiceURL = _.get(this.configdata, 'ServiceURL', "");
+    return _endpoint.executeEndpoint(this.configdata.endpointName, ServiceURL).then((resp) => {
+      if (resp) {
+        if (resp.success === false || resp.error === true) {
+          throw new Error(resp.message);
         }
-        return data;
+        return resp.data;
       }
-      return generalResponse;
+      return resp;
     });
   }
 
