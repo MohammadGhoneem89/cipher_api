@@ -618,7 +618,7 @@ app.get('/API/:channel/:action', permissions, apiCallsHandler);
 
 app.post('/API/:channel/:action', permissions, apiCallsHandler);
 
-function apiCallsHandler(req, res){
+function apiCallsHandler(req, res) {
   if (checkbadinput(req)) {
     let resperr = { 'error': "illeagal character found in request" };
     res.send(resperr);
@@ -639,7 +639,7 @@ function apiCallsHandler(req, res){
   const url_parts = url.parse(req.url, true);
   const query = url_parts.query;
   logger.info({ fs: 'app.js', func: 'API' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
-  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: "::1", query});
+  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: "::1", query });
   logger.info('calling handleExternalRequest ');
   const UUID = uuid();
   logger.info({ fs: 'app.js', func: 'API' }, 'UUID:  ' + UUID);

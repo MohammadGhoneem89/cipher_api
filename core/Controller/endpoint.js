@@ -169,6 +169,26 @@ module.exports = class Endpoint {
     return header;
   }
   computeFormBody(endpoint,body) {
+
+    // clean body
+    _.set(body,'header.content-type',undefined)
+    _.set(body,'header.cache-control',undefined)
+    _.set(body,'header.postman-token',undefined)
+    _.set(body,'header.user-agent',undefined)
+    _.set(body,'header.accept',undefined)
+    _.set(body,'header.host',undefined)
+    _.set(body,'header.accept-encoding',undefined)
+    _.set(body,'header.content-length',undefined)
+    _.set(body,'header.connection',undefined)
+    _.set(body,'action',undefined)
+    _.set(body,'channel',undefined)
+    _.set(body,'ipAddress',undefined)
+    _.set(body,'query',undefined)
+    _.set(body,'__JWTORG',undefined)
+    _.set(body,'JWToken',undefined)
+    _.set(body,'token',undefined)
+
+    
     let data = {
       form: {},
       body: body
