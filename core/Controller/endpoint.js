@@ -78,9 +78,10 @@ module.exports = class Endpoint {
   }
   executeNoAuthEndpoint(endpoint, body, url) {
     let header = this.computeHeaders(endpoint);
+    let data = this.computeFormBody(endpoint, body);
     return this.callWebService({
       serviceURL: url,
-      body: body,
+      ...data,
       headers: header
     });
   }
@@ -88,10 +89,11 @@ module.exports = class Endpoint {
     let authorizationHeader;
     authorizationHeader = `Bearer ${token}`;
     let header = this.computeHeaders(endpoint);
+    let data = this.computeFormBody(endpoint, body);
     _.set(header, 'Authorization', authorizationHeader);
     return this.callWebService({
       serviceURL: url,
-      body: body,
+      ...data,
       headers: header
     });
   }
@@ -101,6 +103,7 @@ module.exports = class Endpoint {
       throw new Error("Cred Header Authorization Credentials are required!!");
     }
     let header = this.computeHeaders(endpoint);
+    let data = this.computeFormBody(endpoint, body);
     _.set(body, 'username', endpoint.auth.username);
     _.set(body, 'password', endpoint.auth.password);
     _.set(header, 'username', endpoint.auth.username);
@@ -110,7 +113,7 @@ module.exports = class Endpoint {
     _.set(header, 'Authorization', authorizationHeader);
     return this.callWebService({
       serviceURL: url,
-      body: body,
+      ...data,
       headers: header
     });
   }
@@ -121,10 +124,11 @@ module.exports = class Endpoint {
     }
     authorizationHeader = `Basic ${Base64.encode(`${endpoint.auth.username}:${endpoint.auth.password}`)}`;
     let header = this.computeHeaders(endpoint);
+    let data = this.computeFormBody(endpoint, body);
     _.set(header, 'Authorization', authorizationHeader);
     return this.callWebService({
       serviceURL: url,
-      body: body,
+      ...data,
       headers: header,
       ignoreBody
     });
@@ -163,6 +167,27 @@ module.exports = class Endpoint {
       });
     }
     return header;
+  }
+  computeFormBody(endpoint,body) {
+    let data = {
+      form: {},
+      body: body
+    };
+    if (endpoint.header) {
+      endpoint.header.forEach((elem) => {
+        switch (elem.headerType) {
+          case "formParams":
+            _.set(data, `form.${elem.headerKey}`, elem.headerPrefix);
+            break;
+          case "bodyParams":
+            _.set(data, `body.${elem.headerKey}`, elem.headerPrefix);
+            break;
+          default:
+            break;
+        }
+      });
+    }
+    return data;
   }
   callWebService(options) {
     let generalResponse = {
