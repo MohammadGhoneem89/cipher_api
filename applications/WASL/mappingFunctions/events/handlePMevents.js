@@ -121,9 +121,9 @@ function UpdateKYCDetail(mResponse) {
         "username": "gdrfaapi",
         "password": "b933d03e1b877de6128ad78ab5f96585c99e8321574adb45ff31f597d577acf731d53b17fc42c9a85a197b0b77ef87af6e25f044e689f1b9dbe28fcf73bb074a"  },
       body: {
-        // "bypassSimu": true,
+     
          "residenceAddr":mResponse.data.PersonInfo.Address.City.CityDescEN,
-        "contactPersonMobile":"00002030303" ,
+        "contactPersonMobile": mResponse.data.PersonInfo.Contact.MobileNo == null ?"00971": mResponse.data.PersonInfo.Contact.MobileNo,
         "nationality": mResponse.data.PersonInfo.Address.Emirate.EmirateDescEN,
         "dateOfBirth": mResponse.data.PersonInfo.DOB,
          "natId":mResponse.data.PersonInfo.EmiratesID.EIDNumber,
