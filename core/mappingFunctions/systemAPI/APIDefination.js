@@ -7,6 +7,7 @@ const writefileToPath = path.join(__dirname, './Chaincode/chaincode.go');
 const readfileFromPathStruct = path.join(__dirname, './Chaincode/structTemplate.txt');
 const writefileToPathStruct = path.join(__dirname, './Chaincode/struct.go');
 const APIDefinitation = require('../../../lib/repositories/apiDefination');
+const complexType = require('../../../lib/repositories/complexTypes');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
 const fs = require('fs');
@@ -229,32 +230,51 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
   }
   APIDefinitation.getActiveAPIList(payload).then((data) => {
     let grouped = _.groupBy(data, 'useCase');
+
     let resp = {};
+
+
     data.forEach((data) => {
       let dest = data.useCase + "." + data.route;
       let reqMap = [];
+      let complexTypeList = [];
       data.RequestMapping.fields.forEach((field) => {
         if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData" || field.IN_FIELDTYPE === "OrgIdentifier") {
           reqMap.push(field);
+          if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA != "")
+            complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
+
+          if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA != "")
+            complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
         }
       });
+
       let resMap = [];
       data.ResponseMapping.fields.forEach((field) => {
+        if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA != "")
+          complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
+
+        if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA != "")
+          complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
         resMap.push(field);
       });
       data.ResponseMapping = resMap;
       data.RequestMapping = reqMap;
       let groupedRoute = _.omit(data, 'route', 'useCase');
       _.set(resp, dest, groupedRoute);
-    });
-    let response = {
-      "RouteList": {
-        "action": "RouteList",
-        "data": resp
-      }
-    };
+      data.useCase + "." + data.route
 
-    callback(response);
+      return complexType.findByComplexTypeIds(Array.from(new Set(complexTypeList))).then((detailList) => {
+        _.set(resp, `${data.useCase}.${data.route}.complexList`, detailList)
+        let response = {
+          "RouteList": {
+            "action": "RouteList",
+            "data": resp 
+          }
+        };
+        return callback(response);
+      })
+    });
   }).catch((err) => {
     callback(err);
   });
