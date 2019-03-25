@@ -18,27 +18,19 @@ module.exports = class Endpoint {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", ServiceURL);
     switch (endpoint.authType) {
       case "bearer":
-        if (endpoint.auth.endpoint.auth.endpoint) {
-          generalResponse.error = true;
-          generalResponse.message = "Circualr JWT Request Cannot be Processed Please Check Endpoint!!";
-          return Promise.resolve(generalResponse);
-        };
+        // if (endpoint.auth.endpoint.auth.endpoint) {
+        //   generalResponse.error = true;
+        //   generalResponse.message = "Circualr JWT Request Cannot be Processed Please Check Endpoint!!";
+        //   return Promise.resolve(generalResponse);
+        // };
         let tokenfield = _.get(endpoint, 'auth.field', undefined);
         if (!tokenfield) {
-          generalResponse.error = true;
-          generalResponse.message = "Token field not available Please Check Endpoint!!";
-          return Promise.resolve(generalResponse);
+          throw new Error("Cred Header Authorization Credentials are required!!");
         };
         return this.executeEndpoint(endpoint.auth.endpoint, "/", 1).then((data) => {
           let tokenValue = _.get(data, `data.${tokenfield}`, undefined);
           if (!tokenValue) {
-            generalResponse.error = true;
-            generalResponse.message = `Not able to fetch field from success authentication response | field : ${tokenfield}`;
-            generalResponse.data = data;
-            return Promise.resolve(generalResponse);
-          }
-          else if (data.error && data.error == true) {
-            return Promise.resolve(data);
+            throw new Error( `Not able to fetch field from success authentication response | field : ${tokenfield}`);
           }
           return this.executeBarerAuthEndpoint(endpoint, this._requestBody, ServiceURL, tokenValue).then((resp) => {
             if (resp.error === true) {
@@ -49,11 +41,6 @@ module.exports = class Endpoint {
             generalResponse.data = resp;
             return Promise.resolve(generalResponse);
           });
-        }).catch((ex) => {
-          console.log(ex);
-          generalResponse.error = true;
-          generalResponse.message = ex.message;
-          return generalResponse;
         });
       case "noAuth":
         return this.executeNoAuthEndpoint(endpoint, this._requestBody, ServiceURL).then((resp) => {
@@ -61,12 +48,7 @@ module.exports = class Endpoint {
           generalResponse.message = `Processed Ok!`;
           generalResponse.data = resp;
           return generalResponse;
-        }).catch((ex) => {
-          console.log(ex);
-          generalResponse.error = true;
-          generalResponse.message = ex.message;
-          return generalResponse;
-        });
+        })
       case "basicAuth":
         console.log("Calling function BASIC");
         return this.executeBasicAuthEndpoint(endpoint, this._requestBody, ServiceURL, ignoreBody).then((resp) => {
@@ -88,9 +70,10 @@ module.exports = class Endpoint {
   }
   executeNoAuthEndpoint(endpoint, body, url) {
     let header = this.computeHeaders(endpoint);
+    let data = this.computeFormBody(endpoint, body);
     return this.callWebService({
       serviceURL: url,
-      body: body,
+      ...data,
       headers: header
     });
   }
@@ -98,10 +81,11 @@ module.exports = class Endpoint {
     let authorizationHeader;
     authorizationHeader = `Bearer ${token}`;
     let header = this.computeHeaders(endpoint);
+    let data = this.computeFormBody(endpoint, body);
     _.set(header, 'Authorization', authorizationHeader);
     return this.callWebService({
       serviceURL: url,
-      body: body,
+      ...data,
       headers: header
     });
   }
@@ -111,6 +95,7 @@ module.exports = class Endpoint {
       throw new Error("Cred Header Authorization Credentials are required!!");
     }
     let header = this.computeHeaders(endpoint);
+    let data = this.computeFormBody(endpoint, body);
     _.set(body, 'username', endpoint.auth.username);
     _.set(body, 'password', endpoint.auth.password);
     _.set(header, 'username', endpoint.auth.username);
@@ -120,7 +105,7 @@ module.exports = class Endpoint {
     _.set(header, 'Authorization', authorizationHeader);
     return this.callWebService({
       serviceURL: url,
-      body: body,
+      ...data,
       headers: header
     });
   }
@@ -131,10 +116,11 @@ module.exports = class Endpoint {
     }
     authorizationHeader = `Basic ${Base64.encode(`${endpoint.auth.username}:${endpoint.auth.password}`)}`;
     let header = this.computeHeaders(endpoint);
+    let data = this.computeFormBody(endpoint, body);
     _.set(header, 'Authorization', authorizationHeader);
     return this.callWebService({
       serviceURL: url,
-      body: body,
+      ...data,
       headers: header,
       ignoreBody
     });
@@ -174,21 +160,66 @@ module.exports = class Endpoint {
     }
     return header;
   }
+  computeFormBody(endpoint, body) {
+
+    // clean body
+    _.set(body, 'header.content-type', undefined)
+    _.set(body, 'header.cache-control', undefined)
+    _.set(body, 'header.postman-token', undefined)
+    _.set(body, 'header.user-agent', undefined)
+    _.set(body, 'header.accept', undefined)
+    _.set(body, 'header.host', undefined)
+    _.set(body, 'header.accept-encoding', undefined)
+    _.set(body, 'header.content-length', undefined)
+    _.set(body, 'header.connection', undefined)
+    _.set(body, 'action', undefined)
+    _.set(body, 'channel', undefined)
+    _.set(body, 'ipAddress', undefined)
+    _.set(body, 'query', undefined)
+    _.set(body, '__JWTORG', undefined)
+    _.set(body, 'JWToken', undefined)
+    _.set(body, 'token', undefined)
+
+
+    let data = {
+      form: {},
+      body: body
+    };
+    if (endpoint.header) {
+      endpoint.header.forEach((elem) => {
+        switch (elem.headerType) {
+          case "formParams":
+            _.set(data, `form.${elem.headerKey}`, elem.headerPrefix);
+            break;
+          case "bodyParams":
+            _.set(data, `body.${elem.headerKey}`, elem.headerPrefix);
+            break;
+          default:
+            break;
+        }
+      });
+    }
+
+    return data;
+  }
   callWebService(options) {
     let generalResponse = {
       "error": true,
       "message": "Failed to get response"
     };
-
     let rpOptions = {
       method: 'POST',
       url: options.serviceURL,
+      form: Object.keys(options.form).length > 0 ? options.form : undefined,
       headers: options.headers,
       timeout: 10000,
       json: !options.ignoreBody
     };
     if (!options.ignoreBody) {
       _.set(rpOptions, 'body', options.body);
+    } else {
+      for (let key in options.form)
+        _.set(rpOptions, 'body', `${key}:${options.form[key]}`);
     }
     console.log("-------------BEGIN External Request--------------");
     console.log(JSON.stringify(rpOptions, null, 2));
@@ -217,14 +248,7 @@ module.exports = class Endpoint {
         return JSON.parse(data);
       }
       return data;
-    }).catch((ex) => {
-      console.log("-------------BEGIN Exception On Call --------------");
-      console.log(ex);
-      console.info("-------------END Exception On Call --------------");
-      generalResponse.error = true;
-      generalResponse.message = ex.message;
-      return generalResponse;
-    });
+    })
   }
 
 };

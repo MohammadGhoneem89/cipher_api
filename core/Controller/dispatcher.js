@@ -197,6 +197,9 @@ module.exports = class Dispatcher {
         return resp.data;
       }
       return resp;
+    }).catch((ex) => {
+      console.log(ex);
+      throw new Error(ex.message);
     });
   }
 
