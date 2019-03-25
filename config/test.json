@@ -1,0 +1,155 @@
+{
+    "header": {
+        "username": "Internal_API",
+        "password": "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9",
+        "host": "192.168.1.126:9080",
+        "accept": "application/json",
+        "content-type": "application/json",
+        "content-length": "2595",
+        "connection": "close"
+    },
+    "template": {
+        "_id": "5c98c221722dab7515984c4a",
+        "name": "EventOnRequestKYCUpdateSDG",
+        "data": {
+            "DocumentNo": "{{key}}",
+            "DocumentNoFormat": 1,
+            "DocumentTypeID": 8,
+            "TransactionAudit": {
+                "TransactionBy": 1002,
+                "TransactionDate": "19/02/2019 08:01:00",
+                "TransactionID": 1001161218000003
+            }
+        },
+        "type": "Event"
+    },
+    "endpoint": {
+        "_id": "5c90e2367222845daa3c2df9",
+        "address": "https://api.qa.dubai.gov.ae/secure/dnrd/person/1.0.0/info",
+        "status": true,
+        "protocol": {
+            "custom": false,
+            "secure": true,
+            "nonSecure": false
+        },
+        "attachCert": false,
+        "certPhrase": "",
+        "authType": "bearer",
+        "requestType": "rest",
+        "header": [
+            {
+                "actions": [
+                    {
+                        "actionType": "COMPONENT_FUNCTION",
+                        "iconName": "fa fa-trash",
+                        "label": "Delete"
+                    },
+                    {
+                        "actionType": "COMPONENT_FUNCTION",
+                        "iconName": "fa fa-edit",
+                        "label": "Edit"
+                    }
+                ],
+                "description": "",
+                "headerPrefix": "application/json",
+                "headerType": "FixedValue",
+                "headerKey": "Content-Type"
+            }
+        ],
+        "name": "GDFRA KYC",
+        "__v": 0,
+        "auth": {
+            "endpoint": {
+                "_id": "5c90df4c7222845daa3c2df8",
+                "address": "https://ids.qa.dubai.gov.ae/oauth2/token?grant_type=client_credentials&scope=openid",
+                "status": true,
+                "protocol": {
+                    "custom": false,
+                    "secure": true,
+                    "nonSecure": false
+                },
+                "attachCert": false,
+                "certPhrase": "",
+                "authType": "basicAuth",
+                "requestType": "rest",
+                "header": [
+                    {
+                        "actions": [
+                            {
+                                "actionType": "COMPONENT_FUNCTION",
+                                "iconName": "fa fa-trash",
+                                "label": "Delete"
+                            },
+                            {
+                                "actionType": "COMPONENT_FUNCTION",
+                                "iconName": "fa fa-edit",
+                                "label": "Edit"
+                            }
+                        ],
+                        "description": "Content Type",
+                        "headerPrefix": "application/x-www-form-urlencoded",
+                        "headerType": "FixedValue",
+                        "headerKey": "Content-Type"
+                    }
+                ],
+                "auth": {
+                    "username": "YGfLeIeEZ1zKUE0PuKK1uC5tWQoa",
+                    "password": "CZGWo4PglaLEKpRlU04beCDJksQa",
+                    "endpoint": null
+                },
+                "name": "GDB Authorize",
+                "__v": 0
+            },
+            "field": "access_token"
+        }
+    },
+    "eventData": {
+        "GDRFA": {
+            "contactPersonMobile": "",
+            "dateOfBirth": 0,
+            "emiratesIDExpiryDate": 0,
+            "gender": "",
+            "lastSyncDate": "",
+            "natID": "",
+            "natIDExpDate": 0,
+            "nationality": "",
+            "passport": {
+                "passportExpiryDate": "",
+                "passportIssueDate": "",
+                "passportIssuePlace": "",
+                "passportNo": ""
+            },
+            "phoneNO": "",
+            "poBox": "",
+            "residenceAddr": "",
+            "tenantNameAr": "",
+            "tenantNameEn": "",
+            "visaExpiryDate": 0,
+            "visaIssueDate": "",
+            "visaNo": "",
+            "visaStatus": ""
+        },
+        "SDG": {
+            "customerName": "Ali Safri",
+            "emailID": "ali.safri@avanzainnovation.com",
+            "emiratesID": "784198362619847",
+            "emiratesIDExpiryDate": 1609372800000,
+            "mobileNumber": "0557168540",
+            "visaExpiryDate": 1638316800000,
+            "visaNo": "Visa11111"
+        },
+        "documentName": "kycCollection",
+        "key": "EIDA_784198362619847",
+        "eventName": "RequestKYC",
+        "__collection": "kycCollection",
+        "additionalData": [
+            "WASL"
+        ]
+    },
+    "JWToken": "a73a72be819c644e7120d1538afc7159480a7d19f263c837062f4179be1cba30d2da118ed76779efcaf0308e2a5b1f535c343ece964f7d456089b79bff1232a13a7b5d056fa5984204bb17802604dd5ee8d67284140b831d9d6a036a2e79f084653c6023debc179c8aa5d7611a355c0752f6a63483552455fcedf98a878fd6c8ce9835df1ca3a12578966d10f0539a3a05c6d61ac659b4a6b2f42191fc07458c728322c6348d9148fe6b6b3af4e9937b8624bb64b642820241ddbec4ed86013f1e53f550a33a4083a1f9ce12c7e017e3acf7cf4a71550fa205002b96e91905fb1e3eb45b11c0a34301df5c8ccd91d5be5d8d678823c668e6039bf283b06adf159faa52463f7fed49e3b4419f412174b428720f5d1cbe9206942e37bfc4eca335f59b12144153f3fce94929dff7c491b26eaad2e5170967c1c4c78588617eb20b985250957fa5596b169322bb7d2681b40a5b1ff8ba6aefe8fb2ec069d549b4b29ae100408e99a994cc38a8fc15c60d5127c1cb547acc8b20fdd1729dcd8aa88f2a269a517c072b",
+    "token": "a73a72be819c644e7120d1538afc7159480a7d19f263c837062f4179be1cba30d2da118ed76779efcaf0308e2a5b1f535c343ece964f7d456089b79bff1232a13a7b5d056fa5984204bb17802604dd5ee8d67284140b831d9d6a036a2e79f084653c6023debc179c8aa5d7611a355c0752f6a63483552455fcedf98a878fd6c8ce9835df1ca3a12578966d10f0539a3a05c6d61ac659b4a6b2f42191fc07458c728322c6348d9148fe6b6b3af4e9937b8624bb64b642820241ddbec4ed86013f1e53f550a33a4083a1f9ce12c7e017e3acf7cf4a71550fa205002b96e91905fb1e3eb45b11c0a34301df5c8ccd91d5be5d8d678823c668e6039bf283b06adf159faa52463f7fed49e3b4419f412174b428720f5d1cbe9206942e37bfc4eca335f59b12144153f3fce94929dff7c491b26eaad2e5170967c1c4c78588617eb20b985250957fa5596b169322bb7d2681b40a5b1ff8ba6aefe8fb2ec069d549b4b29ae100408e99a994cc38a8fc15c60d5127c1cb547acc8b20fdd1729dcd8aa88f2a269a517c072b",
+    "action": "generalEventHandler",
+    "channel": "PR",
+    "ipAddress": "::1",
+    "query": {}
+}
