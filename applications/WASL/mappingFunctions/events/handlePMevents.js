@@ -3,8 +3,34 @@ let rp = require('request-promise');
 const _ = require('lodash');
 const config = require('../../../../config');
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
-
+const Endpoint = require('../../../../core/Controller/endpoint');
 async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
+ 
+ 
+ // invoke event blockchain
+ // blockchain route api 
+ // payload
+ //  
+ // ServiceURL
+  // let req = _.cloneDeep(payload.eventData);
+  // req = await transformTemplate(payload.template.data, payload.eventData, [])
+  // let _endpoint = new Endpoint(req);
+  // let ServiceURL = '/';
+  // _endpoint.executeEndpoint(payload.endpoint, ServiceURL).then((resp) => {
+  //   if (resp) {
+  //     if (resp.success === false || resp.error === true) {
+  //       throw new Error(resp.message);
+  //     }
+  //     return resp.data;
+  //   }
+  //   return resp;
+  // }).catch((ex) => {
+  //   console.log(ex);
+  //   throw new Error(ex.message);
+  // });a
+
+
+
 
   try {
     console.log("<<<<<<<<< Request Recieved for PM Event >>>>>>>>");
