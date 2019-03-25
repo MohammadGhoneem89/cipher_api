@@ -133,38 +133,28 @@ function upsertComplexTypes(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function getServiceList(payload, UUIDKey, route, callback, JWToken) {
-  // let resp = {
-  //   "MappingConfigData": {
-  //     "action": "MappingConfigData",
-  //     "data": {
-  //       REQUEST: [],
-  //       RESPONSE: []
-  //     }
-  //   }
-  // };
-  // Promise.all([
-  //   MappingConfig.getServiceList("REQUEST"),
-  //   MappingConfig.getServiceList("RESPONSE")
-  // ]).then((data) => {
-  //   data[0].forEach((key) => {
-  //     let obj = {
-  //       "label": key.mappingName,
-  //       "value": key._id
-  //     };
-  //     resp.MappingConfigData.data.REQUEST.push(obj);
-  //   });
-
-  //   data[1].forEach((key) => {
-  //     let obj = {
-  //       "label": key.mappingName,
-  //       "value": key._id
-  //     };
-  //     resp.MappingConfigData.data.RESPONSE.push(obj);
-  //   });
-  //   callback(resp);
-  // }).catch((err) => {
-  //   callback(err);
-  // });
+  let resp = {
+    "ComplexListData": {
+      "action": "MappingConfigData",
+      "data": {
+        ComplexList: []
+      }
+    }
+  };
+  Promise.all([
+    ComplexTypes.getServiceList()
+  ]).then((data) => {
+    data[0].forEach((key) => {
+      let obj = {
+        "label": key.typeName,
+        "value": key._id
+      };
+      resp.ComplexListData.data.ComplexList.push(obj);
+    });
+    callback(resp);
+  }).catch((err) => {
+    callback(err);
+  });
 }
 
 exports.getServiceList = getServiceList;
