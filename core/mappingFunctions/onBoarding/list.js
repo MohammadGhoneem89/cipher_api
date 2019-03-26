@@ -15,8 +15,8 @@ function onBoardingList(payload, callback) {
                     getOnBoardingList: {
                         action: payload.action,
                         pageData: {
-                            pageSize: payload.page.pageSize,
-                            currentPageNo: payload.page.currentPageNo,
+                            pageSize: payload.pageData.pageSize,
+                            currentPageNo: payload.pageData.currentPageNo,
                             totalRecords: res.count
                         },
                         data: {
