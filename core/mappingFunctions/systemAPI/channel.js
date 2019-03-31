@@ -124,7 +124,7 @@ function getServiceList(payload, UUIDKey, route, callback, JWToken) {
   ]).then((data) => {
     data[0].forEach((key) => {
       let obj = {
-        "label": `${key.channelName}-${key.networkName}`,
+        "label": `${key.channelName}~${key.networkName}`,
         "value": key._id
       };
       resp.ChannelTypeData.data.channels.push(obj);
