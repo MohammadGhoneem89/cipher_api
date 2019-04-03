@@ -84,12 +84,17 @@ func (t *PRChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	fmt.Println("Arguments Loaded Successfully!!")
 
 	//<<Function Validation Logic-Start>>
-	if orgType == "SDG" {						
+	if orgType == "REGAUTH" {						
 		switch functionName := function; functionName {
 		//<<FunctionCases-Start>>
 		
-		case "AddTenant":
-			return t.AddTenant(stub, args,"AddTenant")
+		case "postDataToBlockchainChamber":
+			return t.postDataToBlockchainChamber(stub, args,"postDataToBlockchainChamber")
+					
+		//<<FunctionCases-Start>>
+		
+		case "postDataToBlockchainRegAuth":
+			return t.postDataToBlockchainRegAuth(stub, args,"postDataToBlockchainRegAuth")
 					
 		//<<FunctionCases-End>>
 		
@@ -99,17 +104,12 @@ func (t *PRChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		}
 	} else 
 //<<Function Validation Logic-Start>>
-	if orgType == "ENBD" {						
+	if orgType == "CUSTOMS" {						
 		switch functionName := function; functionName {
 		//<<FunctionCases-Start>>
 		
-		case "AssociatePaymentInstruments":
-			return t.AssociatePaymentInstruments(stub, args,"AssociatePaymentInstruments")
-					
-		//<<FunctionCases-Start>>
-		
-		case "AssociatePaymentInstrumentsTemp":
-			return t.AssociatePaymentInstrumentsTemp(stub, args,"AssociatePaymentInstrumentsTemp")
+		case "postDataToBlockchainCustoms":
+			return t.postDataToBlockchainCustoms(stub, args,"postDataToBlockchainCustoms")
 					
 		//<<FunctionCases-End>>
 		
@@ -119,12 +119,12 @@ func (t *PRChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		}
 	} else 
 //<<Function Validation Logic-Start>>
-	if orgType == "WASL" {						
+	if orgType == "DPW" {						
 		switch functionName := function; functionName {
 		//<<FunctionCases-Start>>
 		
-		case "BLANK":
-			return t.BLANK(stub, args,"BLANK")
+		case "postDataToBlockchainDPW":
+			return t.postDataToBlockchainDPW(stub, args,"postDataToBlockchainDPW")
 					
 		//<<FunctionCases-End>>
 		
@@ -134,12 +134,12 @@ func (t *PRChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		}
 	} else 
 //<<Function Validation Logic-Start>>
-	if orgType == "DLD" {						
+	if orgType == "DT" {						
 		switch functionName := function; functionName {
 		//<<FunctionCases-Start>>
 		
-		case "EjariTerminationStatus":
-			return t.EjariTerminationStatus(stub, args,"EjariTerminationStatus")
+		case "postDataToBlockchainDubaiTrade":
+			return t.postDataToBlockchainDubaiTrade(stub, args,"postDataToBlockchainDubaiTrade")
 					
 		//<<FunctionCases-End>>
 		
@@ -183,11 +183,11 @@ func insertDataAndRaiseEvent(stub shim.ChaincodeStubInterface,key string,eventTy
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:AddTenant
-	Description: UAE Pass authentication token event for the user login is stamped on blockchain for both WASL and Bank.
+	Function Name:postDataToBlockchainChamber
+	Description: This API is consumed by Dubai Chamber (DCC) to stamp the licensing/registration related information on the Blockchain.
 */
-func (t *PRChainCode) AddTenant(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("AddTenant: %v", args)
+func (t *URChainCode) postDataToBlockchainChamber(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("postDataToBlockchainChamber: %v", args)
     
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
@@ -195,23 +195,14 @@ func (t *PRChainCode) AddTenant(stub shim.ChaincodeStubInterface, args []string,
 	
 	//Business Logic to be added here
 		
-AddTenant := &AddTenant{	
-		OrgCode:   sanitize(args[0], "string").(string),
-OrgID:   sanitize(args[1], "string").(string),
-EmiratesID:   sanitize(args[2], "string").(string),
-CustomerName:   sanitize(args[3], "string").(string),
-MobileNumber:   sanitize(args[4], "string").(string),
-EmailID:   sanitize(args[5], "string").(string),
-VisaNo:   sanitize(args[6], "string").(string),
-VisaExpiryDate:   sanitize(args[7], "string").(string),
-EmiratesIDExpiryDate:   sanitize(args[8], "string").(string),
-AuthToken:   sanitize(args[9], "string").(string),
-Timestamp:   sanitize(args[10], "string").(string),
-OrgCodeWASL:   sanitize(args[11], "string").(string),
+postDataToBlockchainChamber := &postDataToBlockchainChamber{	
+		UnifiedID:   sanitize(args[0], "string").(string),
+MembershipExpiryDate:   sanitize(args[1], "string").(string),
+MembershipStatus:   sanitize(args[2], "string").(string),
   }
 
-fmt.Println(AddTenant)
-	logger.Debug("AddTenant function executed successfully.")
+fmt.Println(postDataToBlockchainChamber)
+	logger.Debug("postDataToBlockchainChamber function executed successfully.")
 	
 	return shim.Success(nil)
 }
@@ -219,11 +210,11 @@ fmt.Println(AddTenant)
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:AssociatePaymentInstruments
-	Description: The API consumed by the Bank to stamp the payment instruments association on the blockchain. This could have variations to store first time payments as well as later payments done based on payment terms.
+	Function Name:postDataToBlockchainRegAuth
+	Description: This API is consumed by registration authority (JAFZA) to stamp the licensing/registration related information on the Blockchain. The same method will be called for adding new data or modification to any data already stamped on the chain. Complete payload information should be provided again.
 */
-func (t *PRChainCode) AssociatePaymentInstruments(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("AssociatePaymentInstruments: %v", args)
+func (t *URChainCode) postDataToBlockchainRegAuth(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("postDataToBlockchainRegAuth: %v", args)
     
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
@@ -231,15 +222,14 @@ func (t *PRChainCode) AssociatePaymentInstruments(stub shim.ChaincodeStubInterfa
 	
 	//Business Logic to be added here
 		
-AssociatePaymentInstruments := &AssociatePaymentInstruments{	
-		AuthToken:   sanitize(args[0], "string").(string),
-EIDA:   sanitize(args[1], "string").(string),
-ContractID:   sanitize(args[2], "string").(string),
-OrgCode:   sanitize(args[3], "string").(string),
+postDataToBlockchainRegAuth := &postDataToBlockchainRegAuth{	
+		UnifiedID:   sanitize(args[0], "string").(string),
+MembershipExpiryDate:   sanitize(args[1], "string").(string),
+MembershipStatus:   sanitize(args[2], "string").(string),
   }
 
-fmt.Println(AssociatePaymentInstruments)
-	logger.Debug("AssociatePaymentInstruments function executed successfully.")
+fmt.Println(postDataToBlockchainRegAuth)
+	logger.Debug("postDataToBlockchainRegAuth function executed successfully.")
 	
 	return shim.Success(nil)
 }
@@ -247,11 +237,11 @@ fmt.Println(AssociatePaymentInstruments)
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:AssociatePaymentInstrumentsTemp
-	Description: The API consumed by the Bank to stamp the payment instruments association on the blockchain. This could have variations to store first time payments as well as later payments done based on payment terms.
+	Function Name:postDataToBlockchainCustoms
+	Description: This API is consumed by Dubai Trade (Dubai Customs) to stamp the licensing/registration related information on the Blockchain.
 */
-func (t *PRChainCode) AssociatePaymentInstrumentsTemp(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("AssociatePaymentInstrumentsTemp: %v", args)
+func (t *URChainCode) postDataToBlockchainCustoms(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("postDataToBlockchainCustoms: %v", args)
     
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
@@ -259,15 +249,14 @@ func (t *PRChainCode) AssociatePaymentInstrumentsTemp(stub shim.ChaincodeStubInt
 	
 	//Business Logic to be added here
 		
-AssociatePaymentInstrumentsTemp := &AssociatePaymentInstrumentsTemp{	
-		AuthToken:   sanitize(args[0], "string").(string),
-EIDA:   sanitize(args[1], "string").(string),
-ContractID:   sanitize(args[2], "string").(string),
-OrgCode:   sanitize(args[3], "string").(string),
+postDataToBlockchainCustoms := &postDataToBlockchainCustoms{	
+		UnifiedID:   sanitize(args[0], "string").(string),
+AccountName:   sanitize(args[1], "string").(string),
+GroupBuisnessName:   sanitize(args[2], "string").(string),
   }
 
-fmt.Println(AssociatePaymentInstrumentsTemp)
-	logger.Debug("AssociatePaymentInstrumentsTemp function executed successfully.")
+fmt.Println(postDataToBlockchainCustoms)
+	logger.Debug("postDataToBlockchainCustoms function executed successfully.")
 	
 	return shim.Success(nil)
 }
@@ -275,11 +264,11 @@ fmt.Println(AssociatePaymentInstrumentsTemp)
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:BLANK
-	Description: The Rest API can be used to add a renewal of the tenancy contract on the Blockchain along with installments, payment method and selected bank.
+	Function Name:postDataToBlockchainDPW
+	Description: This API is consumed by DP World (DPW) to stamp the licensing/registration related information on the Blockchain.
 */
-func (t *PRChainCode) BLANK(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("BLANK: %v", args)
+func (t *URChainCode) postDataToBlockchainDPW(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("postDataToBlockchainDPW: %v", args)
     
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
@@ -287,11 +276,14 @@ func (t *PRChainCode) BLANK(stub shim.ChaincodeStubInterface, args []string, fun
 	
 	//Business Logic to be added here
 		
-BLANK := &BLANK{	
-		BLANK:   sanitize(args[0], "string").(string),  }
+postDataToBlockchainDPW := &postDataToBlockchainDPW{	
+		UnifiedID:   sanitize(args[0], "string").(string),
+CompanyBrief:   sanitize(args[1], "string").(string),
+NonVATCustomer:   sanitize(args[2], "bool").(bool),
+  }
 
-fmt.Println(BLANK)
-	logger.Debug("BLANK function executed successfully.")
+fmt.Println(postDataToBlockchainDPW)
+	logger.Debug("postDataToBlockchainDPW function executed successfully.")
 	
 	return shim.Success(nil)
 }
@@ -299,11 +291,11 @@ fmt.Println(BLANK)
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:EjariTerminationStatus
-	Description: When DLD will receive the termination request either from Blockchain or WASL legacy system, DLD to call this API to update the status on Blockchain when termination is successful.
+	Function Name:postDataToBlockchainDubaiTrade
+	Description: This API is consumed by Dubai Trade (Dubai Trade) to stamp the licensing/registration related information on the Blockchain.
 */
-func (t *PRChainCode) EjariTerminationStatus(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("EjariTerminationStatus: %v", args)
+func (t *URChainCode) postDataToBlockchainDubaiTrade(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("postDataToBlockchainDubaiTrade: %v", args)
     
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
@@ -311,14 +303,15 @@ func (t *PRChainCode) EjariTerminationStatus(stub shim.ChaincodeStubInterface, a
 	
 	//Business Logic to be added here
 		
-EjariTerminationStatus := &EjariTerminationStatus{	
-		OrgCode:   sanitize(args[0], "string").(string),
-ContractID:   sanitize(args[1], "string").(string),
-EjariTerminationStatus:   sanitize(args[2], "string").(string),
+postDataToBlockchainDubaiTrade := &postDataToBlockchainDubaiTrade{	
+		UnifiedID:   sanitize(args[0], "string").(string),
+FacebookURL:   sanitize(args[1], "string").(string),
+TwitterURL:   sanitize(args[2], "string").(string),
+VATAccountNo:   sanitize(args[3], "string").(string),
   }
 
-fmt.Println(EjariTerminationStatus)
-	logger.Debug("EjariTerminationStatus function executed successfully.")
+fmt.Println(postDataToBlockchainDubaiTrade)
+	logger.Debug("postDataToBlockchainDubaiTrade function executed successfully.")
 	
 	return shim.Success(nil)
 }

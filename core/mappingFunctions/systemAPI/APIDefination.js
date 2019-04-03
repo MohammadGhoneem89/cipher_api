@@ -269,12 +269,78 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
         let response = {
           "RouteList": {
             "action": "RouteList",
-            "data": resp 
+            "data": resp
           }
         };
         return callback(response);
       })
     });
+  }).catch((err) => {
+    callback(err);
+  });
+}
+
+function getActiveAPIListForDocumentation(payload, UUIDKey, route, callback, JWToken) {
+  let resp = {
+    "responseMessage": {
+      "action": "upsertAPIDefinition",
+      "data": {
+        "message": {
+          "status": "ERROR",
+          "errorDescription": "UseCase must be provided!!",
+          "displayToUser": true,
+          "newPageURL": ""
+        }
+      }
+    }
+  };
+  if (!payload.useCase) {
+    return callback(resp);
+  }
+  APIDefinitation.getActiveAPIList(payload).then( async (data) => {
+    let resp = {};
+    for (const useCaseObj of data) {
+      let dest = useCaseObj.useCase + "." + useCaseObj.route;
+      let reqMap = [];
+      let complexTypeList = [];
+      useCaseObj.RequestMapping.fields.forEach((field) => {
+        if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData" || field.IN_FIELDTYPE === "OrgIdentifier") {
+          reqMap.push(field);
+          if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA !== "")
+            complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
+
+          if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA !== "")
+            complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
+        }
+      });
+      let resMap = [];
+      useCaseObj.ResponseMapping.fields.forEach((field) => {
+        if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA != "")
+          complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
+
+        if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA != "")
+          complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
+        resMap.push(field);
+      });
+      useCaseObj.ResponseMapping = resMap;
+      useCaseObj.RequestMapping = reqMap;
+      let groupedRoute = _.omit(useCaseObj, 'route', 'useCase');
+      _.set(resp, dest, groupedRoute);
+      const detailList = await complexType.findByComplexTypeIds(Array.from(new Set(complexTypeList)));
+      if (detailList) {
+        _.set(resp, `${useCaseObj.useCase}.${useCaseObj.route}.complexList`, detailList)
+      }
+
+    }
+    let response = {
+      "RouteList": {
+        "action": "RouteList",
+        "data": resp
+      }
+    };
+
+    return callback(response);
+
   }).catch((err) => {
     callback(err);
   });
@@ -665,6 +731,7 @@ exports.getAPIDefinitionID = getAPIDefinitionID;
 exports.upsertAPIDefinition = upsertAPIDefinition;
 exports.getServiceList = getServiceList;
 exports.getActiveAPIList = getActiveAPIList;
+exports.getActiveAPIListForDocumentation = getActiveAPIListForDocumentation;
 exports.LoadConfig = LoadConfig;
 exports.updateRequestStub = updateRequestStub;
 exports.getActiveAPIs = getActiveAPIs;
