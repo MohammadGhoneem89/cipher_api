@@ -4,6 +4,7 @@ const _ = require('lodash');
 const config = require('../../../../config');
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 const Endpoint = require('../../../../core/Controller/endpoint');
+
 async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
   console.log('===========handlePMevents payload=======', JSON.stringify(payload))
@@ -14,9 +15,6 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
   // payload
   //  
   // ServiceURL
-
-
-
 
 
   try {
@@ -34,8 +32,13 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
         break;
       }
       case "RequestKYC": {
-        RequestKYC(payload);
-       
+        let result = await RequestKYC(payload);
+        callback({
+          error: false,
+          message: payload.eventData.eventName + " Dispatched",
+          request: await createMessage(payload).body,
+          response: result
+        });
         break;
       }
       default:
@@ -86,59 +89,50 @@ function UpdateContractStatus(contractID) {
 }
 
 async function RequestKYC(payload) {
-  let req = _.cloneDeep(payload.eventData);
-  req = await transformTemplate(payload.template.data, payload.eventData, [])
+
+  // let req = _.cloneDeep(payload.eventData);
+  let req = await transformTemplate(payload.template.data, payload.eventData, []);
   let _endpoint = new Endpoint(req);
   let ServiceURL = '/';
-  _endpoint.executeEndpoint(payload.endpoint, ServiceURL).then((resp) => {
-    if (resp) {
-      console.log("=========Response from GDRFA======" + JSON.stringify(resp))
-      
-
-      if (resp.success === false || resp.error === true) {
-        throw new Error(resp.message);
-      }
-    }
-    let mResponse = resp;
-    console.log(mResponse.data.PersonInfo.Address.Passport, "|||||||||||||")
-   UpdateKYCDetail(mResponse);
-    return resp;
-  }).catch((ex) => {
-    console.log(ex);
-    throw new Error(ex.message);
-  });
+  let GDRFAResponse = await _endpoint.executeEndpoint(payload.endpoint, ServiceURL);
+  console.log("=========Response from GDRFA======>" + JSON.stringify(GDRFAResponse), "<=========Response from GDRFA======");
+  if (GDRFAResponse && (GDRFAResponse.success === false || GDRFAResponse.error === true)) {
+    throw GDRFAResponse.message;
+  }
+  let UpdateKYCDetailResult = await UpdateKYCDetail(GDRFAResponse);
+  console.log("=========UpdateKYCDetailResult======>" + JSON.stringify(UpdateKYCDetailResult), "<=========UpdateKYCDetailResult======");
 }
 
 function UpdateKYCDetail(mResponse) {
   console.log("UpdateKYCDetail===============><===============UpdateKYCDetail");
-  //  let url = config.get('URLRestInterface') || "http://0.0.0.0/";
+
+  let url = config.get('URLRestInterface') || "http://0.0.0.0/";
   let message = {
     method: 'POST',
-    url: 'http://51.140.250.28/API/PR/UpdateKYCDetail',
+    url: `${url}API/PR/UpdateKYCDetail`,
     body: {
-      header: 
-      {
-        "username": "gdrfaapi",
-        "password": "b933d03e1b877de6128ad78ab5f96585c99e8321574adb45ff31f597d577acf731d53b17fc42c9a85a197b0b77ef87af6e25f044e689f1b9dbe28fcf73bb074a"  },
+      header: config.get('eventService.Avanza_ISC') || {
+        username: "Internal_API",
+        password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
+      },
       body: {
-     
-         "residenceAddr":mResponse.data.PersonInfo.Address.City.CityDescEN,
-        "contactPersonMobile": mResponse.data.PersonInfo.Contact.MobileNo == null ?"00971": mResponse.data.PersonInfo.Contact.MobileNo,
+        "residenceAddr": mResponse.data.PersonInfo.Address.City.CityDescEN,
+        "contactPersonMobile": mResponse.data.PersonInfo.Contact.MobileNo == null ? "00971" : mResponse.data.PersonInfo.Contact.MobileNo,
         "nationality": mResponse.data.PersonInfo.Address.Emirate.EmirateDescEN,
         "dateOfBirth": mResponse.data.PersonInfo.DOB,
-         "natId":mResponse.data.PersonInfo.EmiratesID.EIDNumber,
-         "natIdExpDate":mResponse.data.PersonInfo.EmiratesID.EIDExpiryDate,
-         "poBox": mResponse.data.PersonInfo.Contact.POBox == null ? "1000" : mResponse.data.PersonInfo.Contact.POBox,
+        "natId": mResponse.data.PersonInfo.EmiratesID.EIDNumber,
+        "natIdExpDate": mResponse.data.PersonInfo.EmiratesID.EIDExpiryDate,
+        "poBox": mResponse.data.PersonInfo.Contact.POBox == null ? "1000" : mResponse.data.PersonInfo.Contact.POBox,
         "passport": {
-            "passportNo": mResponse.data.PersonInfo.Passport.PPNumber,
-            "passportIssueDate": mResponse.data.PersonInfo.Passport.PPIssueDate,
-            "passportExpiryDate": mResponse.data.PersonInfo.Passport.PPExpiryDate,
-            "passportIssuePlace": mResponse.data.PersonInfo.Passport.PPIssuePlaceEN
+          "passportNo": mResponse.data.PersonInfo.Passport.PPNumber,
+          "passportIssueDate": mResponse.data.PersonInfo.Passport.PPIssueDate,
+          "passportExpiryDate": mResponse.data.PersonInfo.Passport.PPExpiryDate,
+          "passportIssuePlace": mResponse.data.PersonInfo.Passport.PPIssuePlaceEN
         },
         "phoneNo": mResponse.data.PersonInfo.Contact.HomePhoneNo,
-        "gender": mResponse.data.PersonInfo.Sex == 1 ? "M":"F",
+        "gender": mResponse.data.PersonInfo.Sex == 1 ? "M" : "F",
         "tenantNameEn": mResponse.data.PersonInfo.ApplicantNameEN,
-        "tenantNameAr":  mResponse.data.PersonInfo.ApplicantNameAR,
+        "tenantNameAr": mResponse.data.PersonInfo.ApplicantNameAR,
         "visaNo": mResponse.data.PersonInfo.ImmigrationFile.FileNumber.toString(),
         "visaIssueDate": mResponse.data.PersonInfo.ImmigrationFile.FileIssueDate,
         "visaExpiryDate": mResponse.data.PersonInfo.ImmigrationFile.FileExpiryDate,
@@ -147,12 +141,9 @@ function UpdateKYCDetail(mResponse) {
     },
     json: true
   };
-  return rp(message).then(result => {
-    console.log("~~~~~~~`",message,"~~~~~~~~~~")
-    console.log("UpdateKYCDetail Response===========>", result, "<===========UpdateKYCDetail Response");
-    return Promise.resolve(true);
-  });
+  return rp(message);
 }
+
 async function createMessage(payload) {
 
   return await {
