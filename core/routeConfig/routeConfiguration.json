@@ -1,5 +1,11 @@
 {
   "core": {
+    "diffPermissionsRoutes": {
+      "customMapping": true,
+      "MappingfunctionName": "diffPermissionsRoutes",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "upsertAPIImport": {
       "customMapping": true,
       "MappingfunctionName": "upsertAPIImport",
