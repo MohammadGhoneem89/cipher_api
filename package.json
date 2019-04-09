@@ -22,6 +22,7 @@
     "bunyan-rotating-file-stream": "^1.6.3",
     "casting": "0.0.2",
     "client-ip": "^1.0.0",
+    "convert-excel-to-json": "^1.6.1",
     "convict": "^4.0.1",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.3",
