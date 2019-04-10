@@ -44,7 +44,6 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
       case "AssociatePaymentInstruments": {
         let result = await GetContractDetailsBackOffice(payload.eventData.contractID, payload.eventData.EIDA);
         let message = await createMessageAssociatedPayments(payload,result.contractDetail);
-        payload.eventData = result.contractDetail;
         await getPromise(payload, message, callback);
         break;
       }
