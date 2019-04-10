@@ -41,6 +41,13 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
         });
         break;
       }
+      case "AssociatePaymentInstruments": {
+        let result = await GetContractDetailsBackOffice(payload.eventData.contractID, payload.eventData.EIDA);
+        let message = await createMessageAssociatedPayments(payload,result.contractDetail);
+        payload.eventData = result.contractDetail;
+        await getPromise(payload, message, callback);
+        break;
+      }
       default:
         callback({
           error: true,
@@ -56,7 +63,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
     callback({
       error: true,
       message: err.message,
-      request: "THIS IS REQUEST",
+      request: "FAILED",
       response: err
     });
     return Promise.resolve(true);
@@ -144,8 +151,58 @@ function UpdateKYCDetail(mResponse) {
   return rp(message);
 }
 
-async function createMessage(payload) {
 
+function GetContractDetailsBackOffice(contractID, EIDA) {
+  let url = config.get('URLRestInterface') || "http://0.0.0.0/";
+  let message = {
+    method: 'POST',
+    url: `${url}API/PR/GetContractDetailsBackOffice`,
+    body: {
+      header: config.get('eventService.Avanza_ISC') || {
+        username: "Internal_API",
+        password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
+      },
+      body: {
+        "orgCode": "WASL",
+        "contractID": contractID,
+        "EIDA": EIDA
+      }
+    },
+    json: true
+  };
+  return rp(message).then(result => {
+    console.log("GetContractDetailsBackOffice===========>", result, "<===========GetContractDetailsBackOffice");
+    return Promise.resolve(result);
+  });
+}
+function createMessageAssociatedPayments(payload,data) {
+  let message = {
+    method: 'POST',
+    url: payload.endpoint.address,
+    body: {
+      header: payload.endpoint.auth,
+      body: {
+        "contractID": data.contractID,
+        "firstPayment": "false",
+        "paymentInstruments": data.paymentInstruments.map((item)=>{
+          return {
+            "bankCode": item.bankCode,
+            "paymentMethod": item.paymentMethod,
+            "instrumentID": item.instrumentID,
+            "status": item.status,
+            "date": item.date,
+            "amount": item.amount
+          }
+        })
+      }
+    },
+    json: true
+  };
+  console.log("createMessageAssociatedPayments===========>", message, "<===========createMessageAssociatedPayments");
+  return Promise.resolve(message);
+}
+
+async function createMessage(payload) {
   return await {
     method: 'POST',
     url: payload.endpoint.address,
