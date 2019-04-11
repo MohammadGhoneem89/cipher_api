@@ -269,7 +269,7 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
         let response = {
           "RouteList": {
             "action": "RouteList",
-            "data": resp 
+            "data": resp
           }
         };
         return callback(response);
@@ -379,7 +379,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         responses[0].ApiListData.APIdata[j].RequestMapping.fields = responses[0].ApiListData.APIdata[j].RequestMapping.fields.filter(function (item) {
           return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object');
         });
-        // console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
+        //  console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
       }
       for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
         for (let i = 0; i < responses[0].ApiListData.APIdata[j].RequestMapping.fields.length; i++) {
@@ -395,18 +395,30 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
       function replaceM(fileData) {
         let getData = getFileIndex(fileData);
-
+        // console.log("!!!!!! GET DATA------", getData, "----- !!!!!! GET DATA")
         let mData = getIndex(getData);
-        //console.log("OOOOOOOOOOOOOOO",mData,"OOOOOOOOOOOOOOOoooo")
+        // console.log("OOOOOOOOOOOOOOO", mData, "OOOOOOOOOOOOOOOoooo")
+
         let nData; let gData; let newData; let updatedfileData = "";
         //console.log(responses[0].ApiListData.APIdata)
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
-          // console.log("+++++", responses[0].ApiListData.APIdata[i]);
+          // console.log(responses[0].ApiListData.APIdata[i].APIList[0].route,">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
+          
+          let arr=responses[0].ApiListData.APIdata[i].APIList;
+          arr.map((item)=>{
+            console.log(item.route,">>>>>>>>>>>>>>ROUTE")
+          })
+          
           nData = "";
           for (let k = 0; k < responses[0].ApiListData.APIdata[i].APIList.length; k++) {
-            nData = ""
+            nData = ""; updatedfileData = "";
+            
             for (let j = 0; j < responses[0].ApiListData.APIdata[i].RequestMapping.fields.length; j++) {
+              
+               
               let getSlicedFieldName = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split(".");
+             
+              // console.log("+++++", responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD);
               let updateField = getSlicedFieldName[1]
               if (updateField != undefined)
                 updateField = updateField.capitalize();
@@ -417,17 +429,20 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
               gData = gData.replace('<<field1JSON>>', dataSplit[1]);
               nData += gData + '\n'
               if (j === responses[0].ApiListData.APIdata[i].RequestMapping.fields.length - 1) {
-
+                // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
                 updatedfileData += getData.replace(mData, nData);
+                // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
                 updatedfileData = updatedfileData.replace('<<structName>>', responses[0].ApiListData.APIdata[i].APIList[k].route);
-
+                // 
               }
             }
+            // console.log(updatedfileData, ">>>>>>>>>>> ----- UPDATED FILE DATA")
           }
+          
         }
-
-        // console.log("%%%%%%%%",responses[0].ApiListData.APIdata,"%%%%%%%%5")
         return updatedfileData;
+        // console.log("%%%%%%%%",responses[0].ApiListData.APIdata,"%%%%%%%%5")
+       
       }
 
 
@@ -454,7 +469,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let finalStructFile = fileData.replace(getD, readUpdatedFile)
         fs.writeFile(writefileToPathStruct, finalStructFile, 'utf8', function (err) {
           if (err) return console.log(err);
-          //console.log(readUpdatedFile);
+
+          // console.log(readUpdatedFile,"------->>>>>>>>>FILE DATE REPLACEm");
         });
 
       });

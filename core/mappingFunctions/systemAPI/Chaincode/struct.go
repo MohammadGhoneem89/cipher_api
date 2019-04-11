@@ -8,42 +8,19 @@ type MSPList struct {
 type BLANK struct {
 	BLANK string `json:"BLANK"`
 }
-type  AddTenant struct{
-	OrgCode string `json:"orgCode"`
-OrgID string `json:"orgID"`
-EmiratesID string `json:"emiratesID"`
-CustomerName string `json:"customerName"`
-MobileNumber string `json:"mobileNumber"`
-EmailID string `json:"emailID"`
-VisaNo string `json:"visaNo"`
-VisaExpiryDate string `json:"visaExpiryDate"`
-EmiratesIDExpiryDate string `json:"emiratesIDExpiryDate"`
-AuthToken string `json:"authToken"`
-Timestamp string `json:"timestamp"`
-OrgCodeWASL string `json:"orgCodeWASL"`
- }
-
-
-type  AssociatePaymentInstruments struct{
-	AuthToken string `json:"authToken"`
-EIDA string `json:"EIDA"`
-ContractID string `json:"contractID"`
-OrgCode string `json:"orgCode"`
- }
-
-
-type  AssociatePaymentInstrumentsTemp struct{
-	AuthToken string `json:"authToken"`
-EIDA string `json:"EIDA"`
-ContractID string `json:"contractID"`
-OrgCode string `json:"orgCode"`
- }
-
-
-type  EjariTerminationStatus struct{
-	OrgCode string `json:"orgCode"`
-ContractID string `json:"contractID"`
-EjariTerminationStatus string `json:"ejariTerminationStatus"`
+type  getDeclarationData struct{
+	COONo string `json:"COONo"`
+ModeOfTransport string `json:"modeOfTransport"`
+ExitPoint string `json:"exitPoint"`
+FinalShipmentDestination string `json:"finalShipmentDestination"`
+PortOfDischarge string `json:"portOfDischarge"`
+VesselName string `json:"vesselName"`
+ProcessType string `json:"processType"`
+ProcessingCountry string `json:"processingCountry"`
+ExportDeclaration string `json:"exportDeclaration"`
+PaymentMethod string `json:"paymentMethod"`
+ExporterType string `json:"exporterType"`
+MemeberNo string `json:"memeberNo"`
  }
 
 
