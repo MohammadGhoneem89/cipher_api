@@ -5,11 +5,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const uuid = require('uuid/v1');
 const db = require('./core/database/db')(); // eslint-disable-line
-//  const jsReport = require('jsreport');
 const url = require('url');
 const cors = require('cors');
 const rp = require('request-promise');
-const renderExport = require('./exports');
 //  const generateReports = require('./reports');
 let app = express();
 const expressWs = require('express-ws')(app);
@@ -27,7 +25,7 @@ const authUser = require('./lib/auth/user');
 const logger = require('./core/api/connectors/logger').app;
 const serverStats = require('./lib/services/serverStats');
 const notification = require('./core/mappingFunctions/notification/list');
-
+const _ = require('lodash');
 process.on('uncaughtException', (err) => {
   logger.error({ fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack }, 'uncaught exception');
 });
@@ -591,31 +589,9 @@ app.post('/upload/:action', permissions, function (req, res) {
 
 });
 
-app.post('/APII/:channel/:action', permissions, function (req, res) {
-  if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" };
-    res.send(resperr);
-    return;
-  }
-  const payload = req.body;
-  const JWToken = req.get('token');
-  const action = req.params.action;
-  const channel = req.params.channel;
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
-  if (channel === 'Cipher') {
-    logger.trace({ payload: payload }, 'Cipher APII call Payload');
-  }
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'calling handleExternalRequest ');
-  const UUID = uuid();
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'UUID:  ' + UUID);
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'JWToken :  ' + JWToken);
 
-  RestController.handleExternalRequest(payload, channel, action, UUID, res, '');
 
-});
-
-app.get('/API/:channel/:action', permissions, apiCallsHandler);
-
+app.get('/API/:channel/:action?', permissions, apiCallsHandler);
 app.post('/API/:channel/:action', permissions, apiCallsHandler);
 
 function apiCallsHandler(req, res) {
@@ -625,6 +601,7 @@ function apiCallsHandler(req, res) {
     return;
   }
   let payload = req.body;
+
   let JWToken = '';
   if (payload.JWToken) {
     JWToken = payload.JWToken;
@@ -632,6 +609,13 @@ function apiCallsHandler(req, res) {
   else {
     JWToken = req.get('token');
   }
+  if (req.query) {
+    Object.assign(payload, { queryParams: req.query });
+  }
+  if (req.files && Object.keys(req.files).length > 0) {
+    _.set(payload, 'files', req.files);
+  }
+
   payload.token = JWToken;
   const action = req.params.action;
   const channel = req.params.channel;
@@ -648,12 +632,6 @@ function apiCallsHandler(req, res) {
   const decoded = crypto.decrypt(JWToken);
   logger.info({ fs: 'app.js', func: 'API' }, decoded, 'decoded.userID:');
   RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
-}
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min; // The maximum is exclusive and the minimum is inclusive
 }
 
 app.post('/SIMU/:action', function (req, res) {
@@ -692,37 +670,7 @@ function sendError(req, res) {
   res.end();
 }
 
-app.get('/export/:channel', permissions, function (req, res) {
-  if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" }
-    res.send(resperr);
-    return;
-  }
-  const url_parts = url.parse(req.url, true);
-  const type = url_parts.query.type;
-  let gridType = url_parts.query.gridType;
-  const JWToken = url_parts.query.JWT;
-  let decoded;
-  try {
-    decoded = crypto.decrypt(JWToken);
-  }
-  catch (err) {
-    return sendError(res, req);
-  }
-  if (!decoded || !JWToken) {
-    return sendError(req, res);
-  }
-  let query = url_parts.query.searchCriteria || '';
-  try {
-    query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
-  }
-  catch (e) {
-    res.send(e);
-    res.end();
-  }
-  renderExport(type, gridType, query, jsReport, decoded, res);
 
-});
 
 app.post('/passOn', function (req, res) {
   if (checkbadinput(req)) {
@@ -740,47 +688,4 @@ app.post('/passOn', function (req, res) {
   res.send(JSON.stringify({ "status": "Done" }));
 });
 
-
-
-const generateReports = require('./reports');
-app.get('/reports/:channel/:action', function(req, res) {
-    if(checkbadinput(req)){
-        let resperr={'error':"illeagal character found in request"};
-        res.send(resperr);
-        return;
-    }
-    const url_parts = url.parse(req.url, true);
-    let id = url_parts.query.id;
-    const type = url_parts.query.reportFormat;
-    const JWToken = url_parts.query.JWT;
-    let language = url_parts.query.language;
-    let query = url_parts.query.searchCriteria || '';
-    query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
-    language = language ? JSON.parse(new Buffer(language, 'base64')) : {};
-
-    let decoded ;
-    try{
-        decoded = crypto.decrypt(JWToken);
-    }
-    catch(err){
-        return sendError(req, res);
-    }
-    if(!decoded || !JWToken){
-        return sendError(req, res);
-    }
-
-    const payload = {
-        filters: query,
-        reportsCriteriaId: id,
-        JWT: decoded,
-        nationalization: language
-    };
-    try {
-        generateReports(jsReport, payload, res, type);
-    }
-    catch (e) {
-        res.send(e);
-        return res.end();
-    }
-});
 
