@@ -11,16 +11,17 @@ function onBoardingList(payload, callback) {
 
     onBoarding.getList(payload)
     .then((res)=>{
+        console.log(res," RES      @@@@@@@@@@@@@@2")
              const response = {
                     getOnBoardingList: {
                         action: payload.action,
                         pageData: {
                             pageSize: payload.pageData.pageSize,
                             currentPageNo: payload.pageData.currentPageNo,
-                            totalRecords: res.count
+                            totalRecords: res ? res.count : 0
                         },
                         data: {
-                            searchResult: res.paymentList
+                            searchResult: res ? res.paymentList : 0
                         }
                     }
                 };
