@@ -230,10 +230,7 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
   }
   APIDefinitation.getActiveAPIList(payload).then((data) => {
     let grouped = _.groupBy(data, 'useCase');
-
     let resp = {};
-
-
     data.forEach((data) => {
       let dest = data.useCase + "." + data.route;
       let reqMap = [];
@@ -297,7 +294,8 @@ function getActiveAPIListForDocumentation(payload, UUIDKey, route, callback, JWT
   if (!payload.useCase) {
     return callback(resp);
   }
-  APIDefinitation.getActiveAPIList(payload).then( async (data) => {
+  APIDefinitation.getActiveAPIListForDocumentation(payload).then( async (data) => {
+    console.log('dididididi', JSON.stringify(data));
     let resp = {};
     for (const useCaseObj of data) {
       let dest = useCaseObj.useCase + "." + useCaseObj.route;

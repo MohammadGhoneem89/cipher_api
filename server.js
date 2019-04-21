@@ -363,7 +363,7 @@ app.post('/login', function (req, res) {
 
   if (checkbadinput(req)) {
     let err = {
-      desc: 'invalid userId or password'
+      desc: 'The username or password is incorrect'
     };
     response.loginResponse.data.message.status = 'ERROR';
     response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
@@ -639,7 +639,7 @@ function apiCallsHandler(req, res) {
   const url_parts = url.parse(req.url, true);
   const query = url_parts.query;
   logger.info({ fs: 'app.js', func: 'API' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
-  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: "::1", query });
+  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: "::1", query});
   logger.info('calling handleExternalRequest ');
   const UUID = uuid();
   logger.info({ fs: 'app.js', func: 'API' }, 'UUID:  ' + UUID);
