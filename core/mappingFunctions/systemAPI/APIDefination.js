@@ -1,5 +1,7 @@
 'use strict';
 
+const { APIDefination, Permission } = require("../../../lib/models/index");
+
 const path = require('path');
 const zipafolder = require('zip-a-folder');
 const readfileFromPath = path.join(__dirname, './Chaincode/ChaincodeTemplate.txt');
