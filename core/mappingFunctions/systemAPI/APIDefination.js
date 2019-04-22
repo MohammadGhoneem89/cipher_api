@@ -415,9 +415,7 @@ console.log(">>>>>>>>>+++++++++++++++++++======================>????????????????
           nData = "";
           
           for (let k = 0; k < responses[0].ApiListData.APIdata[i].APIList.length; k++) {
-            nData = ""; updatedfileData = "";
-            
-            
+            nData = ""; 
             for (let j = 0; j < responses[0].ApiListData.APIdata[i].RequestMapping.fields.length; j++) {
               
               let getSlicedFieldName = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split(".");
