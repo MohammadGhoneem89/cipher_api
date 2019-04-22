@@ -12,14 +12,17 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
     return filename.split('.').pop();
   }
 
-  let userID, fileReference, type;
+  let userID, fileReference, type, source;
   if (JWToken.userID) {
     userID = JWToken.userID;
   }
   if (payload.queryParams.fileReference || payload.headersParams.fileReference) {
     fileReference = payload.queryParams.fileReference || payload.headersParams.fileReference;
+  }
+  if (payload.queryParams.source || payload.headersParams.source) {
+    source = payload.queryParams.source || payload.headersParams.source;
   } else {
-    fileReference = 'API'
+    source = 'API'
   }
   if (payload.queryParams.type || payload.headersParams.type) {
     type = payload.queryParams.type || payload.headersParams.type;
@@ -83,7 +86,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
          "name": fileName,
          "type": type,
          "userId": JWToken._id,
-         "source": fileReference,
+         "source": source,
          "UUID": UUIDKey,
          "hash": fileHash,
          "context": "",
