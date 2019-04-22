@@ -12,15 +12,19 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
     return filename.split('.').pop();
   }
 
-  let userID, fileReference, source;
+  let userID, fileReference, type;
   if (JWToken.userID) {
     userID = JWToken.userID;
   }
   if (payload.queryParams.fileReference || payload.headersParams.fileReference) {
     fileReference = payload.queryParams.fileReference || payload.headersParams.fileReference;
+  } else {
+    fileReference = 'API'
   }
-  if (payload.queryParams.source || payload.headersParams.source) {
-    fileReference = payload.queryParams.fileReference || payload.headersParams.fileReference || 'API';
+  if (payload.queryParams.type || payload.headersParams.type) {
+    type = payload.queryParams.type || payload.headersParams.type;
+  } else {
+    type = 'FILE'
   }
 
   const allowedExtensions = config.get('fileTypes');
@@ -59,7 +63,6 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
       return callback(resp);
     }
     const fileHash = sha512(fileName + new Date());
-    fileReference = fileReference ? '' : fileReference;
      let resp = {
       "messageStatus": "OK",
       "cipherMessageId": UUIDKey,
@@ -67,7 +70,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
       "errorCode": 200,
       "timestamp": new Date(),
       "name": fileName,
-      "type": "FILE",
+      "type": type,
       "hash": fileHash,
       "path": basePath + fileHash + '.' + fileExtension,
       "fileReference": fileReference
@@ -78,9 +81,9 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
          "path": basePath + fileHash + '.' + fileExtension,
          "ext": fileExtension.toUpperCase(),
          "name": fileName,
-         "type": "FILE",
+         "type": type,
          "userId": JWToken._id,
-         "source": "API",
+         "source": fileReference,
          "UUID": UUIDKey,
          "hash": fileHash,
          "context": "",
