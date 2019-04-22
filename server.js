@@ -363,7 +363,7 @@ app.post('/login', function (req, res) {
 
   if (checkbadinput(req)) {
     let err = {
-      desc: 'invalid userId or password'
+      desc: 'The username or password is incorrect'
     };
     response.loginResponse.data.message.status = 'ERROR';
     response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
@@ -618,7 +618,7 @@ app.get('/API/:channel/:action', permissions, apiCallsHandler);
 
 app.post('/API/:channel/:action', permissions, apiCallsHandler);
 
-function apiCallsHandler(req, res){
+function apiCallsHandler(req, res) {
   if (checkbadinput(req)) {
     let resperr = { 'error': "illeagal character found in request" };
     res.send(resperr);

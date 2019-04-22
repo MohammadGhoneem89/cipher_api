@@ -1,5 +1,7 @@
 'use strict';
 
+const { APIDefination, Permission } = require("../../../lib/models/index");
+
 const path = require('path');
 const zipafolder = require('zip-a-folder');
 const readfileFromPath = path.join(__dirname, './Chaincode/ChaincodeTemplate.txt');
@@ -7,6 +9,7 @@ const writefileToPath = path.join(__dirname, './Chaincode/chaincode.go');
 const readfileFromPathStruct = path.join(__dirname, './Chaincode/structTemplate.txt');
 const writefileToPathStruct = path.join(__dirname, './Chaincode/struct.go');
 const APIDefinitation = require('../../../lib/repositories/apiDefination');
+const complexType = require('../../../lib/repositories/complexTypes');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
 const fs = require('fs');
@@ -233,20 +236,102 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
     data.forEach((data) => {
       let dest = data.useCase + "." + data.route;
       let reqMap = [];
+      let complexTypeList = [];
       data.RequestMapping.fields.forEach((field) => {
         if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData" || field.IN_FIELDTYPE === "OrgIdentifier") {
           reqMap.push(field);
+          if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA != "")
+            complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
+
+          if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA != "")
+            complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
         }
       });
+
       let resMap = [];
       data.ResponseMapping.fields.forEach((field) => {
+        if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA != "")
+          complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
+
+        if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA != "")
+          complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
         resMap.push(field);
       });
       data.ResponseMapping = resMap;
       data.RequestMapping = reqMap;
       let groupedRoute = _.omit(data, 'route', 'useCase');
       _.set(resp, dest, groupedRoute);
+      data.useCase + "." + data.route
+
+      return complexType.findByComplexTypeIds(Array.from(new Set(complexTypeList))).then((detailList) => {
+        _.set(resp, `${data.useCase}.${data.route}.complexList`, detailList)
+        let response = {
+          "RouteList": {
+            "action": "RouteList",
+            "data": resp
+          }
+        };
+        return callback(response);
+      })
     });
+  }).catch((err) => {
+    callback(err);
+  });
+}
+
+function getActiveAPIListForDocumentation(payload, UUIDKey, route, callback, JWToken) {
+  let resp = {
+    "responseMessage": {
+      "action": "upsertAPIDefinition",
+      "data": {
+        "message": {
+          "status": "ERROR",
+          "errorDescription": "UseCase must be provided!!",
+          "displayToUser": true,
+          "newPageURL": ""
+        }
+      }
+    }
+  };
+  if (!payload.useCase) {
+    return callback(resp);
+  }
+  APIDefinitation.getActiveAPIListForDocumentation(payload).then( async (data) => {
+    console.log('dididididi', JSON.stringify(data));
+    let resp = {};
+    for (const useCaseObj of data) {
+      let dest = useCaseObj.useCase + "." + useCaseObj.route;
+      let reqMap = [];
+      let complexTypeList = [];
+      useCaseObj.RequestMapping.fields.forEach((field) => {
+        if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData" || field.IN_FIELDTYPE === "OrgIdentifier") {
+          reqMap.push(field);
+          if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA !== "")
+            complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
+
+          if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA !== "")
+            complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
+        }
+      });
+      let resMap = [];
+      useCaseObj.ResponseMapping.fields.forEach((field) => {
+        if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA != "")
+          complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
+
+        if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA != "")
+          complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
+        resMap.push(field);
+      });
+      useCaseObj.ResponseMapping = resMap;
+      useCaseObj.RequestMapping = reqMap;
+      let groupedRoute = _.omit(useCaseObj, 'route', 'useCase');
+      _.set(resp, dest, groupedRoute);
+      const detailList = await complexType.findByComplexTypeIds(Array.from(new Set(complexTypeList)));
+      if (detailList) {
+        _.set(resp, `${useCaseObj.useCase}.${useCaseObj.route}.complexList`, detailList)
+      }
+
+    }
     let response = {
       "RouteList": {
         "action": "RouteList",
@@ -254,7 +339,8 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
       }
     };
 
-    callback(response);
+    return callback(response);
+
   }).catch((err) => {
     callback(err);
   });
@@ -636,6 +722,94 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
     });
 }
 
+async function diffPermissionsRoutes(payload, UUIDKey, route, callback, JWToken) {
+  try {
+    /*Querying on Permissions DB Table*/
+    const permissions = await Permission.find({}).lean(true).exec();
+    /*Querying on APIDefinition DB Table*/
+    const aPIDefinition = await APIDefination.find({}).lean(true).exec();
+    /*Comparison Function, takes two array larger array as first parameter and shows return the difference as array*/
+    let finalRoutes = {};
+    const compare = (array1, array2) => {
+      return array1.filter(x => !array2.includes(x));
+    };
+
+    let data = [];
+    const recursive = (object, resultObject, treeKey, dataKey) => {
+      iterator(object[treeKey], resultObject, treeKey, dataKey);
+    };
+    /*Function to find the URIs from nth level of Object named children*/
+    const iterator = (object, resultObject, treeKey, dataKey) => {
+      for (let obj of object) {
+        let hasData = obj[dataKey];
+        if (hasData) {
+          resultObject.push(hasData);
+        }
+        if (obj[treeKey]) {
+          iterator(obj[treeKey], resultObject, treeKey, dataKey)
+        }
+      }
+    };
+
+    /*Fetching Routes from Permissions DB Table*/
+    for (let perm of permissions) {
+      recursive(perm, data, 'children', 'URI');
+    }
+    data = [].concat(...data);
+    let finalRoutesFromPermissions = [];
+    for (let route of data) {
+      if (~route.indexOf('/')) {
+        let routeArray = [];
+        routeArray = route.split('/');
+        let size = routeArray.length - 1;
+        finalRoutesFromPermissions.push(routeArray[size] ==='' ? routeArray[size - 1]: routeArray[size]);
+      } else {
+        finalRoutesFromPermissions.push(route)
+      }
+    }
+    let finalRoutesFromAPIDefination = [];
+    /*Fetching Routes from APIDefinition DB Table*/
+    for (let apiRoute of aPIDefinition) {
+      finalRoutesFromAPIDefination.push(apiRoute.route);
+    }
+
+    /*Invoking comparison function on APIDefinition DB Table and Permissions DB Table*/
+    finalRoutesFromAPIDefination.length <= finalRoutesFromPermissions.length ?
+      finalRoutes.APIDefinationRoutes = compare(finalRoutesFromAPIDefination, finalRoutesFromPermissions):
+      finalRoutes.APIDefinationRoutes = compare(finalRoutesFromPermissions, finalRoutesFromAPIDefination);
+
+
+    /*Routes read from core routeConfiguration File*/
+    let coreRoutes = fs.readFileSync(path.join(__dirname, '../../routeConfig/routeConfiguration.json'), 'utf8');
+    coreRoutes = JSON.parse(coreRoutes);
+    coreRoutes = [].concat(coreRoutes['core']);
+    coreRoutes = coreRoutes.map((e)=> Object.keys(e));
+    coreRoutes = [].concat(...coreRoutes);
+    /*Invoking comparison function on Core routeConfiguration File and Permissions DB Table*/
+    coreRoutes.length <= finalRoutesFromPermissions.length ?
+      finalRoutes.coreRoutes = compare(coreRoutes, finalRoutesFromPermissions):
+      finalRoutes.coreRoutes = compare(finalRoutesFromPermissions, coreRoutes);
+
+    if (payload.application) {
+      /*Routes read from Applications routeConfiguration File*/
+      let applicationRoutes = fs.readFileSync(path.join(__dirname, '../../../applications/routeConfig/routeConfiguration.json'), 'utf8');
+      applicationRoutes = JSON.parse(applicationRoutes);
+      if (applicationRoutes[payload.application]) {
+        applicationRoutes = [].concat(applicationRoutes[payload.application]);
+        applicationRoutes = applicationRoutes.map((e) => typeof e === 'object' ? Object.keys(e) : null);
+        applicationRoutes = [].concat(...applicationRoutes);
+        /*Invoking comparison function on Applications routeConfiguration File and Permissions DB Table*/
+        applicationRoutes.length <= finalRoutesFromPermissions.length ?
+          finalRoutes.applicationRoutes = compare(applicationRoutes, finalRoutesFromPermissions) :
+          finalRoutes.applicationRoutes = compare(finalRoutesFromPermissions, applicationRoutes);
+      }
+    }
+    callback(finalRoutes);
+  } catch (error) {
+    console.log(error.stack)
+  }
+}
+
 async function main() {
   await zipafolder.zip('./core/mappingFunctions/systemAPI/Chaincode', './core/mappingFunctions/systemAPI/Chaincode.zip');
 }
@@ -645,7 +819,10 @@ exports.getAPIDefinitionID = getAPIDefinitionID;
 exports.upsertAPIDefinition = upsertAPIDefinition;
 exports.getServiceList = getServiceList;
 exports.getActiveAPIList = getActiveAPIList;
+exports.getActiveAPIListForDocumentation = getActiveAPIListForDocumentation;
 exports.LoadConfig = LoadConfig;
 exports.updateRequestStub = updateRequestStub;
 exports.getActiveAPIs = getActiveAPIs;
+exports.diffPermissionsRoutes = diffPermissionsRoutes;
+
 
