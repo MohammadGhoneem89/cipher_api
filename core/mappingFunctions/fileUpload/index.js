@@ -16,11 +16,11 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
   if (JWToken.userID) {
     userID = JWToken.userID;
   }
-  if (payload.queryParams.fileReference || payload.headers.fileReference) {
-    fileReference = payload.queryParams.fileReference || payload.headers.fileReference;
+  if (payload.queryParams.fileReference || payload.headersParams.fileReference) {
+    fileReference = payload.queryParams.fileReference || payload.headersParams.fileReference;
   }
-  if (payload.queryParams.source || payload.headers.source) {
-    fileReference = payload.queryParams.fileReference || payload.headers.fileReference || 'API';
+  if (payload.queryParams.source || payload.headersParams.source) {
+    fileReference = payload.queryParams.fileReference || payload.headersParams.fileReference || 'API';
   }
 
   const allowedExtensions = config.get('fileTypes');

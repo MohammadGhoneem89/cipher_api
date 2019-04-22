@@ -614,7 +614,7 @@ function apiCallsHandler(req, res) {
   }
 
   if (req.headers) {
-    Object.assign(payload, { headers: req.headers });
+    Object.assign(payload, { headersParams: req.headers });
   }
 
   if (req.files && Object.keys(req.files).length > 0) {
