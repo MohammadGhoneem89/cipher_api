@@ -612,7 +612,11 @@ function apiCallsHandler(req, res) {
   if (req.query) {
     Object.assign(payload, { queryParams: req.query });
   }
-  
+
+  if (req.headers) {
+    Object.assign(payload, { headers: req.headers });
+  }
+
   if (req.files && Object.keys(req.files).length > 0) {
     _.set(payload, 'files', req.files);
   }
