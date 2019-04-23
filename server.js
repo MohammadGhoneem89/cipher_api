@@ -27,6 +27,7 @@ const authUser = require('./lib/auth/user');
 const logger = require('./core/api/connectors/logger').app;
 const serverStats = require('./lib/services/serverStats');
 const notification = require('./core/mappingFunctions/notification/list');
+const _ = require('lodash');
 
 process.on('uncaughtException', (err) => {
   logger.error({ fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack }, 'uncaught exception');
@@ -632,6 +633,18 @@ function apiCallsHandler(req, res) {
   else {
     JWToken = req.get('token');
   }
+  if (req.query) {
+    Object.assign(payload, { queryParams: req.query });
+  }
+
+  if (req.headers) {
+    Object.assign(payload, { headersParams: req.headers });
+  }
+
+  if (req.files && Object.keys(req.files).length > 0) {
+    _.set(payload, 'files', req.files);
+  }
+
   payload.token = JWToken;
   const action = req.params.action;
   const channel = req.params.channel;

@@ -1,5 +1,17 @@
 {
   "core": {
+    "upload": {
+      "customMapping": true,
+      "MappingfunctionName": "upload",
+      "CustomMappingFile": "fileUpload/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "download": {
+      "customMapping": true,
+      "MappingfunctionName": "download",
+      "CustomMappingFile": "fileUpload/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "upsertAPIImport": {
       "customMapping": true,
       "MappingfunctionName": "upsertAPIImport",
