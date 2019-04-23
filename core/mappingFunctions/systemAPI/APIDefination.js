@@ -372,33 +372,39 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
             "APIList": [
               {
                 "route": chainCodeData[i].route,
-                // "purpose": chainCodeData[i].description
-
+                "purpose": chainCodeData[i].description,
+                "RequestMapping": chainCodeData[i].RequestMapping
               }
             ],
-            "RequestMapping": chainCodeData[i].RequestMapping
+
           };
           responses[0].ApiListData.APIdata.push(response);
         }
 
       }
-      // console.log(responses[0].ApiListData.APIdata.length,">>>>>>>???????>BEFOFRE LENGTH  ")
+      console.log(JSON.stringify(responses[0].ApiListData.APIdata), ">>>>>>>???????>BEFOFRE LENGTH  ")
       console.log(">>>>>>>>>+++++++++++++++++++======================>?????????????????????????????????")
       for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
-        responses[0].ApiListData.APIdata[j].RequestMapping.fields = responses[0].ApiListData.APIdata[j].RequestMapping.fields.filter(function (item) {
-          // console.log(responses[0].ApiListData.APIdata[j].RequestMapping.fields,">>>>> FIELDSSSSS")
-          return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object');
-        });
+        for (let k = 0; k < responses[0].ApiListData.APIdata[j].APIList.length; k++) {
+          // for (let i = 0; i < responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields.length; i++) {
+            responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields = responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields.filter(function (item) {
+              // console.log(responses[0].ApiListData.APIdata[j].RequestMapping.fields,">>>>> FIELDSSSSS")
+              return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object');
+            });
+          // }
+        }
         //  console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
       }
       // console.log("AFTER ------------- !!!!!!!!!!",JSON.stringify(responses[0].ApiListData.APIdata));
       for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
-        for (let i = 0; i < responses[0].ApiListData.APIdata[j].RequestMapping.fields.length; i++) {
-          if (responses[0].ApiListData.APIdata[j].RequestMapping.fields[i].IN_FIELDDT === 'number') {
-            responses[0].ApiListData.APIdata[j].RequestMapping.fields[i].IN_FIELDDT = 'int64';
-          }
-          if (responses[0].ApiListData.APIdata[j].RequestMapping.fields[i].IN_FIELDDT === 'boolean') {
-            responses[0].ApiListData.APIdata[j].RequestMapping.fields[i].IN_FIELDDT = 'bool';
+        for (let k = 0; k < responses[0].ApiListData.APIdata[j].APIList.length; k++) {
+          for (let i = 0; i < responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields.length; i++) {
+            if (responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields[i].IN_FIELDDT === 'number') {
+              responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields[i].IN_FIELDDT = 'int64';
+            }
+            if (responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields[i].IN_FIELDDT === 'boolean') {
+              responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields[i].IN_FIELDDT = 'bool';
+            }
           }
         }
         // console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
@@ -491,34 +497,34 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
             // }
             // if (flag) {
             //   console.log(commonRemove ,"??????????? COMMON RWMOVE ")
-              // for (let j = 0; j < commonRemove[0].RequestMapping.fields.length; j++) {
+            // for (let j = 0; j < commonRemove[0].RequestMapping.fields.length; j++) {
 
-              //   let getSlicedFieldName = commonRemove[0].RequestMapping.fields[j].IN_FIELD.split(".");
+            //   let getSlicedFieldName = commonRemove[0].RequestMapping.fields[j].IN_FIELD.split(".");
 
-              //   // console.log("+++++", commonRemove[0].RequestMapping.fields[j].IN_FIELD);
-              //   let updateField = getSlicedFieldName[1]
-              //   if (updateField != undefined)
-              //     updateField = updateField.capitalize();
+            //   // console.log("+++++", commonRemove[0].RequestMapping.fields[j].IN_FIELD);
+            //   let updateField = getSlicedFieldName[1]
+            //   if (updateField != undefined)
+            //     updateField = updateField.capitalize();
 
-              //   gData = mData.replace('<<field1>>', updateField);
-              //   gData = gData.replace('<<fieldType>>', commonRemove[0].RequestMapping.fields[j].IN_FIELDDT);
-              //   let dataSplit = commonRemove[0].RequestMapping.fields[j].IN_FIELD.split('.');
-              //   gData = gData.replace('<<field1JSON>>', dataSplit[1]);
-              //   nData += gData + '\n'
-              //   if (j === commonRemove[0].RequestMapping.fields.length - 1) {
-              //     // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
-              //     updatedfileData += getData.replace(mData, nData);
-              //     // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
-              //     updatedfileData = updatedfileData.replace('<<structName>>', commonRemove[0].APIList.route);
-              //     // 
-              //   }
-              // }
+            //   gData = mData.replace('<<field1>>', updateField);
+            //   gData = gData.replace('<<fieldType>>', commonRemove[0].RequestMapping.fields[j].IN_FIELDDT);
+            //   let dataSplit = commonRemove[0].RequestMapping.fields[j].IN_FIELD.split('.');
+            //   gData = gData.replace('<<field1JSON>>', dataSplit[1]);
+            //   nData += gData + '\n'
+            //   if (j === commonRemove[0].RequestMapping.fields.length - 1) {
+            //     // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
+            //     updatedfileData += getData.replace(mData, nData);
+            //     // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
+            //     updatedfileData = updatedfileData.replace('<<structName>>', commonRemove[0].APIList.route);
+            //     // 
+            //   }
+            // }
             // }
 
             // else if (!flag) {
-              {
-              for (let j = 0; j < responses[0].ApiListData.APIdata[i].RequestMapping.fields.length; j++) {
-                let getSlicedFieldName = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split(".");
+            {
+              for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList[k].RequestMapping.fields.length; j++) {
+                let getSlicedFieldName = responses[0].ApiListData.APIdata[i].APIList[k].RequestMapping.fields[j].IN_FIELD.split(".");
 
                 // console.log("+++++", responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD);
                 let updateField = getSlicedFieldName[1]
@@ -526,11 +532,11 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
                   updateField = updateField.capitalize();
 
                 gData = mData.replace('<<field1>>', updateField);
-                gData = gData.replace('<<fieldType>>', responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELDDT);
-                let dataSplit = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split('.');
+                gData = gData.replace('<<fieldType>>', responses[0].ApiListData.APIdata[i].APIList[k].RequestMapping.fields[j].IN_FIELDDT);
+                let dataSplit = responses[0].ApiListData.APIdata[i].APIList[k].RequestMapping.fields[j].IN_FIELD.split('.');
                 gData = gData.replace('<<field1JSON>>', dataSplit[1]);
                 nData += gData + '\n'
-                if (j === responses[0].ApiListData.APIdata[i].RequestMapping.fields.length - 1) {
+                if (j === responses[0].ApiListData.APIdata[i].APIList[k].RequestMapping.fields.length - 1) {
                   // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
                   updatedfileData += getData.replace(mData, nData);
                   // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
@@ -629,7 +635,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       function mspFunctionDesc(tdata) {
         let yData = "";
         let fiData = ""; let qData = ""
-        // console.log("%%%%%%%%",responses[0].ApiListData.APIdata,"%%%%%%%%5")
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
 
           let getFnDescInd = findFnDescInd(tdata, data);
@@ -644,27 +649,30 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
               tData = findIndex(fData);
               //console.log("&&&&&&&&",findIndexOfStruct(fData),"&&&&&&&&&");
-              for (let j = 0; j < responses[0].ApiListData.APIdata[i].RequestMapping.fields.length; j++) {
-                //console.log("$$$$$$$$$$$$$$$$$$",responses[0].ApiListData.APIdata[i].RequestMapping.fields,"$$$$$$$$$$")
+              for (let k = 0; k <responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields.length; k++) {
+                
 
-                let getSlicedFieldName = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split(".");
+                let getSlicedFieldName = responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields[k].IN_FIELD.split(".");
+                
                 let updateField = getSlicedFieldName[1]
                 if (updateField != undefined)
                   updateField = updateField.capitalize();
 
                 let hData = tData.replace('<<field>>', updateField);
-                hData = hData.replace(/<<fieldType>>/g, responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELDDT);
-                hData = hData.replace('<<currentNo>>', j);
+                hData = hData.replace(/<<fieldType>>/g, responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields[k].IN_FIELDDT);
+                hData = hData.replace('<<currentNo>>', k);
 
                 fiData += hData + "\n";
-
-                if (j === responses[0].ApiListData.APIdata[i].RequestMapping.fields.length - 1) {
+                console.log("$$$$$$$$$$$$$$$$$$",fiData,"$$$$$$$$$$")
+                if (k === responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields.length - 1) {
                   // console.log("***********", fiData, "***********")
                   fData = fData.replace(tData, fiData);
                   // yData += fiData + "\n";
                   fiData = "";
                 }
+                
               }
+              
               fData = fData.replace(/<<structName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route);
 
               fData = fData.replace(/<<getStructName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route);
