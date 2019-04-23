@@ -2,10 +2,17 @@
   "keyVault": {
     "env": "DPW",
     "header":{
-
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
     },
     "url": "http://23.97.138.116:9009/keyVault"
+  },
+  "coreDB":{
+    "env": "core_database_list",
+    "header":{
+      "username": "vaultKeeper",
+      "password": "DSGkeeper@321"
+    }
   }
 }
+
