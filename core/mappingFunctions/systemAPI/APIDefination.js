@@ -316,7 +316,10 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let request = {
     "action": "mappingData",
     "searchCriteria": payload.searchCriteria,
-    
+    "page": {
+      "currentPageNo": 1,
+      "pageSize": 10
+    }
   };
   APIDefinitation.findPageAndCount(request)
     .then((data) => {
@@ -453,26 +456,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       }
       responses[0].ApiListData.APIdata = uniqueMSP;
 
-
-
-
-      // console.log(JSON.stringify(storeDuplicate), "%%%%%   STORE DUPLICATE")
-      let commonRemove = checkCommon(storeDuplicate);
-      function checkCommon(storeDuplicate) {
-        console.log("INSIDE CHECKCOMMON")
-        for (let i = 0; i < storeDuplicate[0].APIList.length; i++) {
-          for (let j = 0; j < storeDuplicate[0].APIList.length; j++) {
-            if (storeDuplicate[0].APIList[i] == storeDuplicate[0].APIList[j]) {
-              console.log("  ***************88 SAME &&&&&&&&&&&&&&&&&&")
-              delete storeDuplicate[0].APIList[j];
-            }
-          }
-          return storeDuplicate
-        }
-      }
-
-      // console.log("++++++++++", JSON.stringify(commonRemove), "-----------------")
-      let flag = false
       function replaceM(fileData, storeDuplicate) {
         let getData = getFileIndex(fileData);
         // console.log("!!!!!! GET DATA------", getData, "----- !!!!!! GET DATA")
