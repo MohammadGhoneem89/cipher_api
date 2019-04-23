@@ -310,6 +310,7 @@ function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
 function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let chainCodeData = [];
   let responses = [];
+  let storeDuplicate = [];
   console.log(payload, "IQRA");
 
   let request = {
@@ -317,11 +318,14 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
     "searchCriteria": payload.searchCriteria,
     "page": {
       "currentPageNo": 1,
-      "pageSize": 10
+      "pageSize": 100
     }
   };
   APIDefinitation.findPageAndCount(request)
     .then((data) => {
+      // console.log(data[0],"&&&&&&&&&&&&&&&&&&")
+
+
       function findIndex(ifileData) {
         let startIndex = ifileData.search("<<field>>");
         let endIndex = ifileData.search("  }");
@@ -336,7 +340,9 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       }
 
       data[0].map((item) => {
+        console.log(item.route, ">>>>>>>???????>   DATA [0]")
         if (item.isSmartContract === true && item.isActive === true) {
+
           chainCodeData.push({
             'isActive': item.isActive,
             'MSP': item.MSP,
@@ -348,7 +354,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           });
         }
       });
-
+      // console.log(chainCodeData,">>>>>>>???????>chainCodeData")
       {
         responses.push({
           ApiListData: {
@@ -359,6 +365,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       }
       let response = {};
       for (let i = 0; i < chainCodeData.length; i++) {
+
         {
           response = {
             "MSP": chainCodeData[i].MSP,
@@ -375,8 +382,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         }
 
       }
-      //  console.log(JSON.stringify(responses[0].ApiListData.APIdata));
-console.log(">>>>>>>>>+++++++++++++++++++======================>?????????????????????????????????")
+      // console.log(responses[0].ApiListData.APIdata.length,">>>>>>>???????>BEFOFRE LENGTH  ")
+      console.log(">>>>>>>>>+++++++++++++++++++======================>?????????????????????????????????")
       for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
         responses[0].ApiListData.APIdata[j].RequestMapping.fields = responses[0].ApiListData.APIdata[j].RequestMapping.fields.filter(function (item) {
           // console.log(responses[0].ApiListData.APIdata[j].RequestMapping.fields,">>>>> FIELDSSSSS")
@@ -397,54 +404,149 @@ console.log(">>>>>>>>>+++++++++++++++++++======================>????????????????
         // console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
       }
       //  console.log("NEXT AFTER ----$$$$$$$$$$$$$$$$$$$$$$$$$44",JSON.stringify(responses[0].ApiListData))
-      console.log(responses[0].ApiListData.APIdata.length,">>>>>>>???????>BEFOFRE LENGTH  ")
-     
-      function replaceM(fileData) {
+      let DupIndex = [];
+
+      function removeDuplicatesBy(comparator, array) {
+        let unique = [];
+        // console.log(array,"============== ARRAY")
+        for (let i = 0; i < array.length; i++) {
+          let isUnique = true;
+          for (let j = 0; j < i; j++) {
+            // console.log(array[i],array[j],"        array[i],array[j]")
+            if (comparator(array[i], array[j])) {
+              isUnique = false;
+              DupIndex.push(i);
+              break;
+            }
+          }
+          if (isUnique)
+            unique.push(array[i]);
+        }
+        // console.log(unique)
+        return unique;
+      }
+
+      let uniqueMSP = removeDuplicatesBy(function (a, b) {
+        return a.MSP === b.MSP;
+      }, responses[0].ApiListData.APIdata);
+      // console.log("unique : \n", uniqueMSP, "\n DupIndex :", DupIndex)
+      for (let i = 0; i < DupIndex.length; i++) {
+        // console.log(JSON.stringify(responses[0].ApiListData.APIdata[DupIndex[i]]), "++++++++++++ DUP INDEX DATA ")
+        storeDuplicate.push(responses[0].ApiListData.APIdata[DupIndex[i]]);
+
+      }
+      // console.log(JSON.stringify(storeDuplicate), "diffRoutes-------------------")
+
+      for (let m = 0; m < responses[0].ApiListData.APIdata.length; m++) {
+        for (let k = 0; k < DupIndex.length; k++) {
+          if (responses[0].ApiListData.APIdata[m].MSP == responses[0].ApiListData.APIdata[DupIndex[k]].MSP) {
+            console.log()
+            // console.log(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0],"NEW=====")
+            // storeDuplicate.push(responses[0].ApiListData.APIdata[DupIndex[k]]);
+            responses[0].ApiListData.APIdata[m].APIList.push(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0]);
+
+          }
+        }
+      }
+      responses[0].ApiListData.APIdata = uniqueMSP;
+
+
+
+
+      // console.log(JSON.stringify(storeDuplicate), "%%%%%   STORE DUPLICATE")
+      let commonRemove = checkCommon(storeDuplicate);
+      function checkCommon(storeDuplicate) {
+        console.log("INSIDE CHECKCOMMON")
+        for (let i = 0; i < storeDuplicate[0].APIList.length; i++) {
+          for (let j = 0; j < storeDuplicate[0].APIList.length; j++) {
+            if (storeDuplicate[0].APIList[i] == storeDuplicate[0].APIList[j]) {
+              console.log("  ***************88 SAME &&&&&&&&&&&&&&&&&&")
+              delete storeDuplicate[0].APIList[j];
+            }
+          }
+          return storeDuplicate
+        }
+      }
+
+      // console.log("++++++++++", JSON.stringify(commonRemove), "-----------------")
+      let flag = false
+      function replaceM(fileData, storeDuplicate) {
         let getData = getFileIndex(fileData);
         // console.log("!!!!!! GET DATA------", getData, "----- !!!!!! GET DATA")
         let mData = getIndex(getData);
         let nData; let gData; let newData; let updatedfileData = "";
-        console.log(responses[0].ApiListData.APIdata.length,">>>>>>>>>>>>>>LENGTH  ")
+        // console.log(responses[0].ApiListData.APIdata.length, ">>>>>>>>>>>>>>LENGTH  ")
+
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
-         
-          let arr=responses[0].ApiListData.APIdata[i].APIList;
-          arr.map((item)=>{
-            console.log(item.route,">>>>>>>>>>>>>>ROUTE  ")
-          })
-
           nData = "";
-          
-          for (let k = 0; k < responses[0].ApiListData.APIdata[i].APIList.length; k++) {
-            nData = ""; 
-            for (let j = 0; j < responses[0].ApiListData.APIdata[i].RequestMapping.fields.length; j++) {
-              
-              let getSlicedFieldName = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split(".");
-             
-              // console.log("+++++", responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD);
-              let updateField = getSlicedFieldName[1]
-              if (updateField != undefined)
-                updateField = updateField.capitalize();
 
-              gData = mData.replace('<<field1>>', updateField);
-              gData = gData.replace('<<fieldType>>', responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELDDT);
-              let dataSplit = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split('.');
-              gData = gData.replace('<<field1JSON>>', dataSplit[1]);
-              nData += gData + '\n'
-              if (j === responses[0].ApiListData.APIdata[i].RequestMapping.fields.length - 1) {
-                // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
-                updatedfileData += getData.replace(mData, nData);
-                // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
-                updatedfileData = updatedfileData.replace('<<structName>>', responses[0].ApiListData.APIdata[i].APIList[k].route);
-                // 
+          for (let k = 0; k < responses[0].ApiListData.APIdata[i].APIList.length; k++) {
+            nData = "";
+            // // console.log(commonRemove[0].APIList , " INSIDE CHECK")
+            // for (let p = 0; p < commonRemove[0].APIList.length; p++) {
+            //   console.log(commonRemove[0].APIList[p], " INSIDE CHECK")
+            //   if (responses[0].ApiListData.APIdata[i].APIList[k].route == commonRemove[0].APIList.route)
+            //    { console.log(flag, "<<<<<<   TRUE TREU >>>>>>>>>>");
+            //   flag = true;}
+            // }
+            // if (flag) {
+            //   console.log(commonRemove ,"??????????? COMMON RWMOVE ")
+              // for (let j = 0; j < commonRemove[0].RequestMapping.fields.length; j++) {
+
+              //   let getSlicedFieldName = commonRemove[0].RequestMapping.fields[j].IN_FIELD.split(".");
+
+              //   // console.log("+++++", commonRemove[0].RequestMapping.fields[j].IN_FIELD);
+              //   let updateField = getSlicedFieldName[1]
+              //   if (updateField != undefined)
+              //     updateField = updateField.capitalize();
+
+              //   gData = mData.replace('<<field1>>', updateField);
+              //   gData = gData.replace('<<fieldType>>', commonRemove[0].RequestMapping.fields[j].IN_FIELDDT);
+              //   let dataSplit = commonRemove[0].RequestMapping.fields[j].IN_FIELD.split('.');
+              //   gData = gData.replace('<<field1JSON>>', dataSplit[1]);
+              //   nData += gData + '\n'
+              //   if (j === commonRemove[0].RequestMapping.fields.length - 1) {
+              //     // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
+              //     updatedfileData += getData.replace(mData, nData);
+              //     // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
+              //     updatedfileData = updatedfileData.replace('<<structName>>', commonRemove[0].APIList.route);
+              //     // 
+              //   }
+              // }
+            // }
+
+            // else if (!flag) {
+              {
+              for (let j = 0; j < responses[0].ApiListData.APIdata[i].RequestMapping.fields.length; j++) {
+                let getSlicedFieldName = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split(".");
+
+                // console.log("+++++", responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD);
+                let updateField = getSlicedFieldName[1]
+                if (updateField != undefined)
+                  updateField = updateField.capitalize();
+
+                gData = mData.replace('<<field1>>', updateField);
+                gData = gData.replace('<<fieldType>>', responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELDDT);
+                let dataSplit = responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD.split('.');
+                gData = gData.replace('<<field1JSON>>', dataSplit[1]);
+                nData += gData + '\n'
+                if (j === responses[0].ApiListData.APIdata[i].RequestMapping.fields.length - 1) {
+                  // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
+                  updatedfileData += getData.replace(mData, nData);
+                  // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
+                  updatedfileData = updatedfileData.replace('<<structName>>', responses[0].ApiListData.APIdata[i].APIList[k].route);
+                  // 
+                }
+
               }
             }
             // console.log(updatedfileData, ">>>>>>>>>>> ----- UPDATED FILE DATA")
           }
-          
+
         }
         return updatedfileData;
         // console.log("%%%%%%%%",responses[0].ApiListData.APIdata,"%%%%%%%%5")
-       
+
       }
 
 
@@ -465,8 +567,8 @@ console.log(">>>>>>>>>+++++++++++++++++++======================>????????????????
         if (err) {
           return console.log(err);
         }
-        console.log(responses[0].ApiListData.APIdata.length,">>>>>>>>NEW LENGTH  ")
-        let readUpdatedFile = replaceM(fileData);
+        console.log(responses[0].ApiListData.APIdata.length, ">>>>>>>>NEW LENGTH  ")
+        let readUpdatedFile = replaceM(fileData, storeDuplicate);
         let getD = getFileIndex(fileData)
         let finalStructFile = fileData.replace(getD, readUpdatedFile)
         fs.writeFile(writefileToPathStruct, finalStructFile, 'utf8', function (err) {
@@ -477,40 +579,8 @@ console.log(">>>>>>>>>+++++++++++++++++++======================>????????????????
 
       });
 
-      let DupIndex = [];
 
-      function removeDuplicatesBy(comparator, array) {
-        let unique = [];
-        for (let i = 0; i < array.length; i++) {
-          let isUnique = true;
-          for (let j = 0; j < i; j++) {
-            if (comparator(array[i], array[j])) {
-              isUnique = false;
-              DupIndex.push(i);
-              break;
-            }
-          }
-          if (isUnique) unique.push(array[i]);
-        }
-        // console.log(unique)
-        return unique;
-      }
-
-      // let uniqueMSP = removeDuplicatesBy(function (a, b) {
-      //   return a.MSP === b.MSP;
-      // }, responses[0].ApiListData.APIdata);
-      // // console.log("unique : \n", uniqueMSP, "\n DupIndex :", DupIndex)
-
-      // for (let m = 0; m < responses[0].ApiListData.APIdata.length; m++) {
-      //   for (let k = 0; k < DupIndex.length; k++) {
-      //     if (responses[0].ApiListData.APIdata[m].MSP == responses[0].ApiListData.APIdata[DupIndex[k]].MSP) {
-      //       responses[0].ApiListData.APIdata[m].APIList.push(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0]);
-
-      //     }
-      //   }
-      // }
-      // responses[0].ApiListData.APIdata = uniqueMSP;
-      //console.log(responses[0].ApiListData.APIdata)
+      //  console.log(JSON.stringify(responses[0].ApiListData.APIdata),"DATA --------------")
 
       let newData = "", updateIndex = "";
       let mData = "", mData2 = "", mData3 = "", wData = "";
@@ -624,6 +694,7 @@ console.log(">>>>>>>>>+++++++++++++++++++======================>????????????????
         let Ldata = fData.replace(getFnLogicInd, overWrite);
 
         let getFnDescInd = findFnDescInd(fData);
+
         let hData = Ldata.replace(getFnDescInd, overWriteAgain);
 
         fs.writeFile(writefileToPath, hData, 'utf8', function (err) {
