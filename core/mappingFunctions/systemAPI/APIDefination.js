@@ -316,10 +316,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let request = {
     "action": "mappingData",
     "searchCriteria": payload.searchCriteria,
-    "page": {
-      "currentPageNo": 1,
-      "pageSize": 100
-    }
+    
   };
   APIDefinitation.findPageAndCount(request)
     .then((data) => {
@@ -382,8 +379,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         }
 
       }
-      console.log(JSON.stringify(responses[0].ApiListData.APIdata), ">>>>>>>???????>BEFOFRE LENGTH  ")
-      console.log(">>>>>>>>>+++++++++++++++++++======================>?????????????????????????????????")
+      // console.log(JSON.stringify(responses[0].ApiListData.APIdata), ">>>>>>>???????>BEFOFRE LENGTH  ")
+      // console.log(">>>>>>>>>+++++++++++++++++++======================>?????????????????????????????????")
       for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
         for (let k = 0; k < responses[0].ApiListData.APIdata[j].APIList.length; k++) {
           // for (let i = 0; i < responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields.length; i++) {
@@ -488,40 +485,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
           for (let k = 0; k < responses[0].ApiListData.APIdata[i].APIList.length; k++) {
             nData = "";
-            // // console.log(commonRemove[0].APIList , " INSIDE CHECK")
-            // for (let p = 0; p < commonRemove[0].APIList.length; p++) {
-            //   console.log(commonRemove[0].APIList[p], " INSIDE CHECK")
-            //   if (responses[0].ApiListData.APIdata[i].APIList[k].route == commonRemove[0].APIList.route)
-            //    { console.log(flag, "<<<<<<   TRUE TREU >>>>>>>>>>");
-            //   flag = true;}
-            // }
-            // if (flag) {
-            //   console.log(commonRemove ,"??????????? COMMON RWMOVE ")
-            // for (let j = 0; j < commonRemove[0].RequestMapping.fields.length; j++) {
-
-            //   let getSlicedFieldName = commonRemove[0].RequestMapping.fields[j].IN_FIELD.split(".");
-
-            //   // console.log("+++++", commonRemove[0].RequestMapping.fields[j].IN_FIELD);
-            //   let updateField = getSlicedFieldName[1]
-            //   if (updateField != undefined)
-            //     updateField = updateField.capitalize();
-
-            //   gData = mData.replace('<<field1>>', updateField);
-            //   gData = gData.replace('<<fieldType>>', commonRemove[0].RequestMapping.fields[j].IN_FIELDDT);
-            //   let dataSplit = commonRemove[0].RequestMapping.fields[j].IN_FIELD.split('.');
-            //   gData = gData.replace('<<field1JSON>>', dataSplit[1]);
-            //   nData += gData + '\n'
-            //   if (j === commonRemove[0].RequestMapping.fields.length - 1) {
-            //     // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
-            //     updatedfileData += getData.replace(mData, nData);
-            //     // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
-            //     updatedfileData = updatedfileData.replace('<<structName>>', commonRemove[0].APIList.route);
-            //     // 
-            //   }
-            // }
-            // }
-
-            // else if (!flag) {
+           
+            
             {
               for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList[k].RequestMapping.fields.length; j++) {
                 let getSlicedFieldName = responses[0].ApiListData.APIdata[i].APIList[k].RequestMapping.fields[j].IN_FIELD.split(".");
@@ -663,7 +628,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
                 hData = hData.replace('<<currentNo>>', k);
 
                 fiData += hData + "\n";
-                console.log("$$$$$$$$$$$$$$$$$$",fiData,"$$$$$$$$$$")
+               
                 if (k === responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields.length - 1) {
                   // console.log("***********", fiData, "***********")
                   fData = fData.replace(tData, fiData);
@@ -734,7 +699,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
                   {
                     "route": "",
                     "purpose": ""
-
+                       
                   }
 
                 ]
