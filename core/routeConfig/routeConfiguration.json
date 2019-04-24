@@ -1,5 +1,59 @@
 {
   "core": {
+    "upload": {
+      "customMapping": true,
+      "MappingfunctionName": "upload",
+      "CustomMappingFile": "fileUpload/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "download": {
+      "customMapping": true,
+      "MappingfunctionName": "download",
+      "CustomMappingFile": "fileUpload/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "upsertAPIImport": {
+      "customMapping": true,
+      "MappingfunctionName": "upsertAPIImport",
+      "CustomMappingFile": "systemAPI/apiImport.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getImport": {
+      "customMapping": true,
+      "MappingfunctionName": "getImport",
+      "CustomMappingFile": "systemAPI/apiImport.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getServiceList": {
+      "customMapping": true,
+      "MappingfunctionName": "git",
+      "CustomMappingFile": "systemAPI/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getComplexServiceList": {
+      "customMapping": true,
+      "MappingfunctionName": "getServiceList",
+      "CustomMappingFile": "systemAPI/complexTypes.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "upsertComplexTypes": {
+      "customMapping": true,
+      "MappingfunctionName": "upsertComplexTypes",
+      "CustomMappingFile": "systemAPI/complexTypes.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getComplexTypesByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getComplexTypesByID",
+      "CustomMappingFile": "systemAPI/complexTypes.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getComplexTypes": {
+      "customMapping": true,
+      "MappingfunctionName": "getComplexTypes",
+      "CustomMappingFile": "systemAPI/complexTypes.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "upsertAPIImport": {
       "customMapping": true,
       "MappingfunctionName": "upsertAPIImport",
@@ -203,7 +257,7 @@
       "MappingfunctionName": "updateNetworkConfig",
       "CustomMappingFile": "systemAPI/networkConfig.js",
       "mappingConfigFile": "ePayMapping"
-    }, 
+    },
     "getUserList": {
       "customMapping": true,
       "MappingfunctionName": "getUserList",
@@ -297,6 +351,12 @@
     "getActiveAPIList": {
       "customMapping": true,
       "MappingfunctionName": "getActiveAPIList",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getActiveAPIListForDocumentation": {
+      "customMapping": true,
+      "MappingfunctionName": "getActiveAPIListForDocumentation",
       "CustomMappingFile": "systemAPI/APIDefination.js",
       "mappingConfigFile": "ePayMapping"
     },

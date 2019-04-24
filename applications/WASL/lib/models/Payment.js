@@ -5,6 +5,9 @@ const Schema = mongoose.Schema;
 const dates = require('../../../../lib/helpers/dates');
 
 const schema = new Schema({
+  bankCode: {
+    type: String
+  },
   name: {
     type: String
   },
