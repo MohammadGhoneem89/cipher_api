@@ -723,7 +723,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let Ldata = fData.replace(getFnLogicInd, overWrite);
 
         let getFnDescInd = findFnDescInd(fData);
-
         let hData = Ldata.replace(getFnDescInd, overWriteAgain);
 
         fs.writeFile(writefileToPath, hData, 'utf8', function (err) {

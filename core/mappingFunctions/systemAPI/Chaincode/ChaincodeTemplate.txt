@@ -16,23 +16,23 @@ import (
   ===================================================================================*/
 
 //Struct For Chain Code
-type PRChainCode struct {
+type <<UseCase>>ChainCode struct {
 }
 
-var logger = shim.NewLogger("PR")
+var logger = shim.NewLogger("<<UseCase>>")
 
 //Standard Functions
 func main() {
-	fmt.Println("PR ChainCode Started")
-	err := shim.Start(new(PRChainCode))
+	fmt.Println("<<UseCase>> ChainCode Started")
+	err := shim.Start(new(<<UseCase>>ChainCode))
 	if err != nil {
-		fmt.Println("Error starting PR chaincode: %s", err)
+		fmt.Println("Error starting <<UseCase>> chaincode: %s", err)
 	}
 }
 
 //Init is called during chaincode instantiation to initialize any data.
-func (t *PRChainCode) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	fmt.Println("PR ChainCode Initiated")
+func (t *<<UseCase>>ChainCode) Init(stub shim.ChaincodeStubInterface) pb.Response {
+	fmt.Println("<<UseCase>> ChainCode Initiated")
 
 	_, args := stub.GetFunctionAndParameters()
 	fmt.Println("Init: %v", args)
@@ -60,7 +60,7 @@ func (t *PRChainCode) Init(stub shim.ChaincodeStubInterface) pb.Response {
 }
 
 //Invoke is called per transaction on the chaincode
-func (t *PRChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
+func (t *<<UseCase>>ChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 	//getting MSP
 	certOrgType, err := cid.GetMSPID(stub)
