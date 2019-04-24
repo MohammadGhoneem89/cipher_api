@@ -354,6 +354,12 @@
       "CustomMappingFile": "systemAPI/APIDefination.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getActiveAPIListForDocumentation": {
+      "customMapping": true,
+      "MappingfunctionName": "getActiveAPIListForDocumentation",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getAPIList": {
       "customMapping": true,
       "MappingfunctionName": "getServiceList",

@@ -8,19 +8,32 @@ type MSPList struct {
 type BLANK struct {
 	BLANK string `json:"BLANK"`
 }
-type  getDeclarationData struct{
-	COONo string `json:"COONo"`
-ModeOfTransport string `json:"modeOfTransport"`
-ExitPoint string `json:"exitPoint"`
-FinalShipmentDestination string `json:"finalShipmentDestination"`
-PortOfDischarge string `json:"portOfDischarge"`
-VesselName string `json:"vesselName"`
-ProcessType string `json:"processType"`
-ProcessingCountry string `json:"processingCountry"`
-ExportDeclaration string `json:"exportDeclaration"`
-PaymentMethod string `json:"paymentMethod"`
-ExporterType string `json:"exporterType"`
-MemeberNo string `json:"memeberNo"`
+type  postDataToBlockchainChamber struct{
+	UnifiedID string `json:"unifiedID"`
+MembershipExpiryDate string `json:"membershipExpiryDate"`
+MembershipStatus string `json:"membershipStatus"`
+ }
+
+
+type  postDataToBlockchainCustoms struct{
+	UnifiedID string `json:"unifiedID"`
+AccountName string `json:"accountName"`
+GroupBuisnessName string `json:"groupBuisnessName"`
+ }
+
+
+type  postDataToBlockchainDPW struct{
+	UnifiedID string `json:"unifiedID"`
+CompanyBrief string `json:"companyBrief"`
+NonVATCustomer bool `json:"nonVATCustomer"`
+ }
+
+
+type  postDataToBlockchainDubaiTrade struct{
+	UnifiedID string `json:"unifiedID"`
+FacebookURL string `json:"facebookURL"`
+TwitterURL string `json:"twitterURL"`
+VATAccountNo string `json:"VATAccountNo"`
  }
 
 

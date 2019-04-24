@@ -5,9 +5,12 @@ const mime = require('mime');
 const fs = require('fs');
 const config = require('../../../config/index');
 const sha512 = require('../../../lib/hash/sha512');
-const { create } = require('../../../lib/services/documents');
+const { create, findDocument } = require('../../../lib/services/documents');
 
 let upload = async function (payload, UUIDKey, route, callback, JWToken) {
+  const today = new Date();
+  const dirName = `${today.getFullYear()}-${today.getMonth() +1}-${today.getDate()}`;
+
   function getExtension(filename) {
     return filename.split('.').pop();
   }
@@ -16,7 +19,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
   if (JWToken.userID) {
     userID = JWToken.userID;
   }
-  if (payload.queryParams.fileReference || payload.headersParams.fileReference) {
+  if (payload.queryParams && payload.queryParams['fileReference'] || payload.headersParams.fileReference) {
     fileReference = payload.queryParams.fileReference || payload.headersParams.fileReference;
   }
   if (payload.queryParams.source || payload.headersParams.source) {
@@ -31,7 +34,8 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
   }
 
   const allowedExtensions = config.get('fileTypes');
-  const basePath = config.get('basePath');
+  let basePath = config.get('basePath');
+  basePath = String(basePath);
 
   if (!payload.files || Object.keys(payload.files).length == 0) {
     let resp = {
@@ -54,8 +58,13 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
     return callback(resp);
   }
   const fileName = payload.files.files.name;
+  const fileHash = sha512(fileName + new Date());
+
   const fileExtension = getExtension(fileName);
-    if (!allowedExtensions.includes(fileExtension.toUpperCase())) {
+  let completeBasePath = path.normalize(path.join('.', basePath, dirName));
+  let completeFileName = path.normalize(path.join(completeBasePath,  fileHash + '.' + fileExtension));
+
+  if (!allowedExtensions.includes(fileExtension.toUpperCase())) {
        let resp = {
         "messageStatus": "ERROR",
         "cipherMessageId": UUIDKey,
@@ -65,7 +74,6 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
       };
       return callback(resp);
     }
-    const fileHash = sha512(fileName + new Date());
      let resp = {
       "messageStatus": "OK",
       "cipherMessageId": UUIDKey,
@@ -75,13 +83,16 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
       "name": fileName,
       "type": type,
       "hash": fileHash,
-      "path": basePath + fileHash + '.' + fileExtension,
+      "path": completeFileName,
       "fileReference": fileReference
     };
      try {
-       await payload.files.files.mv(path.normalize(basePath + '/' + fileHash + '.' + fileExtension));
+       !fs.existsSync(completeBasePath) ?
+         fs.mkdirSync(completeBasePath, {mode: 777, recursive: true}):
+         null;
+       await payload.files.files.mv(completeFileName);
        await create({
-         "path": basePath + fileHash + '.' + fileExtension,
+         "path": completeFileName,
          "ext": fileExtension.toUpperCase(),
          "name": fileName,
          "type": type,
@@ -97,33 +108,56 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
        });
        return callback(resp);
      } catch (e) {
-       throw new Error(e.stack)
+       return callback(e);
      }
 };
 
-  let download = function (payload, UUIDKey, route, callback, JWToken, res) {
-
-    if (!payload.queryParams.type && !payload.queryParams.path) {
-      let resp = {
-        "messageStatus": "ERROR",
-        "cipherMessageId": UUIDKey,
-        "errorDescription": "type and path is required!",
-        "errorCode": 201,
-        "timestamp": new Date()
-      };
+  let download = async function (payload, UUIDKey, route, callback, JWToken, res) {
+    let resp = {
+      "messageStatus": "ERROR",
+      "cipherMessageId": UUIDKey,
+      "errorDescription": "",
+      "errorCode": 201,
+      "timestamp": new Date()
+    };
+    if (!payload.queryParams.path) {
+      resp.errorDescription = `File reference Hash is required!`;
       return callback(resp);
     }
+    let userId;
+    // if (JWToken.userID) {
+    //   userId = JWToken._id;
+    // } else {
+    //   resp.errorDescription = `You don't have permission to download this file`;
+    //   return callback(resp);
+    // }
+    try {
+      let document = await findDocument({
+        hash: payload.queryParams.path || payload.headersParams.path
+      });
+      if (document) {
+        if (fs.existsSync(path.normalize(document.path))) {
+          let file = path.normalize(document.path);
+          let mimeType = mime.lookup(file);
 
-    let file = path.join(__dirname, 'mock.png');
-    let filename = path.basename(file);
-    let mimetype = mime.lookup(file);
-
-    res.set({
-      'Content-Type': mimetype,
-      'Content-Disposition': `attachment; filename=${filename}`
-    });
-    let filestream = fs.createReadStream(file);
-    return filestream.pipe(res);
+          res.set({
+            'httpResponse': true,
+            'Content-Type': mimeType,
+            'Content-Disposition': `attachment; filename=${document.name}`
+          });
+          let fileStream = await fs.createReadStream(file);
+          return fileStream.pipe(res);
+        } else {
+          resp.errorDescription = `There is no file found with provided hash please try another`;
+          callback(resp);
+        }
+      } else {
+        resp.errorDescription = `There is no file found with provided hash please try another`;
+        callback(resp);
+      }
+    } catch (error) {
+      callback(error.stack);
+    }
   };
 
   exports.upload = upload;

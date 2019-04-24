@@ -9,7 +9,7 @@ const _ = require('lodash');
 const apiFilter = ['RenewContract'];
 
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
-   if (apiFilter.indexOf(incommingRoute) >= 0) {
+  if (apiFilter.indexOf(incommingRoute) >= 0) {
     if (payload.body.password || payload.JWToken || payload.JWT) {
       delete payload.body.password;
       delete payload.JWToken;

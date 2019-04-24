@@ -21,6 +21,7 @@ function tryConnection() {
       }, 60000);
     });
 }
+
 function getConfigs() {
   return new Promise((resolve, reject) => {
     dbConfig.get((err, response, body) => {

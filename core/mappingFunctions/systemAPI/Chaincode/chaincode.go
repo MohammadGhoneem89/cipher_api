@@ -84,60 +84,60 @@ func (t *PRChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	fmt.Println("Arguments Loaded Successfully!!")
 
 	//<<Function Validation Logic-Start>>
-	if orgType == "ORG" {						
+	if orgType == "REGAUTH" {
 		switch functionName := function; functionName {
 		//<<FunctionCases-Start>>
-		
-		case "amendCOO":
-			return t.amendCOO(stub, args,"amendCOO")
-					
-		//<<FunctionCases-Start>>
-		
-		case "amendExportDelcaration":
-			return t.amendExportDelcaration(stub, args,"amendExportDelcaration")
-					
-		//<<FunctionCases-Start>>
-		
-		case "authToExport":
-			return t.authToExport(stub, args,"authToExport")
-					
-		//<<FunctionCases-Start>>
-		
-		case "containerLoaded":
-			return t.containerLoaded(stub, args,"containerLoaded")
-					
-		//<<FunctionCases-Start>>
-		
-		case "createCOO":
-			return t.createCOO(stub, args,"createCOO")
-					
-		//<<FunctionCases-Start>>
-		
-		case "createCOOForDeclaration":
-			return t.createCOOForDeclaration(stub, args,"createCOOForDeclaration")
-					
-		//<<FunctionCases-Start>>
-		
-		case "createExportDeclaration":
-			return t.createExportDeclaration(stub, args,"createExportDeclaration")
-					
-		//<<FunctionCases-Start>>
-		
-		case "getCOOData":
-			return t.getCOOData(stub, args,"getCOOData")
-					
-		//<<FunctionCases-Start>>
-		
-		case "getContainerData":
-			return t.getContainerData(stub, args,"getContainerData")
-					
-		//<<FunctionCases-Start>>
-		
-		case "getDeclarationData":
-			return t.getDeclarationData(stub, args,"getDeclarationData")
-					
+
+		case "postDataToBlockchainChamber":
+			return t.postDataToBlockchainChamber(stub, args,"postDataToBlockchainChamber")
+
 		//<<FunctionCases-End>>
-		
+
+		default:
+			logger.Warning("Invoke did not find function: " + function)
+			return shim.Error("Received unknown function invocation: " + function)
+		}
+	} else
+//<<Function Validation Logic-Start>>
+	if orgType == "CUSTOMS" {
+		switch functionName := function; functionName {
+		//<<FunctionCases-Start>>
+
+		case "postDataToBlockchainCustoms":
+			return t.postDataToBlockchainCustoms(stub, args,"postDataToBlockchainCustoms")
+
+		//<<FunctionCases-End>>
+
+		default:
+			logger.Warning("Invoke did not find function: " + function)
+			return shim.Error("Received unknown function invocation: " + function)
+		}
+	} else
+//<<Function Validation Logic-Start>>
+	if orgType == "DPW" {
+		switch functionName := function; functionName {
+		//<<FunctionCases-Start>>
+
+		case "postDataToBlockchainDPW":
+			return t.postDataToBlockchainDPW(stub, args,"postDataToBlockchainDPW")
+
+		//<<FunctionCases-End>>
+
+		default:
+			logger.Warning("Invoke did not find function: " + function)
+			return shim.Error("Received unknown function invocation: " + function)
+		}
+	} else
+//<<Function Validation Logic-Start>>
+	if orgType == "DT" {
+		switch functionName := function; functionName {
+		//<<FunctionCases-Start>>
+
+		case "postDataToBlockchainDubaiTrade":
+			return t.postDataToBlockchainDubaiTrade(stub, args,"postDataToBlockchainDubaiTrade")
+
+		//<<FunctionCases-End>>
+
 		default:
 			logger.Warning("Invoke did not find function: " + function)
 			return shim.Error("Received unknown function invocation: " + function)
@@ -146,17 +146,17 @@ func (t *PRChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	{
 		return shim.Error("Invalid MSP: " + orgType)
 	}
-	
+
 }
 
 func insertDataAndRaiseEvent(stub shim.ChaincodeStubInterface,key string,eventType string,data []byte) error {
-	
+
 	err := stub.PutState(key, data)
 	if err != nil {
 		return err
 	}
 	logger.Debug("Successfully Put State for Key: " + key)
-		
+
 	err = stub.SetEvent(eventType, []byte(data))
 	if err != nil {
 		return err
@@ -178,360 +178,109 @@ func insertDataAndRaiseEvent(stub shim.ChaincodeStubInterface,key string,eventTy
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:amendCOO
-	Description: This API is consumed by Dubai Chamber to stamp any amendments in COO related information on the Blockchain. In case of changes in the COO the export Declaration event is fired on Customs from blockchain. All attributes other then COO are non mandatory and which attributes changes the appropraite data should only be pushed to the blockchain
+	Function Name:postDataToBlockchainChamber
+	Description: This API is consumed by Dubai Chamber (DCC) to stamp the licensing/registration related information on the Blockchain.
 */
-func (t *EAChainCode) amendCOO(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("amendCOO: %v", args)
-    
+func (t *URChainCode) postDataToBlockchainChamber(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("postDataToBlockchainChamber: %v", args)
+
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
 	}
-	
+
 	//Business Logic to be added here
-		
-amendCOO := &amendCOO{	
-		COONo:   sanitize(args[0], "string").(string),
-ModeOfTransport:   sanitize(args[1], "string").(string),
-ExitPoint:   sanitize(args[2], "string").(string),
-FinalShipmentDestination:   sanitize(args[3], "string").(string),
-PortOfDischarge:   sanitize(args[4], "string").(string),
-VesselName:   sanitize(args[5], "string").(string),
-ProcessType:   sanitize(args[6], "string").(string),
-ProcessingCountry:   sanitize(args[7], "string").(string),
-ExportDeclaration:   sanitize(args[8], "string").(string),
-PaymentMethod:   sanitize(args[9], "string").(string),
-ExporterType:   sanitize(args[10], "string").(string),
-MemeberNo:   sanitize(args[11], "string").(string),
+
+postDataToBlockchainChamber := &postDataToBlockchainChamber{
+		UnifiedID:   sanitize(args[0], "string").(string),
+MembershipExpiryDate:   sanitize(args[1], "string").(string),
+MembershipStatus:   sanitize(args[2], "string").(string),
   }
 
-fmt.Println(amendCOO)
-	logger.Debug("amendCOO function executed successfully.")
-	
+fmt.Println(postDataToBlockchainChamber)
+	logger.Debug("postDataToBlockchainChamber function executed successfully.")
+
 	return shim.Success(nil)
 }
 
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:amendExportDelcaration
-	Description: This API is consumed by Dubai Customs to stamp amend Export Declaration related information on the Blockchain. The API expects all attributes to be non-mandatory and whichever tag values are provided they will be updated. In case if the Export declaration is tied with COO then an event is raised by blockchain to chamber for amending the COO.
+	Function Name:postDataToBlockchainCustoms
+	Description: This API is consumed by Dubai Trade (Dubai Customs) to stamp the licensing/registration related information on the Blockchain.
 */
-func (t *EAChainCode) amendExportDelcaration(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("amendExportDelcaration: %v", args)
-    
+func (t *URChainCode) postDataToBlockchainCustoms(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("postDataToBlockchainCustoms: %v", args)
+
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
 	}
-	
+
 	//Business Logic to be added here
-		
-amendExportDelcaration := &amendExportDelcaration{	
-		COONo:   sanitize(args[0], "string").(string),
-ModeOfTransport:   sanitize(args[1], "string").(string),
-ExitPoint:   sanitize(args[2], "string").(string),
-FinalShipmentDestination:   sanitize(args[3], "string").(string),
-PortOfDischarge:   sanitize(args[4], "string").(string),
-VesselName:   sanitize(args[5], "string").(string),
-ProcessType:   sanitize(args[6], "string").(string),
-ProcessingCountry:   sanitize(args[7], "string").(string),
-ExportDeclaration:   sanitize(args[8], "string").(string),
-PaymentMethod:   sanitize(args[9], "string").(string),
-ExporterType:   sanitize(args[10], "string").(string),
-MemeberNo:   sanitize(args[11], "string").(string),
+
+postDataToBlockchainCustoms := &postDataToBlockchainCustoms{
+		UnifiedID:   sanitize(args[0], "string").(string),
+AccountName:   sanitize(args[1], "string").(string),
+GroupBuisnessName:   sanitize(args[2], "string").(string),
   }
 
-fmt.Println(amendExportDelcaration)
-	logger.Debug("amendExportDelcaration function executed successfully.")
-	
+fmt.Println(postDataToBlockchainCustoms)
+	logger.Debug("postDataToBlockchainCustoms function executed successfully.")
+
 	return shim.Success(nil)
 }
 
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:authToExport
-	Description: This API is consumed by DP World to stamp container when status is “authToExport” updated on the vessel related information on the Blockchain.
+	Function Name:postDataToBlockchainDPW
+	Description: This API is consumed by DP World (DPW) to stamp the licensing/registration related information on the Blockchain.
 */
-func (t *EAChainCode) authToExport(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("authToExport: %v", args)
-    
+func (t *URChainCode) postDataToBlockchainDPW(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("postDataToBlockchainDPW: %v", args)
+
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
 	}
-	
+
 	//Business Logic to be added here
-		
-authToExport := &authToExport{	
-		COONo:   sanitize(args[0], "string").(string),
-ModeOfTransport:   sanitize(args[1], "string").(string),
-ExitPoint:   sanitize(args[2], "string").(string),
-FinalShipmentDestination:   sanitize(args[3], "string").(string),
-PortOfDischarge:   sanitize(args[4], "string").(string),
-VesselName:   sanitize(args[5], "string").(string),
-ProcessType:   sanitize(args[6], "string").(string),
-ProcessingCountry:   sanitize(args[7], "string").(string),
-ExportDeclaration:   sanitize(args[8], "string").(string),
-PaymentMethod:   sanitize(args[9], "string").(string),
-ExporterType:   sanitize(args[10], "string").(string),
-MemeberNo:   sanitize(args[11], "string").(string),
+
+postDataToBlockchainDPW := &postDataToBlockchainDPW{
+		UnifiedID:   sanitize(args[0], "string").(string),
+CompanyBrief:   sanitize(args[1], "string").(string),
+NonVATCustomer:   sanitize(args[2], "bool").(bool),
   }
 
-fmt.Println(authToExport)
-	logger.Debug("authToExport function executed successfully.")
-	
+fmt.Println(postDataToBlockchainDPW)
+	logger.Debug("postDataToBlockchainDPW function executed successfully.")
+
 	return shim.Success(nil)
 }
 
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:containerLoaded
-	Description: This API is consumed by DP World to stamp when container status is updated on the vessel related information on the Blockchain.
+	Function Name:postDataToBlockchainDubaiTrade
+	Description: This API is consumed by Dubai Trade (Dubai Trade) to stamp the licensing/registration related information on the Blockchain.
 */
-func (t *EAChainCode) containerLoaded(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("containerLoaded: %v", args)
-    
+func (t *URChainCode) postDataToBlockchainDubaiTrade(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("postDataToBlockchainDubaiTrade: %v", args)
+
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
 	}
-	
+
 	//Business Logic to be added here
-		
-containerLoaded := &containerLoaded{	
-		COONo:   sanitize(args[0], "string").(string),
-ModeOfTransport:   sanitize(args[1], "string").(string),
-ExitPoint:   sanitize(args[2], "string").(string),
-FinalShipmentDestination:   sanitize(args[3], "string").(string),
-PortOfDischarge:   sanitize(args[4], "string").(string),
-VesselName:   sanitize(args[5], "string").(string),
-ProcessType:   sanitize(args[6], "string").(string),
-ProcessingCountry:   sanitize(args[7], "string").(string),
-ExportDeclaration:   sanitize(args[8], "string").(string),
-PaymentMethod:   sanitize(args[9], "string").(string),
-ExporterType:   sanitize(args[10], "string").(string),
-MemeberNo:   sanitize(args[11], "string").(string),
+
+postDataToBlockchainDubaiTrade := &postDataToBlockchainDubaiTrade{
+		UnifiedID:   sanitize(args[0], "string").(string),
+FacebookURL:   sanitize(args[1], "string").(string),
+TwitterURL:   sanitize(args[2], "string").(string),
+VATAccountNo:   sanitize(args[3], "string").(string),
   }
 
-fmt.Println(containerLoaded)
-	logger.Debug("containerLoaded function executed successfully.")
-	
-	return shim.Success(nil)
-}
+fmt.Println(postDataToBlockchainDubaiTrade)
+	logger.Debug("postDataToBlockchainDubaiTrade function executed successfully.")
 
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:createCOO
-	Description: This API is consumed by Dubai Chamber to stamp the COO registration related information on the Blockchain and this will be the complete information stamped based on the case Normal COO with no co-relation with Export Declaration.
-*/
-func (t *EAChainCode) createCOO(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("createCOO: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-createCOO := &createCOO{	
-		COONo:   sanitize(args[0], "string").(string),
-ModeOfTransport:   sanitize(args[1], "string").(string),
-ExitPoint:   sanitize(args[2], "string").(string),
-FinalShipmentDestination:   sanitize(args[3], "string").(string),
-PortOfDischarge:   sanitize(args[4], "string").(string),
-VesselName:   sanitize(args[5], "string").(string),
-ProcessType:   sanitize(args[6], "string").(string),
-ProcessingCountry:   sanitize(args[7], "string").(string),
-ExportDeclaration:   sanitize(args[8], "string").(string),
-PaymentMethod:   sanitize(args[9], "string").(string),
-ExporterType:   sanitize(args[10], "string").(string),
-MemeberNo:   sanitize(args[11], "string").(string),
-  }
-
-fmt.Println(createCOO)
-	logger.Debug("createCOO function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:createCOOForDeclaration
-	Description: This API is consumed by Dubai Chamber to stamp the COO for declaration related information on the Blockchain. This is used in co-relation with export declaration so those fields available already in the declaration are fetched directly by smart contract and no need to pass as input.
-*/
-func (t *EAChainCode) createCOOForDeclaration(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("createCOOForDeclaration: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-createCOOForDeclaration := &createCOOForDeclaration{	
-		COONo:   sanitize(args[0], "string").(string),
-ModeOfTransport:   sanitize(args[1], "string").(string),
-ExitPoint:   sanitize(args[2], "string").(string),
-FinalShipmentDestination:   sanitize(args[3], "string").(string),
-PortOfDischarge:   sanitize(args[4], "string").(string),
-VesselName:   sanitize(args[5], "string").(string),
-ProcessType:   sanitize(args[6], "string").(string),
-ProcessingCountry:   sanitize(args[7], "string").(string),
-ExportDeclaration:   sanitize(args[8], "string").(string),
-PaymentMethod:   sanitize(args[9], "string").(string),
-ExporterType:   sanitize(args[10], "string").(string),
-MemeberNo:   sanitize(args[11], "string").(string),
-  }
-
-fmt.Println(createCOOForDeclaration)
-	logger.Debug("createCOOForDeclaration function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:createExportDeclaration
-	Description: This API is consumed by Dubai Customs to stamp Export Declaration related information on the Blockchain.
-*/
-func (t *EAChainCode) createExportDeclaration(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("createExportDeclaration: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-createExportDeclaration := &createExportDeclaration{	
-		COONo:   sanitize(args[0], "string").(string),
-ModeOfTransport:   sanitize(args[1], "string").(string),
-ExitPoint:   sanitize(args[2], "string").(string),
-FinalShipmentDestination:   sanitize(args[3], "string").(string),
-PortOfDischarge:   sanitize(args[4], "string").(string),
-VesselName:   sanitize(args[5], "string").(string),
-ProcessType:   sanitize(args[6], "string").(string),
-ProcessingCountry:   sanitize(args[7], "string").(string),
-ExportDeclaration:   sanitize(args[8], "string").(string),
-PaymentMethod:   sanitize(args[9], "string").(string),
-ExporterType:   sanitize(args[10], "string").(string),
-MemeberNo:   sanitize(args[11], "string").(string),
-  }
-
-fmt.Println(createExportDeclaration)
-	logger.Debug("createExportDeclaration function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:getCOOData
-	Description: This API can be consumed by any party to get information latest container information from the Blockchain.
-*/
-func (t *EAChainCode) getCOOData(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("getCOOData: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-getCOOData := &getCOOData{	
-		COONo:   sanitize(args[0], "string").(string),
-ModeOfTransport:   sanitize(args[1], "string").(string),
-ExitPoint:   sanitize(args[2], "string").(string),
-FinalShipmentDestination:   sanitize(args[3], "string").(string),
-PortOfDischarge:   sanitize(args[4], "string").(string),
-VesselName:   sanitize(args[5], "string").(string),
-ProcessType:   sanitize(args[6], "string").(string),
-ProcessingCountry:   sanitize(args[7], "string").(string),
-ExportDeclaration:   sanitize(args[8], "string").(string),
-PaymentMethod:   sanitize(args[9], "string").(string),
-ExporterType:   sanitize(args[10], "string").(string),
-MemeberNo:   sanitize(args[11], "string").(string),
-  }
-
-fmt.Println(getCOOData)
-	logger.Debug("getCOOData function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:getContainerData
-	Description: This API can be consumed by any party to get information latest container information from the Blockchain.
-*/
-func (t *EAChainCode) getContainerData(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("getContainerData: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-getContainerData := &getContainerData{	
-		COONo:   sanitize(args[0], "string").(string),
-ModeOfTransport:   sanitize(args[1], "string").(string),
-ExitPoint:   sanitize(args[2], "string").(string),
-FinalShipmentDestination:   sanitize(args[3], "string").(string),
-PortOfDischarge:   sanitize(args[4], "string").(string),
-VesselName:   sanitize(args[5], "string").(string),
-ProcessType:   sanitize(args[6], "string").(string),
-ProcessingCountry:   sanitize(args[7], "string").(string),
-ExportDeclaration:   sanitize(args[8], "string").(string),
-PaymentMethod:   sanitize(args[9], "string").(string),
-ExporterType:   sanitize(args[10], "string").(string),
-MemeberNo:   sanitize(args[11], "string").(string),
-  }
-
-fmt.Println(getContainerData)
-	logger.Debug("getContainerData function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:getDeclarationData
-	Description: This API can be consumed by any party to get information latest container information from the Blockchain.
-*/
-func (t *EAChainCode) getDeclarationData(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("getDeclarationData: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-getDeclarationData := &getDeclarationData{	
-		COONo:   sanitize(args[0], "string").(string),
-ModeOfTransport:   sanitize(args[1], "string").(string),
-ExitPoint:   sanitize(args[2], "string").(string),
-FinalShipmentDestination:   sanitize(args[3], "string").(string),
-PortOfDischarge:   sanitize(args[4], "string").(string),
-VesselName:   sanitize(args[5], "string").(string),
-ProcessType:   sanitize(args[6], "string").(string),
-ProcessingCountry:   sanitize(args[7], "string").(string),
-ExportDeclaration:   sanitize(args[8], "string").(string),
-PaymentMethod:   sanitize(args[9], "string").(string),
-ExporterType:   sanitize(args[10], "string").(string),
-MemeberNo:   sanitize(args[11], "string").(string),
-  }
-
-fmt.Println(getDeclarationData)
-	logger.Debug("getDeclarationData function executed successfully.")
-	
 	return shim.Success(nil)
 }
 
