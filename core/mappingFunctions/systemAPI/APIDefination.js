@@ -377,7 +377,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
   let chainCodeData = [];
   let responses = [];
   let storeDuplicate = [];
-  console.log(payload, "IQRA");
+  // console.log(payload, "IQRA");
 
   let request = {
     "action": "mappingData",
@@ -387,9 +387,9 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       "pageSize": 10
     }
   };
-  APIDefinitation.findPageAndCount(request)
+  APIDefinitation.findPageAndCount2(request)
     .then((data) => {
-
+      console.log(data[0], "--------------------------------------IQRA");
       function findIndex(ifileData) {
         let startIndex = ifileData.search("<<field>>");
         let endIndex = ifileData.search("  }");
@@ -398,8 +398,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       }
       
       data[0].map((item) => {
-        console.log(item.route, ">>>>>>>???????>   DATA [0]")
-        if (item.isSmartContract === true && item.isActive === true) {
+        // console.log(item.route, ">>>>>>>???????>   DATA [0]")
+        if (item.isBlockchain === true && item.isActive === true) {
 
           chainCodeData.push({
             'isActive': item.isActive,
@@ -503,7 +503,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       for (let m = 0; m < responses[0].ApiListData.APIdata.length; m++) {
         for (let k = 0; k < DupIndex.length; k++) {
           if (responses[0].ApiListData.APIdata[m].MSP == responses[0].ApiListData.APIdata[DupIndex[k]].MSP) {
-            console.log()
+            // console.log()console.log()
             // console.log(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0],"NEW=====")
             // storeDuplicate.push(responses[0].ApiListData.APIdata[DupIndex[k]]);
             responses[0].ApiListData.APIdata[m].APIList.push(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0]);
@@ -519,11 +519,10 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       // console.log(JSON.stringify(storeDuplicate), "%%%%%   STORE DUPLICATE")
       let commonRemove = checkCommon(storeDuplicate);
       function checkCommon(storeDuplicate) {
-        console.log("INSIDE CHECKCOMMON")
         for (let i = 0; i < storeDuplicate[0].APIList.length; i++) {
           for (let j = 0; j < storeDuplicate[0].APIList.length; j++) {
             if (storeDuplicate[0].APIList[i] == storeDuplicate[0].APIList[j]) {
-              console.log("  ***************88 SAME &&&&&&&&&&&&&&&&&&")
+              // console.log("  ***************88 SAME &&&&&&&&&&&&&&&&&&")
               delete storeDuplicate[0].APIList[j];
             }
           }
@@ -594,7 +593,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         if (err) {
           return console.log(err);
         }
-        console.log(responses[0].ApiListData.APIdata.length, ">>>>>>>>NEW LENGTH  ")
+        // console.log(responses[0].ApiListData.APIdata.length, ">>>>>>>>NEW LENGTH  ")
         let readUpdatedFile = replaceM(fileData, storeDuplicate);
         let getD = getFileIndex(fileData)
         let finalStructFile = fileData.replace(getD, readUpdatedFile)
