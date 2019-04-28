@@ -75,10 +75,6 @@ DateOfBirth string `json:"dateOfBirth"`
 NatId string `json:"natId"`
 NatIdExpDate string `json:"natIdExpDate"`
 PoBox string `json:"poBox"`
-Passport string `json:"passport"`
-Passport string `json:"passport"`
-Passport string `json:"passport"`
-Passport string `json:"passport"`
 PhoneNo string `json:"phoneNo"`
 Gender string `json:"gender"`
 TenantNameEn string `json:"tenantNameEn"`
@@ -119,15 +115,6 @@ undefined string `json:"undefined"`
 type  UpdatePaymentInstrumentStatus struct{
 	OrgCode string `json:"orgCode"`
 ContractID string `json:"contractID"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
  }
 
 
@@ -156,12 +143,6 @@ BankCode string `json:"bankCode"`
 
 type  ProcessInstrument struct{
 	ContractID string `json:"contractID"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
-PaymentInstruments int64 `json:"paymentInstruments"`
-PaymentInstruments string `json:"paymentInstruments"`
 OrgCode string `json:"orgCode"`
  }
 

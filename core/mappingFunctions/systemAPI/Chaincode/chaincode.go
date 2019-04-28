@@ -498,18 +498,14 @@ DateOfBirth:   sanitize(args[3], "string").(string),
 NatId:   sanitize(args[4], "string").(string),
 NatIdExpDate:   sanitize(args[5], "string").(string),
 PoBox:   sanitize(args[6], "string").(string),
-Passport:   sanitize(args[7], "string").(string),
-Passport:   sanitize(args[8], "string").(string),
-Passport:   sanitize(args[9], "string").(string),
-Passport:   sanitize(args[10], "string").(string),
-PhoneNo:   sanitize(args[11], "string").(string),
-Gender:   sanitize(args[12], "string").(string),
-TenantNameEn:   sanitize(args[13], "string").(string),
-TenantNameAr:   sanitize(args[14], "string").(string),
-VisaNo:   sanitize(args[15], "string").(string),
-VisaIssueDate:   sanitize(args[16], "string").(string),
-VisaExpiryDate:   sanitize(args[17], "string").(string),
-VisaStatus:   sanitize(args[18], "string").(string),
+PhoneNo:   sanitize(args[7], "string").(string),
+Gender:   sanitize(args[8], "string").(string),
+TenantNameEn:   sanitize(args[9], "string").(string),
+TenantNameAr:   sanitize(args[10], "string").(string),
+VisaNo:   sanitize(args[11], "string").(string),
+VisaIssueDate:   sanitize(args[12], "string").(string),
+VisaExpiryDate:   sanitize(args[13], "string").(string),
+VisaStatus:   sanitize(args[14], "string").(string),
   }
 
 fmt.Println(UpdateKYCDetail)
@@ -622,15 +618,6 @@ func (t *PRChainCode) UpdatePaymentInstrumentStatus(stub shim.ChaincodeStubInter
 UpdatePaymentInstrumentStatus := &UpdatePaymentInstrumentStatus{	
 		OrgCode:   sanitize(args[0], "string").(string),
 ContractID:   sanitize(args[1], "string").(string),
-PaymentInstruments:   sanitize(args[2], "string").(string),
-PaymentInstruments:   sanitize(args[3], "string").(string),
-PaymentInstruments:   sanitize(args[4], "string").(string),
-PaymentInstruments:   sanitize(args[5], "string").(string),
-PaymentInstruments:   sanitize(args[6], "string").(string),
-PaymentInstruments:   sanitize(args[7], "string").(string),
-PaymentInstruments:   sanitize(args[8], "string").(string),
-PaymentInstruments:   sanitize(args[9], "string").(string),
-PaymentInstruments:   sanitize(args[10], "string").(string),
   }
 
 fmt.Println(UpdatePaymentInstrumentStatus)
@@ -739,13 +726,7 @@ func (t *PRChainCode) ProcessInstrument(stub shim.ChaincodeStubInterface, args [
 		
 ProcessInstrument := &ProcessInstrument{	
 		ContractID:   sanitize(args[0], "string").(string),
-PaymentInstruments:   sanitize(args[1], "string").(string),
-PaymentInstruments:   sanitize(args[2], "string").(string),
-PaymentInstruments:   sanitize(args[3], "string").(string),
-PaymentInstruments:   sanitize(args[4], "string").(string),
-PaymentInstruments:   sanitize(args[5], "int64").(int64),
-PaymentInstruments:   sanitize(args[6], "string").(string),
-OrgCode:   sanitize(args[7], "string").(string),
+OrgCode:   sanitize(args[1], "string").(string),
   }
 
 fmt.Println(ProcessInstrument)

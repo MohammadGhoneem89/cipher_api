@@ -444,7 +444,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
         for (let k = 0; k < responses[0].ApiListData.APIdata[j].APIList.length; k++) {
           responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields = responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields.filter(function (item) {
-            return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object');
+            return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object' && item.IN_FIELD.split(".").length <= 2);
           });
         }
       }
@@ -607,7 +607,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
           let getFnDescInd = findFnDescInd(tdata, data);
           let sData = getFnDescInd.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase);
-
           for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList.length; j++) {
             {
               let gData = sData.replace(/<<FunctionName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route);
@@ -615,8 +614,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
               tData = findIndex(fData);
               for (let k = 0; k < responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields.length; k++) {
-
-
+   
                 let getSlicedFieldName = responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields[k].IN_FIELD.split(".");
 
                 let updateField = getSlicedFieldName[1]
