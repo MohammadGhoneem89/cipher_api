@@ -395,7 +395,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let GetData = ifileData.substring(startIndex, endIndex);
         return GetData;
       }
-
+  // console.log(data[0],"DATA")
       data[0].map((item) => {
         if (item.isBlockchain === true && item.isActive === true) {
 
@@ -411,6 +411,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           });
         }
       });
+      console.log(chainCodeData[0],"chaincode")
       {
         responses.push({
           ApiListData: {
