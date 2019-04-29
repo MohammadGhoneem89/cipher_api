@@ -12,60 +12,6 @@
       "CustomMappingFile": "fileUpload/index.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "upsertAPIImport": {
-      "customMapping": true,
-      "MappingfunctionName": "upsertAPIImport",
-      "CustomMappingFile": "systemAPI/apiImport.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getImport": {
-      "customMapping": true,
-      "MappingfunctionName": "getImport",
-      "CustomMappingFile": "systemAPI/apiImport.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getServiceList": {
-      "customMapping": true,
-      "MappingfunctionName": "git",
-      "CustomMappingFile": "systemAPI/index.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getComplexServiceList": {
-      "customMapping": true,
-      "MappingfunctionName": "getServiceList",
-      "CustomMappingFile": "systemAPI/complexTypes.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "upsertComplexTypes": {
-      "customMapping": true,
-      "MappingfunctionName": "upsertComplexTypes",
-      "CustomMappingFile": "systemAPI/complexTypes.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getComplexTypesByID": {
-      "customMapping": true,
-      "MappingfunctionName": "getComplexTypesByID",
-      "CustomMappingFile": "systemAPI/complexTypes.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getComplexTypes": {
-      "customMapping": true,
-      "MappingfunctionName": "getComplexTypes",
-      "CustomMappingFile": "systemAPI/complexTypes.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "upsertAPIImport": {
-      "customMapping": true,
-      "MappingfunctionName": "upsertAPIImport",
-      "CustomMappingFile": "systemAPI/apiImport.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getImport": {
-      "customMapping": true,
-      "MappingfunctionName": "getImport",
-      "CustomMappingFile": "systemAPI/apiImport.js",
-      "mappingConfigFile": "ePayMapping"
-    },
     "getServiceList": {
       "customMapping": true,
       "MappingfunctionName": "git",
