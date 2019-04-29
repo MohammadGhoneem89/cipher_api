@@ -11,9 +11,9 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
 
 
   // invoke event blockchain
-  // blockchain route api 
+  // blockchain route api
   // payload
-  //  
+  //
   // ServiceURL
 
 

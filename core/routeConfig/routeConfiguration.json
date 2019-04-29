@@ -12,18 +12,6 @@
       "CustomMappingFile": "fileUpload/index.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "upsertAPIImport": {
-      "customMapping": true,
-      "MappingfunctionName": "upsertAPIImport",
-      "CustomMappingFile": "systemAPI/apiImport.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getImport": {
-      "customMapping": true,
-      "MappingfunctionName": "getImport",
-      "CustomMappingFile": "systemAPI/apiImport.js",
-      "mappingConfigFile": "ePayMapping"
-    },
     "getServiceList": {
       "customMapping": true,
       "MappingfunctionName": "git",
