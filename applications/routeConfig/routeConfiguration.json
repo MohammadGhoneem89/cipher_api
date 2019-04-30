@@ -1,10 +1,10 @@
 {
-  "PR": {
-    "CustomFunctionsLocation": "../../applications/WASL/mappingFunctions/",
+  "DPW": {
+    "CustomFunctionsLocation": "../../applications/DPW/mappingFunctions/",
     "generalEventHandler": {
       "customMapping": true,
-      "MappingfunctionName": "handlePMevents",
-      "CustomMappingFile": "events/handlePMevents.js",
+      "MappingfunctionName": "handleREGAUTHevents",
+      "CustomMappingFile": "events/handleREGAUTHevents.js",
       "mappingConfigFile": "ePayMapping"
     }
   },
