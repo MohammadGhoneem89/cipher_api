@@ -1,8 +1,8 @@
 'use strict';
 const comparisonFunction = require('./comparison');
 const jsons = require('./jsons');
-let rp = require('request-promise')
-
+const rp = require('request-promise');
+const config = require('../../../../config');
 async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<Request Recieved for Event>>>>")
@@ -15,10 +15,7 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
 
       case "EventOnNewRegistration": {
         try {
-          //1-  call createApproveReg
-          //2-  let globalID=reponse.globalID
-          // FUNCTION PURPOSE NOT CLEAR--NEED TO DECIDE
-          await getPromise(payload, eventOnDataChange(payload), callback);
+          await getPromise(payload, eventOnDataChange(payload, deltaData), callback);
         } catch (e) {
           console.log(e);
         }
@@ -50,19 +47,20 @@ function eventOnDataChange(payload, deltaData) {
   //   payload.eventData, " <=====================PAYLOAD");
 
   return async () => {
+    //let url = config.get('URLRestInterface') || "http://0.0.0.0/";
     let options = {
       method: 'POST',
-      url: ' http://localhost:9082/API/UR/eventOnDataChange',
+      // url: `${url}API/PR/postDataToBlockchainRegAuth`,
+      url: 'http://localhost:9082/API/UR/postDataToBlockchainRegAuth',
       body:
       {
-        header:
-        {
-          username: "",
-          password: ""
+        header: config.get('eventService.Avanza_ISC') || {
+          username: "Internal_API",
+          password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
         },
         body: {
-          "unifiedID": "JAFZA_TradeLicenceNumber",
-          eventData: payload.eventData,
+          "unifiedID": payload.eventData.unifiedID,
+          "eventData": payload.eventData,
           "deltaData": deltaData[0]
         }
       },
