@@ -1,16 +1,23 @@
 'use strict';
+const comparisonFunction = require('./comparison');
+const jsons = require('./jsons');
 let rp = require('request-promise')
 
 async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<Request Recieved for Event>>>>")
-    console.log(JSON.stringify(payload, null, 2));
-    console.log(payload.eventData.eventName, "===========================>handleDLDevents THIS IS PAYLOAD");
+    console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
+    console.log(payload.eventData.eventName, "===========================>event name here");
+    // console.log(payload.template, "===========================> template here");
+    let deltaData = comparisonFunction.manipulator(jsons.current, payload.eventData);
 
     switch (payload.eventData.eventName) {
 
       case "EventOnNewRegistration": {
         try {
+          //1-  call createApproveReg
+          //2-  let globalID=reponse.globalID
+          // FUNCTION PURPOSE NOT CLEAR--NEED TO DECIDE
           await getPromise(payload, eventOnDataChange(payload), callback);
         } catch (e) {
           console.log(e);
@@ -20,7 +27,7 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
 
       case "EventOnDataChange": {
         try {
-          await getPromise(payload, eventOnDataChange(payload), callback);
+          await getPromise(payload, eventOnDataChange(payload, deltaData), callback);
         } catch (e) {
           console.log(e);
         }
@@ -37,9 +44,10 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(err);
   }
 }
-function eventOnDataChange(payload) {
-  console.log("PAYLOAD=====================> ",
-    payload.eventData, " <=====================PAYLOAD");
+
+function eventOnDataChange(payload, deltaData) {
+  // console.log("PAYLOAD=====================> ",
+  //   payload.eventData, " <=====================PAYLOAD");
 
   return async () => {
     let options = {
@@ -54,12 +62,13 @@ function eventOnDataChange(payload) {
         },
         body: {
           "unifiedID": "JAFZA_TradeLicenceNumber",
-          "eventData": {},
-          "deltaData": {}
+          eventData: payload.eventData,
+          "deltaData": deltaData[0]
         }
       },
       json: true
     };
+
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
   }

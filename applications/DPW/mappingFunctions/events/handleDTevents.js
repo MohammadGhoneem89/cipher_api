@@ -77,8 +77,8 @@ function createApproveRegistration(payload) {
           username: "",
           password: ""
         },
-        //body: await transformTemplate("EventOnRequestEjari", payload.eventData, [])
 
+        //KAMRAN JSON COMPARISON FUNCTION (ALREADY USED IN handleREGAUTHevents.js)
         body: await JSONCOMPARISONFUNCTION("", '', [])
       },
       json: true
