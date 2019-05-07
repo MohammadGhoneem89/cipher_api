@@ -9,7 +9,7 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
     console.log(payload.eventData.eventName, "===========================>event name here");
     // console.log(payload.template, "===========================> template here");
-    let deltaData = comparisonFunction.manipulator(jsons.current, payload.eventData);
+    let deltaData = comparisonFunction.manipulator(payload.oldData, payload.eventData);
 
     switch (payload.eventData.eventName) {
 
