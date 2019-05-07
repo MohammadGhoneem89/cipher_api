@@ -1,5 +1,7 @@
 'use strict';
 let rp = require('request-promise');
+const config = require('../../../../../config');
+
 const comparisonFunction = require('./comparison');
 
 async function handleDPWevents(payload, UUIDKey, route, callback, JWToken) {

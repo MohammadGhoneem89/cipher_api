@@ -2,14 +2,14 @@
 const comparisonFunction = require('./comparison');
 const jsons = require('./jsons');
 const rp = require('request-promise');
-const config = require('../../../../config');
+const config = require('../../../../../config');
 async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<Request Recieved for Event>>>>")
     console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
     console.log(payload.eventData.eventName, "===========================>event name here");
     // console.log(payload.template, "===========================> template here");
-    let deltaData = comparisonFunction.manipulator(jsons.current, payload.eventData);
+    let deltaData = comparisonFunction.manipulator(payload.oldData,payload.eventData);
 
     switch (payload.eventData.eventName) {
 
@@ -79,6 +79,7 @@ function eventOnDataChange(payload, deltaData) {
     };
 
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
+    console.log(deltaData[0],"///////////////    deltaData[0]")
     return rp(options);
   }
 }

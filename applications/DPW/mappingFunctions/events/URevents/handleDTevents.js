@@ -1,7 +1,7 @@
 
 'use strict';
 let rp = require('request-promise');
-const config = require('../../../../config');
+const config = require('../../../../../config');
 
 async function handleDTevents(payload, UUIDKey, route, callback, JWToken) {
   try {

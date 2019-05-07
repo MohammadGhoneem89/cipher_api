@@ -2,7 +2,7 @@
 const comparisonFunction = require('./comparison');
 const jsons = require('./jsons');
 const rp = require('request-promise');
-const config = require('../../../../config');
+const config = require('../../../../../config');
 async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<Request Recieved for Event>>>>")

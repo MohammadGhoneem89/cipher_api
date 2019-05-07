@@ -1,23 +1,21 @@
 
 const equal = require('deep-equal');
-let finalObject = [];
-
+let previousValue = [];
+let newValue = [];
 function manipulator(currentObject, previousObject) {
-   console.log("INSIDE manipulator==============")
+
     for (let [props, values] of Object.entries(currentObject)) {
-        // console.log(previousObject.hasOwnProperty(props));
         if (previousObject.hasOwnProperty(props)) {
             if (typeof currentObject[props] === 'object') {
+                // console.log(Object.keys(currentObject),"+++++++++++++++++++");
                 let equalResult = equal(currentObject[props], previousObject[props]);
                 if (!equalResult) {
+                    previousValue.push(previousObject[props]);
+                    newValue.push(currentObject[props])
                     finalObject.push({
                         "attributeName": props,
-                        "previousValue": {
-                            [props]: previousObject[props]
-                        },
-                        "newValue": {
-                            [props]: currentObject[props]
-                        }
+                        previousValue,
+                        newValue
                     })
                 }
             } else {
@@ -28,12 +26,12 @@ function manipulator(currentObject, previousObject) {
                     // }
                     finalObject.push({
                         "attributeName": props,
-                        "previousValue": {
+                        "previousValue": [{
                             [props]: previousObject[props]
-                        },
-                        "newValue": {
+                        }],
+                        "newValue": [{
                             [props]: currentObject[props]
-                        }
+                        }]
                     })
                 }
             }
@@ -43,14 +41,15 @@ function manipulator(currentObject, previousObject) {
             // }
             finalObject.push({
                 "attributeName": props,
-                "newValue": {
+                "newValue": [{
                     [props]: currentObject[props]
-                }
+                }]
             })
         }
     }
     currentObject['deltaData'] = finalObject;
+    console.log(JSON.stringify(currentObject.deltaData));
     return currentObject['deltaData'];
     // console.log(JSON.stringify());
 }
-exports.manipulator=manipulator;
+exports.manipulator = manipulator;
