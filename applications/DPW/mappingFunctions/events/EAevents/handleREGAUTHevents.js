@@ -66,7 +66,6 @@ function eventOnDataChange(payload, deltaData) {
       },
       json: true
     };
-
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
   }
