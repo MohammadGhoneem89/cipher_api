@@ -43,7 +43,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
       }
       case "AssociatePaymentInstruments": {
         let result = await GetContractDetailsBackOffice(payload.eventData.contractID, payload.eventData.EIDA);
-        let message = await createMessageAssociatedPayments(payload,result.contractDetail);
+        let message = await createMessageAssociatedPayments(payload, result.contractDetail);
         await getPromise(payload, message, callback);
         break;
       }
@@ -122,27 +122,27 @@ function UpdateKYCDetail(mResponse) {
         password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
       },
       body: {
-        "residenceAddr": mResponse.data.PersonInfo.Address.City.CityDescEN,
-        "contactPersonMobile": mResponse.data.PersonInfo.Contact.MobileNo == null ? "00971" : mResponse.data.PersonInfo.Contact.MobileNo,
-        "nationality": mResponse.data.PersonInfo.Address.Emirate.EmirateDescEN,
-        "dateOfBirth": mResponse.data.PersonInfo.DOB,
-        "natId": mResponse.data.PersonInfo.EmiratesID.EIDNumber,
-        "natIdExpDate": mResponse.data.PersonInfo.EmiratesID.EIDExpiryDate,
-        "poBox": mResponse.data.PersonInfo.Contact.POBox == null ? "1000" : mResponse.data.PersonInfo.Contact.POBox,
+        "residenceAddr": _.get(mResponse, "data.PersonInfo.Address.City.CityDescEN", ""),
+        "contactPersonMobile": _.get(mResponse, "data.PersonInfo.Contact.MobileNo", null) == null ? "00971" : mResponse.data.PersonInfo.Contact.MobileNo,
+        "nationality": _.get(mResponse, "data.PersonInfo.Address.Emirate.EmirateDescEN", ""),
+        "dateOfBirth": _.get(mResponse, "data.PersonInfo.DOB", ""),
+        "natId": _.get(mResponse, "data.PersonInfo.EmiratesID.EIDNumber", ""),
+        "natIdExpDate": _.get(mResponse, "data.PersonInfo.EmiratesID.EIDExpiryDate", ""),
+        "poBox": _.get(mResponse, "data.PersonInfo.Contact.POBox", null) == null ? "1000" : mResponse.data.PersonInfo.Contact.POBox,
         "passport": {
-          "passportNo": mResponse.data.PersonInfo.Passport.PPNumber,
-          "passportIssueDate": mResponse.data.PersonInfo.Passport.PPIssueDate,
-          "passportExpiryDate": mResponse.data.PersonInfo.Passport.PPExpiryDate,
-          "passportIssuePlace": mResponse.data.PersonInfo.Passport.PPIssuePlaceEN
+          "passportNo": _.get(mResponse, "data.PersonInfo.Passport.PPNumber", ""),
+          "passportIssueDate": _.get(mResponse, "data.PersonInfo.Passport.PPIssueDate", ""),
+          "passportExpiryDate": _.get(mResponse, "data.PersonInfo.Passport.PPExpiryDate", ""),
+          "passportIssuePlace": _.get(mResponse, "data.PersonInfo.Passport.PPIssuePlaceEN", ""),
         },
-        "phoneNo": mResponse.data.PersonInfo.Contact.HomePhoneNo,
-        "gender": mResponse.data.PersonInfo.Sex == 1 ? "M" : "F",
-        "tenantNameEn": mResponse.data.PersonInfo.ApplicantNameEN,
-        "tenantNameAr": mResponse.data.PersonInfo.ApplicantNameAR,
-        "visaNo": mResponse.data.PersonInfo.ImmigrationFile.FileNumber.toString(),
-        "visaIssueDate": mResponse.data.PersonInfo.ImmigrationFile.FileIssueDate,
-        "visaExpiryDate": mResponse.data.PersonInfo.ImmigrationFile.FileExpiryDate,
-        "visaStatus": mResponse.data.PersonInfo.ImmigrationFile.FileStatus
+        "phoneNo": _.get(mResponse, "data.PersonInfo.Contact.HomePhoneNo", ""),
+        "gender": _.get(mResponse, "data.PersonInfo.Sex", 1) === 1 ? "M" : "F",
+        "tenantNameEn": _.get(mResponse, "data.PersonInfo.ApplicantNameEN", ""),
+        "tenantNameAr": _.get(mResponse, "data.PersonInfo.ApplicantNameAR", ""),
+        "visaNo": _.get(mResponse, "data.PersonInfo.ImmigrationFile.FileNumber", "").toString(),
+        "visaIssueDate": _.get(mResponse, "data.PersonInfo.ImmigrationFile.FileIssueDate", ""),
+        "visaExpiryDate": _.get(mResponse, "data.PersonInfo.ImmigrationFile.FileExpiryDate", ""),
+        "visaStatus": _.get(mResponse, "data.PersonInfo.ImmigrationFile.FileStatus", ""),
       }
     },
     json: true
@@ -174,7 +174,8 @@ function GetContractDetailsBackOffice(contractID, EIDA) {
     return Promise.resolve(result);
   });
 }
-function createMessageAssociatedPayments(payload,data) {
+
+function createMessageAssociatedPayments(payload, data) {
   let message = {
     method: 'POST',
     url: payload.endpoint.address,
@@ -183,7 +184,7 @@ function createMessageAssociatedPayments(payload,data) {
       body: {
         "contractID": data.contractID,
         "firstPayment": "false",
-        "paymentInstruments": data.paymentInstruments.map((item)=>{
+        "paymentInstruments": data.paymentInstruments.map((item) => {
           return {
             "bankCode": item.bankCode,
             "paymentMethod": item.paymentMethod,
