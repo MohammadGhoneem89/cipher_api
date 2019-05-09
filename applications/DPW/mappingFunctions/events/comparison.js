@@ -1,5 +1,7 @@
-
+const jsons = require('./jsons');
 const equal = require('deep-equal');
+const _ = require('lodash');
+let finalObject = [];
 let previousValue = [];
 let newValue = [];
 function manipulator(currentObject, previousObject) {
@@ -9,7 +11,7 @@ function manipulator(currentObject, previousObject) {
             if (typeof currentObject[props] === 'object') {
                 // console.log(Object.keys(currentObject),"+++++++++++++++++++");
                 let equalResult = equal(currentObject[props], previousObject[props]);
-                if (!equalResult) {
+                if (!equalResult && !_.isArray(currentObject[props])) {
                     previousValue.push(previousObject[props]);
                     newValue.push(currentObject[props])
                     finalObject.push({
@@ -17,13 +19,17 @@ function manipulator(currentObject, previousObject) {
                         previousValue,
                         newValue
                     })
+                } else if (!equalResult && _.isArray(currentObject[props])) {
+                    // console.log("ARRAY !!!!!!")
+                    finalObject.push({
+                        "attributeName": props,
+                        previousValue: previousObject[props],
+                        newValue: currentObject[props]
+                    })
                 }
             } else {
 
                 if (currentObject[props] !== previousObject[props]) {
-                    // if (!finalObject['modified']) {
-                    //     finalObject['modified'] = []
-                    // }
                     finalObject.push({
                         "attributeName": props,
                         "previousValue": [{
