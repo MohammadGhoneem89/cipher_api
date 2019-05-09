@@ -1,6 +1,6 @@
 'use strict';
-const comparisonFunction = require('./comparison');
-const jsons = require('./jsons');
+const comparisonFunction = require('../comparison');
+const jsons = require('../jsons');
 const rp = require('request-promise');
 const config = require('../../../../../config');
 async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
@@ -66,7 +66,6 @@ function eventOnDataChange(payload, deltaData) {
       },
       json: true
     };
-
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
   }

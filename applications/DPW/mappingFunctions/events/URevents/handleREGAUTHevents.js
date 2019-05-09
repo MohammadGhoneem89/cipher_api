@@ -1,6 +1,6 @@
 'use strict';
-const comparisonFunction = require('./comparison');
-const jsons = require('./jsons');
+const comparisonFunction = require('../comparison');
+const jsons = require('../jsons');
 const rp = require('request-promise');
 const config = require('../../../../../config');
 const _ = require("lodash")

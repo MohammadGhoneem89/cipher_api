@@ -2,7 +2,7 @@
 let rp = require('request-promise');
 const _ = require('lodash');
 const config = require('../../../../../config');
-const comparisonFunction = require('./comparison');
+const comparisonFunction = require('../comparison');
 const Endpoint = require('../../../../core/Controller/endpoint');
 
 async function handleDCCevents(payload, UUIDKey, route, callback, JWToken) {
