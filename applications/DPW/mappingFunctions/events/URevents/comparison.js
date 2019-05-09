@@ -1,6 +1,7 @@
 
 const equal = require('deep-equal');
 let previousValue = [];
+let finalObject=[];
 let newValue = [];
 function manipulator(currentObject, previousObject) {
 

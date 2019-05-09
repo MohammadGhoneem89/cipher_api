@@ -3,19 +3,20 @@ const comparisonFunction = require('./comparison');
 const jsons = require('./jsons');
 const rp = require('request-promise');
 const config = require('../../../../../config');
+const _ = require("lodash")
 async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<Request Recieved for Event>>>>")
     console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
     console.log(payload.eventData.eventName, "===========================>event name here");
     // console.log(payload.template, "===========================> template here");
-    let deltaData = comparisonFunction.manipulator(payload.oldData,payload.eventData);
+    
 
     switch (payload.eventData.eventName) {
 
       case "EventOnNewRegistration": {
         try {
-          await getPromise(payload, eventOnDataChange(payload, deltaData), callback);
+          await getPromise(payload, eventOnNewRegistration(payload), callback);
         } catch (e) {
           console.log(e);
         }
@@ -23,6 +24,17 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
       }
 
       case "EventOnDataChange": {
+
+        
+        let data = _.clone(payload.eventData);
+        _.unset(data, 'key');
+        _.unset(data, 'oldData');
+        
+        let oldData = _.clone(payload.eventData.oldData)
+        _.unset(oldData, 'key');
+        
+        let deltaData = comparisonFunction.manipulator(data,oldData);
+
         try {
           await getPromise(payload, eventOnDataChange(payload, deltaData), callback);
         } catch (e) {
@@ -53,16 +65,55 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
 
 }
 
-function eventOnDataChange(payload, deltaData) {
+function eventOnNewRegistration(payload) {
   // console.log("PAYLOAD=====================> ",
   //   payload.eventData, " <=====================PAYLOAD");
+
+  console.log("***payload***", payload)
 
   return async () => {
     //let url = config.get('URLRestInterface') || "http://0.0.0.0/";
     let options = {
       method: 'POST',
       // url: `${url}API/PR/postDataToBlockchainRegAuth`,
-      url: 'http://localhost:9082/API/UR/postDataToBlockchainRegAuth',
+      url: payload.endpoint.address,
+      body:
+      {
+        header: config.get('eventService.Avanza_ISC') || {
+          username: "Internal_API",
+          password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
+        },
+        body: {
+          "unifiedID": payload.eventData.unifiedID,
+          "eventData": payload.eventData,
+          "deltaData" : {}
+        }
+      },
+      json: true
+    };
+
+    console.log("REQUEST===============>", options.body, "<===============REQUEST");
+    return rp(options);
+  }
+}
+
+function eventOnDataChange(payload, deltaData) {
+  // console.log("PAYLOAD=====================> ",
+  //   payload.eventData, " <=====================PAYLOAD");
+
+  console.log("***payload***", payload)
+  console.log("***deltaData***", deltaData)
+
+  return async () => {
+    //let url = config.get('URLRestInterface') || "http://0.0.0.0/";
+
+    let eventData = _.clone(payload.eventData)
+    _.unset(eventData, 'oldData');
+
+    let options = {
+      method: 'POST',
+      // url: `${url}API/PR/postDataToBlockchainRegAuth`,
+      url: payload.endpoint.address,
       body:
       {
         header: config.get('eventService.Avanza_ISC') || {
