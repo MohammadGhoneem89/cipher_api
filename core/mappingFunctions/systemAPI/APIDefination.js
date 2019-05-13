@@ -296,7 +296,7 @@ function getActiveAPIListForDocumentation(payload, UUIDKey, route, callback, JWT
   if (!payload.useCase) {
     return callback(resp);
   }
-  APIDefinitation.getActiveAPIListForDocumentation(payload).then( async (data) => {
+  APIDefinitation.getActiveAPIListForDocumentation(payload).then(async (data) => {
     console.log('dididididi', JSON.stringify(data));
     let resp = {};
     for (const useCaseObj of data) {
@@ -387,23 +387,22 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       "pageSize": 10
     }
   };
-  APIDefinitation.findPageAndCount(request)
+  APIDefinitation.findPageAndCount2(request)
     .then((data) => {
-
       function findIndex(ifileData) {
         let startIndex = ifileData.search("<<field>>");
         let endIndex = ifileData.search("  }");
         let GetData = ifileData.substring(startIndex, endIndex);
         return GetData;
       }
-
+  // console.log(data[0],"DATA")
       data[0].map((item) => {
-        console.log(item.route, ">>>>>>>???????>   DATA [0]")
-        if (item.isSmartContract === true && item.isActive === true) {
+        if (item.isBlockchain === true && item.isActive === true) {
 
           chainCodeData.push({
             'isActive': item.isActive,
-            'MSP': item.MSP,
+            // 'MSP': item.MSP,
+            'MSP': item.orgType,
             'description': item.description,
             'route': item.route,
             'useCase': item.useCase,
@@ -412,7 +411,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           });
         }
       });
-      // console.log(chainCodeData,">>>>>>>???????>chainCodeData")
+      console.log(chainCodeData[0],"chaincode")
       {
         responses.push({
           ApiListData: {
@@ -427,6 +426,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         {
           response = {
             "MSP": chainCodeData[i].MSP,
+            // "MSP": chainCodeData[i].MSP,
             "APIList": [
               {
                 "route": chainCodeData[i].route,
@@ -436,24 +436,19 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
             ],
 
           };
+          //  console.log(response,"+++++++++++++++RESPONSE")
           responses[0].ApiListData.APIdata.push(response);
         }
 
       }
-      // console.log(JSON.stringify(responses[0].ApiListData.APIdata), ">>>>>>>???????>BEFOFRE LENGTH  ")
-      // console.log(">>>>>>>>>+++++++++++++++++++======================>?????????????????????????????????")
+
       for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
         for (let k = 0; k < responses[0].ApiListData.APIdata[j].APIList.length; k++) {
-          // for (let i = 0; i < responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields.length; i++) {
-            responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields = responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields.filter(function (item) {
-              // console.log(responses[0].ApiListData.APIdata[j].RequestMapping.fields,">>>>> FIELDSSSSS")
-              return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object');
-            });
-          // }
+          responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields = responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields.filter(function (item) {
+            return (item.IN_FIELDDT !== 'array' && item.IN_FIELDDT !== 'object' && item.IN_FIELD.split(".").length <= 2);
+          });
         }
-        //  console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
       }
-      // console.log("AFTER ------------- !!!!!!!!!!",JSON.stringify(responses[0].ApiListData.APIdata));
       for (let j = 0; j < responses[0].ApiListData.APIdata.length; j++) {
         for (let k = 0; k < responses[0].ApiListData.APIdata[j].APIList.length; k++) {
           for (let i = 0; i < responses[0].ApiListData.APIdata[j].APIList[k].RequestMapping.fields.length; i++) {
@@ -465,14 +460,11 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
             }
           }
         }
-        // console.log("********",responses[0].ApiListData.APIdata[j].RequestMapping.fields,"******");
       }
-      //  console.log("NEXT AFTER ----$$$$$$$$$$$$$$$$$$$$$$$$$44",JSON.stringify(responses[0].ApiListData))
       let DupIndex = [];
 
       function removeDuplicatesBy(comparator, array) {
         let unique = [];
-        // console.log(array,"============== ARRAY")
         for (let i = 0; i < array.length; i++) {
           let isUnique = true;
           for (let j = 0; j < i; j++) {
@@ -485,27 +477,20 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           if (isUnique)
             unique.push(array[i]);
         }
-        // console.log(unique)
         return unique;
       }
 
       let uniqueMSP = removeDuplicatesBy(function (a, b) {
         return a.MSP === b.MSP;
       }, responses[0].ApiListData.APIdata);
-      // console.log("unique : \n", uniqueMSP, "\n DupIndex :", DupIndex)
       for (let i = 0; i < DupIndex.length; i++) {
-        // console.log(JSON.stringify(responses[0].ApiListData.APIdata[DupIndex[i]]), "++++++++++++ DUP INDEX DATA ")
         storeDuplicate.push(responses[0].ApiListData.APIdata[DupIndex[i]]);
 
       }
-      // console.log(JSON.stringify(storeDuplicate), "diffRoutes-------------------")
 
       for (let m = 0; m < responses[0].ApiListData.APIdata.length; m++) {
         for (let k = 0; k < DupIndex.length; k++) {
           if (responses[0].ApiListData.APIdata[m].MSP == responses[0].ApiListData.APIdata[DupIndex[k]].MSP) {
-            console.log()
-            // console.log(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0],"NEW=====")
-            // storeDuplicate.push(responses[0].ApiListData.APIdata[DupIndex[k]]);
             responses[0].ApiListData.APIdata[m].APIList.push(responses[0].ApiListData.APIdata[DupIndex[k]].APIList[0]);
 
           }
@@ -513,28 +498,8 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       }
       responses[0].ApiListData.APIdata = uniqueMSP;
 
-
-
-
-      // console.log(JSON.stringify(storeDuplicate), "%%%%%   STORE DUPLICATE")
-      let commonRemove = checkCommon(storeDuplicate);
-      function checkCommon(storeDuplicate) {
-        console.log("INSIDE CHECKCOMMON")
-        for (let i = 0; i < storeDuplicate[0].APIList.length; i++) {
-          for (let j = 0; j < storeDuplicate[0].APIList.length; j++) {
-            if (storeDuplicate[0].APIList[i] == storeDuplicate[0].APIList[j]) {
-              console.log("  ***************88 SAME &&&&&&&&&&&&&&&&&&")
-              delete storeDuplicate[0].APIList[j];
-            }
-          }
-          return storeDuplicate
-        }
-      }
-
-
       function replaceM(fileData) {
         let getData = getFileIndex(fileData);
-        // console.log("!!!!!! GET DATA------", getData, "----- !!!!!! GET DATA")
         let mData = getIndex(getData);
         let nData; let gData; let newData; let updatedfileData = "";
         for (let i = 0; i < responses[0].ApiListData.APIdata.length; i++) {
@@ -546,8 +511,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
             {
               for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList[k].RequestMapping.fields.length; j++) {
                 let getSlicedFieldName = responses[0].ApiListData.APIdata[i].APIList[k].RequestMapping.fields[j].IN_FIELD.split(".");
-
-                // console.log("+++++", responses[0].ApiListData.APIdata[i].RequestMapping.fields[j].IN_FIELD);
                 let updateField = getSlicedFieldName[1]
                 if (updateField != undefined)
                   updateField = updateField.capitalize();
@@ -558,22 +521,16 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
                 gData = gData.replace('<<field1JSON>>', dataSplit[1]);
                 nData += gData + '\n'
                 if (j === responses[0].ApiListData.APIdata[i].APIList[k].RequestMapping.fields.length - 1) {
-                  // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
                   updatedfileData += getData.replace(mData, nData);
-                  // console.log(updatedfileData, ">>>>>>>>>>> -----at j-1 UPDATED FILE DATA")
                   updatedfileData = updatedfileData.replace('<<structName>>', responses[0].ApiListData.APIdata[i].APIList[k].route);
-                  //
                 }
 
               }
             }
-            // console.log(updatedfileData, ">>>>>>>>>>> ----- UPDATED FILE DATA")
           }
 
         }
         return updatedfileData;
-        // console.log("%%%%%%%%",responses[0].ApiListData.APIdata,"%%%%%%%%5")
-
       }
 
 
@@ -594,21 +551,14 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         if (err) {
           return console.log(err);
         }
-        console.log(responses[0].ApiListData.APIdata.length, ">>>>>>>>NEW LENGTH  ")
         let readUpdatedFile = replaceM(fileData, storeDuplicate);
         let getD = getFileIndex(fileData)
         let finalStructFile = fileData.replace(getD, readUpdatedFile)
         fs.writeFile(writefileToPathStruct, finalStructFile, 'utf8', function (err) {
           if (err) return console.log(err);
-
-          // console.log(readUpdatedFile,"------->>>>>>>>>FILE DATE REPLACEm");
         });
 
       });
-
-
-      //  console.log(JSON.stringify(responses[0].ApiListData.APIdata),"DATA --------------")
-
       let newData = "", updateIndex = "";
       let mData = "", mData2 = "", mData3 = "", wData = "";
       let mData1 = "";
@@ -633,8 +583,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList.length; j++) {
 
             wData += mData3.replace(/<<FunctionName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route);
-            // ifileData = ifileData.replace(findIn(ifileData), fillStruct(ifileData, data));
-
             if (j === responses[0].ApiListData.APIdata[i].APIList.length - 1) {
               mData1 += newData.replace(mData3, wData);
             }
@@ -660,19 +608,14 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
           let getFnDescInd = findFnDescInd(tdata, data);
           let sData = getFnDescInd.replace(/<<UseCase>>/g, responses[0].ApiListData.useCase);
-
           for (let j = 0; j < responses[0].ApiListData.APIdata[i].APIList.length; j++) {
             {
               let gData = sData.replace(/<<FunctionName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route);
-              // gData = gData.replace(/<<structName>>/g, responses[0].ApiListData.APIdata[i].APIList[j].route);
-
               fData = gData.replace(/<<FunctionDescription>>/g, responses[0].ApiListData.APIdata[i].APIList[j].purpose);
 
               tData = findIndex(fData);
-              //console.log("&&&&&&&&",findIndexOfStruct(fData),"&&&&&&&&&");
-              for (let k = 0; k <responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields.length; k++) {
-
-
+              for (let k = 0; k < responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields.length; k++) {
+   
                 let getSlicedFieldName = responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields[k].IN_FIELD.split(".");
 
                 let updateField = getSlicedFieldName[1]
@@ -686,7 +629,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
                 fiData += hData + "\n";
 
                 if (k === responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields.length - 1) {
-                  // console.log("***********", fiData, "***********")
                   fData = fData.replace(tData, fiData);
                   // yData += fiData + "\n";
                   fiData = "";
@@ -701,14 +643,11 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
               fData = fData.replace(/<<fieldType>>/g, 'string');
               fData = fData.replace('<<currentNo>>', '0');
             }
-            // console.log("%%%%%%%%",responses[0].ApiListData.APIdata,"%%%%%%%%5")
             xData += fData;
           }
         }
         return xData;
       }
-      //console.log("DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-
       fs.readFile(readfileFromPath, 'utf8', function (err, tdata) {
         if (err) {
           return console.log(err);
@@ -718,7 +657,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let overWrite = mspFunctionsLogic(tdata);
 
         let overWriteAgain = mspFunctionDesc(tdata, data);
-        //console.log("%%%%%%%%",overWriteAgain,"%%%%%%%%5")
         let getFnLogicInd = findFnLogicIndex(fData);
         let Ldata = fData.replace(getFnLogicInd, overWrite);
 
@@ -728,7 +666,6 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
         fs.writeFile(writefileToPath, hData, 'utf8', function (err) {
           if (err) return console.log(err);
-          //  console.log(hData, "writeen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         });
         //   // callback(hData, (responseCallback) => {
 
@@ -813,7 +750,7 @@ async function diffPermissionsRoutes(payload, UUIDKey, route, callback, JWToken)
         let routeArray = [];
         routeArray = route.split('/');
         let size = routeArray.length - 1;
-        finalRoutesFromPermissions.push(routeArray[size] ==='' ? routeArray[size - 1]: routeArray[size]);
+        finalRoutesFromPermissions.push(routeArray[size] === '' ? routeArray[size - 1] : routeArray[size]);
       } else {
         finalRoutesFromPermissions.push(route)
       }
@@ -826,7 +763,7 @@ async function diffPermissionsRoutes(payload, UUIDKey, route, callback, JWToken)
 
     /*Invoking comparison function on APIDefinition DB Table and Permissions DB Table*/
     finalRoutesFromAPIDefination.length <= finalRoutesFromPermissions.length ?
-      finalRoutes.APIDefinationRoutes = compare(finalRoutesFromAPIDefination, finalRoutesFromPermissions):
+      finalRoutes.APIDefinationRoutes = compare(finalRoutesFromAPIDefination, finalRoutesFromPermissions) :
       finalRoutes.APIDefinationRoutes = compare(finalRoutesFromPermissions, finalRoutesFromAPIDefination);
 
 
@@ -834,11 +771,11 @@ async function diffPermissionsRoutes(payload, UUIDKey, route, callback, JWToken)
     let coreRoutes = fs.readFileSync(path.join(__dirname, '../../routeConfig/routeConfiguration.json'), 'utf8');
     coreRoutes = JSON.parse(coreRoutes);
     coreRoutes = [].concat(coreRoutes['core']);
-    coreRoutes = coreRoutes.map((e)=> Object.keys(e));
+    coreRoutes = coreRoutes.map((e) => Object.keys(e));
     coreRoutes = [].concat(...coreRoutes);
     /*Invoking comparison function on Core routeConfiguration File and Permissions DB Table*/
     coreRoutes.length <= finalRoutesFromPermissions.length ?
-      finalRoutes.coreRoutes = compare(coreRoutes, finalRoutesFromPermissions):
+      finalRoutes.coreRoutes = compare(coreRoutes, finalRoutesFromPermissions) :
       finalRoutes.coreRoutes = compare(finalRoutesFromPermissions, coreRoutes);
 
     if (payload.application) {
