@@ -4,7 +4,7 @@
     "generalEventHandler": {
       "customMapping": true,
       "MappingfunctionName": "handleREGAUTHevents",
-      "CustomMappingFile": "events/URevents/handleREGAUTHevents.js",
+      "CustomMappingFile": "events/handleREGAUTHevents.js",
       "mappingConfigFile": "ePayMapping"
     }
   },

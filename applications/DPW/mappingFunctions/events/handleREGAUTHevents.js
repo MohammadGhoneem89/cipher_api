@@ -1,30 +1,9 @@
 'use strict';
-const comparisonFunction = require('../comparison');
-const jsons = require('../jsons');
+const comparisonFunction = require('./comparison');
+const jsons = require('./jsons');
 const rp = require('request-promise');
-const config = require('../../../../../config');
-
-function cleanEventData(eventData) {
- 
-  let newEventData = _.clone(eventData);
-  _.unset(newEventData, '__collection');
-  _.unset(newEventData, 'additionalData');
-  _.unset(newEventData, 'eventName');
-  _.unset(newEventData, 'documentName');
-  _.unset(newEventData, 'key');
-
-  return newEventData;
-}
-
-let data = _.clone(payload.eventData);
-    _.unset(data, 'key');
-    _.unset(data, 'oldData');
-
-    let oldData = _.clone(payload.eventData.oldData)
-    _.unset(oldData, 'key');
-
-    let deltaData = comparisonFunction.manipulator(data, oldData);
-
+const config = require('../../../../config');
+const revise = require('./ccDeployment/approveAttribute')
 async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<Request Recieved for Event>>>>")
@@ -60,6 +39,23 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
         } catch (e) {
           console.log(e);
           return e;
+        }
+        break;
+      }
+      case "InstallSmartContract": {
+        try {
+          await getPromise(payload, revise.reviseSmartContract, callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
+      }
+      case "DeploySmartContract": {
+        try {
+          console.dir(revise.deploySmartContract)
+          await getPromise(payload, revise.deploySmartContract, callback);
+        } catch (e) {
+          console.log(e);
         }
         break;
       }
@@ -152,36 +148,33 @@ function eventOnDataChange(payload, deltaData) {
         },
         body: {
           "unifiedID": payload.eventData.unifiedID,
-          "eventData": cleanEventData(payload.eventData),
-          "deltaData": deltaData
+          "eventData": payload.eventData,
+          "deltaData": deltaData[0]
         }
       },
       json: true
     };
 
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    console.log(deltaData,"///////////////    deltaData")
     return rp(options);
   }
 }
 
 
 async function getPromise(payload, func, callback) {
-  func().then(response => {
+  func(payload).then(response => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
-      error: response.messageStatus == "OK" ? false : true,
-      message: payload.eventData.eventName + (response.messageStatus == "OK" ? " Dispatched" : "  Not Dispatched"),
-      // request: message.body,
+      error: false,
+      message: payload.eventData.eventName + " Dispatched",
       response: response
     })
   }).catch(err => {
     console.log("error : ", err);
     callback({
       error: true,
-      message: err.name,
-      // request: message.body,
-      response: err
+      message: payload.eventData.eventName + " Failed",
+      response: new Error(err).message
     })
   });
 }

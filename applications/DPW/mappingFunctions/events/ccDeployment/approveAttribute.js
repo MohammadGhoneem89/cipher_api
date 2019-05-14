@@ -1,8 +1,8 @@
 const zipafolder = require('zip-a-folder');
 const {join} = require('path')
-const { SmartContract,NetworkConfig,Channel } = require("../../../../../../lib/models/index");
+const { SmartContract,NetworkConfig,Channel } = require("../../../../../lib/models/index");
 const rp = require('request-promise')
-const config = require('../../../../../../config');
+const config = require('../../../../../config');
 var fs = require('fs')
 var fse = require("fs-extra")
 var rimraf = require("rimraf");

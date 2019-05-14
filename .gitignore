@@ -9,3 +9,4 @@ epayqnfs
 !core/mappingFunctions/generated/.gitkeep
 core/mappingFunctions/generated/*
 *.zip
+*.DS_Store
