@@ -30,14 +30,14 @@ function manipulator(currentObject, previousObject) {
             } else {
 
                 if (currentObject[props] !== previousObject[props]) {
+                    let previousValue = [];
+                    let newValue = [];
+                    previousValue.push(previousObject[props]);
+                    newValue.push(currentObject[props])
                     finalObject.push({
                         "attributeName": props,
-                        "previousValue": [{
-                            [props]: previousObject[props]
-                        }],
-                        "newValue": [{
-                            [props]: currentObject[props]
-                        }]
+                        previousValue,
+                        newValue
                     })
                 }
             }
@@ -45,12 +45,29 @@ function manipulator(currentObject, previousObject) {
             // if (!finalObject['new']) {
             //     finalObject['new'] = []
             // }
-            finalObject.push({
-                "attributeName": props,
-                "newValue": [{
-                    [props]: currentObject[props]
-                }]
-            })
+            if (typeof currentObject[props] === 'object' && !_.isArray(currentObject[props])) {
+                let newValue = [];
+                newValue.push(currentObject[props])
+                finalObject.push({
+                    "attributeName": props,
+                    newValue
+                })
+            }
+            else if (typeof currentObject[props] === 'object' && _.isArray(currentObject[props])) {
+                finalObject.push({
+                    "attributeName": props,
+                    newValue: currentObject[props]
+                })
+            }
+            else if (typeof currentObject[props] === 'object') {
+                finalObject.push({
+                    "attributeName": props,
+                    "newValue": [{
+                        [props]: currentObject[props]
+                    }]
+                })
+            }
+
         }
     }
     currentObject['deltaData'] = finalObject;
