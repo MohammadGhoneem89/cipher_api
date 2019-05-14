@@ -2,7 +2,8 @@
 const comparisonFunction = require('./comparison');
 const jsons = require('./jsons');
 const rp = require('request-promise');
-const config = require('../../../../config');
+const config = require('../../../../../config');
+const revise = require('./ccDeployment/approveAttribute')
 async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<Request Recieved for Event>>>>")
@@ -25,6 +26,23 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
       case "EventOnDataChange": {
         try {
           await getPromise(payload, eventOnDataChange(payload, deltaData), callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
+      }
+      case "InstallSmartContract": {
+        try {
+          await getPromise(payload, revise.reviseSmartContract, callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
+      }
+      case "DeploySmartContract": {
+        try {
+          console.dir(revise.deploySmartContract)
+          await getPromise(payload, revise.deploySmartContract, callback);
         } catch (e) {
           console.log(e);
         }
@@ -85,7 +103,7 @@ function eventOnDataChange(payload, deltaData) {
 
 
 async function getPromise(payload, func, callback) {
-  func().then(response => {
+  func(payload).then(response => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
       error: false,
@@ -97,7 +115,7 @@ async function getPromise(payload, func, callback) {
     callback({
       error: true,
       message: payload.eventData.eventName + " Failed",
-      response: err
+      response: new Error(err).message
     })
   });
 }
