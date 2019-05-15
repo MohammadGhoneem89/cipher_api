@@ -1,8 +1,8 @@
 'use strict';
 let rp = require('request-promise');
 const _ = require('lodash');
-const config = require('../../../../../config');
-const comparisonFunction = require('../comparison');
+const config = require('../../../../config');
+const comparisonFunction = require('./comparison');
 
 
 function cleanEventData(eventData) {
@@ -24,15 +24,15 @@ async function handleDCevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(payload.eventData.eventName, "===========================>event name here");
 
     // let deltaData = comparisonFunction.manipulator(jsons.current, payload.eventData);
-    let data = _.clone(payload.eventData);
-    _.unset(data, 'key');
-    _.unset(data, 'oldData');
+    // let data = _.clone(payload.eventData);
+    // _.unset(data, 'key');
+    // _.unset(data, 'oldData');
 
-    let oldData = _.clone(payload.eventData.oldData)
-    _.unset(oldData, 'key');
-    console.log(data, "===========================> DATA");
-    console.log(oldData, "OLD DATA")
-    let deltaData = comparisonFunction.manipulator(data, oldData);
+    // let oldData = _.clone(payload.eventData.oldData)
+    // _.unset(oldData, 'key');
+    // console.log(data, "===========================> DATA");
+    // console.log(oldData, "OLD DATA")
+    // let deltaData = comparisonFunction.manipulator(data, oldData);
 
     switch (payload.eventData.eventName) {
       case "eventOnContainerStatusChange": {
@@ -65,7 +65,7 @@ async function handleDCevents(payload, UUIDKey, route, callback, JWToken) {
       }
       case "eventOnVesselDeparted": {
         try {
-          await getPromise(payload, eventOnVesselDeparted(payload, deltaData), callback);
+          await getPromise(payload, eventOnVesselDeparted(payload), callback);
         } catch (e) {
           console.log(e);
           return e;
