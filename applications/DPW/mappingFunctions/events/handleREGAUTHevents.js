@@ -24,7 +24,8 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
     console.log(payload.eventData.eventName, "===========================>event name here");
     // console.log(payload.template, "===========================> template here");
-
+    let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
+   
     switch (payload.eventData.eventName) {
 
       case "eventOnDeclaration": {
@@ -47,7 +48,7 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
       }
 
       case "EventOnDataChange": {
-        let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
+        
         try {
           await getPromise(payload, eventOnDataChange(payload, deltaData), callback);
         } catch (e) {

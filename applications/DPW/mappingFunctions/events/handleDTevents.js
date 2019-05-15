@@ -1,7 +1,9 @@
 
 'use strict';
 let rp = require('request-promise');
+const comparisonFunction = require('./comparison');
 const config = require('../../../../config');
+const _ = require('lodash')
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 var cheerio = require('cheerio');
 
@@ -13,7 +15,7 @@ function cleanEventData(eventData) {
   _.unset(newEventData, 'eventName');
   _.unset(newEventData, 'documentName');
   _.unset(newEventData, 'key');
-
+  _.unset(newEventData, 'oldData');
   return newEventData;
 }
 async function handleDTevents(payload, UUIDKey, route, callback, JWToken) {
@@ -23,8 +25,9 @@ async function handleDTevents(payload, UUIDKey, route, callback, JWToken) {
 
     switch (payload.eventData.eventName) {
       case "eventOnContainerStatusChange": {
+        let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
         try {
-          await getPromise(payload, eventOnContainerStatusChange(payload, deltaData), callback);
+          await getPromiseJSONapi(payload, eventOnContainerStatusChange(payload, deltaData), callback);
         } catch (e) {
           console.log(e);
           return e;
@@ -314,6 +317,25 @@ async function getPromise(payload, func, callback) {
       message: err.name,
       //request: message.body,
       response: err
+    })
+  });
+}
+
+
+async function getPromiseJSONapi(payload, func, callback) {
+  func(payload).then(response => {
+    console.log("RESPONSE===============>", response, "<===============RESPONSE");
+    callback({
+      error: false,
+      message: payload.eventData.eventName + " Dispatched",
+      response: response
+    })
+  }).catch(err => {
+    console.log("error : ", err);
+    callback({
+      error: true,
+      message: payload.eventData.eventName + " Failed",
+      response: new Error(err).message
     })
   });
 }

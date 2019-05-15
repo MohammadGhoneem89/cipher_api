@@ -13,7 +13,7 @@ function cleanEventData(eventData) {
   _.unset(newEventData, 'eventName');
   _.unset(newEventData, 'documentName');
   _.unset(newEventData, 'key');
-
+  _.unset(newEventData, 'oldData');
   return newEventData;
 }
 
@@ -22,17 +22,7 @@ async function handleDCevents(payload, UUIDKey, route, callback, JWToken) {
     console.log("<<<Request Recieved for Event>>>>")
     console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
     console.log(payload.eventData.eventName, "===========================>event name here");
-
-    // let deltaData = comparisonFunction.manipulator(jsons.current, payload.eventData);
-    // let data = _.clone(payload.eventData);
-    // _.unset(data, 'key');
-    // _.unset(data, 'oldData');
-
-    // let oldData = _.clone(payload.eventData.oldData)
-    // _.unset(oldData, 'key');
-    // console.log(data, "===========================> DATA");
-    // console.log(oldData, "OLD DATA")
-    // let deltaData = comparisonFunction.manipulator(data, oldData);
+    let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
 
     switch (payload.eventData.eventName) {
       case "eventOnContainerStatusChange": {
