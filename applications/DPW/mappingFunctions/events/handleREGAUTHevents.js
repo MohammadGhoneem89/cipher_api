@@ -2,6 +2,7 @@
 const comparisonFunction = require('./comparison');
 const jsons = require('./jsons');
 const rp = require('request-promise');
+const _ = require('lodash')
 const config = require('../../../../config');
 const revise = require('./ccDeployment/approveAttribute');
 
@@ -13,6 +14,7 @@ function cleanEventData(eventData) {
   _.unset(newEventData, 'eventName');
   _.unset(newEventData, 'documentName');
   _.unset(newEventData, 'key');
+  _.unset(newEventData, 'oldData');
 
   return newEventData;
 }
@@ -36,7 +38,7 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
       }
       case "EventOnNewRegistration": {
         try {
-          await getPromise(payload, eventOnNewRegistration(payload, deltaData), callback);
+          await getPromise(payload, eventOnNewRegistration(payload), callback);
         } catch (e) {
           console.log(e);
           return e;
@@ -45,7 +47,7 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
       }
 
       case "EventOnDataChange": {
-        let deltaData = comparisonFunction.manipulator(cleanEventData(data),cleanEventData(oldData));
+        let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
         try {
           await getPromise(payload, eventOnDataChange(payload, deltaData), callback);
         } catch (e) {
@@ -160,7 +162,7 @@ function eventOnDataChange(payload, deltaData) {
         },
         body: {
           "unifiedID": payload.eventData.unifiedID,
-          "eventData": payload.eventData,
+          "eventData": cleanEventData(payload.eventData),
           "deltaData": deltaData
         }
       },

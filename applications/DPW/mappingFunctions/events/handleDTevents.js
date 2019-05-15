@@ -1,8 +1,8 @@
 
 'use strict';
 let rp = require('request-promise');
-const config = require('../../../../../config');
-const transformTemplate = require('../../../../../lib/helpers/transformTemplate');
+const config = require('../../../../config');
+const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 var cheerio = require('cheerio');
 
 function cleanEventData(eventData) {
