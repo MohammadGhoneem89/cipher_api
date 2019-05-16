@@ -22,11 +22,11 @@ async function handleDCCevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
     console.log(payload.eventData.eventName, "===========================>event name here");
 
-    let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
+    
 
     switch (payload.eventData.eventName) {
       case "eventOnContainerStatusChange": {
-
+        let deltaData = payload.eventData.additionalData
         try {
           await getPromise(payload, eventOnContainerStatusChange(payload, deltaData), callback);
         } catch (e) {
@@ -36,6 +36,14 @@ async function handleDCCevents(payload, UUIDKey, route, callback, JWToken) {
         break;
       }
       case "eventOnDeclaration": {
+        if(payload.eventData.checkHistory) {
+          let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
+        }
+        else {
+          deltaData = []
+        }
+          
+        
         try {
           await getPromise(payload, eventOnDeclaration(payload, deltaData), callback);
         } catch (e) {
@@ -45,6 +53,13 @@ async function handleDCCevents(payload, UUIDKey, route, callback, JWToken) {
         break;
       }
       case "eventOnCOO": {
+        if(payload.eventData.checkHistory) {
+          let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
+        }
+        else {
+          let deltaData = []
+        }
+          
         try {
           await getPromise(payload, eventOnCOO(payload, deltaData), callback);
         } catch (e) {
@@ -55,7 +70,7 @@ async function handleDCCevents(payload, UUIDKey, route, callback, JWToken) {
       }
       case "EventOnVesselDeparted": {
         try {
-          await getPromise(payload, eventOnVesselDeparted(payload, deltaData), callback);
+          await getPromise(payload, eventOnVesselDeparted(payload), callback);
         } catch (e) {
           console.log(e);
           return e;
