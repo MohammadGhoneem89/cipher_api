@@ -6,6 +6,12 @@
       "MappingfunctionName": "handlePMevents",
       "CustomMappingFile": "events/handlePMevents.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "bankEventHandler": {
+      "customMapping": true,
+      "MappingfunctionName": "handleBankEvents",
+      "CustomMappingFile": "events/handleBankEvents.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Wasl": {

@@ -42,9 +42,18 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
         break;
       }
       case "AssociatePaymentInstruments": {
-        let result = await GetContractDetailsBackOffice(payload.eventData.contractID, payload.eventData.EIDA);
-        let message = await createMessageAssociatedPayments(payload, result.contractDetail);
-        await getPromise(payload, message, callback);
+        console.log("PAYLOAD=======>",payload,"<=======PAYLOAD");
+        let isCancelPaymentEvent = _.get(payload, "template.name") === "CancelBankPayment";
+        if (isCancelPaymentEvent && payload.additionalData.length > 0) {
+          let result = await GetPaymentInstrumentData(payload.eventData.contractID, payload.eventData.EIDA);
+          let message = await CancelOldPayments(payload, payload.eventData.EIDA);
+        } else {
+          let result = await GetContractDetailsBackOffice(payload.eventData.contractID, payload.eventData.EIDA);
+          let message = await createMessageAssociatedPayments(payload, result.contractDetail);
+          await getPromise(payload, message, callback);
+        }
+
+
         break;
       }
       default:
@@ -150,6 +159,51 @@ function UpdateKYCDetail(mResponse) {
   return rp(message);
 }
 
+async function GetPaymentInstrumentData(contractID,internalInstrumentID, bankCode) {
+  let url = config.get('URLRestInterface') || "http://0.0.0.0/";
+  let message = {
+    method: 'POST',
+    url: `${url}API/PR/GetPaymentInstrumentData`,
+    body: {
+      header: config.get('eventService.Avanza_ISC') || {
+        username: "Internal_API",
+        password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
+      },
+      body: {
+        contractID: contractID,
+        internalInstrumentID: internalInstrumentID,
+        bankCode: bankCode
+      }
+    },
+    json: true
+  };
+  return rp(message).then(result => {
+    console.log("GetPaymentInstrumentData===========>", result, "<===========GetPaymentInstrumentData");
+    return Promise.resolve(result);
+  });
+}
+
+async function CancelOldPayments(payload, EIDA) {
+
+
+  let eventData = {
+    contractID: "",
+    bankCode: "",
+    instrumentID: "",
+    paymentMethod: "",
+    internalInstrumentID: "",
+    date: "",
+    amount: "",
+    status: ""
+  };
+
+
+  let req = await transformTemplate(payload.template.data, eventData, []);
+  let _endpoint = new Endpoint(req);
+  let ServiceURL = '/';
+  let GDRFAResponse = await _endpoint.executeEndpoint(payload.endpoint, ServiceURL);
+  console.log("=========Response from GDRFA======>" + JSON.stringify(GDRFAResponse), "<=========Response from GDRFA======");
+}
 
 function GetContractDetailsBackOffice(contractID, EIDA) {
   let url = config.get('URLRestInterface') || "http://0.0.0.0/";
