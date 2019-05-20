@@ -44,10 +44,10 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
       case "AssociatePaymentInstruments": {
         console.log("PAYLOAD=======>",payload,"<=======PAYLOAD");
         let isCancelPaymentEvent = _.get(payload, "template.name") === "CancelBankPayment";
-        if (isCancelPaymentEvent && payload.additionalData.length > 0) {
+        if (isCancelPaymentEvent && payload.additionalData.length > 0) {//FOR BANK TO CANCEL OLD REPLACED PAYMENTS
           let result = await GetPaymentInstrumentData(payload.eventData.contractID, payload.eventData.EIDA);
           let message = await CancelOldPayments(payload, payload.eventData.EIDA);
-        } else {
+        } else {//FOR WASAL TO INFORM PAYMENTS ARE ASSOCIATED
           let result = await GetContractDetailsBackOffice(payload.eventData.contractID, payload.eventData.EIDA);
           let message = await createMessageAssociatedPayments(payload, result.contractDetail);
           await getPromise(payload, message, callback);
@@ -230,6 +230,7 @@ function GetContractDetailsBackOffice(contractID, EIDA) {
 }
 
 function createMessageAssociatedPayments(payload, data) {
+  let isNotReplacement = true;
   let message = {
     method: 'POST',
     url: payload.endpoint.address,
@@ -237,17 +238,21 @@ function createMessageAssociatedPayments(payload, data) {
       header: payload.endpoint.auth,
       body: {
         "contractID": data.contractID,
-        "firstPayment": "false",
         "paymentInstruments": data.paymentInstruments.map((item) => {
+          if(item.oldInstrumentRefNo){
+            isNotReplacement = false
+          }
           return {
             "bankCode": item.bankCode,
             "paymentMethod": item.paymentMethod,
             "instrumentID": item.instrumentID,
             "status": item.status,
             "date": item.date,
-            "amount": item.amount
+            "amount": item.amount,
+            "bankMetaData": item.bankMetaData
           }
-        })
+        }),
+        "firstPayment": isNotReplacement,
       }
     },
     json: true
