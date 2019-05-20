@@ -257,7 +257,7 @@ function createMessageAssociatedPayments(payload, data) {
     },
     json: true
   };
-  console.log("createMessageAssociatedPayments===========>", message, "<===========createMessageAssociatedPayments");
+  console.log("createMessageAssociatedPayments===========>", JSON.stringify(message, null,2), "<===========createMessageAssociatedPayments");
   return Promise.resolve(message);
 }
 
