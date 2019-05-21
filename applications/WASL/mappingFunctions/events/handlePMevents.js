@@ -274,7 +274,7 @@ async function createMessage(payload) {
 }
 
 async function getPromise(payload, message, callback) {
-  console.log("REQUEST===============>", message, "<===============REQUEST");
+  console.log("REQUEST===============>", JSON.stringify(message, null, 2), "<===============REQUEST");
   return rp(message).then(result => {
     console.log("RESPONSE===============>", result, "<===============RESPONSE");
     message.body && _.set(message.body, 'header.password', "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
