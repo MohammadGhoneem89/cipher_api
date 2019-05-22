@@ -1,19 +1,18 @@
 'use strict';
 let rp = require('request-promise');
 const _ = require('lodash');
-const config = require('../../../../../config');
-const comparisonFunction = require('../comparison');
+const config = require('../../../../config');
+const comparisonFunction = require('./comparison');
 
 
 function cleanEventData(eventData) {
- 
   let newEventData = _.clone(eventData);
   _.unset(newEventData, '__collection');
   _.unset(newEventData, 'additionalData');
   _.unset(newEventData, 'eventName');
   _.unset(newEventData, 'documentName');
   _.unset(newEventData, 'key');
-
+  _.unset(newEventData, 'oldData');
   return newEventData;
 }
 
@@ -23,20 +22,11 @@ async function handleDCCevents(payload, UUIDKey, route, callback, JWToken) {
     console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
     console.log(payload.eventData.eventName, "===========================>event name here");
 
-    // let deltaData = comparisonFunction.manipulator(jsons.current, payload.eventData);
-    let data = _.clone(payload.eventData);
-    _.unset(data, 'key');
-    _.unset(data, 'oldData');
-
-    let oldData = _.clone(payload.eventData.oldData)
-    _.unset(oldData, 'key');
-    console.log(data, "===========================> DATA");
-    console.log(oldData, "OLD DATA")
-    let deltaData = comparisonFunction.manipulator(data, oldData);
+    
 
     switch (payload.eventData.eventName) {
       case "eventOnContainerStatusChange": {
-
+        let deltaData = payload.eventData.additionalData
         try {
           await getPromise(payload, eventOnContainerStatusChange(payload, deltaData), callback);
         } catch (e) {
@@ -46,6 +36,14 @@ async function handleDCCevents(payload, UUIDKey, route, callback, JWToken) {
         break;
       }
       case "eventOnDeclaration": {
+        if(payload.eventData.checkHistory) {
+          let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
+        }
+        else {
+          deltaData = []
+        }
+          
+        
         try {
           await getPromise(payload, eventOnDeclaration(payload, deltaData), callback);
         } catch (e) {
@@ -55,6 +53,13 @@ async function handleDCCevents(payload, UUIDKey, route, callback, JWToken) {
         break;
       }
       case "eventOnCOO": {
+        if(payload.eventData.checkHistory) {
+          let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
+        }
+        else {
+          let deltaData = []
+        }
+          
         try {
           await getPromise(payload, eventOnCOO(payload, deltaData), callback);
         } catch (e) {
@@ -65,7 +70,7 @@ async function handleDCCevents(payload, UUIDKey, route, callback, JWToken) {
       }
       case "EventOnVesselDeparted": {
         try {
-          await getPromise(payload, eventOnVesselDeparted(payload, deltaData), callback);
+          await getPromise(payload, eventOnVesselDeparted(payload), callback);
         } catch (e) {
           console.log(e);
           return e;
@@ -138,8 +143,6 @@ function eventOnDeclaration(payload, deltaData) {
 }
 function eventOnCOO(payload, deltaData) {
 
-  
-  // let url = config.get('URLRestInterface') || "http://0.0.0.0/";
   return async () => {
     let message = {
       method: 'POST',

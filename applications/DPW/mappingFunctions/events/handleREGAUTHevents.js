@@ -2,15 +2,30 @@
 const comparisonFunction = require('./comparison');
 const jsons = require('./jsons');
 const rp = require('request-promise');
+const _ = require('lodash')
 const config = require('../../../../config');
-const revise = require('./ccDeployment/approveAttribute')
+const revise = require('./ccDeployment/approveAttribute');
+
+function cleanEventData(eventData) {
+ 
+  let newEventData = _.clone(eventData);
+  _.unset(newEventData, '__collection');
+  _.unset(newEventData, 'additionalData');
+  _.unset(newEventData, 'eventName');
+  _.unset(newEventData, 'documentName');
+  _.unset(newEventData, 'key');
+  _.unset(newEventData, 'oldData');
+
+  return newEventData;
+}
 async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     // console.log("<<<Request Recieved for Event>>>>")
     // console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
     console.log(payload.eventData.eventName, "===========================>event name here");
     // console.log(payload.template, "===========================> template here");
-
+    let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
+   
     switch (payload.eventData.eventName) {
 
       case "eventOnDeclaration": {
@@ -24,7 +39,7 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
       }
       case "EventOnNewRegistration": {
         try {
-          await getPromise(payload, eventOnNewRegistration(payload, deltaData), callback);
+          await getPromise(payload, eventOnNewRegistration(payload), callback);
         } catch (e) {
           console.log(e);
           return e;
@@ -33,7 +48,7 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
       }
 
       case "EventOnDataChange": {
-        let deltaData = comparisonFunction.manipulator(cleanEventData(data),cleanEventData(oldData));
+        
         try {
           await getPromise(payload, eventOnDataChange(payload, deltaData), callback);
         } catch (e) {
@@ -47,6 +62,7 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
           await getPromiseWithOrgCode(payload,"REGAUTH","JAFZA", revise.reviseSmartContract, callback);
         } catch (e) {
           console.log(e);
+          return e;
         }
         break;
       }
@@ -56,6 +72,7 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
           await getPromise(payload, revise.deploySmartContract, callback);
         } catch (e) {
           console.log(e);
+          return e;
         }
         break;
       }
@@ -135,10 +152,8 @@ function eventOnDataChange(payload, deltaData) {
   //   payload.eventData, " <=====================PAYLOAD");
 
   return async () => {
-    //let url = config.get('URLRestInterface') || "http://0.0.0.0/";
     let options = {
       method: 'POST',
-      // url: `${url}API/PR/postDataToBlockchainRegAuth`,
       url: payload.endpoint.address,
       body:
       {
@@ -148,8 +163,8 @@ function eventOnDataChange(payload, deltaData) {
         },
         body: {
           "unifiedID": payload.eventData.unifiedID,
-          "eventData": payload.eventData,
-          "deltaData": deltaData[0]
+          "eventData": cleanEventData(payload.eventData),
+          "deltaData": deltaData
         }
       },
       json: true

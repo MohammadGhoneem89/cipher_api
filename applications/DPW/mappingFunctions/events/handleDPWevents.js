@@ -1,36 +1,28 @@
 'use strict';
 let rp = require('request-promise');
-const config = require('../../../../../config');
-
-const comparisonFunction = require('../comparison');
+const config = require('../../../../config');
+const _ = require('lodash')
+const comparisonFunction = require('./comparison');
 
 
 function cleanEventData(eventData) {
- 
   let newEventData = _.clone(eventData);
   _.unset(newEventData, '__collection');
   _.unset(newEventData, 'additionalData');
   _.unset(newEventData, 'eventName');
   _.unset(newEventData, 'documentName');
   _.unset(newEventData, 'key');
-
+  _.unset(newEventData, 'oldData');
   return newEventData;
 }
+
 async function handleDPWevents(payload, UUIDKey, route, callback, JWToken) {
   try {
     console.log("<<<Request Recieved for Event>>>>")
     console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
     console.log(payload.eventData.eventName, "===========================>event name here");
-    // console.log(payload.template, "===========================> template here");
-    // let deltaData = comparisonFunction.manipulator(jsons.current, payload.eventData);
-    let data = _.clone(payload.eventData);
-    _.unset(data, 'key');
-    _.unset(data, 'oldData');
-
-    let oldData = _.clone(payload.eventData.oldData)
-    _.unset(oldData, 'key');
-
-    let deltaData = comparisonFunction.manipulator(data, oldData);
+    let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
+    
     switch (payload.eventData.eventName) {
       case "eventOnContainerStatusChange": {
         try {

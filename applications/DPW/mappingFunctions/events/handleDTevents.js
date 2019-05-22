@@ -1,8 +1,10 @@
 
 'use strict';
 let rp = require('request-promise');
-const config = require('../../../../../config');
-const transformTemplate = require('../../../../../lib/helpers/transformTemplate');
+const comparisonFunction = require('./comparison');
+const config = require('../../../../config');
+const _ = require('lodash')
+const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 var cheerio = require('cheerio');
 
 function cleanEventData(eventData) {
@@ -13,7 +15,7 @@ function cleanEventData(eventData) {
   _.unset(newEventData, 'eventName');
   _.unset(newEventData, 'documentName');
   _.unset(newEventData, 'key');
-
+  _.unset(newEventData, 'oldData');
   return newEventData;
 }
 async function handleDTevents(payload, UUIDKey, route, callback, JWToken) {
@@ -23,8 +25,9 @@ async function handleDTevents(payload, UUIDKey, route, callback, JWToken) {
 
     switch (payload.eventData.eventName) {
       case "eventOnContainerStatusChange": {
+        let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
         try {
-          await getPromise(payload, eventOnContainerStatusChange(payload, deltaData), callback);
+          await getPromiseJSONapi(payload, eventOnContainerStatusChange(payload, deltaData), callback);
         } catch (e) {
           console.log(e);
           return e;
@@ -334,8 +337,14 @@ async function getPromise(payload, func, callback) {
   });
 }
 
+<<<<<<< HEAD
 async function getPromiseWithOrgCode(payload,orgCode,orgCode1, func, callback) {
   func(payload,orgCode,orgCode1).then(response => {
+=======
+
+async function getPromiseJSONapi(payload, func, callback) {
+  func(payload).then(response => {
+>>>>>>> bae0ce16075534013ae0528f9befc3b6e0cdad97
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
       error: false,
