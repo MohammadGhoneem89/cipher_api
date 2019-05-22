@@ -42,7 +42,7 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
         break;
       }
       case "AssociatePaymentInstruments": {
-        console.log("PAYLOAD=======>",payload,"<=======PAYLOAD");
+        console.log("PAYLOAD=======>", payload, "<=======PAYLOAD");
         let isCancelPaymentEvent = _.get(payload, "template.name") === "CancelBankPayment";
         if (isCancelPaymentEvent && payload.additionalData.length > 0) {//FOR BANK TO CANCEL OLD REPLACED PAYMENTS
           let result = await GetPaymentInstrumentData(payload.eventData.contractID, payload.eventData.EIDA);
@@ -159,7 +159,7 @@ function UpdateKYCDetail(mResponse) {
   return rp(message);
 }
 
-async function GetPaymentInstrumentData(contractID,internalInstrumentID, bankCode) {
+async function GetPaymentInstrumentData(contractID, internalInstrumentID, bankCode) {
   let url = config.get('URLRestInterface') || "http://0.0.0.0/";
   let message = {
     method: 'POST',
@@ -224,7 +224,7 @@ function GetContractDetailsBackOffice(contractID, EIDA) {
     json: true
   };
   return rp(message).then(result => {
-    console.log("GetContractDetailsBackOffice===========>", result, "<===========GetContractDetailsBackOffice");
+    console.log("GetContractDetailsBackOffice===========>", JSON.stringify(result), "<===========GetContractDetailsBackOffice");
     return Promise.resolve(result);
   });
 }
@@ -239,7 +239,7 @@ function createMessageAssociatedPayments(payload, data) {
       body: {
         "contractID": data.contractID,
         "paymentInstruments": data.paymentInstruments.map((item) => {
-          if(item.oldInstrumentRefNo){
+          if (item.oldInstrumentRefNo) {
             isNotReplacement = false
           }
           return {
@@ -257,7 +257,7 @@ function createMessageAssociatedPayments(payload, data) {
     },
     json: true
   };
-  console.log("createMessageAssociatedPayments===========>", JSON.stringify(message, null,2), "<===========createMessageAssociatedPayments");
+  console.log("createMessageAssociatedPayments===========>", JSON.stringify(message), "<===========createMessageAssociatedPayments");
   return Promise.resolve(message);
 }
 
