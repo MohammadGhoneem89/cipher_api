@@ -3,10 +3,12 @@
 let rp = require('request-promise');
 const comparisonFunction = require('./comparison');
 const config = require('../../../../config');
+
 const _ = require('lodash')
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
 
 
+//config = global.config
 function cleanEventData(eventData) {
  
   let newEventData = _.clone(eventData);
@@ -27,7 +29,7 @@ async function handleDTevents(payload, UUIDKey, route, callback, JWToken) {
       case "eventOnContainerStatusChange": {
         let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
         try {
-          await getPromiseJSONapi(payload, eventOnContainerStatusChange(payload, deltaData), callback);
+          await getPromise(payload, eventOnContainerStatusChange(payload, deltaData), callback);
         } catch (e) {
           console.log(e);
           return e;
@@ -66,11 +68,11 @@ async function handleDTevents(payload, UUIDKey, route, callback, JWToken) {
             //2-  let globalID=reponse.globalID
           }
         }
-      case "EventOnDataChange":
+      case "EventOnDataChangeForREGAUTH":
         {
-          if (payload.eventData.status == "TERMINATED") {
+          if (payload.eventData.status == "AW_TERM") {
             try {
-              await getPromise(payload, endRegistration(payload), callback)
+              await endRegistration(payload,callback)
             } catch (e) {
               console.log(e);
               return e
@@ -80,7 +82,7 @@ async function handleDTevents(payload, UUIDKey, route, callback, JWToken) {
           }
           else {
             try {
-              await getPromise(payload, updateRegistration(payload), callback)
+               await updateRegistration(payload,callback);
             } catch (e) {
               console.log(e);
               return e;
@@ -153,53 +155,53 @@ async function createApproveRegistration(payload) {
   
 }
 
-function updateRegistration(payload) {
+async function  updateRegistration(payload,callback) {
   console.log("PAYLOAD=====================> ",
     payload.eventData, " <=====================PAYLOAD",
     payload.eventData.status, "<<<<<<<<<payload status");
 
-  return async () => {
+    var edata={}
+    edata.accountNumber=payload.eventData.accountNumber;
+    var newBuissnessName= _.get(payload.eventData, "accountNameEn", "")
+    var oldBuissnessName= _.get(payload.eventData, "oldData.accountNameEn","")
+    console.log("new Buissness Name"+newBuissnessName+" old buissness name "+oldBuissnessName)
+    var aliasArray= _.get(payload.eventData, "aliasList", [])
+    console.log("alias array"+aliasArray)
+    if(newBuissnessName!="" && oldBuissnessName!="" && newBuissnessName!=oldBuissnessName){
+      edata.buissnessName=newBuissnessName;
+  
+     edata.custId=getCustId(aliasArray) 
+   
     //let url = config.get('URLRestInterface') || "http://0.0.0.0/";
     let options = {
       method: 'POST',
-      // url: `${url}API/PR/UpdateContractStatus`,
       url: payload.endpoint.address,
-      body: await transformTemplate(payload.template.updateRegData, payload.eventData),
+      body: await transformTemplate(payload.template.data, edata),
       json: false
     };
 
-
-    //finding globalCustomerId in aliasList
-    for (let alias of payload.eventData.aliasList) {
-      if(alias.startsWith('DT') || alias.startsWith('TRADE')) {
-        console.log("---alias---", alias ,"---alias---")
-        console.log($("sch\\:globalCustId").text())
-        $("sch\\:globalCustId").text(alias)
-      }
-    }
-
-    console.log($("sch\\:globalCustId").text())
-    options.body = $.xml();
-
+  
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return rp(options);
+    getPromise2(payload,options,callback)
   }
+
+
 }
 
 function associateAlias(payload, globalCustId) {
-  console.log("PAYLOAD=====================> ",
-    payload.eventData, " <=====================PAYLOAD");
+  //console.log("PAYLOAD=====================> ",
+   // payload.eventData, " <=====================PAYLOAD");
 
-  return async () => {
-    console.log("OUTPUT========================OUTPUT");
+      console.log("OUTPUT========================OUTPUT");
     //let url = config.get('URLRestInterface') || "http://0.0.0.0/";
+    console.log("url ==>"+config.get('eventService.AssociateAliasURL'))
     let options = {
       method: 'POST',
       // url: `${url}API/PR/associateAlias`,
-      url: config.get('eventService.AssociateAliasURL'),
+      url: config.get('eventService.AssociateAliasURL'), //its comming in vault
       body:
       {
-        header: config.get('eventService.Avanza_ISC') || {
+        header: config.get('eventService.Avanza_ISC') || { //assigned permission to internal group
           username: "Internal_API",
           password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
         },
@@ -216,42 +218,54 @@ function associateAlias(payload, globalCustId) {
       json: true
     };
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return rp(options);
-  }
+    return options;
+  
 }
 
-function endRegistration(payload) {
+async function  endRegistration(payload,callback) {
   console.log("PAYLOAD=====================> ",
     payload.eventData, " <=====================PAYLOAD",
     payload.eventData.status, "<<<<<<<<<payload status");
 
-  return async () => {
+
+
+    var edata={}
+    edata.accountNumber=payload.eventData.accountNumber;
+    var newstatus= _.get(payload.eventData, "status", "")
+    var oldstatus= _.get(payload.eventData, "oldData.status","")
+    console.log("new status  "+newstatus+" old status name "+oldstatus)
+    var aliasArray= _.get(payload.eventData, "aliasList", [])
+    console.log("alias array"+aliasArray)
+    if(newstatus!="" && oldstatus!="" && newstatus!=oldstatus){
+     
+     edata.custId=getCustId(aliasArray)    
     console.log("OUTPUT========================OUTPUT");
     //let url = config.get('URLRestInterface') || "http://0.0.0.0/";
     let options = {
       method: 'POST',
       // url: `${url}API/PR/UpdateContractStatus`,
       url: payload.endpoint.address,
-      body: await transformTemplate(payload.template.endRegData, payload.eventData, []),
+      body: await transformTemplate(payload.template.endRegData, edata, []),
       json: false
     };
 
   
-    //finding globalCustomerId in aliasList
-    for (let alias of payload.eventData.aliasList) {
-      if(alias.startsWith('DT') || alias.startsWith('TRADE')) {
-        console.log("---alias---", alias ,"---alias---")
-        console.log($("sch\\:globalCustId").text())
-        $("sch\\:globalCustId").text(alias)
-      }
-    }
-
-    console.log($("sch\\:globalCustId").text())
-    options.body = $.xml();
+    
 
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return rp(options);
-  }
+    getPromise2(payload,options,callback)
+  
+}
+}
+
+
+
+
+function getCustId(aliasArray){
+  var filterList = aliasArray.filter(function(x){console.log("el  "+x); return x!=undefined && x!=null && x.includes("TRADE_") })
+     console.log(filterList)
+     return filterList != undefined || filterList.length != 0?filterList[0].replace("TRADE_",""):0
+    
 }
 
 
@@ -264,22 +278,21 @@ if(response.includes("<sch:exception>")){
 
   callback({
     error: true,
-    message: "Exception in payload",
+    message: "Exception in response payload",
     response: {
       "request":message,
       "response":response
     }
   })
-}
-
- 
-    if ($("sch\\:status").text() == "SUCCESS") {
-      getPromiseForCreate(payload, associateAlias(payload, $("sch\\:globalCustId").text()), callback)
+}else if (response.includes("SUCCESS") ) {
+  var globalCustid=response.substring(response.indexOf("<sch:globalCustId>")+18, response.lastIndexOf("globalCustId>")-6)
+  console.log("global Custid "+globalCustid)
+      getPromiseForCreate(payload,message,response, associateAlias(payload, globalCustid), callback)
     }
     else {
       callback({
         error: true,
-        message: $("sch\\:status").text(),
+        message: "SUCCESS",
         response: {
           "request":message,
           "response":response
@@ -299,20 +312,32 @@ if(response.includes("<sch:exception>")){
   });
 }
 
-async function getPromiseForCreate(payload, func, callback) {
-  func().then(response => {
+async function getPromiseForCreate(payload,requestsoap,responsesoap, options, callback) {
+  rp(options).then(response => {
     console.log(response, "RESPONSE");
+    _.set(options.body, 'header.password', "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
     callback({
       error: response.errorCode == 200 ? false : true,
       message: response.errorCode == 200 ? payload.eventData.eventName + " Dispatched" : "Internal Error. " + response.errorDescription,
-      response: response
+      response: {
+        "soap Request":requestsoap , 
+        "soap Response":responsesoap,
+        "request":options,
+        "response":response
+        }
     })
   }).catch(err => {
     console.log("error : ", err);
+    _.set(options.body, 'header.password', "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
     callback({
       error: true,
       message: "Internal Error. " + err.name,
-      response: err
+      response: {
+      "soap Request":requestsoap , 
+      "soap Response":responsesoap,
+      "request":options,
+      "response":err
+      }
     })
   });
 }
@@ -337,14 +362,36 @@ async function getPromise(payload, func, callback) {
   });
 }
 
-<<<<<<< HEAD
+
+async function getPromise2(payload, request, callback) {
+  rp(request).then(response => {
+    console.log("response===============>", response, "<==========response");
+  
+    callback({
+      error: response.includes("SUCCESS") ? false : true,
+      message: response.includes("SUCCESS")  ? payload.eventData.eventName + " Dispatched" : "Failed",
+      response: {
+        "reqeust":request,
+        "response":response
+      }
+    })
+  }).catch(err => {
+    console.log("error : ", err);
+    callback({
+      error: true,
+      message: err.name,
+      //request: message.body,
+      response: {
+        "reqeust":request,
+        "response":err
+      }
+    })
+  });
+}
+
 async function getPromiseWithOrgCode(payload,orgCode,orgCode1, func, callback) {
   func(payload,orgCode,orgCode1).then(response => {
-=======
 
-async function getPromiseJSONapi(payload, func, callback) {
-  func(payload).then(response => {
->>>>>>> bae0ce16075534013ae0528f9befc3b6e0cdad97
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
       error: false,
