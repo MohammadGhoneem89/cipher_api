@@ -41,7 +41,23 @@ async function handleDPWevents(payload, UUIDKey, route, callback, JWToken) {
         }
         break;
       }
-
+      case "InstallSmartContract": {
+        try {
+          await getPromiseWithOrgCode(payload,"PORT","DPW", revise.reviseSmartContract, callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
+      }
+      case "DeploySmartContract": {
+        try {
+          console.dir(revise.deploySmartContract)
+          await getPromise(payload, revise.deploySmartContract, callback);
+        } catch (e) {
+          console.log(e);
+        }
+        break;
+      }   
       default:
         callback({
           error: true,
@@ -106,4 +122,23 @@ async function getPromise(payload, func, callback) {
     })
   });
 }
+
+async function getPromiseWithOrgCode(payload,orgCode,orgCode1, func, callback) {
+  func(payload,orgCode,orgCode1).then(response => {
+    console.log("RESPONSE===============>", response, "<===============RESPONSE");
+    callback({
+      error: false,
+      message: payload.eventData.eventName + " Dispatched",
+      response: response
+    })
+  }).catch(err => {
+    console.log("error : ", err);
+    callback({
+      error: true,
+      message: payload.eventData.eventName + " Failed",
+      response: new Error(err).message
+    })
+  });
+}
+
 exports.handleDPWevents = handleDPWevents

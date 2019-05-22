@@ -9,7 +9,8 @@ const constants = require('../Common/constants_en.js');
 const ObjectMapper = require('./objectMapper');
 const OldRestController = require('./_RestController');
 const APIDefination = require('../mappingFunctions/systemAPI/APIDefination');
-const apiFilter = ['RenewContract'];
+const vaultConfig = require('../../config');
+const apiFilter = vaultConfig.get('apiFilter');
 
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
 

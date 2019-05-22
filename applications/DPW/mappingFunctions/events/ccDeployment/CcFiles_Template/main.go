@@ -2,6 +2,7 @@
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -97,6 +98,9 @@ func (t *URChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		case "getDataByUnifiedID":
 			return t.getDataByUnifiedID(connection, args, "getDataByUnifiedID")
 
+		case "GetDataByKey":
+			return t.GetDataByKey(connection, args, "GetDataByKey")
+
 		default:
 			logger.Warning("Invoke did not find function: " + function)
 			return shim.Error("Received unknown function invocation: " + function)
@@ -117,6 +121,9 @@ func (t *URChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 		case "getDataByAlias":
 			return t.getDataByAlias(connection, args, "getDataByAlias", orgType)
+
+		case "GetDataByKey":
+			return t.GetDataByKey(connection, args, "GetDataByKey")
 
 		default:
 			logger.Warning("Invoke did not find function: " + function)
@@ -139,6 +146,9 @@ func (t *URChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		case "getDataByAlias":
 			return t.getDataByAlias(connection, args, "getDataByAlias", orgType)
 
+		case "GetDataByKey":
+			return t.GetDataByKey(connection, args, "GetDataByKey")
+
 		default:
 			logger.Warning("Invoke did not find function: " + function)
 			return shim.Error("Received unknown function invocation: " + function)
@@ -160,6 +170,9 @@ func (t *URChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		case "getDataByAlias":
 			return t.getDataByAlias(connection, args, "getDataByAlias", orgType)
 
+		case "GetDataByKey":
+			return t.GetDataByKey(connection, args, "GetDataByKey")
+
 		default:
 			logger.Warning("Invoke did not find function: " + function)
 			return shim.Error("Received unknown function invocation: " + function)
@@ -169,8 +182,8 @@ func (t *URChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 		connection.Connection = stub
 		switch functionName := function; functionName {
 
-		case "postDataToBlockchainCustoms":
-			return t.postDataToBlockchainCUSTOMS(connection, args, "postDataToBlockchainCustoms", orgType)
+		case "postDataToBlockchainCUSTOMS":
+			return t.postDataToBlockchainCUSTOMS(connection, args, "postDataToBlockchainCUSTOMS", orgType)
 
 		case "associateAlias":
 			return t.associateAlias(connection, args, "associateAlias", orgType)
@@ -180,6 +193,9 @@ func (t *URChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 		case "getDataByAlias":
 			return t.getDataByAlias(connection, args, "getDataByAlias", orgType)
+
+		case "GetDataByKey":
+			return t.GetDataByKey(connection, args, "GetDataByKey")
 
 		default:
 			logger.Warning("Invoke did not find function: " + function)
@@ -316,8 +332,6 @@ func (t *URChainCode) postDataToBlockchainREGAUTH(stub hypConnect, args []string
 			//<<DubaiCustoms Struct newField placeholder>>
 		}
 
-		fmt.Println("===============> ", unifiedReg)
-
 		unifiedRegJSONasBytes, err := json.Marshal(unifiedReg)
 		if err != nil {
 			return shim.Error(err.Error())
@@ -330,67 +344,15 @@ func (t *URChainCode) postDataToBlockchainREGAUTH(stub hypConnect, args []string
 
 		///////////////////Unified Reg Grouping///////////////////////////
 		//=================================================================================================================
-		unifiedRegGroupingAsBytes, err := fetchData(stub, "F_"+unifiedRegParams.FormationNo, "unifiedRegGrouping_"+s[0])
-		if err != nil {
-			fmt.Printf("%s\n", err)
-			return shim.Error("Somthing went wrong while fetching Master Attribute data" + err.Error())
+		if unifiedRegParams.FormationNo != "" {
+			err = unfiedRegGrouping(stub, "F_", unifiedRegParams.FormationNo, s[0], unifiedRegParams.UnifiedID)
+			if err != nil {
+				return shim.Error(err.Error())
+			}
 		}
 
-		//if document does not exist
-		if unifiedRegGroupingAsBytes == nil {
-			var unifiedIDsArrary []string
-			unifiedIDsArrary = append(unifiedIDsArrary, unifiedID)
-			unifiedRegGrouping := &UnifiedRegGrouping{
-				DocumentName: "unifiedRegGrouping",
-				Key:          "F_" + unifiedRegParams.FormationNo,
-				UnifiedIDs:   unifiedIDsArrary,
-			}
-			//insert document to collection
-			//marshal document
-			unifiedRegGroupingAsBytes, err := json.Marshal(unifiedRegGrouping)
-			if err != nil {
-				return shim.Error(err.Error())
-			}
-			// insert document
-			err = insertData(&stub, unifiedRegGrouping.Key, "unifiedRegGrouping_"+s[0], []byte(unifiedRegGroupingAsBytes))
-			if err != nil {
-				return shim.Error(err.Error())
-			}
-
-		} else { // document exist
-			//UnMarshal unifiedRegGroupingAsBytes
-			var unifiedRegGroupingAsJSON UnifiedRegGrouping
-			err = json.Unmarshal([]byte(unifiedRegGroupingAsBytes), &unifiedRegGroupingAsJSON)
-			if err != nil {
-				fmt.Printf("%s\n", err)
-				return shim.Error(err.Error())
-			}
-			//check for duplicates
-			var unifiedIDExist = false
-			for i := 0; i < len(unifiedRegGroupingAsJSON.UnifiedIDs); i++ {
-				if unifiedRegGroupingAsJSON.UnifiedIDs[i] == unifiedID {
-					unifiedIDExist = true
-				}
-			}
-			//check flag
-			if !unifiedIDExist {
-				//append unifiedID in the array
-				unifiedRegGroupingAsJSON.UnifiedIDs = append(unifiedRegGroupingAsJSON.UnifiedIDs, unifiedID)
-
-				//insert updated document to collection
-				//marshal document
-				updated_UnifiedRegGroupingAsBytes, err := json.Marshal(unifiedRegGroupingAsJSON)
-				if err != nil {
-					return shim.Error(err.Error())
-				}
-				// insert document
-				err = insertData(&stub, unifiedRegGroupingAsJSON.Key, "unifiedRegGrouping_"+s[0], []byte(updated_UnifiedRegGroupingAsBytes))
-				if err != nil {
-					return shim.Error(err.Error())
-				}
-			}
-		}
 		//=================================================================================================================
+
 		fmt.Println("postDataToBlockchainREGAUTH function executed successfully.")
 		//raise Event for new record ==> (with out history flag)
 		RaiseEventData(stub, "EventOnNewRegistration")
@@ -457,64 +419,10 @@ func (t *URChainCode) postDataToBlockchainREGAUTH(stub hypConnect, args []string
 
 		///////////////////Unified Reg Grouping///////////////////////////
 		//=================================================================================================================
-		unifiedRegGroupingAsBytes, err := fetchData(stub, "F_"+unifiedRegParams.FormationNo, "unifiedRegGrouping_"+s[0])
-		if err != nil {
-			fmt.Printf("%s\n", err)
-			return shim.Error("Somthing went wrong while fetching Master Attribute data" + err.Error())
-		}
-
-		//if document does not exist
-		if unifiedRegGroupingAsBytes == nil {
-			var unifiedIDsArrary []string
-			unifiedIDsArrary = append(unifiedIDsArrary, unifiedID)
-			unifiedRegGrouping := &UnifiedRegGrouping{
-				DocumentName: "unifiedRegGrouping",
-				Key:          "F_" + unifiedRegParams.FormationNo,
-				UnifiedIDs:   unifiedIDsArrary,
-			}
-			//insert document to collection
-			//marshal document
-			unifiedRegGroupingAsBytes, err := json.Marshal(unifiedRegGrouping)
+		if unifiedRegParams.FormationNo != "" {
+			err = unfiedRegGrouping(stub, "F_", unifiedRegParams.FormationNo, s[0], unifiedRegParams.UnifiedID)
 			if err != nil {
 				return shim.Error(err.Error())
-			}
-			// insert document
-			err = insertData(&stub, unifiedRegGrouping.Key, "unifiedRegGrouping_"+s[0], []byte(unifiedRegGroupingAsBytes))
-			if err != nil {
-				return shim.Error(err.Error())
-			}
-
-		} else { // document exist
-			//UnMarshal unifiedRegGroupingAsBytes
-			var unifiedRegGroupingAsJSON UnifiedRegGrouping
-			err = json.Unmarshal([]byte(unifiedRegGroupingAsBytes), &unifiedRegGroupingAsJSON)
-			if err != nil {
-				fmt.Printf("%s\n", err)
-				return shim.Error(err.Error())
-			}
-			//check for duplicates
-			var unifiedIDExist = false
-			for i := 0; i < len(unifiedRegGroupingAsJSON.UnifiedIDs); i++ {
-				if unifiedRegGroupingAsJSON.UnifiedIDs[i] == unifiedID {
-					unifiedIDExist = true
-				}
-			}
-			//check flag
-			if !unifiedIDExist {
-				//append unifiedID in the array
-				unifiedRegGroupingAsJSON.UnifiedIDs = append(unifiedRegGroupingAsJSON.UnifiedIDs, unifiedID)
-
-				//insert updated document to collection
-				//marshal document
-				updated_UnifiedRegGroupingAsBytes, err := json.Marshal(unifiedRegGroupingAsJSON)
-				if err != nil {
-					return shim.Error(err.Error())
-				}
-				// insert document
-				err = insertData(&stub, unifiedRegGroupingAsJSON.Key, "unifiedRegGrouping_"+s[0], []byte(updated_UnifiedRegGroupingAsBytes))
-				if err != nil {
-					return shim.Error(err.Error())
-				}
 			}
 		}
 		//=================================================================================================================
@@ -525,7 +433,6 @@ func (t *URChainCode) postDataToBlockchainREGAUTH(stub hypConnect, args []string
 		fmt.Println("postDataToBlockchainRegAuth function Updated successfully.")
 		//raise Event for existing document ==> (with history flag)
 		RaiseEventData(stub, "EventOnDataChangeForREGAUTH", additionalData)
-		//RaiseEventData(stub, "EventOnDataChangeForREGAUTH", checkHistory)
 
 	}
 
@@ -579,7 +486,6 @@ func (t *URChainCode) postDataToBlockchainCHAMBEROFCOMM(stub hypConnect, args []
 		fmt.Printf("%s\n", err)
 		return shim.Error(err.Error())
 	}
-	fmt.Println("=================> ", unifiedRegDataAsJSON)
 
 	//=================================================================================================================
 	// insert the old document after changing the key to ==> old_key
@@ -598,54 +504,13 @@ func (t *URChainCode) postDataToBlockchainCHAMBEROFCOMM(stub hypConnect, args []
 		return shim.Error(err.Error())
 	}
 	//=================================================================================================================
+
+	// Call function to Update Alias
 	var compositeKeyArray []string
-	i := 0
-	for i < len(alias) {
-		compositKey := ""
-		if alias[i].Type != "" {
-			compositKey = orgType + "_" + alias[i].Key + "_" + alias[i].Type
-		} else {
-			compositKey = orgType + "_" + alias[i].Key
-		}
-		compositeKeyArray = append(compositeKeyArray, compositKey)
-		aliasStructure := &AliasStructure{
-			DocumentName: "alias",
-			Key:          compositKey,
-			AliasKey:     alias[i].Key,
-			AliasType:    alias[i].Type,
-			UnifiedID:    postDataToBlockchainCHAMBEROFCOMM.UnifiedID,
-		}
-
-		aliasStructureAsBytes, err := json.Marshal(aliasStructure)
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		err = insertData(&stub, aliasStructure.Key, "alias_"+s[0], []byte(aliasStructureAsBytes))
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		i += 1
+	err = updateAlias(stub, compositeKeyArray, &unifiedRegDataAsJSON, alias, orgType, postDataToBlockchainCHAMBEROFCOMM.UnifiedID, s[0])
+	if err != nil {
+		return shim.Error(err.Error())
 	}
-
-	//Update registrationData.alias and check for duplicates
-	j := 0
-	for j < len(compositeKeyArray) {
-		exist := false
-		k := 0
-		for k < len(unifiedRegDataAsJSON.Alias) {
-			if compositeKeyArray[j] == unifiedRegDataAsJSON.AliasList[k] {
-				exist = true
-			}
-			k += 1
-		}
-		if !exist {
-			unifiedRegDataAsJSON.AliasList = append(unifiedRegDataAsJSON.AliasList, compositeKeyArray[j])
-		}
-		j += 1
-	}
-	fmt.Println("================after Inserting Alias================")
-	fmt.Println(unifiedRegDataAsJSON.Alias)
-	fmt.Println(compositeKeyArray)
 	// Append remaining information here
 
 	// new parameters are:
@@ -662,7 +527,10 @@ func (t *URChainCode) postDataToBlockchainCHAMBEROFCOMM(stub hypConnect, args []
 	fmt.Println("postDataToBlockchainCHAMBEROFCOMM function executed successfully.")
 
 	//raise Event for existing document ==> (with history flag)
-	RaiseEventData(stub, "EventOnDataChangeForCHAMBEROFCOMM", true)
+	additionalData := &AdditionalData{
+		CheckHistory: true,
+	}
+	RaiseEventData(stub, "EventOnDataChangeForCHAMBEROFCOMM", additionalData)
 	return shim.Success(nil)
 }
 
@@ -729,55 +597,12 @@ func (t *URChainCode) postDataToBlockchainPORT(stub hypConnect, args []string, f
 	}
 	//=================================================================================================================
 
+	// Call function to Update Alias
 	var compositeKeyArray []string
-	i := 0
-	for i < len(alias) {
-		compositKey := ""
-		if alias[i].Type != "" {
-			compositKey = orgType + "_" + alias[i].Key + "_" + alias[i].Type
-		} else {
-			compositKey = orgType + "_" + alias[i].Key
-		}
-		compositeKeyArray = append(compositeKeyArray, compositKey)
-		aliasStructure := &AliasStructure{
-			DocumentName: "alias",
-			Key:          compositKey,
-			AliasKey:     alias[i].Key,
-			AliasType:    alias[i].Type,
-			UnifiedID:    postDataToBlockchainPORT.UnifiedID,
-		}
-
-		aliasStructureAsBytes, err := json.Marshal(aliasStructure)
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		err = insertData(&stub, aliasStructure.Key, "alias_"+s[0], []byte(aliasStructureAsBytes))
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		i += 1
+	err = updateAlias(stub, compositeKeyArray, &unifiedRegDataAsJSON, alias, orgType, postDataToBlockchainPORT.UnifiedID, s[0])
+	if err != nil {
+		return shim.Error(err.Error())
 	}
-	fmt.Println("=====Before alias update in UnifiedReg collection =====", unifiedRegDataAsJSON.Alias)
-
-	//Update registrationData.alias and check for duplicates
-	j := 0
-	for j < len(compositeKeyArray) {
-		exist := false
-		k := 0
-		for k < len(unifiedRegDataAsJSON.Alias) {
-			if compositeKeyArray[j] == unifiedRegDataAsJSON.AliasList[k] {
-				exist = true
-			}
-			k += 1
-		}
-		if !exist {
-			unifiedRegDataAsJSON.AliasList = append(unifiedRegDataAsJSON.AliasList, compositeKeyArray[j])
-		}
-		j += 1
-	}
-	fmt.Println("================after Inserting Alias================")
-	fmt.Println(unifiedRegDataAsJSON.Alias)
-	fmt.Println(compositeKeyArray)
 	// Append remaining information here
 	// new parameters are:
 	//<<update the field of main structure with DPW field>>
@@ -794,7 +619,10 @@ func (t *URChainCode) postDataToBlockchainPORT(stub hypConnect, args []string, f
 	fmt.Println("postDataToBlockchainPORT function executed successfully.")
 
 	//raise Event for existing document ==> (with history flag)
-	RaiseEventData(stub, "EventOnDataChangeForPORT", true)
+	additionalData := &AdditionalData{
+		CheckHistory: true,
+	}
+	RaiseEventData(stub, "EventOnDataChangeForPORT", additionalData)
 	return shim.Success(nil)
 }
 
@@ -844,7 +672,6 @@ func (t *URChainCode) postDataToBlockchainTRADE(stub hypConnect, args []string, 
 		fmt.Printf("%s\n", err)
 		return shim.Error(err.Error())
 	}
-	fmt.Println("=================> ", unifiedRegDataAsJSON)
 
 	//=================================================================================================================
 	// insert the old document after changing the key to ==> old_key
@@ -863,54 +690,14 @@ func (t *URChainCode) postDataToBlockchainTRADE(stub hypConnect, args []string, 
 		return shim.Error(err.Error())
 	}
 	//=================================================================================================================
+
+	// Call function to Update Alias
 	var compositeKeyArray []string
-	i := 0
-	for i < len(alias) {
-		compositKey := ""
-		if alias[i].Type != "" {
-			compositKey = orgType + "_" + alias[i].Key + "_" + alias[i].Type
-		} else {
-			compositKey = orgType + "_" + alias[i].Key
-		}
-		compositeKeyArray = append(compositeKeyArray, compositKey)
-		aliasStructure := &AliasStructure{
-			DocumentName: "alias",
-			Key:          compositKey,
-			AliasKey:     alias[i].Key,
-			AliasType:    alias[i].Type,
-			UnifiedID:    postDataToBlockchainTRADE.UnifiedID,
-		}
-
-		aliasStructureAsBytes, err := json.Marshal(aliasStructure)
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		err = insertData(&stub, aliasStructure.Key, "alias_"+s[0], []byte(aliasStructureAsBytes))
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		i += 1
+	err = updateAlias(stub, compositeKeyArray, &unifiedRegDataAsJSON, alias, orgType, postDataToBlockchainTRADE.UnifiedID, s[0])
+	if err != nil {
+		return shim.Error(err.Error())
 	}
 
-	//Update registrationData.alias and check for duplicates
-	j := 0
-	for j < len(compositeKeyArray) {
-		exist := false
-		k := 0
-		for k < len(unifiedRegDataAsJSON.Alias) {
-			if compositeKeyArray[j] == unifiedRegDataAsJSON.AliasList[k] {
-				exist = true
-			}
-			k += 1
-		}
-		if !exist {
-			unifiedRegDataAsJSON.AliasList = append(unifiedRegDataAsJSON.AliasList, compositeKeyArray[j])
-		}
-		j += 1
-	}
-	fmt.Println("================after Inserting Alias================")
-	fmt.Println(unifiedRegDataAsJSON.Alias)
-	fmt.Println(compositeKeyArray)
 	// Append remaining information here
 	// new parameters are:
 	//<<update the field of main structure with DubaiTrade field>>
@@ -927,7 +714,10 @@ func (t *URChainCode) postDataToBlockchainTRADE(stub hypConnect, args []string, 
 
 	fmt.Println("postDataToBlockchainTRADE function executed successfully.")
 	//raise Event for existing document ==> (with history flag)
-	RaiseEventData(stub, "EventOnDataChangeForTRADE", true)
+	additionalData := &AdditionalData{
+		CheckHistory: true,
+	}
+	RaiseEventData(stub, "EventOnDataChangeForTRADE", additionalData)
 	return shim.Success(nil)
 }
 
@@ -979,7 +769,6 @@ func (t *URChainCode) postDataToBlockchainCUSTOMS(stub hypConnect, args []string
 		fmt.Printf("%s\n", err)
 		return shim.Error(err.Error())
 	}
-	fmt.Println("=================> ", unifiedRegDataAsJSON)
 
 	//=================================================================================================================
 	// insert the old document after changing the key to ==> old_key
@@ -998,58 +787,13 @@ func (t *URChainCode) postDataToBlockchainCUSTOMS(stub hypConnect, args []string
 		return shim.Error(err.Error())
 	}
 	//=================================================================================================================
+
+	// Call function to Update Alias
 	var compositeKeyArray []string
-	i := 0
-	for i < len(alias) {
-		compositKey := ""
-		if alias[i].Type != "" {
-			compositKey = orgType + "_" + alias[i].Key + "_" + alias[i].Type
-		} else {
-			compositKey = orgType + "_" + alias[i].Key
-		}
-		compositeKeyArray = append(compositeKeyArray, compositKey)
-		aliasStructure := &AliasStructure{
-			DocumentName: "alias",
-			Key:          compositKey,
-			AliasKey:     alias[i].Key,
-			AliasType:    alias[i].Type,
-			UnifiedID:    postDataToBlockchainCustoms.UnifiedID,
-		}
-
-		aliasStructureAsBytes, err := json.Marshal(aliasStructure)
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		err = insertData(&stub, aliasStructure.Key, "alias_"+s[0], []byte(aliasStructureAsBytes))
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		i += 1
+	err = updateAlias(stub, compositeKeyArray, &unifiedRegDataAsJSON, alias, orgType, postDataToBlockchainCustoms.UnifiedID, s[0])
+	if err != nil {
+		return shim.Error(err.Error())
 	}
-	fmt.Println("=====Before alias update in UnifiedReg collection =====", unifiedRegDataAsJSON.Alias)
-
-	//Update registrationData.alias and check for duplicates
-	j := 0
-	for j < len(compositeKeyArray) {
-		exist := false
-		k := 0
-		for k < len(unifiedRegDataAsJSON.Alias) {
-			if compositeKeyArray[j] == unifiedRegDataAsJSON.AliasList[k] {
-				exist = true
-			}
-			k += 1
-		}
-		if !exist {
-			unifiedRegDataAsJSON.AliasList = append(unifiedRegDataAsJSON.AliasList, compositeKeyArray[j])
-		}
-		j += 1
-	}
-	fmt.Println("================after Inserting Alias================")
-	fmt.Println(unifiedRegDataAsJSON.Alias)
-	fmt.Println(compositeKeyArray)
-	// Append remaining information here
-	// new parameters are:
-	//<<update the field of main structure with DubaiCustoms field>>
 
 	updated_UnifiedRegDataAsBytes, err := json.Marshal(unifiedRegDataAsJSON)
 	if err != nil {
@@ -1063,71 +807,21 @@ func (t *URChainCode) postDataToBlockchainCUSTOMS(stub hypConnect, args []string
 
 	///////////////////Unified Reg Grouping///////////////////////////
 	//=================================================================================================================
-	unifiedRegGroupingAsBytes, err := fetchData(stub, "C_"+postDataToBlockchainCustoms.GroupBuisnessName, "unifiedRegGrouping_"+s[0])
-	if err != nil {
-		fmt.Printf("%s\n", err)
-		return shim.Error("Somthing went wrong while fetching Master Attribute data" + err.Error())
+	if postDataToBlockchainCustoms.GroupBuisnessName != "" {
+		err = unfiedRegGrouping(stub, "C_", postDataToBlockchainCustoms.GroupBuisnessName, s[0], postDataToBlockchainCustoms.UnifiedID)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
 	}
 
-	//if document does not exist
-	if unifiedRegGroupingAsBytes == nil {
-		var unifiedIDsArrary []string
-		unifiedIDsArrary = append(unifiedIDsArrary, postDataToBlockchainCustoms.UnifiedID)
-		unifiedRegGrouping := &UnifiedRegGrouping{
-			DocumentName: "unifiedRegGrouping",
-			Key:          "C_" + postDataToBlockchainCustoms.GroupBuisnessName,
-			UnifiedIDs:   unifiedIDsArrary,
-		}
-		//insert document to collection
-		//marshal document
-		unifiedRegGroupingAsBytes, err := json.Marshal(unifiedRegGrouping)
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		// insert document
-		err = insertData(&stub, unifiedRegGrouping.Key, "unifiedRegGrouping_"+s[0], []byte(unifiedRegGroupingAsBytes))
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-
-	} else { // document exist
-		//UnMarshal unifiedRegGroupingAsBytes
-		var unifiedRegGroupingAsJSON UnifiedRegGrouping
-		err = json.Unmarshal([]byte(unifiedRegGroupingAsBytes), &unifiedRegGroupingAsJSON)
-		if err != nil {
-			fmt.Printf("%s\n", err)
-			return shim.Error(err.Error())
-		}
-		//check for duplicates
-		var unifiedIDExist = false
-		for i := 0; i < len(unifiedRegGroupingAsJSON.UnifiedIDs); i++ {
-			if unifiedRegGroupingAsJSON.UnifiedIDs[i] == postDataToBlockchainCustoms.UnifiedID {
-				unifiedIDExist = true
-			}
-		}
-		//check flag
-		if !unifiedIDExist {
-			//append unifiedID in the array
-			unifiedRegGroupingAsJSON.UnifiedIDs = append(unifiedRegGroupingAsJSON.UnifiedIDs, postDataToBlockchainCustoms.UnifiedID)
-
-			//insert updated document to collection
-			//marshal document
-			updated_UnifiedRegGroupingAsBytes, err := json.Marshal(unifiedRegGroupingAsJSON)
-			if err != nil {
-				return shim.Error(err.Error())
-			}
-			// insert document
-			err = insertData(&stub, unifiedRegGroupingAsJSON.Key, "unifiedRegGrouping_"+s[0], []byte(updated_UnifiedRegGroupingAsBytes))
-			if err != nil {
-				return shim.Error(err.Error())
-			}
-		}
-	}
 	//=================================================================================================================
 
 	fmt.Println("postDataToBlockchainCUSTOMS function executed successfully.")
 	//raise Event for existing document ==> (with history flag)
-	RaiseEventData(stub, "EventOnDataChangeForCUSTOMS", true)
+	additionalData := &AdditionalData{
+		CheckHistory: true,
+	}
+	RaiseEventData(stub, "EventOnDataChangeForCUSTOMS", additionalData)
 	return shim.Success(nil)
 }
 
@@ -1169,7 +863,6 @@ func (t *URChainCode) associateAlias(stub hypConnect, args []string, functionNam
 		fmt.Printf("%s\n", err)
 		return shim.Error("Invalid Argument for Alias!!!!!!" + err.Error())
 	}
-	fmt.Println(" alias ========> ", alias)
 
 	associateAlias := &AssociateAlias{
 		UnifiedID: sanitize(args[0], "string").(string),
@@ -1196,56 +889,14 @@ func (t *URChainCode) associateAlias(stub hypConnect, args []string, functionNam
 		fmt.Printf("%s\n", err)
 		return shim.Error(err.Error())
 	}
-	fmt.Println("=================> ", unifiedRegDataAsJSON)
+
+	// Call function to Update Alias
 	var compositeKeyArray []string
-	i := 0
-	for i < len(alias) {
-		compositKey := ""
-		if alias[i].Type != "" {
-			compositKey = orgType + "_" + alias[i].Key + "_" + alias[i].Type
-		} else {
-			compositKey = orgType + "_" + alias[i].Key
-		}
-		compositeKeyArray = append(compositeKeyArray, compositKey)
-		aliasStructure := &AliasStructure{
-			DocumentName: "alias",
-			Key:          compositKey,
-			AliasKey:     alias[i].Key,
-			AliasType:    alias[i].Type,
-			UnifiedID:    associateAlias.UnifiedID,
-		}
-
-		aliasStructureAsBytes, err := json.Marshal(aliasStructure)
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		err = insertData(&stub, aliasStructure.Key, "alias_"+s[0], []byte(aliasStructureAsBytes))
-		if err != nil {
-			return shim.Error(err.Error())
-		}
-		i += 1
+	err = updateAlias(stub, compositeKeyArray, &unifiedRegDataAsJSON, alias, orgType, associateAlias.UnifiedID, s[0])
+	if err != nil {
+		return shim.Error(err.Error())
 	}
-	fmt.Println("=====Before alias update in UnifiedReg collection =====", unifiedRegDataAsJSON.Alias)
 
-	//Update registrationData.alias and check for duplicates
-	j := 0
-	for j < len(compositeKeyArray) {
-		exist := false
-		k := 0
-		for k < len(unifiedRegDataAsJSON.Alias) {
-			if compositeKeyArray[j] == unifiedRegDataAsJSON.AliasList[k] {
-				exist = true
-			}
-			k += 1
-		}
-		if !exist {
-			unifiedRegDataAsJSON.AliasList = append(unifiedRegDataAsJSON.AliasList, compositeKeyArray[j])
-		}
-		j += 1
-	}
-	fmt.Println("================after Inserting Alias================")
-	fmt.Println(unifiedRegDataAsJSON.Alias)
-	fmt.Println(compositeKeyArray)
 	// Append remaining information here
 	//.... No data to be appended here ===> only the alias which is appended above
 
@@ -1298,7 +949,6 @@ func (t *URChainCode) getDataByUnifiedID(stub hypConnect, args []string, functio
 		fmt.Printf("%s\n", err)
 		return shim.Error(err.Error())
 	}
-	fmt.Println("================111================")
 	// Retrieve all the aliases from the alias_**** collection
 	var alias []Alias
 	i := 0
@@ -1314,7 +964,6 @@ func (t *URChainCode) getDataByUnifiedID(stub hypConnect, args []string, functio
 		if aliasAsBytes == nil {
 			continue
 		}
-		fmt.Println("================222================")
 		var singleAliasAsJSON AliasStructure
 		err = json.Unmarshal([]byte(aliasAsBytes), &singleAliasAsJSON)
 		if err != nil {
@@ -1329,7 +978,6 @@ func (t *URChainCode) getDataByUnifiedID(stub hypConnect, args []string, functio
 
 		i += 1
 	}
-	fmt.Println("================333================")
 	unifiedRegDataAsJSON.Alias = alias
 
 	UpdatedUnifiedRegDataAsBytes, err := json.Marshal(unifiedRegDataAsJSON)
@@ -1388,11 +1036,6 @@ func (t *URChainCode) getDataByAlias(stub hypConnect, args []string, functionNam
 		return shim.Error(err.Error())
 	}
 
-	// call the getDataByID Function
-	// var argsArray []string
-	// argsArray = append(argsArray, compositeAliasAsJSON.UnifiedID)
-	// t.getDataByUnifiedID(stub, argsArray, "getDataByUnifiedID")
-	// get the first part of the UnifiedID spliting string by "_"
 	s := strings.Split(compositeAliasAsJSON.UnifiedID, "_")
 	unifiedRegDataAsBytes, err := fetchData(stub, compositeAliasAsJSON.UnifiedID, "unifiedReg_"+s[0])
 	if err != nil {
@@ -1411,7 +1054,6 @@ func (t *URChainCode) getDataByAlias(stub hypConnect, args []string, functionNam
 		fmt.Printf("%s\n", err)
 		return shim.Error(err.Error())
 	}
-	fmt.Println("================111================")
 	// Retrieve all the aliases from the alias_**** collection
 	var alias []Alias
 	i := 0
@@ -1427,7 +1069,6 @@ func (t *URChainCode) getDataByAlias(stub hypConnect, args []string, functionNam
 		if aliasAsBytes == nil {
 			continue
 		}
-		fmt.Println("================222================")
 		var singleAliasAsJSON AliasStructure
 		err = json.Unmarshal([]byte(aliasAsBytes), &singleAliasAsJSON)
 		if err != nil {
@@ -1442,7 +1083,6 @@ func (t *URChainCode) getDataByAlias(stub hypConnect, args []string, functionNam
 
 		i += 1
 	}
-	fmt.Println("================333================")
 	unifiedRegDataAsJSON.Alias = alias
 
 	UpdatedUnifiedRegDataAsBytes, err := json.Marshal(unifiedRegDataAsJSON)
@@ -1450,6 +1090,122 @@ func (t *URChainCode) getDataByAlias(stub hypConnect, args []string, functionNam
 		return shim.Error(err.Error())
 	}
 	return shim.Success([]byte(UpdatedUnifiedRegDataAsBytes))
+}
+
+// ###################### End ########################
+
+// ###################### updateAlias Function ########################
+func updateAlias(stub hypConnect, compositeKeyArray []string, unifiedRegDataAsJSON *UnifiedReg, alias []Alias, orgType string, unifiedID string, regAuth string) error {
+	for i := 0; i < len(alias); i++ {
+
+		compositKey := ""
+		if alias[i].Type != "" {
+			compositKey = orgType + "_" + alias[i].Key + "_" + alias[i].Type
+		} else {
+			compositKey = orgType + "_" + alias[i].Key
+		}
+		compositeKeyArray = append(compositeKeyArray, compositKey)
+		aliasStructure := &AliasStructure{
+			DocumentName: "alias",
+			Key:          compositKey,
+			AliasKey:     alias[i].Key,
+			AliasType:    alias[i].Type,
+			UnifiedID:    unifiedID,
+		}
+
+		aliasStructureAsBytes, err := json.Marshal(aliasStructure)
+		if err != nil {
+			return errors.New("Fail to Marshal the aliasStructure")
+		}
+		err = insertData(&stub, aliasStructure.Key, "alias_"+regAuth, []byte(aliasStructureAsBytes))
+		if err != nil {
+			return errors.New("Failed to insert data to Alias_*** Collection")
+		}
+	}
+
+	//Update registrationData.alias and check for duplicates
+
+	for j := 0; j < len(compositeKeyArray); j++ {
+		exist := false
+
+		for k := 0; k < len(unifiedRegDataAsJSON.AliasList); k++ {
+			if compositeKeyArray[j] == unifiedRegDataAsJSON.AliasList[k] {
+				exist = true
+			}
+		}
+		if !exist {
+			unifiedRegDataAsJSON.AliasList = append(unifiedRegDataAsJSON.AliasList, compositeKeyArray[j])
+		}
+	}
+
+	return nil
+}
+
+// ###################### End ########################
+
+// ###################### unfiedRegGrouping Function ########################
+func unfiedRegGrouping(stub hypConnect, fORc string, GroupBuisnessNameOrFormationNo string, regAuth string, unifiedID string) error {
+
+	unifiedRegGroupingAsBytes, err := fetchData(stub, fORc+GroupBuisnessNameOrFormationNo, "unifiedRegGrouping_"+regAuth)
+	if err != nil {
+		fmt.Printf("%s\n", err)
+		return errors.New("Failed to fetch unifiedRegGrouping_*** collection ")
+	}
+	//if document does not exist
+	if unifiedRegGroupingAsBytes == nil {
+		var unifiedIDsArrary []string
+		unifiedIDsArrary = append(unifiedIDsArrary, unifiedID)
+		unifiedRegGrouping := &UnifiedRegGrouping{
+			DocumentName: "unifiedRegGrouping",
+			Key:          fORc + GroupBuisnessNameOrFormationNo, //fORc means =====> F_ or C_ for regAuth or Customs
+			UnifiedIDs:   unifiedIDsArrary,
+		}
+		//insert document to collection
+		//marshal document
+		unifiedRegGroupingAsBytes, err := json.Marshal(unifiedRegGrouping)
+		if err != nil {
+			return errors.New("Failed to marshal unifiedRegGrouping")
+		}
+		// insert document
+		err = insertData(&stub, unifiedRegGrouping.Key, "unifiedRegGrouping_"+regAuth, []byte(unifiedRegGroupingAsBytes))
+		if err != nil {
+			return errors.New("Failed to insert unifiedRegGrouping to unifiedRegGrouping_*** collection")
+		}
+
+	} else { // document exist
+		//UnMarshal unifiedRegGroupingAsBytes
+		var unifiedRegGroupingAsJSON UnifiedRegGrouping
+		err = json.Unmarshal([]byte(unifiedRegGroupingAsBytes), &unifiedRegGroupingAsJSON)
+		if err != nil {
+			fmt.Printf("%s\n", err)
+			return errors.New("Failed to Unmarshal unifiedRegGroupingAsJSON")
+		}
+		//check for duplicates
+		var unifiedIDExist = false
+		for i := 0; i < len(unifiedRegGroupingAsJSON.UnifiedIDs); i++ {
+			if unifiedRegGroupingAsJSON.UnifiedIDs[i] == unifiedID {
+				unifiedIDExist = true
+			}
+		}
+		//check flag
+		if !unifiedIDExist {
+			//append unifiedID in the array
+			unifiedRegGroupingAsJSON.UnifiedIDs = append(unifiedRegGroupingAsJSON.UnifiedIDs, unifiedID)
+
+			//insert updated document to collection
+			//marshal document
+			updatedUnifiedRegGroupingAsBytes, err := json.Marshal(unifiedRegGroupingAsJSON)
+			if err != nil {
+				return errors.New("Failed to Marshal unifiedRegGroupingAsJSON berfor data Insertion")
+			}
+			// insert document
+			err = insertData(&stub, unifiedRegGroupingAsJSON.Key, "unifiedRegGrouping_"+regAuth, []byte(updatedUnifiedRegGroupingAsBytes))
+			if err != nil {
+				return errors.New("Failed to insert data to unifiedRegGrouping_ *** collection")
+			}
+		}
+	}
+	return nil
 }
 
 // ###################### End ########################

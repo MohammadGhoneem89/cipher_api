@@ -6,7 +6,8 @@ let routeConfiguration = Object.assign(require('../routeConfig/routeConfiguratio
 let pointer = require('json-pointer');
 const apiPayloadRepo = require('../../lib/repositories/apiPayload');
 const _ = require('lodash');
-const apiFilter = ['RenewContract'];
+const vaultConfig = require('../../config');
+const apiFilter = vaultConfig.get('apiFilter');
 
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
   if (apiFilter.indexOf(incommingRoute) >= 0) {

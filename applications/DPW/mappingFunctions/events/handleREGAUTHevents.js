@@ -6,8 +6,8 @@ const config = require('../../../../config');
 const revise = require('./ccDeployment/approveAttribute')
 async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
   try {
-    console.log("<<<Request Recieved for Event>>>>")
-    console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
+    // console.log("<<<Request Recieved for Event>>>>")
+    // console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
     console.log(payload.eventData.eventName, "===========================>event name here");
     // console.log(payload.template, "===========================> template here");
 
@@ -44,7 +44,7 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
       }
       case "InstallSmartContract": {
         try {
-          await getPromise(payload, revise.reviseSmartContract, callback);
+          await getPromiseWithOrgCode(payload,"REGAUTH","JAFZA", revise.reviseSmartContract, callback);
         } catch (e) {
           console.log(e);
         }
@@ -163,6 +163,26 @@ function eventOnDataChange(payload, deltaData) {
 
 async function getPromise(payload, func, callback) {
   func(payload).then(response => {
+    console.log("RESPONSE===============>", response, "<===============RESPONSE");
+    callback({
+      error: false,
+      message: payload.eventData.eventName + " Dispatched",
+      response: response
+    })
+  }).catch(err => {
+    console.log("error : ", err);
+    callback({
+      error: true,
+      message: payload.eventData.eventName + " Failed",
+      response: new Error(err).message
+    })
+  });
+}
+
+
+
+async function getPromiseWithOrgCode(payload,orgCode,orgCode1, func, callback) {
+  func(payload,orgCode,orgCode1).then(response => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
       error: false,

@@ -24,406 +24,338 @@ var rimraf = require("rimraf");
  let apprrovedAttributeList = []
  let argumentList = []
 
+    module.exports.reviseSmartContract = async function reviseSmartContract(payload,orgCode) {
+        
+        // Copy Chaincode Template folder befor modification 
+        try {
+            await fse.copy(join(__dirname,'CcFiles_Template'), join(__dirname,'CcFiles'))
+            console.log('success!')
+        } catch (err) {
+            console.error(err)
+        }
 
-module.exports.reviseSmartContract = async function reviseSmartContract(payload,orgCode,orgCode1) {
-    
-    // Copy Chaincode Template folder befor modification 
-    try {
-        await fse.copy(join(__dirname,'CcFiles_Template'), join(__dirname,'CcFiles'))
-        console.log('success!')
-    } catch (err) {
-        console.error(err)
-    }
 
-
-    var eventData = payload.eventData
-
-     //get SmartContract Local Path fro each Organization       
-    try{
-         
+        var eventData = payload.eventData
+        
+        //get SmartContract Local Path fro each Organization 
         var SmartContractLocalPath = new Array()
         SmartContractLocalPath = eventData['smartContractLocalPath']
-        if (SmartContractLocalPath){
-            console.log('Smart Contract Path Array ====> ', JSON.stringify(SmartContractLocalPath))
-            console.log('Organization ======> ',orgCode1)
-            var localSMObject = true
-            for (i= 0; i< SmartContractLocalPath.length; i++){
-                var locaPathObject = SmartContractLocalPath[i]
-                if(orgCode1 == locaPathObject['orgCode']){
-                    
-                    if(locaPathObject['version'] == "0" || locaPathObject['version'] == ""){
-                        version = -1
-                    }else{
-                        version = parseInt(locaPathObject['version'])
-                        console.log('Smartcontract Local Version ==============> ' , version)
-                    }
-                    localSMObject = false
+
+        for (i= 0; i< SmartContractLocalPath.length; i++){
+            var locaPathObject = SmartContractLocalPath[i]
+            if(orgCode == locaPathObject['orgCode']){
+                // Check version of smartContract
+                if(locaPathObject['version'] == "0" || locaPathObject['version'] == ""){
+                    version = -1
+                }else{
+                    version = parseInt(locaPathObject['version'], 10)
                 }
-                
             }
-
-            // Check if Organization is matching 
-            if (localSMObject){
-                throw "Organization OrgCode does not match ........"
-            }
-
-        }else{
-            throw "Cann't Fetch Local Smartcontract Path......"
         }
-        
-    }catch (err){
-        console.log(err)
-        throw err 
-    }
-    
-    // Generate the Smart Contract with new approved attributes
-    try{
+        //SmartContractLocalPath = eventData['smartContractLocalPath']
 
+        console.log('========111========')
         if (eventData['addAttributeList']){
         
-            //get the array of atrributes
-            var attributes = new Array();
-            attributes = eventData['addAttributeList']
-            //get number of params for each organization
-            getNumberOfParamsForEachOrg(attributes)
+            try{
 
-            console.log('attributes size :' + attributes.length)
 
-            //find the Approved Attribute
-            for (var i = 0; i < attributes.length; i++) {
-            
-                var attribute = attributes[i]
-                
-                if (attribute['attributeStatus']){
-            
-                    var attributeStatus = attribute['attributeStatus']
-                    if(attributeStatus == '002'){
+                console.log('========222========')
+                //get the array of atrributes
+                var attributes = new Array();
+                attributes = eventData['addAttributeList']
+                //get number of params for each organization
+                getNumberOfParamsForEachOrg(attributes)
+                console.log(totalDeployedAttribute)
+                console.log(dccDeployedAttr)
+                console.log(dpwDeployedAttr)
+                console.log(dcDeployedAttr)
+                console.log(dtDeployedAttr)
+                console.log('attributes size :' + attributes.length)
+                //#########################################################################################################
+                    // modify stuct.go file
+                //#########################################################################################################
+                //find the Approved Attribute
+                for (var i = 0; i < attributes.length; i++) {
+                    console.log('========333========')
+                    var attribute = attributes[i]
+                    console.log(attribute)
+                    if (attribute['attributeStatus']){
+                        console.log('========444========')
+                        var attributeStatus = attribute['attributeStatus']
+                        if(attributeStatus == '002'){
 
-                        // add approved attribute to a separate list to update its status later after Chaincode is revised 002 ==> 004
-                        apprrovedAttributeList.push(attribute)
+                            // add approved attribute to a separate list to update its status later after Chaincode is revised 002 ==> 004
+                            apprrovedAttributeList.push(attribute)
 
-                        channelID = attribute['channel']
-                        //this is the new attribute
-                        //.
-                        //.
-                        // get other attribute details
-                        var attributeDetails = getAttributeDetails(attribute)
-                        
-                        // if children == 0 ==> simple attribute type ==> just append it in the corresponding structrue
-                        if(attributeDetails.type == 'string'|| attributeDetails.type == 'Date' || attributeDetails.type == 'int' || attributeDetails.type == 'bool'){
-                    
-                            if(attributeDetails.occurrence == 'One' & attributeDetails.privacy == 'common'){
+                            channelID = attribute['channel']
+                            //this is the new attribute
+                            //.
+                            //.
+                            // get other attribute details
+                            var attributeDetails = getAttributeDetails(attribute)
+                            console.log('========555========')
+                            // if children == 0 ==> simple attribute type ==> just append it in the corresponding structrue
+                            if(attributeDetails.type == 'string'|| attributeDetails.type == 'Date' || attributeDetails.type == 'int' || attributeDetails.type == 'bool'){
+                                console.log('========55555========')
+                                if(attributeDetails.occurrence == 'One' & attributeDetails.privacy == 'common'){
+                                    
+                                    string_One_Common(attributeDetails)
+                                    
+                                }else if(attributeDetails.occurrence == 'Many' & attributeDetails.privacy == 'common'){
+                                    
+                                    string_Many_Common(attributeDetails)
+
+                                }
+
+
+                            }else if(attributeDetails.type == 'object' & attributeDetails.occurrence == 'One' & attributeDetails.privacy == 'common'){
+                            
+                                object_One_Common(attributeDetails)
                                 
-                                string_One_Common(attributeDetails)
-                                
-                            }else if(attributeDetails.occurrence == 'Many' & attributeDetails.privacy == 'common'){
-                                
-                                string_Many_Common(attributeDetails)
+                            }else if(attributeDetails.type == 'object' & attributeDetails.occurrence == 'Many' & attributeDetails.privacy == 'common'){
 
+                                object_Many_Common(attributeDetails)
+                                
                             }
-
-
-                        }else if(attributeDetails.type == 'object' & attributeDetails.occurrence == 'One' & attributeDetails.privacy == 'common'){
                             
-                            object_One_Common(attributeDetails)
                             
-                        }else if(attributeDetails.type == 'object' & attributeDetails.occurrence == 'Many' & attributeDetails.privacy == 'common'){
-
-                            object_Many_Common(attributeDetails)
-                                
+                        }else if(attributeStatus == 4){
+                            //this is deployed Attribute
+                        }else if(attributeStatus == 3){
+                            //this is a rejected Attribute
+                        }else if(attributeStatus == 1){
+                            //this is a pending Attribute
                         }
-                        
-                        
-                    }else if(attributeStatus == 4){
-                        //this is deployed Attribute
-                    }else if(attributeStatus == 3){
-                        //this is a rejected Attribute
-                    }else if(attributeStatus == 1){
-                        //this is a pending Attribute
                     }
                 }
-            }
-        
-        } 
 
-    }catch (err){
-        console.log(err)
-        throw err
-    }
+                version++ 
 
-    // Install the smart contract and update the attributes status
-    try{
-
-        version++ 
-
-        //Zip the chaincode folder 
-        await zipafolder.zip(join(__dirname,'CcFiles'), join(__dirname , 'CcFiles_V'+version+'.zip') );
-
-        
-        //Delete Chaincode Template and mark the new chaincode as template 
-        // rimraf.sync(join(__dirname,'CcFiles_Template'));
-        
-        // //Rename the new chaincode from 'CcFiles' ==> to   'CcFiles_Template'
-        // fs.rename(join(__dirname,'CcFiles'), join(__dirname,'CcFiles_Template'))
-        
-        let documents 
-    
-        //query SmartContract document 
-        const smartCointractDoc = await SmartContract.findOne({"channelID":config.get('attributeConfig.channelID'),"smartContract" :config.get('attributeConfig.smartcontractName')}).lean(true).exec()
-    
-        
-        if (smartCointractDoc) {
-            documents = smartCointractDoc.documents
-            if (documents) {
-                documents[0].documentName = 'CcFiles_V'+version+'.zip'
-                documents[0].retreivalPath = join(__dirname , 'CcFiles_V'+version+'.zip')
-            }
-        }else{
-            throw "Fetch Smartcontract Document Failed......."
-        }
-        
-        
-        // query Channel Document 
-        const channelDoc = await Channel.findOne({"_id":config.get('attributeConfig.channelID')}).lean(true).exec()
-        if (!channelDoc) {
-            throw "Fetch Channel Document Failed......."
-        }
-    
-
-        // query Network Document 
-        let peersIPs = []
-
-        const networkDoc = await NetworkConfig.findOne({"_id":channelDoc.network}).lean(true).exec()
-
-        if (!networkDoc) {
-            throw "Fetch Network Document Failed......."
-        }
-    
-        let peerList = networkDoc.peerList
-        if (peerList) {
-            for(i=0; i< peerList.length; i++){
-                let iP = ""
-                iP = peerList[i].requests
-                iP.replace("grpcs://", "");
-                peersIPs.push(iP)
-            }
-    
-        }
-
-        //call Install Chaincode API
-        let options = {
-            method: 'POST',
-            url: config.get('attributeConfig.installChaincodeURL'),
-            body:{
-            
-                header: config.get('eventService.Avanza_ISC') || {
-                    username: "Internal_API",
-                    password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
-                },
-                "channelName":channelDoc.channelName,
-                "function": "0007",
-                "network":channelDoc.networkName,
-                "peerList":peersIPs,
-                "smartContractName":smartCointractDoc.smartContract,
-                "smartContractPackPath":documents[0].retreivalPath,
-                "smartContractVersion":version.toString()
-            
-            },
-            json: true
-        };
-        let response = await rp(options)
-        
-        let installSamrtContract= response.HyperledgerConnect.data.success
-        let installSamrtContractMessage= response.HyperledgerConnect.data.message
-
-        // If smartcontrat version already exist ====> increment the version and try to install it again
-        if (response.HyperledgerConnect.data.message == "[Failed] Smart Contract may already exist. meta info status is not 200"){
-
-            version++
-
-            let options = {
-                method: 'POST',
-                url: config.get('attributeConfig.installChaincodeURL'),
-                body:{
+                //Zip the chaincode folder 
+                await zipafolder.zip(join(__dirname,'CcFiles'), join(__dirname , 'CcFiles_V'+version+'.zip') );
+                //Delete Chaincode Template and mark the new chaincode as template 
+                rimraf.sync(join(__dirname,'CcFiles_Template'));
                 
-                    header: config.get('eventService.Avanza_ISC') || {
-                        username: "Internal_API",
-                        password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
-                    },
-                    "channelName":channelDoc.channelName,
-                    "function": "0007",
-                    "network":channelDoc.networkName,
-                    "peerList":peersIPs,
-                    "smartContractName":smartCointractDoc.smartContract,
-                    "smartContractPackPath":documents[0].retreivalPath,
-                    "smartContractVersion":version.toString()
-                
-                },
-                json: true
-            };
-            let response = await rp(options)
+                //Rename the new chaincode from 'CcFiles' ==> to   'CcFiles_Template'
+                fs.rename(join(__dirname,'CcFiles'), join(__dirname,'CcFiles_Template'), function (err) {
+                    if (err) throw err;
+                    console.log('==========Renamed Completed Successfully============');
+                });
+                            
 
-            installSamrtContract= response.HyperledgerConnect.data.success
-            installSamrtContractMessage= response.HyperledgerConnect.data.message
-
-        }
-
-        // If samrtContract installed successfully ==> then call Update_Attribute API
-        if(installSamrtContract){
+                let documents 
             
-            console.log("Smart Contract Installed Successfully. Now Updating the Attribute Status")
-
-            //call Update Attribute API
-            //prepare list of parameters
-            argumentList = []
-            for(var i = 0; i< apprrovedAttributeList.length; i++){
-                var approvedAttribute = apprrovedAttributeList[i]
-                var orgList = approvedAttribute['orgList']
+                //query SmartContract document 
+                const smartCointractDoc = await SmartContract.findOne({"channelID":config.get('attributeConfig.channelID'),"smartContract" :config.get('attributeConfig.smartcontractName')}).lean(true).exec()
+                console.log('smartcontarct is :', smartCointractDoc)
                 
-                var argumentObject1 = {
-                    uuid: approvedAttribute['attributeUUID'],
-                    regAuth: approvedAttribute['regAuth'],
-                    status: "004",
-                    orgCode: orgCode1
-
+                if (smartCointractDoc) {
+                    documents = smartCointractDoc.documents
+                    if (documents) {
+                        documents[0].documentName = 'CcFiles_V'+version+'.zip'
+                        documents[0].retreivalPath = join(__dirname , 'CcFiles_V'+version+'.zip')
+                    }
                 }
-                argumentList.push(argumentObject1)
-                //console.log('Update Call =======> ',argumentList)
-            }
-            
-            // Prepare SmartContractLocalPath Object 
-            var samrtContractPath = {
-                orgCode: orgCode1,
-                path: join(__dirname , 'CcFiles_V'+version+'.zip'),
-                version: version.toString()
-            }
-            
-            // Updated SmartcontractLocalPath for Corresponding Organization 
-            for(var i=0; i<SmartContractLocalPath.length; i++){
-                var orgLocalPath = SmartContractLocalPath[i]
-                if( orgLocalPath['orgCode'] == orgCode1 ){
-                    SmartContractLocalPath[i] = samrtContractPath
-                }
-            }
-            
-            console.log('Latest SmartContract Path ====>', JSON.stringify(SmartContractLocalPath))
-            
-            //Prepare request 
-            let options1 = {
-                method: 'POST',
-                url: config.get('attributeConfig.updateAttributeURL'),
-                body:{
                 
-                    header: config.get('eventService.Avanza_ISC') || {
-                        username: "Internal_API",
-                        password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
+                
+                // query Channel Document 
+                console.log('=======> chaneelll' ,"smartCointractDoc.channelID")
+                const channelDoc = await Channel.findOne({"_id":config.get('attributeConfig.channelID')}).lean(true).exec()
+                console.log('Channel is :', channelDoc)
+                console.log('xxxxxxxxxxxxxxxxxxxxxxx')
+
+                // query Network Document 
+                let peersIPs = []
+                console.log('=======> Network' ,channelDoc.network)
+                const networkDoc = await NetworkConfig.findOne({"_id":channelDoc.network}).lean(true).exec()
+                console.log('Network is :', networkDoc)
+                let peerList = networkDoc.peerList
+                if (peerList) {
+                    for(i=0; i< peerList.length; i++){
+                        let iP = ""
+                        iP = peerList[i].requests
+                        console.log(iP)
+                        iP.replace("grpcs://", "");
+                        console.log(iP)
+                        peersIPs.push(iP)
+                    }
+                    console.log(peersIPs)
+                }
+
+                //call Install Chaincode API
+                let options = {
+                    method: 'POST',
+                    url: config.get('attributeConfig.installChaincodeURL'),
+                    body:{
+                    
+                        header: config.get('eventService.Avanza_ISC') || {
+                            username: "Internal_API",
+                            password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
                         },
-
-                    body: {
-                        "argumentList":argumentList,
-                        "smartContractLocalPath": SmartContractLocalPath
-                    }
-                },
-                json: true
+                        "channelName":channelDoc.channelName,
+                        "function": "0007",
+                        "network":channelDoc.networkName,
+                        "peerList":peersIPs,
+                        "smartContractName":smartCointractDoc.smartContract,
+                        "smartContractPackPath":documents[0].retreivalPath,
+                        "smartContractVersion":version.toString()
+                    
+                    },
+                    json: true
                 };
-            let updateResponse = await rp(options1)
-            
+                let response = await rp(options)
+                console.log('Message ============> ' , response.HyperledgerConnect.data)
+                let installSamrtContract= response.HyperledgerConnect.data.success
+                let installSamrtContractMessage= response.HyperledgerConnect.data.message
 
-            console.log('argumentList in update Call ==============> ' , JSON.stringify(argumentList))
-            console.log('Error Received in update Call ==============> ' , updateResponse.errorCode)
-        
 
-            if(updateResponse.errorCode != '200' ){
-                installSamrtContractMessage = updateResponse.errorDescription
-                console.log('Failed to call API for UpdateAttribute =====> :' , updateResponse.errorDescription)
-                throw updateResponse.errorDescription
-            } 
+                if (response.HyperledgerConnect.data.message == "'[Failed] Smart Contract may already exist. meta info status is not 200'"){
 
-        }else{
-            console.log('Insallation of the smart contract is failed' + installSamrtContractMessage)
-            throw installSamrtContractMessage
-        }
+                    version++
 
-        console.log("Updating the local copy of Smart contract in MongoDB")
-        //Update the Smart Contract in MongoDB
-        var myquery = { "channelID":config.get('attributeConfig.channelID'),"smartContract" : config.get('attributeConfig.smartcontractName') };
-        var newvalues = { $set: {smartContractVersion: version.toString(),documents:documents } };
-        const smartCointractDoc1 = await SmartContract.updateOne(myquery, newvalues); 
-        
-        if (!smartCointractDoc1) {
-            throw " Update Smartcontract Document in Mongo Failed......."
-        }
-    
-        return "Success"
-    } catch (err) {
-        console.log(err)
-        throw err
+                    let options = {
+                        method: 'POST',
+                        url: config.get('attributeConfig.installChaincodeURL'),
+                        body:{
+                        
+                            header: config.get('eventService.Avanza_ISC') || {
+                                username: "Internal_API",
+                                password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
+                            },
+                            "channelName":channelDoc.channelName,
+                            "function": "0007",
+                            "network":channelDoc.networkName,
+                            "peerList":peersIPs,
+                            "smartContractName":smartCointractDoc.smartContract,
+                            "smartContractPackPath":documents[0].retreivalPath,
+                            "smartContractVersion":version.toString()
+                        
+                        },
+                        json: true
+                    };
+                    let response = await rp(options)
+
+                    installSamrtContract= response.HyperledgerConnect.data.success
+                    installSamrtContractMessage= response.HyperledgerConnect.data.message
+
+                }
+
+                // If samrtContract installed successfully ==> then call Update Attribute API
+                if(installSamrtContract){
+
+                    //call Update Attribute API
+                    //prepare list of parameters
+                    for(var i = 0; i< apprrovedAttributeList.length; i++){
+                        var approvedAttribute = apprrovedAttributeList[i]
+                        var orgList = approvedAttribute['orgList']
+                        
+                        var argumentObject1 = {
+                            uuid: approvedAttribute['attributeUUID'],
+                            regAuth: approvedAttribute['regAuth'],
+                            status: "004",
+                            orgCode: orgCode
+
+                        }
+                        argumentList.push(argumentObject1)
+                        //console.log('Update Call =======> ',argumentList)
+                    }
+                    
+                    // Prepare SmartContractLocalPath Object 
+                    var samrtContractPath = {
+                        orgCode: orgCode,
+                        path: join(__dirname , 'CcFiles_V'+version+'.zip'),
+                        version: version.toString
+                    }
+                    SmartContractLocalPath.push(samrtContractPath)
+                    
+                    //Prepare request 
+                    let options1 = {
+                        method: 'POST',
+                        url: config.get('attributeConfig.updateAttributeURL'),
+                        body:{
+                        
+                            header: config.get('eventService.Avanza_ISC') || {
+                                username: "Internal_API",
+                                password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
+                                },
+
+                            body: {
+                                "argumentList":argumentList,
+                                "smartContractLocalPath": SmartContractLocalPath
+                            }
+                        },
+                        json: true
+                        };
+                    let updateResponse = await rp(options1)
+                    console.log('Options ==============> ' , options1)
+                    console.log('updateResponse ==============> ' , updateResponse.errorCode)
+                    console.log('argumentList ==============> ', argumentList)
+
+                    if(updateResponse.errorCode != '200' ){
+                        installSamrtContractMessage = updateResponse.errorDescription
+                        throw updateResponse.errorDescription
+                    } 
+
+                }else{
+                    console.log('XXXX=====XXXX')
+                    //throw new Error(installSamrtContractMessage)
+                    throw installSamrtContractMessage
+                }
+                    
+                    
+                console.log('Update argumentList ========> ' ,argumentList)
+
+
+
+
+                //Update the Smart Contract in MongoDB
+                var myquery = { "channelID":config.get('attributeConfig.channelID'),"smartContract" : config.get('attributeConfig.smartcontractName') };
+                var newvalues = { $set: {smartContractVersion: version.toString(),documents:documents } };
+                const smartCointractDoc1 = await SmartContract.updateOne(myquery, newvalues); 
+
+
+                console.log('111111111')
+                return "Success"
+            } catch (err) {
+                console.log(err)
+                throw err
+            }
+
+
     }
-}
 
 
+    
+    
+  }
 
-
-
-  module.exports.deploySmartContract = async function deploySmartContract(payload,orgCode,orgCode1) {
-	  
-	console.log('Deploying the smart contract')
+  module.exports.deploySmartContract = async function deploySmartContract(payload) {
     var eventData = payload.eventData
     let installedAttributeList = []
     let channelId = ''
-  
-    //version = parseInt(eventData['version'], 10)
-	
-	try{
-        // var SmartContractLocalPath = new Array()
-        // SmartContractLocalPath = eventData['smartContractLocalPath']
-        // console.log('Smart Contract Path', JSON.stringify(SmartContractLocalPath))
-        // console.log('Organization',orgCode1)
-
-        // for (i= 0; i< SmartContractLocalPath.length; i++){
-        //     var locaPathObject = SmartContractLocalPath[i]
-        //     if(orgCode1 == locaPathObject['orgCode']){
-                
-        //         // if(locaPathObject['version'] == "0" || locaPathObject['version'] == ""){
-        //         //     version = -1
-        //         // }else{
-        //         //     version = parseInt(locaPathObject['version'], 10)
-        //         // }
-
-        //         version = parseInt(locaPathObject['version'], 10)
-        //     }
-        // }
-		
-	    // console.log('Version of the smart contract code to be upgraded/instantiated' , version)
-
-
-	
-        if (eventData['addAttributeList']){
-        
-            var attributes = new Array();
-            attributes = eventData['addAttributeList']
-        
-            for (var i = 0; i < attributes.length; i++) {
-                
-                var attribute = attributes[i]
-                
-                if (attribute['attributeStatus']){
-    
-                    var attributeStatus = attribute['attributeStatus']
-                    if(attributeStatus == '004'){
-                        installedAttributeList.push(attribute)
-                        channelId = attribute['channel']
-                    }
+    //console.log(eventData)
+    version = parseInt(eventData['version'], 10) 
+    console.log('========111========')
+    if (eventData['addAttributeList']){
+        console.log('========222========')
+        //get the array of atrributes
+        var attributes = new Array();
+        attributes = eventData['addAttributeList']
+        //find the Installed Attribute
+        for (var i = 0; i < attributes.length; i++) {
+            console.log('========333========')
+            var attribute = attributes[i]
+            console.log(attribute)
+            if (attribute['attributeStatus']){
+                console.log('========444========')
+                var attributeStatus = attribute['attributeStatus']
+                if(attributeStatus == '004'){
+                    installedAttributeList.push(attribute)
+                    channelId = attribute['channel']
                 }
-            } 
-
-        }else{
-            throw "addAttributeList is not Found ........"
-        }
-
-    }catch (err){
-        console.log(err)
-        throw err
+            }
+        } 
     }
 
     let deploySamrtContract= false
@@ -433,40 +365,38 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
         
         //query SmartContract document 
         const smartContractDoc = await SmartContract.findOne({"channelID":config.get('attributeConfig.channelID'),"smartContract" : config.get('attributeConfig.smartcontractName')}).lean(true).exec()
-        if (!smartContractDoc) {
-            throw "Fetch Smartcontract Document Failed during Instantiate/Upgrade Process ......."
-        }
+        console.log('smartcontarct is :', smartContractDoc)
+        
+        
 
-        //query Channel document 
+        // query Channel Document 
+        console.log('=======> chaneelll' ,"smartCointractDoc.channelID")
         const channelDoc = await Channel.findOne({"_id":config.get('attributeConfig.channelID')}).lean(true).exec()
-        if (!channelDoc) {
-            throw "Fetch Channel Document Failed Instantiate/Upgrade Process ......."
-        }
+        console.log('Channel is :', channelDoc)
+        console.log('xxxxxxxxxxxxxxxxxxxxxxx')
 
         // query Network Document 
         let peersIPs = []
-        
+        console.log('=======> Network' ,channelDoc.network)
         const networkDoc = await NetworkConfig.findOne({"_id":channelDoc.network}).lean(true).exec()
-        if (!networkDoc) {
-            throw "Fetch Network Document Failed Instantiate/Upgrade Process ......."
-        }
-        
+        console.log('Network is :', networkDoc)
         let peerList = networkDoc.peerList
         if (peerList) {
             for(i=0; i< peerList.length; i++){
                 let iP = ""
                 iP = peerList[i].requests
+                console.log(iP)
                 iP.replace("grpcs://", "");
+                console.log(iP)
                 peersIPs.push(iP)
             }
-           
+            console.log(peersIPs)
         }
 
 
 
         //check if smartContract document is fetched 
         if (smartContractDoc) {
-			console.log("Instatiating the smart contract ........")
             if(smartContractDoc.smartContractVersion == "0"){
                 // Instantiate smart contract 
                 //call Instantiate Chaincode API
@@ -487,19 +417,18 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
                         "smartContractArgs": smartContractDoc.smartContractArgs,
                         "smartContractMethod": "init",
                         "smartContractName":smartContractDoc.smartContract,
-                        //"smartContractVersion":version.toString()
-                        "smartContractVersion":smartContractDoc.smartContractVersion
+                        "smartContractVersion":version.toString()
                     
                     },
                     json: true
                 };
-                let response = await rp(options)                
-              
+                let response = await rp(options)
+                
+                console.log(response)
                 deploySamrtContract = response.HyperledgerConnect.data.success
                 deploySamrtContractMessage = response.HyperledgerConnect.data.message
 
             }else{
-				console.log("Upgrading the smart contract ........")
                 // Upgrade smartContract 
                 //call Upgrade Chaincode API
                 let options = {
@@ -520,35 +449,30 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
                         "smartContractArgs": smartContractDoc.smartContractArgs,
                         "smartContractMethod": "init",
                         "smartContractName":smartContractDoc.smartContract,
-                        //"smartContractVersion":version.toString()
-                        "smartContractVersion":smartContractDoc.smartContractVersion
+                        "smartContractVersion":version.toString()
                     
                     },
                     json: true
                 };
                 let response = await rp(options)
                 
-                
+                console.log(response)
                 deploySamrtContract = response.HyperledgerConnect.data.success
                 deploySamrtContractMessage = response.HyperledgerConnect.data.message
 
             }
-        }else{
-
-            throw "Fetch Smartcontract Document Failed during Instantiate/Upgrade Process ......."
         }
 
 
         if(deploySamrtContract){
-			console.log('Smart Contract Successfully Deployed Now Updating the status of all entities as Deployed ........')
             //call Update Attribute API
             //prepare list of parameters
             for(var i = 0; i< installedAttributeList.length; i++){
-                var installedAttribute = installedAttributeList[i]
-                var orgList = installedAttribute['orgList']
+                var approvedAttribute = apprrovedAttributeList[i]
+                var orgList = approvedAttribute['orgList']
                 var argumentObject1 = {
-                    uuid: installedAttribute['attributeUUID'],
-                    regAuth: installedAttribute['regAuth'],
+                    uuid: approvedAttribute['attributeUUID'],
+                    regAuth: approvedAttribute['regAuth'],
                     status: 005,
                     orgCode: "JAFZA"
 
@@ -585,14 +509,13 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
                 };
             let updateResponse = await rp(options)
             
-           
+            console.log('updateResponse =========>',updateResponse)
+
             if(updateResponse.errorCode != '200' ){
-				console.log('Error Received while updating the status of the attributes as deployed' + updateResponse.errorDescription)
                 throw updateResponse.errorDescription
             } 
 
         }else{
-			console.log('Deployment of the smart contract failed with an error' + deploySamrtContractMessage)
             throw deploySamrtContractMessage
         }
     
@@ -610,7 +533,7 @@ function string_One_Common(attributeDetails){
     var Type = attributeDetails.type
     // sample ==> UnifiedID    string   `json:"unifiedID"`  
     var structField = '' 
-    structField = Name + ' ' + Type + ' ' + '`json:\"'+ attributeDetails.name +'\"`\n'
+    structField = Name + ' ' + Type + ' ' + '`json:\"'+ lowerCaseFirstLetter(attributeDetails.name) +'\"`\n'
 
     if(attributeDetails.dataProvider == 'JAFZA'){
         structField += '//<<RegAuth Struct field placeholder>>'
@@ -721,13 +644,7 @@ function string_One_Common(attributeDetails){
         // sample ==>  FormationNo:  "",
         var paramNew = ''
         paramNew = capitalizeFirstLetter(attributeDetails.name)
-        if (attributeDetails.type == "string") {
-            paramNew += ': "", \n'
-        }else if (attributeDetails.type == "bool"){
-            paramNew += ': false, \n'
-        }else if (attributeDetails.type == "int"){
-            paramNew += ': 0, \n'
-        }
+        paramNew += ': "", \n'
         paramNew += '//<<Chamber Struct field placeholder>>'
         replacePlaceholderSync(join(__dirname,'CcFiles/main.go'),'//<<Chamber Struct field placeholder>>',paramNew)
 
@@ -774,14 +691,8 @@ function string_One_Common(attributeDetails){
         // 1- prepare parameter handeling in main structrure
         // sample ==>  FormationNo:  "",
         var paramNew = ''
-        paramNew = capitalizeFirstLetter(attributeDetails.name)
-        if (attributeDetails.type == "string") {
-            paramNew += ': "", \n'
-        }else if (attributeDetails.type == "bool"){
-            paramNew += ': false, \n'
-        }else if (attributeDetails.type == "int"){
-            paramNew += ': 0, \n'
-        }
+        paramNew = attributeDetails.name
+        paramNew += ': "", \n'
         paramNew += '//<<DubaiTrade Struct field placeholder>>'
         replacePlaceholderSync(join(__dirname,'CcFiles/main.go'),'//<<DubaiTrade Struct field placeholder>>',paramNew)
 
@@ -830,13 +741,7 @@ function string_One_Common(attributeDetails){
         // sample ==>  FormationNo:  "",
         var paramNew = ''
         paramNew = capitalizeFirstLetter(attributeDetails.name)
-        if (attributeDetails.type == "string") {
-            paramNew += ': "", \n'
-        }else if (attributeDetails.type == "bool"){
-            paramNew += ': false, \n'
-        }else if (attributeDetails.type == "int"){
-            paramNew += ': 0, \n'
-        }
+        paramNew += ': "", \n'
         paramNew += '//<<DubaiCustoms Struct field placeholder>>'
         replacePlaceholderSync(join(__dirname,'CcFiles/main.go'),'//<<DubaiCustoms Struct field placeholder>>',paramNew)
 
@@ -887,7 +792,7 @@ function string_Many_Common(attributeDetails){
         var childName = capitalizeFirstLetter(child['name'])
         console.log('========666========')
         var childType = child['type']
-        struct += childName + ' ' + childType + ' ' + '`json:\"'+ child['name'] +'\"`\n'
+        struct += childName + ' ' + childType + ' ' + '`json:\"'+ lowerCaseFirstLetter(childName) +'\"`\n'
     }
     struct += '}\n'
     struct += '//<< New struct placeholder>>'
@@ -899,7 +804,7 @@ function string_Many_Common(attributeDetails){
     var fieldType = attributeDetails.type
     var structField = '' 
     // sample ==> ContactDPW     []Contacts   `json:"contactDPW"`
-    structField = fieldName + ' []' + fieldType + ' ' + '`json:\"'+ attributeDetails.name +'\"`\n'
+    structField = fieldName + ' []' + fieldType + ' ' + '`json:\"'+ lowerCaseFirstLetter(fieldName) +'\"`\n'
 
     if(attributeDetails.dataProvider == 'JAFZA'){
         structField += '//<<RegAuth Struct field placeholder>>'
@@ -1232,7 +1137,7 @@ function object_One_Common(attributeDetails){
         var childName = capitalizeFirstLetter(child['name'])
         console.log('========666========')
         var childType = child['type']
-        struct += childName + ' ' + childType + ' ' + '`json:\"'+ child['name'] +'\"`\n'
+        struct += childName + ' ' + childType + ' ' + '`json:\"'+ lowerCaseFirstLetter(childName) +'\"`\n'
         }
         struct += '}\n'
         struct += '//<< New struct placeholder>>'
@@ -1243,7 +1148,7 @@ function object_One_Common(attributeDetails){
         var fieldName = capitalizeFirstLetter(attributeDetails.name) 
         var fieldType = capitalizeFirstLetter(attributeDetails.name) 
         var structField = '' 
-        structField = fieldName + ' ' + fieldType + ' ' + '`json:\"'+ attributeDetails.name +'\"`\n'
+        structField = fieldName + ' ' + fieldType + ' ' + '`json:\"'+ lowerCaseFirstLetter(fieldName) +'\"`\n'
 
         if(attributeDetails.dataProvider == 'JAFZA'){
             structField += '//<<RegAuth Struct field placeholder>>'
@@ -1650,7 +1555,7 @@ function object_Many_Common(attributeDetails){
         var childName = capitalizeFirstLetter(child['name'])
         console.log('========666========')
         var childType = child['type']
-        struct += childName + ' ' + childType + ' ' + '`json:\"'+ child['name'] +'\"`\n'
+        struct += childName + ' ' + childType + ' ' + '`json:\"'+ lowerCaseFirstLetter(childName) +'\"`\n'
     }
     struct += '}\n'
     struct += '//<< New struct placeholder>>'
@@ -1662,7 +1567,7 @@ function object_Many_Common(attributeDetails){
     var fieldType = capitalizeFirstLetter(attributeDetails.name) 
     var structField = '' 
     // sample ==> ContactDPW     []Contacts   `json:"contactDPW"`
-    structField = fieldName + ' []' + fieldType + ' ' + '`json:\"'+ attributeDetails.name +'\"`\n'
+    structField = fieldName + ' []' + fieldType + ' ' + '`json:\"'+ lowerCaseFirstLetter(fieldName) +'\"`\n'
 
     if(attributeDetails.dataProvider == 'JAFZA'){
         structField += '//<<RegAuth Struct field placeholder>>'
@@ -2030,6 +1935,25 @@ function getNumberOfParamsForEachOrg(attributes){
     }
 }
 
+function replacePlaceholder(filePath , placeholder, replacment){
+    
+    fs.readFile(filePath, 'utf8', function (err,data) {
+        if (err) {
+            console.log("Cann't read file !!!!!!!!")
+            return console.log(err);
+        }
+        var result = data.replace(new RegExp(placeholder, 'g'), replacment);
+        //result = result.replace('//<<RegAuth Struct field placeholder>>',replacment)
+
+        fs.writeFile(filePath, result, 'utf8', function (err) {
+        if (err){
+            console.log("Cann't write to the file !!!!!!!!")
+            return console.log(err);
+        } 
+        });
+    });
+}
+
 function getAttributeDetails( attribute){
     var attributeProvider = "Not Available"
     attributeProvider = attribute['dataProvider']
@@ -2138,4 +2062,180 @@ function getAttributeDetails( attribute){
 
 
 
+  /*
   
+  var eventDataa = {
+    "key":"unifiedReg_SmartContract_{{REG_AUTH}}",
+    "documentName":"SmartContractExchange",
+    "contractName":"",
+    "verion":"1.0",
+    "chainCodePath":"",
+    "attribute":[
+       {
+          "name":"OfficeAddress",
+          "type":"string",
+          "regAuthCode":"JAFZA",
+          "dataProvider":"DCC",
+          "isRequired":true,
+          "occurrence":"many",
+          "attributeStatus":"005",
+          "visibility":"common",
+          "allowedMSP":[
+             "DPW",
+             "JAFZA"
+          ],
+          "children":[
+            "Var1", "Var2", "Var3", "Var4" 
+          ],
+          "status":[
+             {
+                "MSP":"dpwSP",
+                "status":"002"
+             },
+             {
+                "MSP":"jafzaMSP",
+                "status":"002"
+             },
+             {
+                "MSP":"dccMSP",
+                "status":"002"
+             },
+             {
+                "MSP":"dcMSP",
+                "status":"002"
+             },
+             {
+                "MSP":"dtMSP",
+                "status":"002"
+             }
+          ]
+       },
+       {
+        "name":"OfficeAddress",
+        "type":"object",
+        "regAuthCode":"JAFZA",
+        "dataProvider":"DC",
+        "isRequired":true,
+        "occurrence":"many",
+        "attributeStatus":"005",
+        "visibility":"common",
+        "allowedMSP":[
+           "DPW",
+           "JAFZA"
+        ],
+        "children":[
+          "Var1", "Var2", "Var3", "Var4" 
+        ],
+        "status":[
+           {
+              "MSP":"dpwSP",
+              "status":"002"
+           },
+           {
+              "MSP":"jafzaMSP",
+              "status":"002"
+           },
+           {
+              "MSP":"dccMSP",
+              "status":"002"
+           },
+           {
+              "MSP":"dcMSP",
+              "status":"002"
+           },
+           {
+              "MSP":"dtMSP",
+              "status":"002"
+           }
+        ]
+     },
+     {
+      "name":"issueDate",
+      "type":"object",
+      "regAuth":"JAFZA",
+      "orgType": "CUSTOMS",
+      "dataProvider":"DPW",
+      "isRequired":true,
+      "occurrence":"many",
+      "attributeStatus":"002",
+      "visibility":"common",
+      "allowedMSP":[
+         "DPW",
+         "JAFZA"
+      ],
+      "children":[
+        {  
+            "name":"building1",
+            "type":"string"
+         },
+         {  
+            "name":"building2",
+            "type":"string"
+         }
+      ],
+      "status":[
+         {
+            "MSP":"dpwSP",
+            "status":"002"
+         },
+         {
+            "MSP":"jafzaMSP",
+            "status":"002"
+         },
+         {
+            "MSP":"dccMSP",
+            "status":"002"
+         },
+         {
+            "MSP":"dcMSP",
+            "status":"002"
+         },
+         {
+            "MSP":"dtMSP",
+            "status":"002"
+         }
+      ]
+   }
+    ]
+ }
+
+ var eventDataaa = {
+    "_id": "smartContractExchange_JAFZA",
+    "_rev": "70-6e18716675f7c24fbb954fb75956508e",
+  "addAttributeList": [
+    {
+      "attributeStatus": "002",
+      "attributeType": "master",
+      "attributeUUID": "5e34e800-7187-11e9-961d-db51240cacb0",
+      "channel": "1111",
+      "children": [],
+      "dataProvider": "DPW",
+      "isRequired": false,
+      "masterUUID": "fb190be0-6f45-11e9-a452-abbc4fd5576c",
+      "name": "issueData",
+      "occurrence": "many",
+      "orgList": [
+        {
+          "installedOn": "",
+          "orgCode": "JAFZA",
+          "orgType": "REGAUTH",
+          "status": "001"
+        }
+      ],
+      "orgType": "CUSTOMS",
+      "privacy": "common",
+      "regAuth": "JAFZA",
+      "type": "object"
+}
+],
+"deployedOn": "",
+"documentName": "smartContractExchange_JAFZA",
+"key": "smartContractExchange_JAFZA",
+"regAuth": "JAFZA",
+"smartContractPath": "",
+"version": "",
+"~version": "\u0000CgQCKnIA"
+}
+  
+  
+  */

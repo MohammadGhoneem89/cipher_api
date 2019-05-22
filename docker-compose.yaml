@@ -1,0 +1,458 @@
+version: '2.0'
+
+services:
+  cipher-adapter-jafza:
+   restart: unless-stopped
+   image: registry.gitlab.com/avanzainnovations/cipher-adapter:1.4
+   volumes:
+        - /eserv/appConfig/cipher-adapter/config-jafza/config.json:/opt/app-root/config/config.json
+        - /eserv/appConfig/cipher-adapter/logs-jafza:/opt/app-root/logs
+        - /eserv/appConfig/cipher-adapter/chaincode:/opt/app-root/chaincode
+        - /eserv/appConfig/cipher-adapter/dist:/opt/app-root/dist
+   working_dir: /opt/app-root
+   ports:
+     - 9051:9051
+   expose:
+      - 9051
+   command: node app
+   extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+      - "application.wasl.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+
+  cipher-adapter-dt:
+   restart: unless-stopped
+   image: registry.gitlab.com/avanzainnovations/cipher-adapter:alpine-gen-3
+   volumes:
+        - /eserv/appConfig/cipher-adapter/config-dt/config.json:/opt/app-root/config/config.json
+        - /eserv/appConfig/cipher-adapter/logs-dt:/opt/app-root/logs
+   working_dir: /opt/app-root
+   ports:
+     - 10051:9051
+   expose:
+      - 10051
+   command: node app
+   extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+      - "application.wasl.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+
+  cipher-adapter-dpw:
+   restart: unless-stopped
+   image: registry.gitlab.com/avanzainnovations/cipher-adapter:alpine-gen-3
+   volumes:
+        - /eserv/appConfig/cipher-adapter/config-dpw/config.json:/opt/app-root/config/config.json
+        - /eserv/appConfig/cipher-adapter/logs-dpw:/opt/app-root/logs
+   working_dir: /opt/app-root
+   ports:
+     - 11051:9051
+   expose:
+      - 11051
+   command: node app
+   extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+      - "application.wasl.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+
+  cipher-adapter-dc:
+   restart: unless-stopped
+   image: registry.gitlab.com/avanzainnovations/cipher-adapter:alpine-gen-3
+   volumes:
+        - /eserv/appConfig/cipher-adapter/config-dc/config.json:/opt/app-root/config/config.json
+        - /eserv/appConfig/cipher-adapter/logs-dc:/opt/app-root/logs
+   working_dir: /opt/app-root
+   ports:
+     - 12051:9051
+   expose:
+      - 12051
+   command: node app.js
+   extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+      - "application.wasl.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+
+  cipher-vault:
+   restart: unless-stopped
+   image: registry.gitlab.com/avanzainnovations/cipher-vault:latest
+   volumes:
+        - /eserv/appConfig/cipher-vault/config/config.json:/opt/app-root/config/config.json
+        - /eserv/appConfig/cipher-vault/logs:/opt/app-root/logs
+   ports:
+      - "9009:9009"
+   expose:
+      - 9009
+   extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+      - "application.wasl.com:172.20.49.59"
+
+  cipher-ui-jafza:
+    restart: unless-stopped
+    image:  registry.gitlab.com/avanzainnovations/cipher-ui:dpw-alpine-3
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+    volumes:
+        #- /eserv/appConfig/cipher-ui/config/routes.js:/opt/app-root/constants/routes.js
+        - /eserv/appConfig/cipher-ui/config-jafza/backOffices.js:/opt/app-root/applications/backOffices.js
+    command: npm start
+    extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+
+  cipher-ui-dt:
+    restart: unless-stopped
+    image:  registry.gitlab.com/avanzainnovations/cipher-ui:dpw-alpine-3
+    ports:
+      - 3001:3010
+    expose:
+      - 3001
+    volumes:
+        #- /eserv/appConfig/cipher-ui/config/routes.js:/opt/app-root/constants/routes.js
+        - /eserv/appConfig/cipher-ui/config-dt/backOffices.js:/opt/app-root/applications/backOffices.js
+    command: npm start
+    extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+
+  cipher-ui-dpw:
+    restart: unless-stopped
+    image:  registry.gitlab.com/avanzainnovations/cipher-ui:dpw-alpine-3
+    ports:
+      - 3002:3010
+    expose:
+      - 3002
+    volumes:
+        #- /eserv/appConfig/cipher-ui/config/routes.js:/opt/app-root/constants/routes.js
+        - /eserv/appConfig/cipher-ui/config-dpw/backOffices.js:/opt/app-root/applications/backOffices.js
+    command: npm start
+    extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+
+  cipher-ui-dc:
+    restart: unless-stopped
+    image:  registry.gitlab.com/avanzainnovations/cipher-ui:dpw-alpine-3
+    ports:
+      - 3003:3010
+    expose:
+      - 3003
+    volumes:
+        #- /eserv/appConfig/cipher-ui/config/routes.js:/opt/app-root/constants/routes.js
+        - /eserv/appConfig/cipher-ui/config-dc/backOffices.js:/opt/app-root/applications/backOffices.js
+    command: npm start
+    extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+
+  cipher-api-jafza:
+   restart: unless-stopped
+   image:  registry.gitlab.com/avanzainnovations/cipher-api:dpw-alpine-5
+   ports:
+     - 9080:9080
+   expose:
+     - 9080
+   environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+   volumes:
+     - /eserv/appConfig/cipher-api/config-jafza/config.json:/opt/app-root/config/config.json
+     - /eserv/appConfig/cipher-api/logs-jafza:/opt/app-root/logs
+     - /eserv/appConfig/cipher-api/upload:/uploadPublic/
+     - /eserv/appConfig/cipher-api/eventHandlers/JAFZA/applications.json:/opt/app-root/applications/applications.json
+     - /eserv/appConfig/cipher-api/config-jafza/permissions.js:/opt/app-root/lib/middleware/permissions
+     - /eserv/appConfig/cipher-api/config-jafza/applications:/opt/app-root/applications
+     #- /eserv/appConfig/:/opt/app-root
+   command: node --max-old-space-size=16000 app.js | tee /dev/null | head
+   extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+      - "application.wasl.com:172.20.49.59"
+
+  cipher-api-dt:
+   restart: unless-stopped
+   image:  registry.gitlab.com/avanzainnovations/cipher-api:dpw-alpine-5
+   ports:
+     - 9081:9080
+   expose:
+     - 9081
+   environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+   volumes:
+     - /eserv/appConfig/cipher-api/config-dt/config.json:/opt/app-root/config/config.json
+     - /eserv/appConfig/cipher-api/logs-dt:/opt/app-root/logs
+     - /eserv/appConfig/cipher-api/upload:/uploadPublic/
+     - /eserv/appConfig/cipher-api/eventHandlers/DT/applications.json:/opt/app-root/applications/applications.json
+     - /eserv/appConfig/cipher-api/config-dt/permissions.js:/opt/app-root/lib/middleware/permissions
+     - /eserv/appConfig/cipher-api/config-dt/applications:/opt/app-root/applications
+
+     #- /eserv/appConfig/:/opt/app-root
+   command: node --max-old-space-size=16000 app.js | tee /dev/null | head
+   extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+      - "application.wasl.com:172.20.49.59"
+
+  cipher-api-dpw:
+   restart: unless-stopped
+   image:  registry.gitlab.com/avanzainnovations/cipher-api:dpw-alpine-5
+   ports:
+     - 9082:9080
+   expose:
+     - 9082
+   environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+   volumes:
+     - /eserv/appConfig/cipher-api/config-dpw/config.json:/opt/app-root/config/config.json
+     - /eserv/appConfig/cipher-api/logs-dpw:/opt/app-root/logs
+     - /eserv/appConfig/cipher-api/upload:/uploadPublic/
+     - /eserv/appConfig/cipher-api/eventHandlers/DPW/applications.json:/opt/app-root/applications/applications.json
+     - /eserv/appConfig/cipher-api/config-dpw/permissions.js:/opt/app-root/lib/middleware/permissions
+     - /eserv/appConfig/cipher-api/config-dpw/applications:/opt/app-root/applications
+
+     #- /eserv/appConfig/:/opt/app-root
+   command: node --max-old-space-size=16000 app.js | tee /dev/null | head
+   extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+      - "application.wasl.com:172.20.49.59"
+
+  cipher-api-dc:
+   restart: unless-stopped
+   image:  registry.gitlab.com/avanzainnovations/cipher-api:dpw-alpine-5
+   ports:
+     - 9083:9080
+   expose:
+     - 9083
+   environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+   volumes:
+     - /eserv/appConfig/cipher-api/config-dc/config.json:/opt/app-root/config/config.json
+     - /eserv/appConfig/cipher-api/logs-dc:/opt/app-root/logs
+     - /eserv/appConfig/cipher-api/upload:/uploadPublic/
+     - /eserv/appConfig/cipher-api/eventHandlers/DPW/applications.json:/opt/app-root/applications/applications.json
+     - /eserv/appConfig/cipher-api/config-dc/permissions.js:/opt/app-root/lib/middleware/permissions
+     - /eserv/appConfig/cipher-api/config-dc/applications:/opt/app-root/applications
+     #- /eserv/appConfig/:/opt/app-root
+   command: node --max-old-space-size=16000 app.js | tee /dev/null | head
+   extra_hosts:
+      - "blockchain.avanza.com:172.20.49.59"
+      - "application.wasl.com:172.20.49.59"
+
+
+  cipher-event-jafza:
+    restart: unless-stopped
+    image: registry.gitlab.com/avanzainnovations/cipher-event:dpw-alpine-1
+    hostname: "cipher-event"
+    command: node app.js
+    volumes:
+       - /eserv/appConfig/cipher-event/config-jafza:/opt/app-root/config
+       - /eserv/appConfig/cipher-event/logs-jafza:/opt/app-root/logs
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+
+  cipher-event-dt:
+    restart: unless-stopped
+    image: registry.gitlab.com/avanzainnovations/cipher-event:dpw-alpine-1
+    hostname: "cipher-event"
+    command: node app.js
+    volumes:
+       - /eserv/appConfig/cipher-event/config-dt:/opt/app-root/config
+       - /eserv/appConfig/cipher-event/logs-dt:/opt/app-root/logs
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+
+  cipher-event-dpw:
+    restart: unless-stopped
+    image: registry.gitlab.com/avanzainnovations/cipher-event:dpw-alpine-1
+    hostname: "cipher-event"
+    command: node app.js
+    volumes:
+       - /eserv/appConfig/cipher-event/config-dpw:/opt/app-root/config
+       - /eserv/appConfig/cipher-event/logs-dpw:/opt/app-root/logs
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+
+  cipher-event-dc:
+    restart: unless-stopped
+    image: registry.gitlab.com/avanzainnovations/cipher-event:dpw-alpine-1
+    hostname: "cipher-event"
+    command: node app.js
+    volumes:
+       - /eserv/appConfig/cipher-event/config-dc:/opt/app-root/config
+       - /eserv/appConfig/cipher-event/logs-dc:/opt/app-root/logs
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+
+  cipher-replicator-jafza:
+    image: registry.gitlab.com/avanzainnovations/cipher-replicator:alpine-gen-3
+    hostname: "cipher-replicator"
+    command: node app.js
+    volumes:   
+       - /eserv/appConfig/cipher-replicator/config-jafza:/opt/app-root/config
+       - /eserv/appConfig/cipher-replicator/config-jafza/config.json:/opt/app-root/lib/config/config.json
+       - /eserv/appConfig/cipher-replicator/logs-jafza:/opt/app-root/logs
+       - /eserv/appConfig/cipher-replicator/eventEmitter/UF/eventEmitter.js:/opt/app-root/eventConnect/eventEmitter.js
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+      - "blockchain.avanza.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+
+  cipher-replicator-jafza-smcexchange:
+    image: registry.gitlab.com/avanzainnovations/cipher-replicator:alpine-gen-3
+    hostname: "cipher-replicator"
+    command: node app.js
+    volumes:   
+       - /eserv/appConfig/cipher-replicator/config-jafza/smcExchange:/opt/app-root/config
+      # - /eserv/appConfig/cipher-replicator/config-jafza/smcExchange:/opt/app-root/lib/config
+       - /eserv/appConfig/cipher-replicator/logs-jafza:/opt/app-root/logs
+       - /eserv/appConfig/cipher-replicator/eventEmitter/SMCExchange/eventEmitter.js:/opt/app-root/eventConnect/eventEmitter.js
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+      - "blockchain.avanza.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+      
+      
+  cipher-replicator-dt:
+    image: registry.gitlab.com/avanzainnovations/cipher-replicator:alpine-gen-3
+    hostname: "cipher-replicator"
+    command: node app.js
+    volumes:   
+       - /eserv/appConfig/cipher-replicator/config-dt/:/opt/app-root/config
+       #- /eserv/appConfig/cipher-replicator/config-dt/config.json:/opt/app-root/lib/config/config.json
+       - /eserv/appConfig/cipher-replicator/logs-dt/:/opt/app-root/logs
+       - /eserv/appConfig/cipher-replicator/eventEmitter/UF/eventEmitter.js:/opt/app-root/eventConnect/eventEmitter.js
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+      - "blockchain.avanza.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+      
+  cipher-replicator-dt-smcexchange:
+    image: registry.gitlab.com/avanzainnovations/cipher-replicator:alpine-gen-3
+    hostname: "cipher-replicator"
+    command: node app.js
+    volumes:   
+       - /eserv/appConfig/cipher-replicator/config-dt/smcExchange:/opt/app-root/config
+       #- /eserv/appConfig/cipher-replicator/config-dt/configSCExchange.json:/opt/app-root/lib/config/config.json
+       - /eserv/appConfig/cipher-replicator/logs-dt/:/opt/app-root/logs
+       - /eserv/appConfig/cipher-replicator/eventEmitter/SMCExchange/eventEmitter.js:/opt/app-root/eventConnect/eventEmitter.js
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+      - "blockchain.avanza.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+
+  cipher-replicator-dpw:
+    image: registry.gitlab.com/avanzainnovations/cipher-replicator:alpine-gen-3
+    hostname: "cipher-replicator"
+    command: node app.js
+    volumes:   
+       - /eserv/appConfig/cipher-replicator/config-dpw/:/opt/app-root/config
+       #- /eserv/appConfig/cipher-replicator/config-dpw/config.json:/opt/app-root/lib/config/config.json
+       - /eserv/appConfig/cipher-replicator/logs-dpw/:/opt/app-root/logs
+       - /eserv/appConfig/cipher-replicator/eventEmitter/UF/eventEmitter.js:/opt/app-root/eventConnect/eventEmitter.js
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+      - "blockchain.avanza.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+      
+  cipher-replicator-dpw-smcexchange:
+    image: registry.gitlab.com/avanzainnovations/cipher-replicator:alpine-gen-3
+    hostname: "cipher-replicator"
+    command: node app.js
+    volumes:   
+       - /eserv/appConfig/cipher-replicator/config-dpw/smcExchange:/opt/app-root/config
+       #- /eserv/appConfig/cipher-replicator/config-dpw/configSCExchange.json:/opt/app-root/lib/config/config.json
+       - /eserv/appConfig/cipher-replicator/logs-dpw/:/opt/app-root/logs
+       - /eserv/appConfig/cipher-replicator/eventEmitter/SMCExchange/eventEmitter.js:/opt/app-root/eventConnect/eventEmitter.js
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+      - "blockchain.avanza.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+
+
+
+  cipher-replicator-dc:
+    image: registry.gitlab.com/avanzainnovations/cipher-replicator:alpine-gen-3
+    hostname: "cipher-replicator"
+    command: node app.js
+    volumes:   
+       - /eserv/appConfig/cipher-replicator/config-dc/:/opt/app-root/config
+       #- /eserv/appConfig/cipher-replicator/config-dc/config.json:/opt/app-root/lib/config/config.json
+       - /eserv/appConfig/cipher-replicator/logs-dc/:/opt/app-root/logs
+       - /eserv/appConfig/cipher-replicator/eventEmitter/UF/eventEmitter.js:/opt/app-root/eventConnect/eventEmitter.js
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+      - "blockchain.avanza.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+
+  cipher-replicator-dc-smcexchange:
+    image: registry.gitlab.com/avanzainnovations/cipher-replicator:alpine-gen-3
+    hostname: "cipher-replicator"
+    command: node app.js
+    volumes:   
+       - /eserv/appConfig/cipher-replicator/config-dc/smcExchange:/opt/app-root/config
+       #- /eserv/appConfig/cipher-replicator/config-dc/configSCExchange.json:/opt/app-root/lib/config/config.json
+       - /eserv/appConfig/cipher-replicator/logs-dc/:/opt/app-root/logs
+       - /eserv/appConfig/cipher-replicator/eventEmitter/SMCExchange/eventEmitter.js:/opt/app-root/eventConnect/eventEmitter.js
+    extra_hosts:
+      - "application.wasl.com:172.20.49.59"
+      - "blockchain.avanza.com:172.20.49.59"
+      - "hyperledger.avanza.com:172.20.49.59"
+
+
+  cipher-rabbit:
+    image: registry.gitlab.com/avanzainnovations/avanza-rabbit:alpine-gen-1
+    hostname: "cipher-rabbit"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "4369:15672"
+      - "5672:5672"
+    expose:
+      - 4369
+      - 5672
+    labels:
+     NAME: "rabbitmq1"
+    volumes:
+      - "/eserv/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins"
+
+  mongodb:
+    image: registry.gitlab.com/avanzainnovations/mongo-avanza:alpine-gen-1
+    container_name: "mongodb"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - /eserv/mongodb/data/db:/data/db
+    ports:
+      - 10050:27017
+    expose:
+      - 10050
+    command: mongod --smallfiles --logpath=/dev/null 
+    #--auth
+
+  postgres:
+    restart: unless-stopped
+    image: registry.gitlab.com/avanzainnovations/avanza-postgres:alpine-gen-1
+    environment:
+      POSTGRES_USER: Admin
+      POSTGRES_PASSWORD: avanza123
+      PGDATA: /data/postgres
+    volumes:
+       - /eserv/postgress:/data/postgres
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+
+  pgadmin:
+      image: registry.gitlab.com/avanzainnovations/avanza-pgadmin:alpine-gen-1
+      #environment:
+        #DEFAULT_USER: avanza
+        #DEFAULT_PASSWORD: avanza123
+      ports:
+        - "5050:5050"
+      restart: unless-stopped
