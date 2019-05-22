@@ -5,7 +5,7 @@ const comparisonFunction = require('./comparison');
 const config = require('../../../../config');
 const _ = require('lodash')
 const transformTemplate = require('../../../../lib/helpers/transformTemplate');
-var cheerio = require('cheerio');
+
 
 function cleanEventData(eventData) {
  
@@ -56,7 +56,7 @@ async function handleDTevents(payload, UUIDKey, route, callback, JWToken) {
           if (payload.eventData) {
             console.log("<<<<  EventOnNewRegistration >>>>>> ")
             try {
-              await associateAliasFromCustID(payload, createApproveRegistration(payload), callback)
+              await associateAliasFromCustID(payload, await createApproveRegistration(payload), callback)
             } catch (e) {
               console.log(e);
               return e;
@@ -136,13 +136,11 @@ function eventOnContainerStatusChange(payload, deltaData) {
     return rp(message);
   }
 }
-function createApproveRegistration(payload) {
+async function createApproveRegistration(payload) {
   console.log("PAYLOAD=====================> ",
     payload.eventData, " <=====================PAYLOAD");
 
-  return async () => {
-    console.log("OUTPUT============================OUTPUT");
-    //let url = config.get('URLRestInterface') || "http://0.0.0.0/";
+
     let options = {
       method: 'POST',
       // url: `${url}API/PR/UpdateContractStatus`,
@@ -151,8 +149,8 @@ function createApproveRegistration(payload) {
       body: await transformTemplate(payload.template.data, payload.eventData, [])
     };
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
-    return rp(options);
-  }
+    return options;
+  
 }
 
 function updateRegistration(payload) {
@@ -170,11 +168,6 @@ function updateRegistration(payload) {
       json: false
     };
 
-    let $ = cheerio.load(options.body, {
-      xml: {
-        normalizeWhitespace: true,
-      }
-    });
 
     //finding globalCustomerId in aliasList
     for (let alias of payload.eventData.aliasList) {
@@ -243,12 +236,7 @@ function endRegistration(payload) {
       json: false
     };
 
-    let $ = cheerio.load(options.body, {
-      xml: {
-        normalizeWhitespace: true,
-      }
-    });
-
+  
     //finding globalCustomerId in aliasList
     for (let alias of payload.eventData.aliasList) {
       if(alias.startsWith('DT') || alias.startsWith('TRADE')) {
@@ -267,14 +255,24 @@ function endRegistration(payload) {
 }
 
 
-async function associateAliasFromCustID(payload, func, callback) {
-  func().then(response => {
+async function associateAliasFromCustID(payload, message, callback) {
+  rp(message).then(response => {
     console.log("------------response-----------------", response)
-    let $ = cheerio.load(response, {
-      xml: {
-        normalizeWhitespace: true,
-      }
-    });
+
+
+if(response.includes("<sch:exception>")){
+
+  callback({
+    error: true,
+    message: "Exception in payload",
+    response: {
+      "request":message,
+      "response":response
+    }
+  })
+}
+
+ 
     if ($("sch\\:status").text() == "SUCCESS") {
       getPromiseForCreate(payload, associateAlias(payload, $("sch\\:globalCustId").text()), callback)
     }
@@ -282,7 +280,10 @@ async function associateAliasFromCustID(payload, func, callback) {
       callback({
         error: true,
         message: $("sch\\:status").text(),
-        response: response
+        response: {
+          "request":message,
+          "response":response
+        }
       })
     }
   }).catch(err => {
@@ -290,7 +291,10 @@ async function associateAliasFromCustID(payload, func, callback) {
     callback({
       error: true,
       message: err.name,
-      response: err
+      response: {
+        "request":message,
+        "response":err
+      }
     })
   });
 }
@@ -316,11 +320,7 @@ async function getPromiseForCreate(payload, func, callback) {
 async function getPromise(payload, func, callback) {
   func().then(response => {
     console.log("response===============>", response, "<==========response");
-    let $ = cheerio.load(response, {
-      xml: {
-        normalizeWhitespace: true,
-      }
-    });
+  
     callback({
       error: $("sch\\:status").text() == "SUCCESS" ? false : true,
       message: $("sch\\:status").text() == "SUCCESS" ? payload.eventData.eventName + " Dispatched" : $("sch\\:status").text(),

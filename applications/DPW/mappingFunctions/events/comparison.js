@@ -1,11 +1,11 @@
 const jsons = require('./jsons');
 const equal = require('deep-equal');
 const _ = require('lodash');
-let finalObject = [];
-let previousValue = [];
-let newValue = [];
-function manipulator(currentObject, previousObject) {
 
+function manipulator(currentObject, previousObject) {
+    let finalObject = [];
+    let previousValue = [];
+    let newValue = [];
     for (let [props, values] of Object.entries(currentObject)) {
         if (previousObject.hasOwnProperty(props)) {
             if (typeof currentObject[props] === 'object') {
