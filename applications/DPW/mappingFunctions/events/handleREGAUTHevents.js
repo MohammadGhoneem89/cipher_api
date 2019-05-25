@@ -6,7 +6,7 @@ const _ = require('lodash')
 const config = require('../../../../config');
 const revise = require('./ccDeployment/approveAttribute');
 function cleanEventData(eventData) {
- 
+
   let newEventData = _.clone(eventData);
   _.unset(newEventData, '__collection');
   _.unset(newEventData, 'additionalData');
@@ -15,19 +15,19 @@ function cleanEventData(eventData) {
   _.unset(newEventData, 'key');
   _.unset(newEventData, 'oldData');
   _.unset(newEventData, 'nonVATCustomer');
-    _.unset(newEventData, 'nonVATCustomer');
+  _.unset(newEventData, 'nonVATCustomer');
 
 
 
   //remove
   _.unset(newEventData, 'alias');
-  _.unset(newEventData, 'aliasList'); 
+  _.unset(newEventData, 'aliasList');
 
 
-//to do
-_.unset(newEventData, 'licenseCategoryCodeDescAr');
-_.unset(newEventData, 'licenseCategoryCodeDescEn');
-_.unset(newEventData, 'tradeLicense');
+  //to do
+  _.unset(newEventData, 'licenseCategoryCodeDescAr');
+  _.unset(newEventData, 'licenseCategoryCodeDescEn');
+  _.unset(newEventData, 'tradeLicense');
 
 
 
@@ -35,20 +35,20 @@ _.unset(newEventData, 'tradeLicense');
   _.unset(newEventData, 'fax');
   _.unset(newEventData, 'VATAccountNo');
   _.unset(newEventData, 'VATRegCertificate');
-  
 
 
-  newEventData.licenseCategoryDodeDescAr=eventData.licenseCategoryCodeDescAr
-  newEventData.licenseCategoryDodeDescEn=eventData.licenseCategoryCodeDescEn
-  newEventData.vatAccountNo=eventData.VATAccountNo
-  newEventData.vatRegCertificate=eventData.VATRegCertificate
 
-  newEventData.poBox=eventData.POBOX
-  newEventData.FAX=eventData.fax
-  newEventData.vatAccountNo=eventData.VATAccountNo
-  newEventData.vatRegCertificate=eventData.VATRegCertificate
+  newEventData.licenseCategoryDodeDescAr = eventData.licenseCategoryCodeDescAr
+  newEventData.licenseCategoryDodeDescEn = eventData.licenseCategoryCodeDescEn
+  newEventData.vatAccountNo = eventData.VATAccountNo
+  newEventData.vatRegCertificate = eventData.VATRegCertificate
 
-  
+  newEventData.poBox = eventData.POBOX
+  newEventData.FAX = eventData.fax
+  newEventData.vatAccountNo = eventData.VATAccountNo
+  newEventData.vatRegCertificate = eventData.VATRegCertificate
+
+
 
 
   return newEventData;
@@ -59,8 +59,8 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
     // console.log(JSON.stringify(payload, null, 2), "---+++++ !!!! >>>?????  I AM PAYLOAD ");
     console.log(payload.eventData.eventName, "===========================>event name here");
     // console.log(payload.template, "===========================> template here");
-   
-   
+
+
     switch (payload.eventData.eventName) {
 
       case "eventOnDeclaration": {
@@ -74,28 +74,28 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
       }
 
       case "EventOnDataChangeForPORT": {
-        
-        processDataChange(payload,callback)
+
+        processDataChange(payload, callback)
         break;
       }
       case "EventOnDataChangeForTRADE": {
-        
-        processDataChange(payload,callback)
+
+        processDataChange(payload, callback)
         break;
       }
       case "EventOnDataChangeForCUSTOMS": {
-        
-        processDataChange(payload,callback)
+
+        processDataChange(payload, callback)
         break;
       }
       case "EventOnDataChangeForCHAMBEROFCOMM": {
-        
-        processDataChange(payload,callback)
+
+        processDataChange(payload, callback)
         break;
       }
       case "InstallSmartContract": {
         try {
-          await getPromiseWithOrgCode(payload,"REGAUTH","JAFZA", revise.reviseSmartContract, callback);
+          await getPromiseWithOrgCode(payload, "REGAUTH", "JAFZA", revise.reviseSmartContract, callback);
         } catch (e) {
           console.log(e);
           return e;
@@ -135,10 +135,10 @@ async function handleREGAUTHevents(payload, UUIDKey, route, callback, JWToken) {
 
 }
 
-async function  processDataChange(payload,callback){
+async function processDataChange(payload, callback) {
   try {
-    let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData),cleanEventData(payload.eventData.oldData));
-    let message = await  eventOnDataChange(payload, deltaData)
+    let deltaData = comparisonFunction.manipulator(cleanEventData(payload.eventData), cleanEventData(payload.eventData.oldData));
+    let message = await eventOnDataChange(payload, deltaData)
     await getPromise(payload, message, callback);
     //getPromise(payload, , callback);
   } catch (e) {
@@ -148,7 +148,7 @@ async function  processDataChange(payload,callback){
 }
 
 function eventOnDeclaration(payload, deltaData) {
-  
+
   return async () => {
     let message = {
       method: 'POST',
@@ -165,7 +165,7 @@ function eventOnDeclaration(payload, deltaData) {
       },
       json: true
     };
-    console.log("eventOnDeclaration============"+ JSON.stringify(message.body.body) +"=============eventOnDeclaration");
+    console.log("eventOnDeclaration============" + JSON.stringify(message.body.body) + "=============eventOnDeclaration");
     return rp(message);
   }
 }
@@ -178,14 +178,14 @@ function eventOnNewRegistration(payload) {
       url: payload.endpoint.address,
       body:
       {
-        header:  {
+        header: {
           username: payload.endpoint.auth.username,
           password: payload.endpoint.auth.password
         },
         body: {
           "unifiedID": payload.eventData.unifiedID,
           "eventData": cleanEventData(payload.eventData),
-          "deltaData" : []
+          "deltaData": []
         }
       },
       json: true
@@ -199,43 +199,43 @@ function eventOnNewRegistration(payload) {
 function eventOnDataChange(payload, deltaData) {
   console.log("eventOnDataChange PAYLOAD=====================> ");
   //   payload.eventData, " <=====================PAYLOAD");
-    let message = {
-      method: 'POST',
-      url: payload.endpoint.address,
-      body:
-      {
-        header:  {
-          username: payload.endpoint.auth.username,
-          password: payload.endpoint.auth.password
-        },
-        body: {
-          "unifiedID": payload.eventData.unifiedID,
-          "eventData": cleanEventData(payload.eventData),
-          "deltaData": deltaData
-        }
+  let message = {
+    method: 'POST',
+    url: payload.endpoint.address,
+    body:
+    {
+      header: {
+        username: payload.endpoint.auth.username,
+        password: payload.endpoint.auth.password
       },
-      json: true
-    };
+      body: {
+        "unifiedID": payload.eventData.unifiedID,
+        "eventData": cleanEventData(payload.eventData),
+        "deltaData": deltaData
+      }
+    },
+    json: true
+  };
 
-    console.log("REQUEST===============>",message, "<===============REQUEST");
-    return Promise.resolve(message);
-  
+  console.log("REQUEST===============>", message, "<===============REQUEST");
+  return Promise.resolve(message);
+
 }
 
 
 async function getPromise(payload, message, callback) {
-  
+
   return rp(message).then(response => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
-     _.set(message.body, 'header.password', "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+    _.set(message.body, 'header.password', "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
     callback({
       error: false,
       message: payload.eventData.eventName + " Dispatched",
       response: {
-        request:message,
-        response:response
+        request: message,
+        response: response
       }
-        
+
     })
   }).catch(err => {
     console.log("error : ", err);
@@ -243,8 +243,8 @@ async function getPromise(payload, message, callback) {
       error: true,
       message: payload.eventData.eventName + " Failed",
       response: {
-        request:message,
-        response:err
+        request: message,
+        response: err
       }
     })
   });
@@ -252,8 +252,8 @@ async function getPromise(payload, message, callback) {
 
 
 
-async function getPromiseWithOrgCode(payload,orgCode,orgCode1, func, callback) {
-  func(payload,orgCode,orgCode1).then(response => {
+async function getPromiseWithOrgCode(payload, orgCode, orgCode1, func, callback) {
+  func(payload, orgCode, orgCode1).then(response => {
     console.log("RESPONSE===============>", response, "<===============RESPONSE");
     callback({
       error: false,
@@ -270,4 +270,17 @@ async function getPromiseWithOrgCode(payload,orgCode,orgCode1, func, callback) {
   });
 }
 
+async function getConfig(payload, UUIDKey, route, callback, JWToken) {
+  let configuration = config.get(payload.body.key);
+  callback({
+    getChannelConfig: {
+      error: false,
+      message: "Channel List",
+      response: configuration
+    }
+  })
+
+}
+
 exports.handleREGAUTHevents = handleREGAUTHevents;
+exports.getConfig = getConfig;

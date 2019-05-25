@@ -6,6 +6,12 @@
       "MappingfunctionName": "handleREGAUTHevents",
       "CustomMappingFile": "events/handleREGAUTHevents.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getConfig": {
+      "customMapping": true,
+      "MappingfunctionName": "getConfig",
+      "CustomMappingFile": "events/handleREGAUTHevents.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Wasl": {
