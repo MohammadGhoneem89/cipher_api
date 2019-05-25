@@ -23,19 +23,19 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
     switch (payload.eventData.eventName) {
       case "UpdateFirstPaymentInstrumentStatus": {
         await UpdateContractStatus(payload.eventData.contractID);
-        let message =  await createMessage(payload);
-        let bankMetaData = _.get(message,"body.body.paymentInstruments.[0].bankMetaData",{}); //HACK: For JSON [Object Object] problem with Handlebars.js
+        let message = await createMessage(payload);
+        let bankMetaData = _.get(message, "body.body.paymentInstruments.[0].bankMetaData", {}); //HACK: For JSON [Object Object] problem with Handlebars.js
         bankMetaData = JSON.parse(bankMetaData);
-        _.set(message,"body.body.paymentInstruments.[0].bankMetaData",bankMetaData);
+        _.set(message, "body.body.paymentInstruments.[0].bankMetaData", bankMetaData);
         await getPromise(payload, message, callback);
         break;
       }
       case "UpdatePaymentInstrumentStatus": {
         await UpdateContractStatus(payload.eventData.contractID);
-        let message =  await createMessage(payload);
-        let bankMetaData = _.get(message,"body.body.paymentInstruments.[0].bankMetaData",{}); //HACK: For JSON [Object Object] problem with Handlebars.js
+        let message = await createMessage(payload);
+        let bankMetaData = _.get(message, "body.body.paymentInstruments.[0].bankMetaData", {}); //HACK: For JSON [Object Object] problem with Handlebars.js
         bankMetaData = JSON.parse(bankMetaData);
-        _.set(message,"body.body.paymentInstruments.[0].bankMetaData",bankMetaData);
+        _.set(message, "body.body.paymentInstruments.[0].bankMetaData", bankMetaData);
         await getPromise(payload, message, callback);
         break;
       }
@@ -51,12 +51,18 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
       }
       case "AssociatePaymentInstruments": {
         let isCancelPaymentEvent = _.get(payload, "template.name") === "CancelBankPayment";
-        console.log("PAYLOAD=======>", payload.eventData.additionalData, "<=======PAYLOAD");
-        let additionalData = _.get(payload,"eventData.additionalData",[]);
-        if (isCancelPaymentEvent && additionalData.length > 0) {//FOR BANK TO CANCEL OLD REPLACED PAYMENTS
-          // let result = await GetPaymentInstrumentData(payload.eventData.contractID, payload.eventData.EIDA);
-          // let message = await CancelOldPayments(payload, payload.eventData.EIDA);
-          await getPromise(payload, await createMessage(payload), callback);
+        console.log("PAYLOAD=======>", payload, "<=======PAYLOAD");
+        let additionalData = _.get(payload, "eventData.additionalData.[0]", []);
+        if (isCancelPaymentEvent && additionalData.oldInstrumentsRef.length > 0) {//FOR BANK TO CANCEL OLD REPLACED PAYMENTS
+          let params = {
+            orgCode: additionalData.orgCode,
+            contractID: additionalData.contractID,
+            internalInstrumentIDs: additionalData.oldInstrumentsRef,
+            bankCodes: config.get('orgCodes')
+          };
+          let results = await GetPaymentInstrumentData(params);
+          await CancelOldPayments(payload, params, results, callback);
+          //await getPromise(payload, await createMessage(message), callback);
         } else {//FOR WASAL TO INFORM PAYMENTS ARE ASSOCIATED
           let result = await GetContractDetailsBackOffice(payload.eventData.contractID, payload.eventData.EIDA);
           let message = await createMessageAssociatedPayments(payload, result.contractDetail);
@@ -169,50 +175,85 @@ function UpdateKYCDetail(mResponse) {
   return rp(message);
 }
 
-async function GetPaymentInstrumentData(contractID, internalInstrumentID, bankCode) {
-  let url = config.get('URLRestInterface') || "http://0.0.0.0/";
-  let message = {
-    method: 'POST',
-    url: `${url}API/PR/GetPaymentInstrumentData`,
-    body: {
-      header: config.get('eventService.Avanza_ISC') || {
-        username: "Internal_API",
-        password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
-      },
-      body: {
-        contractID: contractID,
-        internalInstrumentID: internalInstrumentID,
-        bankCode: bankCode
-      }
-    },
-    json: true
-  };
-  return rp(message).then(result => {
-    console.log("GetPaymentInstrumentData===========>", result, "<===========GetPaymentInstrumentData");
-    return Promise.resolve(result);
+async function GetPaymentInstrumentData({orgCode, contractID, internalInstrumentIDs, bankCodes}) {
+  let combinations = [];
+  internalInstrumentIDs.map(internalInstrumentID => {
+    bankCodes.map(bankCode => {
+      combinations.push({internalInstrumentID, bankCode});
+    });
   });
+  const getData = async () => {
+    return await combinations.reduce(async (previousPromise, item) => {
+      const collection = await previousPromise;
+      const result = await send(item);
+      if (_.get(result, "errorCode", false) === 200) {
+        collection.push(result.GetPaymentInstrumentData);
+      }
+      return collection;
+    }, Promise.resolve([]))
+  };
+
+  function send({internalInstrumentID, bankCode}) {
+    let url = config.get('URLRestInterface') || "http://0.0.0.0/";
+    let message = {
+      method: 'POST',
+      url: `${url}API/PR/GetPaymentInstrumentData`,
+      body: {
+        header: config.get('eventService.Avanza_ISC') || {
+          username: "Internal_API",
+          password: "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
+        },
+        body: {
+          orgCode: orgCode,
+          contractID: contractID,
+          internalInstrumentID: internalInstrumentID,
+          bankCode: bankCode
+        }
+      },
+      json: true
+    };
+    return rp(message);
+  }
+
+  let results = await getData();
+  console.log("GetPaymentInstrumentData===========>", results, "<===========GetPaymentInstrumentData");
+  return results;
 }
 
-async function CancelOldPayments(payload, EIDA) {
+async function CancelOldPayments(payload, params, results, callback) {
+  let cancelOrders = [];
+  let temp = await Promise.all(results.map(paymentInstrument => send(paymentInstrument)));
+  callback({
+    error: false,
+    message: payload.eventData.eventName + " Dispatched",
+    request: {},
+    response: cancelOrders
+  });
+  return temp;
+
+  async function send(paymentInstrument) {
+    let eventData = {
+      contractID: params.contractID,
+      bankCode: paymentInstrument.bankCodes,
+      instrumentID: paymentInstrument.instrumentID,
+      paymentMethod: paymentInstrument.paymentMethod,
+      internalInstrumentID: paymentInstrument.internalInstrumentID,
+      date: paymentInstrument.date,
+      amount: paymentInstrument.amount,
+      status: paymentInstrument.status
+    };
 
 
-  let eventData = {
-    contractID: "",
-    bankCode: "",
-    instrumentID: "",
-    paymentMethod: "",
-    internalInstrumentID: "",
-    date: "",
-    amount: "",
-    status: ""
-  };
-
-
-  let req = await transformTemplate(payload.template.data, eventData, []);
-  let _endpoint = new Endpoint(req);
-  let ServiceURL = '/';
-  let GDRFAResponse = await _endpoint.executeEndpoint(payload.endpoint, ServiceURL);
-  console.log("=========Response from GDRFA======>" + JSON.stringify(GDRFAResponse), "<=========Response from GDRFA======");
+    let req = await transformTemplate(payload.template.data, eventData, []);
+    let _endpoint = new Endpoint(req);
+    let ServiceURL = '/';
+    let BankResponse = await _endpoint.executeEndpoint(payload.endpoint, ServiceURL);
+    console.log("=========Response from Bank======>" + JSON.stringify(BankResponse), "<=========Response from Bank======");
+    cancelOrders.push({
+      request: req,
+      response: BankResponse
+    });
+  }
 }
 
 function GetContractDetailsBackOffice(contractID, EIDA) {
@@ -272,7 +313,7 @@ function createMessageAssociatedPayments(payload, data) {
 }
 
 async function createMessage(payload) {
-  console.log("TEMPLATE========>", JSON.stringify(payload.template,null,2),"<=========TEMPLATE");
+  console.log("TEMPLATE========>", JSON.stringify(payload.template, null, 2), "<=========TEMPLATE");
   return await {
     method: 'POST',
     url: payload.endpoint.address,
