@@ -23,12 +23,20 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
     switch (payload.eventData.eventName) {
       case "UpdateFirstPaymentInstrumentStatus": {
         await UpdateContractStatus(payload.eventData.contractID);
-        await getPromise(payload, await createMessage(payload), callback);
+        let message =  await createMessage(payload);
+        let bankMetaData = _.get(message,"body.body.paymentInstruments.[0].bankMetaData",{}); //HACK: For JSON [Object Object] problem with Handlebars.js
+        bankMetaData = JSON.parse(bankMetaData);
+        _.set(message,"body.body.paymentInstruments.[0].bankMetaData",bankMetaData);
+        await getPromise(payload, message, callback);
         break;
       }
       case "UpdatePaymentInstrumentStatus": {
         await UpdateContractStatus(payload.eventData.contractID);
-        await getPromise(payload, await createMessage(payload), callback);
+        let message =  await createMessage(payload);
+        let bankMetaData = _.get(message,"body.body.paymentInstruments.[0].bankMetaData",{}); //HACK: For JSON [Object Object] problem with Handlebars.js
+        bankMetaData = JSON.parse(bankMetaData);
+        _.set(message,"body.body.paymentInstruments.[0].bankMetaData",bankMetaData);
+        await getPromise(payload, message, callback);
         break;
       }
       case "RequestKYC": {
@@ -42,11 +50,13 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
         break;
       }
       case "AssociatePaymentInstruments": {
-        console.log("PAYLOAD=======>", payload, "<=======PAYLOAD");
         let isCancelPaymentEvent = _.get(payload, "template.name") === "CancelBankPayment";
-        if (isCancelPaymentEvent && payload.additionalData.length > 0) {//FOR BANK TO CANCEL OLD REPLACED PAYMENTS
-          let result = await GetPaymentInstrumentData(payload.eventData.contractID, payload.eventData.EIDA);
-          let message = await CancelOldPayments(payload, payload.eventData.EIDA);
+        console.log("PAYLOAD=======>", payload.eventData.additionalData, "<=======PAYLOAD");
+        let additionalData = _.get(payload,"eventData.additionalData",[]);
+        if (isCancelPaymentEvent && additionalData.length > 0) {//FOR BANK TO CANCEL OLD REPLACED PAYMENTS
+          // let result = await GetPaymentInstrumentData(payload.eventData.contractID, payload.eventData.EIDA);
+          // let message = await CancelOldPayments(payload, payload.eventData.EIDA);
+          await getPromise(payload, await createMessage(payload), callback);
         } else {//FOR WASAL TO INFORM PAYMENTS ARE ASSOCIATED
           let result = await GetContractDetailsBackOffice(payload.eventData.contractID, payload.eventData.EIDA);
           let message = await createMessageAssociatedPayments(payload, result.contractDetail);
@@ -262,6 +272,7 @@ function createMessageAssociatedPayments(payload, data) {
 }
 
 async function createMessage(payload) {
+  console.log("TEMPLATE========>", JSON.stringify(payload.template,null,2),"<=========TEMPLATE");
   return await {
     method: 'POST',
     url: payload.endpoint.address,
