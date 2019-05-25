@@ -131,7 +131,7 @@ module.exports = {
         _.set(element, 'replacementReason', undefined);
         _.set(element, 'newInstrumentRefNo', undefined);
         _.set(element, 'oldInstrumentRefNo', undefined);
-        _.set(element, 'failureDescription', undefined);
+       // _.set(element, 'failureDescription', undefined);
 
       });
 
