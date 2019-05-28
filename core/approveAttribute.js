@@ -12,7 +12,7 @@ var rimraf = require("rimraf");
 
 
 
- 
+ var policyPlaceholder = '{}'
  var totalDeployedAttribute = 2
  var dccDeployedAttr = 2
  var dpwDeployedAttr = 2
@@ -83,9 +83,7 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
         
             //get the array of atrributes
             var attributes = new Array();
-            var privateCollections = new Array();
             attributes = eventData['addAttributeList']
-            privateCollections = eventData['privateCollection']
             //get number of params for each organization
             getNumberOfParamsForEachOrg(attributes)
 
@@ -103,7 +101,6 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
 
                         // add approved attribute to a separate list to update its status later after Chaincode is revised 002 ==> 004
                         apprrovedAttributeList.push(attribute)
-                        console.log('===================Pushing Approved Attribute to separate list ======================')
 
                         channelID = attribute['channel']
                         //this is the new attribute
@@ -123,65 +120,6 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
                                 
                                 string_Many_Common(attributeDetails)
 
-                            }else if(attributeDetails.occurrence == 'One' & attributeDetails.privacy == 'private'){
-                                
-                                //Pass Parameter By reference to the function
-                                var obj = {}
-                                obj.allOrgsExist = true
-                                obj.newCollectionName = 'unifiedReg_Collection_1'
-                                obj.existingCollectionName = ''
-                                
-                                // Check if collection exist
-                                checkIfCollectionExist(obj,privateCollections,attributeDetails)
-
-                                var allOrgsExist = obj.allOrgsExist
-                                var newCollectionName = obj.newCollectionName
-                                var existingCollectionName = obj.existingCollectionName
-                                
-                                if(allOrgsExist){
-                                    // Add the attribute to the existing collection 
-                                    console.log('================ if allOrgsExist==================')
-                                    existing_String_One_Private(attributeDetails , existingCollectionName)
-                                }else{
-                                    console.log('================ else allOrgsExist==================')
-                                    // Create new collection defintion in the json file
-                                    define_Private_Collection(attributeDetails,newCollectionName)
-                                    
-                                    // Create New structure for the private collection in the Struct.go file 
-                                    string_One_Private(attributeDetails,newCollectionName)
-
-                                }
-
-                                
-                                
-                            }else if(attributeDetails.occurrence == 'Many' & attributeDetails.privacy == 'private'){
-                                //Pass Parameter By reference to the function
-                                var obj = {}
-                                obj.allOrgsExist = true
-                                obj.newCollectionName = 'unifiedReg_Collection_1'
-                                obj.existingCollectionName = ''
-                                
-                                // Check if collection exist
-                                checkIfCollectionExist(obj , privateCollections , attributeDetails)
-
-                                var allOrgsExist = obj.allOrgsExist
-                                var newCollectionName = obj.newCollectionName
-                                var existingCollectionName = obj.existingCollectionName
-                                // Check if collection exist
-                                
-                                if(allOrgsExist){
-                                    // Add the attribute to the existing collection
-                                    console.log('================ if allOrgsExist==================')
-                                    existing_String_Many_Private(attributeDetails , existingCollectionName)
-                                }else{
-                                    console.log('================ else allOrgsExist==================')
-                                    // Create new collection defintion in the json file
-                                    define_Private_Collection(attributeDetails,newCollectionName)
-                                    
-                                    // Create New structure for the private collection in the Struct.go file 
-                                    string_Many_Private(attributeDetails,newCollectionName)
-
-                                }
                             }
 
 
@@ -193,72 +131,11 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
 
                             object_Many_Common(attributeDetails)
                                 
-                        }else if(attributeDetails.type == 'object' & attributeDetails.occurrence == 'One' & attributeDetails.privacy == 'private'){
-                            
-                            //Pass Parameter By reference to the function
-                            var obj = {}
-                            obj.allOrgsExist = true
-                            obj.newCollectionName = 'unifiedReg_Collection_1'
-                            obj.existingCollectionName = ''
-                            
-                            // Check if collection exist
-                            checkIfCollectionExist(obj , privateCollections , attributeDetails)
-
-                            var allOrgsExist = obj.allOrgsExist
-                            var newCollectionName = obj.newCollectionName
-                            var existingCollectionName = obj.existingCollectionName
-                            // Check if collection exist
-                            
-                            if(allOrgsExist){
-                                // Add the attribute to the existing collection
-                                console.log('================ if allOrgsExist==================')
-                                existing_Object_One_Private(attributeDetails , existingCollectionName)
-                            }else{
-                                console.log('================ else allOrgsExist==================')
-                                // Create new collection defintion in the json file
-                                define_Private_Collection(attributeDetails,newCollectionName)
-                                
-                                // Create New structure for the private collection in the Struct.go file 
-                                object_One_private(attributeDetails, newCollectionName)
-
-                            }
-                            
-                        }else if(attributeDetails.type == 'object' & attributeDetails.occurrence == 'Many' & attributeDetails.privacy == 'private'){
-
-                            
-                            //Pass Parameter By reference to the function
-                            var obj = {}
-                            obj.allOrgsExist = true
-                            obj.newCollectionName = 'unifiedReg_Collection_1'
-                            obj.existingCollectionName = ''
-                            
-                            // Check if collection exist
-                            checkIfCollectionExist(obj , privateCollections , attributeDetails)
-
-                            var allOrgsExist = obj.allOrgsExist
-                            var newCollectionName = obj.newCollectionName
-                            var existingCollectionName = obj.existingCollectionName
-                            // Check if collection exist
-                            
-                            if(allOrgsExist){
-                                // Add the attribute to the existing collection
-                                console.log('================ if allOrgsExist==================')
-                                existing_Object_Many_Private(attributeDetails , existingCollectionName)
-                            }else{
-                                console.log('================ else allOrgsExist==================')
-                                // Create new collection defintion in the json file
-                                define_Private_Collection(attributeDetails,newCollectionName)
-                                
-                                // Create New structure for the private collection in the Struct.go file 
-                                object_Many_private(attributeDetails, newCollectionName)
-
-                            }
-                                
                         }
                         
-
+                        
                     }else if(attributeStatus == 4){
-                        //this is installed Attribute
+                        //this is deployed Attribute
                     }else if(attributeStatus == 3){
                         //this is a rejected Attribute
                     }else if(attributeStatus == 1){
@@ -398,9 +275,7 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
 
             //call Update Attribute API
             //prepare list of parameters
-            argumentList.length = 0
-            console.log('===================Approved Attribute size is ======================')
-            console.log(apprrovedAttributeList.length)
+            argumentList = []
             for(var i = 0; i< apprrovedAttributeList.length; i++){
                 var approvedAttribute = apprrovedAttributeList[i]
                 var orgList = approvedAttribute['orgList']
@@ -412,7 +287,6 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
                     orgCode: orgCode1
 
                 }
-                console.log('===================Approved Attribute befor Pushing ======================')
                 argumentList.push(argumentObject1)
                 //console.log('Update Call =======> ',argumentList)
             }
@@ -457,8 +331,6 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
 
             console.log('argumentList in update Call ==============> ' , JSON.stringify(argumentList))
             console.log('Error Received in update Call ==============> ' , updateResponse.errorCode)
-            console.log('Complete response is ==============> ' , JSON.stringify(updateResponse))
-            console.log('Request Body is ==============> ' , JSON.stringify(options1.body))
         
 
             if(updateResponse.errorCode != '200' ){
@@ -732,319 +604,6 @@ module.exports.reviseSmartContract = async function reviseSmartContract(payload,
     }
 }
 
-function checkIfCollectionExist(obj, privateCollections, attributeDetails){
-    obj.allOrgsExist = true
-    obj.newCollectionName = 'unifiedReg_Collection_1'
-    // Check if collection exist
-    for(var i=0; i<privateCollections.length; i++){
-        var privateCollectionObject = privateCollections[i]
-        var collectionOrgList = new Array();
-        var attributeOrgList = new Array();
-        var collectionName = privateCollectionObject['collectionName']
-        console.log('Collection Name is ======>>' + collectionName)
-        collectionOrgList = privateCollectionObject['orgList']
-        attributeOrgList = attributeDetails.allowedMSP
-        if(attributeOrgList.length == collectionOrgList.length){
-            console.log('==========>>> Orgs Number are Same <<<===========')
-            // check if organizations are matching
-            for(var j=0; j<attributeOrgList.length; j++){
-                var orgExist = false
-                for(var k = 0; k<collectionOrgList.length; k++){
-                    if(attributeOrgList[j].orgCode == collectionOrgList[k].orgCode){
-                        orgExist = true
-                        console.log('==========>>> OrgCode Matching <<<===========')
-                    }
-                }
-                if(!orgExist){
-                    obj.allOrgsExist = false
-                }
-            }
-        }
-        // Check if allOrgsExist ===> means we found the collection so ====> break the loop 
-        if(obj.allOrgsExist){
-            //return the existing collection name ===> to include the new attribute in it 
-            obj.existingCollectionName = collectionName
-            break;
-        }
-        //maintaine the hiegest number for collection name
-        var res = collectionName.split("_");
-        var res2 = obj.newCollectionName.split("_");
-        if(res.length == 3){
-            var collectionNumber = parseInt(res[2], 10);
-            var newCollectionNumber = parseInt(res2[2], 10);
-            if(collectionNumber >= newCollectionNumber){
-                collectionNumber++
-                obj.newCollectionName = 'unifiedReg_Collection_' + collectionNumber
-            }
-        }
-    }
-}
-
-function existing_String_One_Private(attributeDetails , existingCollectionName){
-
-    var placeholder = '//<< ' + capitalizeFirstLetter(existingCollectionName) + ' Struct field placeholder>> \n'
-    var structField = '' 
-    structField = capitalizeFirstLetter(attributeDetails.name) + ' ' + attributeDetails.type + ' ' + '`json:\"'+ attributeDetails.name +'\"`\n'
-    structField += placeholder
-    // Update the struct.go file
-    replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,placeholder, structField) 
-    console.log('Struct field is ========>>' + structField)
-
-    // Update the Main.go file 
-    if(attributeDetails.dataProvider == 'JAFZA'){
-       
-
-    }else if(attributeDetails.dataProvider == 'DPW'){
-
-    }else if(attributeDetails.dataProvider == 'DT'){
-
-    }else if(attributeDetails.dataProvider == 'DC'){
-
-    }else if(attributeDetails.dataProvider == 'DCC'){
-
-    }
-
-}
-
-function existing_String_Many_Private(attributeDetails , existingCollectionName){
-
-    var placeholder = '//<< ' + capitalizeFirstLetter(existingCollectionName) + ' Struct field placeholder>> \n'
-    var structField = '' 
-    // sample ==> ContactDPW     []Contacts   `json:"contactDPW"`
-    structField = capitalizeFirstLetter(attributeDetails.name) + ' []' + attributeDetails.type + ' ' + '`json:\"'+ attributeDetails.name +'\"`\n'
-    structField += placeholder
-    // Update the struct.go file
-    replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,placeholder, structField) 
-
-    // Update the Main.go file 
-    if(attributeDetails.dataProvider == 'JAFZA'){
-       
-
-    }else if(attributeDetails.dataProvider == 'DPW'){
-
-    }else if(attributeDetails.dataProvider == 'DT'){
-
-    }else if(attributeDetails.dataProvider == 'DC'){
-
-    }else if(attributeDetails.dataProvider == 'DCC'){
-
-    }
-
-}
-
-function existing_Object_One_Private(attributeDetails , existingCollectionName){
-
-
-
-    // 1- prepare the struct of the attribute 
-    var attributeStruct = ''
-    attributeStruct = 'type' + ' ' + capitalizeFirstLetter(attributeDetails.name)  + ' ' + 'struct {\n'
-
-    for(var i =0; i< attributeDetails.children.length; i++){
-        var child =  attributeDetails.children[i]
-        var childName = capitalizeFirstLetter(child['name'])
-        var childType = child['type']
-        attributeStruct += childName + ' ' + childType + ' ' + '`json:\"'+ child['name'] +'\"`\n'
-    }
-    attributeStruct += '}\n'
-    attributeStruct += '//<< New struct placeholder>>'
-    // Update the struct.go file
-    replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,'//<< New struct placeholder>>', attributeStruct) 
-
-    // include the attribute in the existing collection Structure
-    // sample ==> PassportCopy PassportCopy `json:"passportCopy"`
-    var placeholder = '//<< ' + capitalizeFirstLetter(existingCollectionName) + ' Struct field placeholder>> \n'
-    var structField = '' 
-    structField = capitalizeFirstLetter(attributeDetails.name) + ' ' + attributeDetails.name + ' ' + '`json:\"'+ attributeDetails.name +'\"`\n'
-    structField += placeholder
-    // Update the struct.go file
-    replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,placeholder, structField) 
-
-    // Update the Main.go file 
-    if(attributeDetails.dataProvider == 'JAFZA'){
-       
-
-    }else if(attributeDetails.dataProvider == 'DPW'){
-
-    }else if(attributeDetails.dataProvider == 'DT'){
-
-    }else if(attributeDetails.dataProvider == 'DC'){
-
-    }else if(attributeDetails.dataProvider == 'DCC'){
-
-    }
-
-}
-
-function existing_Object_Many_Private(attributeDetails , existingCollectionName){
-
-
-
-    // 1- prepare the struct of the attribute 
-    var attributeStruct = ''
-    attributeStruct = 'type' + ' ' + capitalizeFirstLetter(attributeDetails.name)  + ' ' + 'struct {\n'
-
-    for(var i =0; i< attributeDetails.children.length; i++){
-        var child =  attributeDetails.children[i]
-        var childName = capitalizeFirstLetter(child['name'])
-        var childType = child['type']
-        attributeStruct += childName + ' ' + childType + ' ' + '`json:\"'+ child['name'] +'\"`\n'
-    }
-    attributeStruct += '}\n'
-    attributeStruct += '//<< New struct placeholder>>'
-    // Update the struct.go file
-    replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,'//<< New struct placeholder>>', attributeStruct) 
-
-    // include the attribute in the existing collection Structure
-    // sample ==> PassportCopy []PassportCopy `json:"passportCopy"`
-    var placeholder = '//<< ' + capitalizeFirstLetter(existingCollectionName) + ' Struct field placeholder>> \n'
-    var structField = '' 
-    structField = capitalizeFirstLetter(attributeDetails.name) + ' []' + attributeDetails.name + ' ' + '`json:\"'+ attributeDetails.name +'\"`\n'
-    structField += placeholder
-    // Update the struct.go file
-    replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,placeholder, structField) 
-
-    // Update the Main.go file 
-    if(attributeDetails.dataProvider == 'JAFZA'){
-       
-
-    }else if(attributeDetails.dataProvider == 'DPW'){
-
-    }else if(attributeDetails.dataProvider == 'DT'){
-
-    }else if(attributeDetails.dataProvider == 'DC'){
-
-    }else if(attributeDetails.dataProvider == 'DCC'){
-
-    }
-
-}
-
-function string_One_Private(attributeDetails,newCollectionName){
-    // include the premitive type in the new collection structure ==> no need to create a separate structure, its only a primitive type
-    var newPrivateCollectionStruct = ''
-    newPrivateCollectionStruct = 'type' + ' ' + capitalizeFirstLetter(newCollectionName)  + ' ' + 'struct {\n'
-    newPrivateCollectionStruct += capitalizeFirstLetter(attributeDetails.name) + ' ' + attributeDetails.type + ' ' + '`json:\"' + attributeDetails.name + '\"` \n'
-    newPrivateCollectionStruct += '//<< ' + capitalizeFirstLetter(newCollectionName) + ' Struct field placeholder>> \n'
-    newPrivateCollectionStruct += '}\n'
-    newPrivateCollectionStruct += '//<< New private collection structure placeholder>>'
-
-    
-    console.log('========newPrivateCollectionStruct========')
-    console.log(newPrivateCollectionStruct)
-
-     // Update the struct.go file
-     replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,'//<< New private collection structure placeholder>>', newPrivateCollectionStruct)
-
-    if(attributeDetails.dataProvider == 'JAFZA'){
-       
-
-    }else if(attributeDetails.dataProvider == 'DPW'){
-
-    }else if(attributeDetails.dataProvider == 'DT'){
-
-    }else if(attributeDetails.dataProvider == 'DC'){
-
-    }else if(attributeDetails.dataProvider == 'DCC'){
-
-    }
-
-}
-
-function string_Many_Private(attributeDetails, newCollectionName){
-    
-    // // 1- prepare the struct of the attribute 
-    // var attributeStruct = ''
-    // attributeStruct = 'type' + ' ' + capitalizeFirstLetter(attributeDetails.name)  + ' ' + 'struct {\n'
-
-    // for(var i =0; i< attributeDetails.children.length; i++){
-    //     var child =  attributeDetails.children[i]
-    //     var childName = capitalizeFirstLetter(child['name'])
-    //     var childType = child['type']
-    //     attributeStruct += childName + ' ' + childType + ' ' + '`json:\"'+ child['name'] +'\"`\n'
-    // }
-    // attributeStruct += '}\n'
-    // attributeStruct += '//<< New struct placeholder>>'
-    
-    //2- prepare the struct of the private collection and append the above struct in it.
-    var newPrivateCollectionStruct = ''
-    newPrivateCollectionStruct = 'type' + ' ' + capitalizeFirstLetter(newCollectionName)  + ' ' + 'struct {\n'
-    newPrivateCollectionStruct += capitalizeFirstLetter(attributeDetails.name) + ' []' + attributeDetails.type + ' ' + '`json:\"' + attributeDetails.name + '\"` \n'
-    newPrivateCollectionStruct += '//<< ' + capitalizeFirstLetter(newCollectionName) + ' Struct field placeholder>> \n'
-    newPrivateCollectionStruct += '}\n'
-    newPrivateCollectionStruct += '//<< New private collection structure placeholder>>'
-
-    // Update the struct.go file
-    //replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,'//<< New struct placeholder>>', attributeStruct)
-    replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,'//<< New private collection structure placeholder>>', newPrivateCollectionStruct)
-    
-    console.log('========newPrivateCollectionStruct========')
-    console.log(newPrivateCollectionStruct)
-
-}
-
-function object_Many_private(attributeDetails, newCollectionName){
-   
-    // 1- prepare the struct of the attribute 
-    var attributeStruct = ''
-    attributeStruct = 'type' + ' ' + capitalizeFirstLetter(attributeDetails.name)  + ' ' + 'struct {\n'
-
-    for(var i =0; i< attributeDetails.children.length; i++){
-        var child =  attributeDetails.children[i]
-        var childName = capitalizeFirstLetter(child['name'])
-        var childType = child['type']
-        attributeStruct += childName + ' ' + childType + ' ' + '`json:\"'+ child['name'] +'\"`\n'
-    }
-    attributeStruct += '}\n'
-    attributeStruct += '//<< New struct placeholder>>'
-    
-    //2- prepare the struct of the private collection and append the above struct in it.
-    var newPrivateCollectionStruct = ''
-    newPrivateCollectionStruct = 'type' + ' ' + capitalizeFirstLetter(newCollectionName)  + ' ' + 'struct {\n'
-    newPrivateCollectionStruct += capitalizeFirstLetter(attributeDetails.name) + ' []' + capitalizeFirstLetter(attributeDetails.name) + ' ' + '`json:\"' + attributeDetails.name + '\"` \n'
-    newPrivateCollectionStruct += '//<< ' + capitalizeFirstLetter(newCollectionName) + ' Struct field placeholder>> \n' 
-    newPrivateCollectionStruct += '}\n'
-    newPrivateCollectionStruct += '//<< New private collection structure placeholder>>'
-
-    // Update the struct.go file
-    replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,'//<< New struct placeholder>>', attributeStruct)
-    replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,'//<< New private collection structure placeholder>>', newPrivateCollectionStruct)
-    
-    console.log('========newPrivateCollectionStruct========')
-    console.log(newPrivateCollectionStruct)
-}
-
-
-function object_One_private(attributeDetails, newCollectionName){
-   
-    // 1- prepare the struct of the attribute 
-    var attributeStruct = ''
-    attributeStruct = 'type' + ' ' + capitalizeFirstLetter(attributeDetails.name)  + ' ' + 'struct {\n'
-
-    for(var i =0; i< attributeDetails.children.length; i++){
-        var child =  attributeDetails.children[i]
-        var childName = capitalizeFirstLetter(child['name'])
-        var childType = child['type']
-        attributeStruct += childName + ' ' + childType + ' ' + '`json:\"'+ child['name'] +'\"`\n'
-    }
-    attributeStruct += '}\n'
-    attributeStruct += '//<< New struct placeholder>>'
-    
-    //2- prepare the struct of the private collection and append the above struct in it.
-    var newPrivateCollectionStruct = ''
-    newPrivateCollectionStruct = 'type' + ' ' + capitalizeFirstLetter(newCollectionName)  + ' ' + 'struct {\n'
-    newPrivateCollectionStruct += capitalizeFirstLetter(attributeDetails.name) + ' ' + capitalizeFirstLetter(attributeDetails.name) + ' ' + '`json:\"' + attributeDetails.name + '\"` \n'
-    newPrivateCollectionStruct += '//<< ' + capitalizeFirstLetter(newCollectionName) + ' Struct field placeholder>>\n'
-    newPrivateCollectionStruct += '}\n'
-    newPrivateCollectionStruct += '//<< New private collection structure placeholder>>'
-
-    // Update the struct.go file
-    replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,'//<< New struct placeholder>>', attributeStruct)
-    replacePlaceholderSync(join(__dirname,'CcFiles/struct.go') ,'//<< New private collection structure placeholder>>', newPrivateCollectionStruct)
-    
-    console.log('========newPrivateCollectionStruct========')
-    console.log(newPrivateCollectionStruct)
-}
 
 function string_One_Common(attributeDetails){
     var Name = capitalizeFirstLetter(attributeDetails.name)
@@ -1328,7 +887,7 @@ function string_Many_Common(attributeDetails){
         var childName = capitalizeFirstLetter(child['name'])
         console.log('========666========')
         var childType = child['type']
-        struct += childName + ' ' + childType + ' ' + '`json:\"'+ child['name'] +'\"`\n'
+        struct += childName + ' ' + childType + ' ' + '`json:\"'+ childName +'\"`\n'
     }
     struct += '}\n'
     struct += '//<< New struct placeholder>>'
@@ -1340,7 +899,7 @@ function string_Many_Common(attributeDetails){
     var fieldType = attributeDetails.type
     var structField = '' 
     // sample ==> ContactDPW     []Contacts   `json:"contactDPW"`
-    structField = fieldName + ' []' + fieldType + ' ' + '`json:\"'+ attributeDetails.name +'\"`\n'
+    structField = fieldName + ' []' + fieldType + ' ' + '`json:\"'+ fieldName +'\"`\n'
 
     if(attributeDetails.dataProvider == 'JAFZA'){
         structField += '//<<RegAuth Struct field placeholder>>'
@@ -1673,7 +1232,7 @@ function object_One_Common(attributeDetails){
         var childName = capitalizeFirstLetter(child['name'])
         console.log('========666========')
         var childType = child['type']
-        struct += childName + ' ' + childType + ' ' + '`json:\"'+ child['name'] +'\"`\n'
+        struct += childName + ' ' + childType + ' ' + '`json:\"'+ childName +'\"`\n'
         }
         struct += '}\n'
         struct += '//<< New struct placeholder>>'
@@ -1684,7 +1243,7 @@ function object_One_Common(attributeDetails){
         var fieldName = capitalizeFirstLetter(attributeDetails.name) 
         var fieldType = capitalizeFirstLetter(attributeDetails.name) 
         var structField = '' 
-        structField = fieldName + ' ' + fieldType + ' ' + '`json:\"'+ attributeDetails.name +'\"`\n'
+        structField = fieldName + ' ' + fieldType + ' ' + '`json:\"'+ fieldName +'\"`\n'
 
         if(attributeDetails.dataProvider == 'JAFZA'){
             structField += '//<<RegAuth Struct field placeholder>>'
@@ -2091,7 +1650,7 @@ function object_Many_Common(attributeDetails){
         var childName = capitalizeFirstLetter(child['name'])
         console.log('========666========')
         var childType = child['type']
-        struct += childName + ' ' + childType + ' ' + '`json:\"'+ child['name'] +'\"`\n'
+        struct += childName + ' ' + childType + ' ' + '`json:\"'+ childName +'\"`\n'
     }
     struct += '}\n'
     struct += '//<< New struct placeholder>>'
@@ -2103,7 +1662,7 @@ function object_Many_Common(attributeDetails){
     var fieldType = capitalizeFirstLetter(attributeDetails.name) 
     var structField = '' 
     // sample ==> ContactDPW     []Contacts   `json:"contactDPW"`
-    structField = fieldName + ' []' + fieldType + ' ' + '`json:\"'+ attributeDetails.name +'\"`\n'
+    structField = fieldName + ' []' + fieldType + ' ' + '`json:\"'+ fieldName +'\"`\n'
 
     if(attributeDetails.dataProvider == 'JAFZA'){
         structField += '//<<RegAuth Struct field placeholder>>'
@@ -2425,99 +1984,6 @@ function object_Many_Common(attributeDetails){
     }
 }
 
-function define_Private_Collection(attributeDetails, privateCollectionName){
-
-    var policyPlaceholder = '{}'
-    
-    var privateCollection = ''
-    privateCollection = '{ \n'
-    privateCollection += '\"name\": \"'
-    privateCollection += privateCollectionName // Need to confirm with sandeep 
-    privateCollection += '\",\n'
-    privateCollection += '\"policy\": {\n'
-    privateCollection += '\"identities\": ['
-    for (var i=0; i<attributeDetails.allowedMSP.length; i++){
-        var orgCode = ''
-        orgCode = attributeDetails.allowedMSP[i].orgCode
-        privateCollection += '{\n'
-        privateCollection += '\"role\": { \n'
-        privateCollection += '\"name\": \"member\", \n'
-        privateCollection += '\"mspId\": \"'
-        privateCollection += orgCode.toLowerCase()
-        privateCollection += 'MSP" \n'
-        privateCollection += '}\n'
-        privateCollection += '}'
-        // add , to sparate objects insied identities array
-        if(i<attributeDetails.allowedMSP.length - 1){
-            privateCollection += ',\n'
-        }
-    }
-    privateCollection += '], \n' // close identities array
-    // prepare policy section
-    privateCollection += '\"policy\": { \n'
-    privateCollection += '\"1-of\": [ \n'
-    for (var i=0; i<attributeDetails.allowedMSP.length; i++){
-        privateCollection += '{ \n'
-        privateCollection += '\"signed-by\": '
-        privateCollection += i
-        privateCollection += '\n'
-        privateCollection += '}'
-        if(i<attributeDetails.allowedMSP.length - 1){
-            privateCollection += ',\n'
-        }
-    }
-    privateCollection += '] \n' //close 1-of array
-    privateCollection += '}' // Close the inner policy object 
-    privateCollection += '}, \n' // Close the main policy object
-    privateCollection += '\"requiredPeerCount\": 3, \n'
-    privateCollection += '\"maxPeerCount\": 4, \n'
-    privateCollection += '\"blockToLive\": 0 \n'
-    privateCollection += '}' // Close private colloection object 
-    privateCollection += ', \n'
-    privateCollection += '{}'
-    
-    console.log('The New Private Collection is =============> \n' + privateCollection)
-
-    replacePlaceholderSync(join(__dirname,'CcFiles/collections_config.json'),policyPlaceholder, privateCollection) 
-    
-    // collection Sample : 
-   /*
-   {
-        "name": "unifiedRegGrouping_JAFZA",
-        "policy": {
-            "identities": [
-                {
-                    "role": {
-                        "name": "member",
-                        "mspId": "dcMSP"
-                    }
-                },
-                {
-                    "role": {
-                        "name": "member",
-                        "mspId": "dpwMSP"
-                    }
-                }
-            ],
-            "policy": {
-                "1-of": [
-                    {
-                        "signed-by": 0
-                    },
-                    {
-                        "signed-by": 1
-                    }
-                ]
-            }
-        },
-        "requiredPeerCount": 3,
-        "maxPeerCount": 4,
-        "blockToLive": 0
-    }, 
-   
-   */
-}
-
 
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -2576,7 +2042,7 @@ function getAttributeDetails( attribute){
     attributeType = attribute['type']
 
     var attributeRegAuthCode = "Not Available"
-    attributeRegAuthCode = attribute['regAuth']
+    attributeRegAuthCode = attribute['regAuthCode']
 
     var attributeOccurrence = "Not Available"
     attributeOccurrence = attribute['occurrence']
@@ -2585,7 +2051,7 @@ function getAttributeDetails( attribute){
     attributePrivacy = attribute['privacy']
 
     var attributeAllowedMSP = []; 
-    attributeAllowedMSP = attribute['orgList']
+    attributeAllowedMSP = attribute['allowedMSP']
     
     var attributeChildren = []; 
     attributeChildren = attribute['children']
