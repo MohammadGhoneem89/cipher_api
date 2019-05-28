@@ -270,17 +270,4 @@ async function getPromiseWithOrgCode(payload, orgCode, orgCode1, func, callback)
   });
 }
 
-async function getConfig(payload, UUIDKey, route, callback, JWToken) {
-  let configuration = config.get(payload.body.key);
-  callback({
-    getChannelConfig: {
-      error: false,
-      message: "Channel List",
-      response: configuration
-    }
-  })
-
-}
-
 exports.handleREGAUTHevents = handleREGAUTHevents;
-exports.getConfig = getConfig;
