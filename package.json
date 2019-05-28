@@ -37,7 +37,7 @@
     "express-ws": "^4.0.0",
     "fast-json-parse": "^1.0.3",
     "flat": "^4.1.0",
-    "handlebars": "^4.1.0",
+    "handlebars": "^4.1.2",
     "js-base64": "^2.5.1",
     "json-fs-store": "^1.0.1",
     "json-pointer": "^0.6.0",
@@ -73,6 +73,7 @@
     "uuid": "^3.0.0",
     "validator": "^9.4.1",
     "when": "^3.7.7",
+    "xml-formatter": "^1.1.0",
     "zip-a-folder": "0.0.7"
   },
   "devDependencies": {

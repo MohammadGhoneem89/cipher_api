@@ -234,7 +234,7 @@ async function CancelOldPayments(payload, params, results, callback) {
   async function send(paymentInstrument) {
     let eventData = {
       contractID: params.contractID,
-      bankCode: paymentInstrument.bankCodes,
+      bankCode: paymentInstrument.bankCode,
       instrumentID: paymentInstrument.instrumentID,
       paymentMethod: paymentInstrument.paymentMethod,
       internalInstrumentID: paymentInstrument.internalInstrumentID,
@@ -242,7 +242,6 @@ async function CancelOldPayments(payload, params, results, callback) {
       amount: paymentInstrument.amount,
       status: paymentInstrument.status
     };
-
 
     let req = await transformTemplate(payload.template.data, eventData, []);
     let _endpoint = new Endpoint(req);
