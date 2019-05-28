@@ -413,6 +413,12 @@
       "MappingfunctionName": "createDynamicStruct",
       "CustomMappingFile": "systemAPI/mappingConfig.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getConfig": {
+      "customMapping": true,
+      "MappingfunctionName": "getConfig",
+      "CustomMappingFile": "getConfigFromVault.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "UI": {
