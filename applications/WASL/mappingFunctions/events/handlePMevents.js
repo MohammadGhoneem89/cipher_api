@@ -250,7 +250,7 @@ async function CancelOldPayments(payload, params, results, callback) {
     let BankResponse = await _endpoint.executeEndpoint(payload.endpoint, ServiceURL);
     console.log("=========Response from Bank======>" + JSON.stringify(BankResponse), "<=========Response from Bank======");
     cancelOrders.push({
-      request: req,
+      request: body,
       response: BankResponse
     });
   }
