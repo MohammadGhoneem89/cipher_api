@@ -243,8 +243,9 @@ async function CancelOldPayments(payload, params, results, callback) {
       status: paymentInstrument.status
     };
 
-    let req = await transformTemplate(payload.template.data, eventData, []);
-    let _endpoint = new Endpoint(req);
+    let body = await transformTemplate(payload.template.data, eventData, []);
+
+    let _endpoint = new Endpoint({body});
     let ServiceURL = '/';
     let BankResponse = await _endpoint.executeEndpoint(payload.endpoint, ServiceURL);
     console.log("=========Response from Bank======>" + JSON.stringify(BankResponse), "<=========Response from Bank======");
