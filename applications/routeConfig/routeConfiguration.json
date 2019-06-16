@@ -41,6 +41,21 @@
       "mappingConfigFile": "ePayMapping"
     }
   },
+  "etisalat": {
+    "CustomFunctionsLocation": "../../applications/etisalat_recon/mappingFunctions/",
+    "addNotificationRules": {
+      "customMapping": true,
+      "MappingfunctionName": "addNotificationRules",
+      "CustomMappingFile": "NotificationRules/NotificationRules.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "viewItem": {
+      "customMapping": true,
+      "MappingfunctionName": "viewItem",
+      "CustomMappingFile": "general/viewItem.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
   "SampleApp": {
     "CustomFunctionsLocation": "../../applications/SampleApp/mappingFunctions/",
     "viewItem": {
