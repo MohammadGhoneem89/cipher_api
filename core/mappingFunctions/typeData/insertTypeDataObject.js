@@ -1,5 +1,5 @@
 'use strict';
-
+console.log(" ------- PAYLOAD")
 const typeData = require('../../../lib/services/typeData');
 console.log(" ------- PAYLOAD")
 
