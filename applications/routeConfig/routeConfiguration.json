@@ -3,7 +3,7 @@
     "CustomFunctionsLocation": "../../applications/etisalat_recon/mappingFunctions/",
     "customFn": {
       "customMapping": true,
-      "MappingfunctionName": "insertTypeDataObject",
+      "MappingfunctionName": "test",
       "CustomMappingFile": "customFn/typeData.js",
       "mappingConfigFile": "ePayMapping"
     },

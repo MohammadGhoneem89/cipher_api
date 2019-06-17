@@ -1,17 +1,13 @@
-'use strict';
+// var request = require("request");
+ const typeData = require('../../../../lib/services/typeData');
+// insertTypeDataName()
 
-const typeData = require('../../../../lib/services/typeData');
-console.log(" ------- PAYLOAD")
+function test(payload, UUIDKey, route, callback, JWToken){
+    console.log(JSON.stringify(payload.body.data),"PAYLOAD")
 
-function insertTypeDataObject(payload, UUIDKey, route, callback, JWToken) {
-    console.log(payload," ------- PAYLOAD")
-    payload.userId = JWToken._id;
-    get(payload, callback);
-}
-
-function get(payload, callback) {
-    typeData.insertTypeData(payload)
+    typeData.insertTypeData(structureTypeData)
         .then((typeData) => {
+
             const response = {
                 responseMessage: {
                     action: payload.action,
@@ -24,7 +20,7 @@ function get(payload, callback) {
                     }
                 }
             };
-            callback(response);
+            console.log(JSON.stringify(response))
         })
         .catch((err) => {
             const response = {
@@ -40,9 +36,13 @@ function get(payload, callback) {
                     }
                 }
             };
-            callback(response);
+            // callback(response);
+            console.log(JSON.stringify(response))
         });
 }
+exports.test=test;
 
-exports.insertTypeDataObject = insertTypeDataObject;
+    console.log(" inside insert fun")
+    
+
 
