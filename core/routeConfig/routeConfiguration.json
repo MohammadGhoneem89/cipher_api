@@ -1,5 +1,6 @@
 {
   "core": {
+    
     "upload": {
       "customMapping": true,
       "MappingfunctionName": "upload",
