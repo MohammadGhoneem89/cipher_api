@@ -512,10 +512,16 @@
       "CustomMappingFile": "commissionTemplate/commissionTemplateUpdate.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "typeData": {
+    "typeDataI": {
       "customMapping": true,
       "MappingfunctionName": "typeDataOut",
       "CustomMappingFile": "typeData.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "typeData": {
+    "customMapping": true,
+      "MappingfunctionName": "insertTypeDataObject",
+      "CustomMappingFile": "typeData/insertTypeDataObject.js",
       "mappingConfigFile": "ePayMapping"
     },
     "logTransactions": {
