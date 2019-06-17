@@ -12,6 +12,12 @@
       "MappingfunctionName": "addNotificationRules",
       "CustomMappingFile": "NotificationRules/NotificationRules.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getNotificationRules" : {
+      "customMapping": true,
+      "MappingfunctionName": "getNotificationRules",
+      "CustomMappingFile": "general/getNotificationRules.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "DPW": {
