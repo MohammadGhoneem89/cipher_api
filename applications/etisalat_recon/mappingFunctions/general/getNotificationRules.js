@@ -11,8 +11,6 @@ exports.getNotificationRules = function (payload, UUIDKey, route, callback, JWTo
     pg.connection().then((conn) => {
         return conn.query(queryData, []).then((data) => {
             let result = [];
-            console.log("=-=-=-=-=",_.get(data,'rows',[]))
-            console.log("!!!")
             _.get(data,'rows',[]).forEach((elemt) => {
 				let notification = {
                     label : elemt.ruleId,

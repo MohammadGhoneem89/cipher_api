@@ -18,6 +18,12 @@
       "MappingfunctionName": "getNotificationRules",
       "CustomMappingFile": "general/getNotificationRules.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getRuleAuditLog" : {
+      "customMapping": true,
+      "MappingfunctionName": "getRuleAuditLog",
+      "CustomMappingFile": "general/getRuleAuditLog.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "DPW": {
