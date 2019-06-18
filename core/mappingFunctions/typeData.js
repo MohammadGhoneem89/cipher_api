@@ -27,6 +27,8 @@ function getTypeData(typeData, getTypeData_CB) {
       "$in": typeData
     }
   }, { "data": 1 }, function (err, typeDataData) {
+    console.log(JSON.stringify(typeData))
+    console.log(JSON.stringify(typeDataData))
     if (err) {
       logger.debug(" [ Type Data ] ERROR : " + err);
       getTypeData_CB(response);
