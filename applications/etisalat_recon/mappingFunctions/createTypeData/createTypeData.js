@@ -1,16 +1,26 @@
-// var request = require("request");
- const typeData = require('../../../../lib/services/typeData');
-// insertTypeDataName()
+const typeData = require('../../../../lib/services/typeData');
 
-function test(payload, UUIDKey, route, callback, JWToken){
-    console.log(JSON.stringify(payload.body.data),"PAYLOAD")
-
+function createTypeData(payload, UUIDKey, route, callback, JWToken) {
+    let structureTypeData;
+    let typeName;
+    let typeNameDetails = [];
+    for (let i = 0; i < payload.body.data.length; i++) {
+        typeName = "integration_" + payload.body.data[i].type;
+        typeNameDetails.push({
+            "label": payload.body.data[i].id,
+            "value": payload.body.data[i].description
+        })
+    }
+    structureTypeData = {
+        action: "typeData",
+        typeName: typeName,
+        typeNameDetails: typeNameDetails
+    }
     typeData.insertTypeData(structureTypeData)
-        .then((typeData) => {
-
+        .then(() => {
             const response = {
                 responseMessage: {
-                    action: payload.action,
+                    action: structureTypeData.action,
                     data: {
                         message: {
                             status: 'OK',
@@ -20,7 +30,9 @@ function test(payload, UUIDKey, route, callback, JWToken){
                     }
                 }
             };
-            console.log(JSON.stringify(response))
+
+            console.log(JSON.stringify(response));
+            callback(response);
         })
         .catch((err) => {
             const response = {
@@ -36,13 +48,11 @@ function test(payload, UUIDKey, route, callback, JWToken){
                     }
                 }
             };
-            // callback(response);
             console.log(JSON.stringify(response))
+            callback(response);
         });
 }
-exports.test=test;
+exports.createTypeData = createTypeData;
 
-    console.log(" inside insert fun")
-    
 
 

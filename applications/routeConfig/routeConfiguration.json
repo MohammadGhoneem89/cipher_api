@@ -1,10 +1,10 @@
 {
   "etisalat": {
     "CustomFunctionsLocation": "../../applications/etisalat_recon/mappingFunctions/",
-    "customFn": {
+    "createTypeData": {
       "customMapping": true,
-      "MappingfunctionName": "test",
-      "CustomMappingFile": "customFn/typeData.js",
+      "MappingfunctionName": "createTypeData",
+      "CustomMappingFile": "createTypeData/createTypeData.js",
       "mappingConfigFile": "ePayMapping"
     },
     "addNotificationRules": {

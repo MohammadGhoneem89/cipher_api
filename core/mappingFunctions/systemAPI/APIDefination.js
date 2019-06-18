@@ -38,6 +38,7 @@ function LoadConfig() {
     APIDefinitation.getAPIConfig()
   ]).then((data) => {
     let typeObj = {};
+    // console.log(data[0],"+++++++++++++++++++++++++++++++++++ DATA[0]")
     data[0].forEach((element) => {
       for (let key in element.data) {
         let arrEnum = [];
