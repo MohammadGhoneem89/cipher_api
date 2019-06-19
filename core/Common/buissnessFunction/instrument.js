@@ -121,7 +121,7 @@ module.exports = {
         element.providerMetaData = element.providerMetaData ? JSON.parse(element.providerMetaData) : undefined;
         element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
         element.beneficiaryData = element.beneficiaryData ? JSON.parse(element.beneficiaryData) : undefined;
-
+        _.set(element,"amount",parseFloat(_.get(element,"amount","0")).toFixed(2).toString())
         _.set(element, 'contractID', undefined);
         _.set(element, 'documentName', undefined);
         _.set(element, 'key', undefined);
