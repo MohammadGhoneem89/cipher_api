@@ -83,7 +83,7 @@ module.exports = class ObjectMapper {
   }
   CustomFunctionsExecution(data, payload, config) {
     if (customFunctions[config.IN_FIELDFUNCTION] instanceof Function) {
-      return customFunctions[config.IN_FIELDFUNCTION](data, payload, this.JWToken);
+      return customFunctions[config.IN_FIELDFUNCTION](data, payload, this.JWToken, config);
     }
     throw new Error(`${config.IN_FIELDFUNCTION} is not found locally!`)
   }
@@ -140,6 +140,7 @@ module.exports = class ObjectMapper {
     });
     return Promise.all(promiseList).then((data) => {
       let fwdMessage = {};
+
       this.mappingConfig.forEach((element, index) => {
 
         if (element.IN_FIELDDT == 'string' && element.MAP_FIELDDT == 'array' && element.IN_FIELDTYPE === 'JWTORG') {
@@ -173,9 +174,12 @@ module.exports = class ObjectMapper {
         }
         else if (element.IN_FIELDDT == 'object' && element.MAP_FIELDDT == 'array') {
           //  execute rules and update JSON
+
           let settingArray = _.get(fwdMessage, element.MAP_FIELD, []);
           let fieldData = "";
-          fieldData = data && data[index] && data[index][0] ? data[index][0] : {};
+
+          fieldData = data && data[index] && data[index][0] ? data[index][0] : data[index];
+          // console.log(">>>>>>>>>>>>>>>>>>>>>ipopo", this.mappingType, JSON.stringify(data[index]));
           let stringObj = JSON.stringify(fieldData);
           settingArray.push(stringObj);
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
