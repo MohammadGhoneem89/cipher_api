@@ -30,6 +30,18 @@
       "MappingfunctionName": "getRuleAuditLog",
       "CustomMappingFile": "general/getRuleAuditLog.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "insertNotificationComment" : {
+      "customMapping": true,
+      "MappingfunctionName": "insertNotificationComment",
+      "CustomMappingFile": "general/insertNotificationComment.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getComments" : {
+      "customMapping": true,
+      "MappingfunctionName": "getComments",
+      "CustomMappingFile": "general/getComments.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Wasl": {
