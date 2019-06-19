@@ -13,6 +13,12 @@
       "CustomMappingFile": "NotificationRules/NotificationRules.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "listNotificationRules": {
+      "customMapping": true,
+      "MappingfunctionName": "listNotificationRules",
+      "CustomMappingFile": "NotificationRules/NotificationRules.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getNotificationRules" : {
       "customMapping": true,
       "MappingfunctionName": "getNotificationRules",
@@ -23,15 +29,6 @@
       "customMapping": true,
       "MappingfunctionName": "getRuleAuditLog",
       "CustomMappingFile": "general/getRuleAuditLog.js",
-      "mappingConfigFile": "ePayMapping"
-    }
-  },
-  "DPW": {
-    "CustomFunctionsLocation": "../../applications/DPW/mappingFunctions/",
-    "generalEventHandler": {
-      "customMapping": true,
-      "MappingfunctionName": "handleREGAUTHevents",
-      "CustomMappingFile": "events/handleREGAUTHevents.js",
       "mappingConfigFile": "ePayMapping"
     }
   },
