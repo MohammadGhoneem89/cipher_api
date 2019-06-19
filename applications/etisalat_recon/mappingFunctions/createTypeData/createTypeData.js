@@ -2,9 +2,7 @@
 const typeData = require('../../../../lib/services/typeData');
 const _ = require('lodash');
 
-
-
-function createTypeData(payload, UUIDKey, route, callback, JWToken) {
+async function createTypeData(payload, UUIDKey, route, callback, JWToken) {
 
     const data = payload.data;
     let structureTypeData;
@@ -27,14 +25,14 @@ function createTypeData(payload, UUIDKey, route, callback, JWToken) {
     newTypeData = [...new Set(getTypeData.map(item => item.typeName))];
     getTypeData.forEach(() => {
         unique = getTypeData.filter(item => newTypeData.find(obj => item.typeName === obj));
-    })
+    });
 
     unique.forEach(obj => {
         newGroup[obj.typeName] ? // check if that array exists or not in newGroup object
             newGroup[obj.typeName].push({ label: obj.label, value: obj.value })  // just push
             : (newGroup[obj.typeName] = [],
                 newGroup[obj.typeName].push({ label: obj.label, value: obj.value })); // create a new array and push
-    })
+    });
 
     keys = Object.keys(newGroup);
     typeData = Object.values(newGroup);
@@ -45,7 +43,8 @@ function createTypeData(payload, UUIDKey, route, callback, JWToken) {
             typeNameDetails: typeData[i]
         }
         console.log(structureTypeData, "structureTypeData");
-        insertTypeData(structureTypeData, callback);
+        try { await insertTypeData(structureTypeData, callback) }
+        catch (e) { return e; }
     }
 }
 function insertTypeData(structureTypeData, callback) {
