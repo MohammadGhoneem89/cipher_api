@@ -320,6 +320,7 @@ function createMessageAssociatedPayments(payload, data) {
 
 async function createMessage(payload) {
   console.log("TEMPLATE========>", JSON.stringify(payload.template, null, 2), "<=========TEMPLATE");
+  console.log("EVENT-DATA========>", JSON.stringify(payload.eventData, null, 2), "<=========EVENT-DATA");
   return await {
     method: 'POST',
     url: payload.endpoint.address,
