@@ -26,8 +26,10 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
         let message = await createMessage(payload);
        // let bankMetaData = _.get(message, "body.body.paymentInstruments.[0].bankMetaData", {}); //HACK: For JSON [Object Object] problem with Handlebars.js
         //bankMetaData = JSON.parse(bankMetaData);
+        console.log("MESSAGE>>>>>>>>>>>",JSON.stringify(message,null,2));
         let bankMetaData = _.get(payload.eventData, "bankMetaData", {});
         _.set(message, "body.body.paymentInstruments.[0].bankMetaData", bankMetaData);
+        console.log("MESSAGE>>>>>>>>>>>",JSON.stringify(message,null,2));
         await getPromise(payload, message, callback);
         break;
       }
@@ -37,7 +39,9 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
         //let bankMetaData = _.get(message, "body.body.paymentInstruments.[0].bankMetaData", {}); //HACK: For JSON [Object Object] problem with Handlebars.js
        // bankMetaData = JSON.parse(bankMetaData);
         let bankMetaData = _.get(payload.eventData, "bankMetaData", {});
+        console.log("MESSAGE>>>>>>>>>>>",message);
         _.set(message, "body.body.paymentInstruments.[0].bankMetaData", bankMetaData);
+        console.log("MESSAGE>>>>>>>>>>>",message);
         await getPromise(payload, message, callback);
         break;
       }
