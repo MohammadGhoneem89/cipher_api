@@ -24,12 +24,8 @@ async function handlePMevents(payload, UUIDKey, route, callback, JWToken) {
       case "UpdateFirstPaymentInstrumentStatus": {
         await UpdateContractStatus(payload.eventData.contractID);
         let message = await createMessage(payload);
-       // let bankMetaData = _.get(message, "body.body.paymentInstruments.[0].bankMetaData", {}); //HACK: For JSON [Object Object] problem with Handlebars.js
-        //bankMetaData = JSON.parse(bankMetaData);
-        console.log("MESSAGE>>>>>>>>>>>",JSON.stringify(message,null,2));
-        let bankMetaData = _.get(payload.eventData, "bankMetaData", {});
+        let bankMetaData = _.get(payload.eventData, "bankMetaData", {}); //HACK: For JSON [Object Object] problem with Handlebars.js
         _.set(message, "body.body.paymentInstruments.[0].bankMetaData", bankMetaData);
-        console.log("MESSAGE>>>>>>>>>>>",JSON.stringify(message,null,2));
         await getPromise(payload, message, callback);
         break;
       }
