@@ -88,6 +88,7 @@ module.exports = class Endpoint {
     let header = this.computeHeaders(endpoint);
     let data = this.computeFormBody(endpoint, body);
     _.set(header, 'Authorization', authorizationHeader);
+    _.set(body, 'header', undefined);
     return this.callWebService({
       type: endpoint.requestType,
       serviceURL: url,
