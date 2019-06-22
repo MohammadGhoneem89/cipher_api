@@ -6,7 +6,7 @@ const pg = require('../../../../core/api/connectors/postgress');
 const _ = require('lodash');
 
 exports.insertNotificationComment = function (payload, UUIDKey, route, callback, JWToken) {
-    const date = Math.round((new Date().getTime())/1000);
+    const date = Math.round((new Date().getTime()));
     let notificationInsertQuery = 'INSERT INTO notificationcomments (commenttext, ruleauditlogid, commentdate, username, commentfrom) values (\'' + payload.comment + '\', \'' + payload.ruleauditlogid + '\', \'' + date + '\', \'' + payload.username + '\', \'' + payload.from + '\')';
     console.log("-=-=-", notificationInsertQuery)
     let correctioStatusUpdateQuery = 'UPDATE ruleauditlog set correction = \'Pending\' WHERE datastructureid=\'' + payload.ruleauditlogid + '\'';

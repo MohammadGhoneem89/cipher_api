@@ -4,12 +4,12 @@ const _ = require('lodash');
 const moment = require('moment');
 const dates = require('../../lib/helpers/dates');
 const inst = require('./buissnessFunction/instrument.js');
+const ds = require('./buissnessFunction/datastructure');
 module.exports = {
   STUB: (data, payload, jwt) => {
     return data;
   },
-  ...inst
-  ,
+  ...ds,
   getDate: (data, payload, jwt) => {
     let format = 'YYYY/MM/DD HH:mm:ss ZZ';
     return moment().format(format);
@@ -21,10 +21,10 @@ module.exports = {
     return dates.ddMMyyyyMS(data);
   },
   ddMMyyyyformat: (data, payload, jwt) => {
-    let e=parseInt(data)/1000
+    let e = parseInt(data) / 1000
     return dates.waslDateformat(e);
   },
-  
+
   MSddMMyyyyHHmmS: (data, payload, jwt) => {
     return dates.MSddMMyyyyHHmmS(data);
   },
