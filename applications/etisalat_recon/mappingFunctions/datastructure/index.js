@@ -79,14 +79,6 @@ function getDatastructureDetail(payload, UUIDKey, route, callback, JWToken) {
 
 function getAttributeTypeRule(payload, UUIDKey, route, callback, JWToken) {
   let queryData = `SELECT * FROM datastructures `;
-
-  // 1)	[Data Structure].[Attribute Name] if used means that take current value of the data structure and attribute from the blockchain and use that for comparison. For recon attribute it will be the reconciled value or if not reconciled then golden value specified as per rules.
-  // 2)	[Data Structure].[Attribute Name].[System] is also allowed for recon attribute that means that use the value of the specific system rather than reconciled value.
-  // 3)	[Data Structure].[Attribute Name].isReconciled is used to check for recon attributes if they are reconciled or not.
-  // 4)	[Data Structure].[Attribute Name].lastVersion  --not in scope-- for any attribute means that take the previous value and not the current changed value. This allows for rules like if Device status changed from “ACTIVE” to others then Device.status.lastVersion == “ACTIVE” and Device.status <> Device.status.lastVersion can be used to configure the rule.
-  // 5)	[Data Structure].IsPending means to check if as part of correction the record is marked as pending. Based on background scheduler it will be automatically cleared after X days based on definition of the correction rule.
-  // 6)	[Data Structure].[Attribute].lastChanged gives a date when the record was last updated. This can be used in case of temporal rules like attribute not changed for last 15 days.
-
   pg.connection().then((conn) => {
     return conn.query(queryData, []).then((dataMain) => {
       let outObj = {};
@@ -129,6 +121,7 @@ function getAttributeTypeRule(payload, UUIDKey, route, callback, JWToken) {
     console.log(err);
   });
 }
+
 exports.getDatastructureList = getDatastructureList;
 exports.getDatastructureDetail = getDatastructureDetail;
 exports.getAttributeTypeRule = getAttributeTypeRule;

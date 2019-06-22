@@ -176,7 +176,7 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
   let queryCriteria = queryCnt + query;
   let queryCriteriaFull = queryData + query;
   if (payload.page) { queryCriteriaFull += ` order by createdon desc limit ${payload.page.pageSize} OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)}`; }
-  console.log(queryCriteriaFull);
+  // console.log(queryCriteriaFull);
   pg.connection().then((conn) => {
     return Promise.all([
       conn.query(queryCriteria, []),
@@ -191,7 +191,7 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
         elemt.status = Status(elemt.status);
         elemt.actions = [{ label: "ReQueue", iconName: "fa fa-recycle", actionType: "COMPONENT_FUNCTION" }, { label: "viewData", iconName: "fa fa-eye", actionType: "COMPONENT_FUNCTION" }];
       });
-      console.log(JSON.stringify(data[0].rows, null, 5))
+      // console.log(JSON.stringify(data[0].rows, null, 5))
       let response = {
         "EventDispatcherStatus": {
           "action": "EventDispatcherStatus",
@@ -233,11 +233,11 @@ function updateEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken)
       resp.responseMessage.data.message.errorDescription = "Event ReQueued!!";
       return callback(resp);
     }).catch((ex) => {
-      console.log(ex);
+      // console.log(ex);
       return callback(resp);
     });
   }).catch((ex) => {
-    console.log(ex);
+    // console.log(ex);
     return callback(resp);
   });
 }

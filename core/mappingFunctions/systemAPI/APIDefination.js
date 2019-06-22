@@ -137,7 +137,6 @@ function getAPIDefinitionID(payload, UUIDKey, route, callback, JWToken) {
 
 function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
   payload.createdBy = JWToken._id;
-
   let resp = {
     "responseMessage": {
       "action": "upsertAPIDefinition",
@@ -151,7 +150,6 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
       }
     }
   };
-
   if (payload.route && payload.useCase) {
     APIDefinitation.findById(payload).then((data) => {
       if (payload.operation === "insert" && data && data.length !== 0) {
@@ -163,21 +161,17 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
         route: payload.route,
         useCase: payload.useCase
       }, payload).then((data) => {
-
         resp.responseMessage.data.message.status = "OK";
         console.log(data);
-
         data.nModified > 0 ?
           resp.responseMessage.data.message.errorDescription = "Record Updated Success!!" :
           resp.responseMessage.data.message.errorDescription = "Record Inserted Successfully!!";
-
         resp.responseMessage.data.message.newPageURL = "/ApiList";
         LoadConfig().then(() => {
           console.log('Configurations Loaded For Request Processing!!');
         });
         callback(resp);
       });
-
     }).catch((err) => {
       console.log(err);
       return callback(resp);
@@ -248,7 +242,6 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
             complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
         }
       });
-
       let resMap = [];
       data.ResponseMapping.fields.forEach((field) => {
         if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA != "")
@@ -396,7 +389,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         let GetData = ifileData.substring(startIndex, endIndex);
         return GetData;
       }
-  // console.log(data[0],"DATA")
+      // console.log(data[0],"DATA")
       data[0].map((item) => {
         if (item.isBlockchain === true && item.isActive === true) {
 
@@ -412,7 +405,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           });
         }
       });
-      console.log(chainCodeData[0],"chaincode")
+      console.log(chainCodeData[0], "chaincode")
       {
         responses.push({
           ApiListData: {
@@ -616,7 +609,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
               tData = findIndex(fData);
               for (let k = 0; k < responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields.length; k++) {
-   
+
                 let getSlicedFieldName = responses[0].ApiListData.APIdata[i].APIList[j].RequestMapping.fields[k].IN_FIELD.split(".");
 
                 let updateField = getSlicedFieldName[1]
