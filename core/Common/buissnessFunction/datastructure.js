@@ -11,6 +11,11 @@ module.exports = {
       arguments: data
     };
     return outVal;
+  },
+  appendPrefixDS: (data, payload, jwt, config) => {
+    return "DS_" + data;
+  },
+  appendPrefixDynamic: (data, payload, jwt, config) => {
+    return _.get(payload, 'body.prefix', '') + data;
   }
-
 };

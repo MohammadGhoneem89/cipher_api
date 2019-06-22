@@ -1,6 +1,37 @@
 {
   "etisalat": {
     "CustomFunctionsLocation": "../../applications/etisalat_recon/mappingFunctions/",
+    
+    "getDatastructureList": {
+      "customMapping": true,
+      "MappingfunctionName": "getDatastructureList",
+      "CustomMappingFile": "datastructure/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAttributeTypeRule": {
+      "customMapping": true,
+      "MappingfunctionName": "getAttributeTypeRule",
+      "CustomMappingFile": "datastructure/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getDatastructureDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "getDatastructureDetail",
+      "CustomMappingFile": "datastructure/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getDatastoreList": {
+      "customMapping": true,
+      "MappingfunctionName": "getDatastoreList",
+      "CustomMappingFile": "datastore/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getDatastoreDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "getDatastoreDetail",
+      "CustomMappingFile": "datastore/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "createTypeData": {
       "customMapping": true,
       "MappingfunctionName": "createTypeData",
