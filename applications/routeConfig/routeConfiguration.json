@@ -19,6 +19,18 @@
       "CustomMappingFile": "NotificationRules/NotificationRules.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getSingleNotificationRule": {
+      "customMapping": true,
+      "MappingfunctionName": "getSingleNotificationRule",
+      "CustomMappingFile": "NotificationRules/NotificationRules.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateNotificationRule": {
+      "customMapping": true,
+      "MappingfunctionName": "updateNotificationRule",
+      "CustomMappingFile": "NotificationRules/NotificationRules.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getNotificationRules" : {
       "customMapping": true,
       "MappingfunctionName": "getNotificationRules",
