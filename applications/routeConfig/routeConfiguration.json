@@ -85,6 +85,12 @@
       "MappingfunctionName": "getComments",
       "CustomMappingFile": "general/getComments.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "insertTask" : {
+      "customMapping": true,
+      "MappingfunctionName": "insertTask",
+      "CustomMappingFile": "general/insertTask.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Wasl": {
