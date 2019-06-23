@@ -39,7 +39,8 @@ const addNotificationRules = async (payload, UUIDKey, route, callback, JWToken) 
                         message: {
                             status: 'OK',
                             errorDescription: 'Notification Rule Added Successfully.',
-                            displayToUser: true
+                            displayToUser: true,
+                            newPageURL: "/etisalat/notificationRulesList"
                         },
                         searchResult: []
                     }
@@ -208,7 +209,8 @@ const updateNotificationRule = async (payload, UUIDKey, route, callback, JWToken
                 message: {
                     status: 'OK',
                     errorDescription: 'Notification Rule update Successfully',
-                    displayToUser: false
+                    displayToUser: false,
+                    newPageURL: "/etisalat/notificationRulesList"
                 },
                 searchResult: []
             }
