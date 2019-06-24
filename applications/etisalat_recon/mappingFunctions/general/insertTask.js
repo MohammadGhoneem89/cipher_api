@@ -14,11 +14,11 @@ exports.insertTask = function (payload, UUIDKey, route, callback, JWToken) {
     })
     insertTaskDetailsQuery = insertTaskDetailsQuery.substring(0, insertTaskDetailsQuery.length - 2)
     console.log("====",insertTaskDetailsQuery)
-    let commentInsertQuery = 'INSERT INTO taskcomments (commentdate, username, commenttext, taskId) values ';
-    payload.comments.forEach((comment,index) => {
-        commentInsertQuery += '(\'' + comment.commentdate + '\', \'' + comment.username + '\', \'' + comment.commenttext + '\', \'' + payload.taskId + '\'), '
-    })
-    commentInsertQuery = commentInsertQuery.substring(0, commentInsertQuery.length - 2)
+    let commentInsertQuery = 'INSERT INTO taskcomments (commentdate, username, commenttext, taskId) values (\'' + payload.comments.commentdate + '\', \'' + payload.comments.username  + '\', \'' + payload.comments.commenttext + '\', \'' + payload.taskId  + '\')';
+    // payload.comments.forEach((comment,index) => {
+    //     commentInsertQuery += '(\'' + comment.commentdate + '\', \'' + comment.username + '\', \'' + comment.commenttext + '\', \'' + payload.taskId + '\'), '
+    // })
+    // commentInsertQuery = commentInsertQuery.substring(0, commentInsertQuery.length - 2)
     //(\'' + payload.taskId + '\', \'' + payload.taskStatus  + '\', \'' + JSON.stringify(payload.documents)  + '\')';
     console.log("++++", commentInsertQuery)
 
