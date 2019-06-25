@@ -1,6 +1,7 @@
 'use strict';
 const pg = require('../../../../core/api/connectors/postgress');
 const dates = require('../../../../lib/helpers/dates');
+const _ = require('lodash');
 function getDatastoreList(payload, UUIDKey, route, callback, JWToken) {
   let queryData = 'SELECT * FROM datastore_elems WHERE 1=1 ';
   let queryCnt = 'SELECT count(*) FROM datastore_elems WHERE 1=1 ';
@@ -72,10 +73,63 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
 
   pg.connection().then((conn) => {
     return conn.query(queryData, []).then((data) => {
+
+      let AttrList = [];
+      let AttrListReconFinal = [];
+      let record = data.rows[0];
+      let attList = _.get(record, 'data.attributeList', undefined);
+      let schema = _.get(record, 'structure.attributeList', undefined);
+      let schemaBasic = _.get(record, 'structure', undefined);
+      let generalData = {
+        id: payload.key.replace(`${schemaBasic.dataStructure.name}_`, ''),
+        blockNum: record.block_num,
+        txnid: record.txnid,
+        updatedAt: record.updatedAt,
+        keyAttributeName: schemaBasic.dataStructure.keyAttributeName,
+        dsName: schemaBasic.dataStructure.name
+      };
+
+      console.log(">>>>>>>>>>>", JSON.stringify(record))
+      _.set(generalData, '', undefined);
+      if (attList && schema) {
+        for (let key in attList) {
+          let attrVal = _.get(schema, `${key}`, undefined);
+          if (attrVal) {
+            if (_.get(attrVal, `attribute.reconType`, "360") == "360") {
+              let system = Object.keys(attrVal.systems)[0];
+
+              AttrList.push({
+                system: system,
+                value: _.get(attList, `${key}.attributesValue.${system}`, ""),
+                name: key
+              });
+            }
+            else {
+              let AttrListRecon = [];
+              Object.keys(attrVal.systems).forEach((elem) => {
+                AttrListRecon.push({
+                  system: elem,
+                  value: _.get(attList, `${key}.attributesValue.${elem}`, "")
+                });
+              });
+              AttrListReconFinal.push({
+                name: key,
+                value: AttrListRecon
+              });
+            }
+          }
+        }
+      }
+
       let response = {
         "getDatastoreDetail": {
           "action": "getDatastoreList",
-          "data": data
+          "data": {
+            AttrList: AttrList,
+            AttrListReconFinal: AttrListReconFinal,
+            meta: generalData,
+            relationshipData: schemaBasic.relationshipData
+          }
         }
       };
       return callback(response);
@@ -85,5 +139,13 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
+function firstN(obj, n) {
+  return Object.keys(obj)
+    .slice(0, n)
+    .reduce(function (memo, current) {
+      memo[current] = obj[current];
+      return memo;
+    }, {});
+}
 exports.getDatastoreList = getDatastoreList;
 exports.getDatastoreDetail = getDatastoreDetail;
