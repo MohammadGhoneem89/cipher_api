@@ -91,6 +91,12 @@
       "MappingfunctionName": "insertTask",
       "CustomMappingFile": "general/insertTask.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getTask" : {
+      "customMapping": true,
+      "MappingfunctionName": "getTask",
+      "CustomMappingFile": "general/getTask.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Wasl": {
