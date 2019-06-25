@@ -8,10 +8,10 @@ const addNotificationRules = async (payload, UUIDKey, route, callback, JWToken) 
         const conn = await pg.connection();
         let querySearchId = `Select * from public."NotificationsRule" WHERE "ruleId"='${payload.body.ruleId}';`;
         let query = `INSERT INTO public."NotificationsRule"(
-        "ruleType", "ruleId", stream, "isActive", description, location, "executionType", scheduled, "time", "parameter", "workOndata", "uimessage", "condition")
+        "ruleType", "ruleId", stream, "isActive", description, location, "executionType", scheduled, "time", "ruleParametersOrCondition", "workOndata", "uimessage")
         VALUES ('${payload.body.ruleType}', '${payload.body.ruleId}', '${payload.body.stream}', ${payload.body.isActive}, '${payload.body.description}',
-             '${payload.body.location}', '${payload.body.executionType}', '${payload.body.scheduled}', '${payload.body.time}', '${JSON.stringify(payload.body.ruleParameters)}',
-              '${JSON.stringify(payload.body.workOnData)}', '${payload.body.uimessage}', '${JSON.stringify(payload.body.ruleConditions)}');`
+             '${payload.body.location}', '${payload.body.executionType}', '${payload.body.scheduled}', '${payload.body.time}', '${JSON.stringify(payload.body.ruleParametersOrCondition)}',
+              '${JSON.stringify(payload.body.workOnData)}', '${payload.body.uimessage}');`
               const execQuerySearchId = await conn.query(querySearchId);
               console.log('query', query, execQuerySearchId)
         if (execQuerySearchId && execQuerySearchId['rows'] && execQuerySearchId['rows'].length) {
@@ -20,7 +20,7 @@ const addNotificationRules = async (payload, UUIDKey, route, callback, JWToken) 
                     action: 'addNotificationRules',
                     data: {
                         message: {
-                            status: 'OK',
+                            status: 'Error',
                             errorDescription: 'Notification Rule Already exist with same Rule ID.',
                             displayToUser: true
                         },
@@ -199,8 +199,8 @@ const updateNotificationRule = async (payload, UUIDKey, route, callback, JWToken
     let query = `UPDATE public."NotificationsRule"
     SET "ruleType"='${payload.body.ruleType}', stream='${payload.body.stream}', "isActive"=${payload.body.isActive}, description='${payload.body.description}',
      location='${payload.body.location}', "executionType"='${payload.body.executionType}', scheduled='${payload.body.scheduled}', "time"='${payload.body.time}',
-      parameter='${JSON.stringify(payload.body.ruleParameters)}', "workOndata"='${JSON.stringify(payload.body.workOnData)}',
-       uimessage='${payload.body.uimessage}', condition='${JSON.stringify(payload.body.ruleConditions)}'
+     ruleParametersOrCondition='${JSON.stringify(payload.body.ruleParametersOrCondition)}', "workOndata"='${JSON.stringify(payload.body.workOnData)}',
+       uimessage='${payload.body.uimessage}'
 	WHERE "ruleId"='${payload.body.ruleId}'`;
     const response = {
         listNotificationRules: {
