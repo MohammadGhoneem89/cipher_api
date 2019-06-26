@@ -121,13 +121,17 @@ const listNotificationRules = async (payload, UUIDKey, route, callback, JWToken)
         };
         if (execQuery && execQuery['rows']) {
             for (let record of execQuery['rows']) {
+                let ruleType = 'comparison';
+                if (record.ruleType === 'Algorithm Rule') {
+                    ruleType = 'algorithm'
+                }
                 record.actions = [{
                     "value": "1003",
                     "type": "componentAction",
                     "label": "View",
                     "params": "",
                     "iconName": "icon-docs",
-                    "URI": ["/etisalat/addNotificationRule"]
+                    "URI": [`/etisalat/addNotificationRule/${ruleType}`]
                 }];
                 response.listNotificationRules.data.searchResult.push(record);
             }
