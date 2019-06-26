@@ -4,7 +4,7 @@ const pg = require('../../../../core/api/connectors/postgress');
 
 const listProcedures = async (payload, UUIDKey, route, callback, JWToken) => {
     const response = {
-        listNotificationRules: {
+        listProcedures: {
             action: 'listProcedures',
             data: {
                 message: {
@@ -29,13 +29,13 @@ const listProcedures = async (payload, UUIDKey, route, callback, JWToken) => {
                     value: row.proname
                 });
             }
-            response.listNotificationRules.data.searchResul = object;
+            response.listProcedures.data.searchResult = object;
         }
         callback(response);
     } catch (error) {
-        response.listNotificationRules.data.message.status = 'Error';
-        response.listNotificationRules.data.message.errorDescription = error.message;
-        response.listNotificationRules.data.message.displayToUser = true;
+        response.listProcedures.data.message.status = 'Error';
+        response.listProcedures.data.message.errorDescription = error.message;
+        response.listProcedures.data.message.displayToUser = true;
         callback(response);
         throw new Error(error);
     }
