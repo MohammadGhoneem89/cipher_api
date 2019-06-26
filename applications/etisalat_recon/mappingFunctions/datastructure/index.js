@@ -89,8 +89,8 @@ function getAttributeTypeRule(payload, UUIDKey, route, callback, JWToken) {
           let systems = Object.keys(elem.tranxData.attributeList[key].systems);
           systems.forEach((sys) => {
             outVal.push({
-              "label": `${key}.${sys}`,
-              "value": `${key}.${sys}`
+              "label": `${key}.attributesValue.${sys}`,
+              "value": `${key}.attributesValue.${sys}`
             });
           });
           outVal.push({
@@ -98,13 +98,14 @@ function getAttributeTypeRule(payload, UUIDKey, route, callback, JWToken) {
             "value": `${key}.isReconciled`
           });
           outVal.push({
-            "label": `${key}.lastChanged`,
-            "value": `${key}.lastChanged`
+            "label": `${key}.timeStamp`,
+            "value": `${key}.timeStamp`
           });
-          outVal.push({
-            "label": `${elem.tranxData.dataStructure.name}.IsPending`,
-            "value": `${elem.tranxData.dataStructure.name}.IsPending`
-          });
+          
+          // outVal.push({
+          //   "label": `${elem.tranxData.dataStructure.name}.timeStamp`,
+          //   "value": `${elem.tranxData.dataStructure.name}.IsPending`
+          // });
         }
         _.set(outObj, elem.tranxData.dataStructure.name, outVal);
       });
