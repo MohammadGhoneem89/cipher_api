@@ -8,13 +8,13 @@ const _ = require('lodash');
 exports.insertTask = function (payload, UUIDKey, route, callback, JWToken) {
     let taskInsertQuery = 'INSERT INTO task (taskid, status, documents) values (\'' + payload.taskId + '\', \'' + payload.taskStatus  + '\', \'' + JSON.stringify(payload.documents)  + '\')';
     console.log("----", taskInsertQuery)
-    let insertTaskDetailsQuery = 'INSERT INTO taskDetails (attributeName, attributeValue, status, taskId) values ';
+    let insertTaskDetailsQuery = 'INSERT INTO taskDetails (attributeName, attributeValue, correctedValue, isCorrect, status, taskId) values ';
     payload.taskDetails.forEach((detail,index) => {
-        insertTaskDetailsQuery += '(\'' + detail.attributeName + '\', \'' + detail.attributeValue + '\', \'' + detail.status + '\', \'' + payload.taskId + '\'), '
+        insertTaskDetailsQuery += '(\'' + detail.attributeName + '\', \'' + detail.attributeValue + '\', \'' + detail.correctedValue + '\', \'' + detail.isCorrect + '\', \'' + detail.status + '\', \'' + payload.taskId + '\'), '
     })
     insertTaskDetailsQuery = insertTaskDetailsQuery.substring(0, insertTaskDetailsQuery.length - 2)
     console.log("====",insertTaskDetailsQuery)
-    let commentInsertQuery = 'INSERT INTO taskcomments (commentdate, username, commenttext, taskId) values (\'' + payload.comments.commentdate + '\', \'' + payload.comments.username  + '\', \'' + payload.comments.commenttext + '\', \'' + payload.taskId  + '\')';
+    let commentInsertQuery = 'INSERT INTO taskcomments (commentdate, username, commenttext, type ,taskId) values (\'' + payload.comments.commentdate + '\', \'' + payload.comments.username  + '\', \'' + payload.comments.commenttext + '\', \'' + payload.comments.type + '\', \'' + payload.taskId  + '\')';
     // payload.comments.forEach((comment,index) => {
     //     commentInsertQuery += '(\'' + comment.commentdate + '\', \'' + comment.username + '\', \'' + comment.commenttext + '\', \'' + payload.taskId + '\'), '
     // })

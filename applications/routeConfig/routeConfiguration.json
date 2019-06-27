@@ -103,6 +103,24 @@
       "MappingfunctionName": "getTask",
       "CustomMappingFile": "general/getTask.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "updateTask" : {
+      "customMapping": true,
+      "MappingfunctionName": "updateTask",
+      "CustomMappingFile": "general/updateTask.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTaskList" : {
+      "customMapping": true,
+      "MappingfunctionName": "getTaskList",
+      "CustomMappingFile": "general/getTaskList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTaskComments" : {
+      "customMapping": true,
+      "MappingfunctionName": "getTaskComments",
+      "CustomMappingFile": "general/getTaskComments.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Wasl": {
