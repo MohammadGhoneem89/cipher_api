@@ -116,10 +116,10 @@
       "CustomMappingFile": "general/getTaskList.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getTaskComments" : {
+    "getGovernanceDashboard" : {
       "customMapping": true,
-      "MappingfunctionName": "getTaskComments",
-      "CustomMappingFile": "general/getTaskComments.js",
+      "MappingfunctionName": "getGovernanceDashboard",
+      "CustomMappingFile": "general/getGovernanceDashboard.js",
       "mappingConfigFile": "ePayMapping"
     }
   },
