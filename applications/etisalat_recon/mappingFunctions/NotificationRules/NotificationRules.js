@@ -203,7 +203,7 @@ const updateNotificationRule = async (payload, UUIDKey, route, callback, JWToken
     let query = `UPDATE public."NotificationsRule"
     SET "ruleType"='${payload.body.ruleType}', stream='${payload.body.stream}', "isActive"=${payload.body.isActive}, description='${payload.body.description}',
      location='${payload.body.location}', "executionType"='${payload.body.executionType}', scheduled='${payload.body.scheduled}', "time"='${payload.body.time}',
-     ruleParametersOrCondition='${JSON.stringify(payload.body.ruleParametersOrCondition)}', "workOndata"='${JSON.stringify(payload.body.workOnData)}',
+     "ruleParametersOrCondition"='${JSON.stringify(payload.body.ruleParametersOrCondition)}', "workOndata"='${JSON.stringify(payload.body.workOnData)}',
        uimessage='${payload.body.uimessage}'
 	WHERE "ruleId"='${payload.body.ruleId}'`;
     const response = {
