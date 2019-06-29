@@ -80,6 +80,7 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
       let attList = _.get(record, 'data.attributeList', undefined);
       let schema = _.get(record, 'structure.attributeList', undefined);
       let schemaBasic = _.get(record, 'structure', undefined);
+      let reconStatus = true;
       let generalData = {
         id: payload.key.replace(`${schemaBasic.dataStructure.name}_`, ''),
         blockNum: record.block_num,
@@ -107,13 +108,18 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
             else {
               let AttrListRecon = [];
               Object.keys(attrVal.systems).forEach((elem) => {
+                let isReconcile = _.get(attList, `${key}.isReconciled`, false);
                 AttrListRecon.push({
                   system: elem,
-                  value: _.get(attList, `${key}.attributesValue.${elem}`, "")
+                  value: _.get(attList, `${key}.attributesValue.${elem}`, ""),
+                  isRecon: isReconcile
                 });
+                if (!isReconcile) {
+                  reconStatus = false
+                }
               });
               AttrListReconFinal.push({
-                name: key,
+                name: _.get(attrVal, `attribute.attributeLabel`, key) || key,
                 value: AttrListRecon
               });
             }
@@ -161,7 +167,8 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
             AttrList: AttrList,
             AttrListReconFinal: AttrListReconFinal,
             meta: generalData,
-            relationshipData: AttrListRecon
+            relationshipData: AttrListRecon,
+            reconStatus: reconStatus
           }
         }
       };
