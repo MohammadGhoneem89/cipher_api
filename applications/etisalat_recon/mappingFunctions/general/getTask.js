@@ -10,7 +10,7 @@ exports.getTask = function (payload, UUIDKey, route, callback, JWToken) {
     console.log("----", taskgetQuery)
     let getTaskDetailsQuery = 'SELECT * FROM taskdetails where taskid = \'' + payload.taskId  + '\'';
     console.log("====",getTaskDetailsQuery)
-    let commentGetQuery = 'SELECT * FROM taskcomments where taskid = \'' + payload.taskId  + '\'';
+    let commentGetQuery = 'SELECT * FROM taskcomments where taskid = \'' + payload.taskId  + '\' ORDER BY commentdate DESC';
     console.log("++++", commentGetQuery)
 
     pg.connection().then((conn) => {

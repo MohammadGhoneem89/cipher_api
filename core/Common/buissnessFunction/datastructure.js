@@ -6,11 +6,15 @@ const dates = require('../../../lib/helpers/dates');
 module.exports = {
 
   transformDataStructure: (data, payload, jwt, config) => {
-    let outVal = {
-      dsName: config.IN_FIELD.replace("body.", ""),
-      arguments: data
-    };
-    return outVal;
+    if (data) {
+      let outVal = {
+        dsName: config.IN_FIELD.replace("body.", ""),
+        arguments: data
+      };
+      return outVal;
+    }
+    return undefined;
+
   },
   appendPrefixDS: (data, payload, jwt, config) => {
     return "DS_" + data;

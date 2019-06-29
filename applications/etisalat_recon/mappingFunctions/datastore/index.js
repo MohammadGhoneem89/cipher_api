@@ -97,11 +97,10 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
           if (attrVal) {
             if (_.get(attrVal, `attribute.reconType`, "360") == "360") {
               let system = Object.keys(attrVal.systems)[0];
-
               AttrList.push({
                 system: system,
                 value: _.get(attList, `${key}.attributesValue.${system}`, ""),
-                name: key
+                name: _.get(attrVal, `attribute.attributeLabel`, key) || key
               });
             }
             else {

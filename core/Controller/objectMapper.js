@@ -183,6 +183,7 @@ module.exports = class ObjectMapper {
           let stringObj = JSON.stringify(fieldData);
           settingArray.push(stringObj);
           _.set(fwdMessage, element.MAP_FIELD, settingArray);
+          
         }
         else if (element.IN_FIELDDT == 'array' && element.MAP_FIELDDT == 'array' && this.mappingType == 'Request') {
           //  execute rules and update JSON

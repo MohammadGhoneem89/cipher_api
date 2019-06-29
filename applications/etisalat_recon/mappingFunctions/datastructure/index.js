@@ -86,22 +86,23 @@ function getAttributeTypeRule(payload, UUIDKey, route, callback, JWToken) {
       dataMain.rows.forEach((elem) => {
         let outVal = [];
         for (let key in elem.tranxData.attributeList) {
-          let systems = Object.keys(elem.tranxData.attributeList[key].systems);
-          systems.forEach((sys) => {
-            outVal.push({
-              "label": `${key}.attributesValue.${sys}`,
-              "value": `${key}.attributesValue.${sys}`
+          if (elem.tranxData.attributeList[key].systems) {
+            let systems = Object.keys(elem.tranxData.attributeList[key].systems);
+            systems.forEach((sys) => {
+              outVal.push({
+                "label": `${key}.attributesValue.${sys}`,
+                "value": `${key}.attributesValue.${sys}`
+              });
             });
-          });
-          outVal.push({
-            "label": `${key}.isReconciled`,
-            "value": `${key}.isReconciled`
-          });
-          outVal.push({
-            "label": `${key}.timeStamp`,
-            "value": `${key}.timeStamp`
-          });
-          
+            outVal.push({
+              "label": `${key}.isReconciled`,
+              "value": `${key}.isReconciled`
+            });
+            outVal.push({
+              "label": `${key}.timeStamp`,
+              "value": `${key}.timeStamp`
+            });
+          }
           // outVal.push({
           //   "label": `${elem.tranxData.dataStructure.name}.timeStamp`,
           //   "value": `${elem.tranxData.dataStructure.name}.IsPending`
