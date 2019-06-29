@@ -89,7 +89,6 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
         dsName: schemaBasic.dataStructure.name
       };
 
-      console.log(">>>>>>>>>>>", JSON.stringify(record))
       _.set(generalData, '', undefined);
       if (attList && schema) {
         for (let key in attList) {
@@ -100,9 +99,11 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
               AttrList.push({
                 system: system,
                 value: _.get(attList, `${key}.attributesValue.${system}`, ""),
-                name: _.get(attrVal, `attribute.attributeLabel`, key) || key
+                name: _.get(attrVal, `attribute.attributeLabel`, key) || key,
+                sequence: parseInt(_.get(attrVal, `attribute.sequence`, "999") || "999", 10)
               });
             }
+
             else {
               let AttrListRecon = [];
               Object.keys(attrVal.systems).forEach((elem) => {
@@ -119,6 +120,39 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
           }
         }
       }
+      AttrList = _.orderBy(AttrList, 'sequence', 'desc');
+      let relationshipData = [];
+      schemaBasic.relationshipData.forEach((data) => {
+        relationshipData.push(data.relatedTo);
+      });
+
+      let relList = _.get(record, 'data.relationList', {});
+      let AttrListRecon = [];
+      let actions = [{
+        "value": "1003",
+        "type": "componentAction",
+        "label": "View",
+        "params": "",
+        "iconName": "icon-docs",
+        "URI": [
+          "/etisalat/datastoreview/"
+        ]
+      }];
+      Object.keys(relList).forEach((elem) => {
+        let arrList = [];
+        relList[elem].forEach((data) => {
+          arrList.push({
+            dsName: elem,
+            key: data,
+            actions: actions
+          });
+        });
+        AttrListRecon.push({
+          dsName: elem,
+          list: arrList
+        });
+      });
+
 
       let response = {
         "getDatastoreDetail": {
@@ -127,7 +161,7 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
             AttrList: AttrList,
             AttrListReconFinal: AttrListReconFinal,
             meta: generalData,
-            relationshipData: schemaBasic.relationshipData
+            relationshipData: AttrListRecon
           }
         }
       };
