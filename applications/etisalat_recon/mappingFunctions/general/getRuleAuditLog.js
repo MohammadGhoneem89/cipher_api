@@ -28,7 +28,7 @@ exports.getRuleAuditLog = async function (payload, UUIDKey, route, callback, JWT
     };
     try {
         const conn = await pg.connection()
-        let sizing = ` ORDER BY "id" DESC LIMIT ${body.pageSize} OFFSET ${body.pageNumber};`
+        let sizing = ` ORDER BY "id"  DESC LIMIT ${body.pageSize} OFFSET ${body.pageNumber};`
         let totalRecords = `Select * from public."ruleauditlog"`;
         let query = `Select r.datastructure, r.datastructureid, r.notification, r.correction, r.id as internalid, r.ruleid, r.datetime, nr.* from public."ruleauditlog" r inner join
         "NotificationsRule" nr  on  nr.id=r.ruleid`;
