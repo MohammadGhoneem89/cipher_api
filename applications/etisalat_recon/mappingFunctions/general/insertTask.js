@@ -34,7 +34,7 @@ exports.insertTask = function (payload, UUIDKey, route, callback, JWToken) {
             console.log(data);
             let result = _.get(data, 'rowCount', []);
             console.log(result)
-            let response = { "responseMessage": { "action": "inserttask", "data": { "message": { "status": "OK", "errorDescription": "Task Inserted Success!!", "displayToUser": true, "newPageURL": "/hyperledger/workboard" } } } }
+            let response = { "responseMessage": { "action": "inserttask", "data": { "message": { "status": "OK", "errorDescription": "Task Inserted Success!!", "displayToUser": true, "newPageURL": "/etisalat/taskscreenlist" } } } }
             return callback(response);
         });
     }).catch((err) => {
