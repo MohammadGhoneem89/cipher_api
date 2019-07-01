@@ -121,6 +121,12 @@
       "MappingfunctionName": "getGovernanceDashboard",
       "CustomMappingFile": "general/getGovernanceDashboard.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getRuleActionLogReport" : {
+      "customMapping": true,
+      "MappingfunctionName": "getRuleActionLogReport",
+      "CustomMappingFile": "general/getRuleActionLogReport.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Wasl": {
