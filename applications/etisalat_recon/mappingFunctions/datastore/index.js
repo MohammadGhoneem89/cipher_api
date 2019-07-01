@@ -71,12 +71,22 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
   on data."tranxData"->>'dataStructureName'=ds.key 
   WHERE data.key='${payload.key}' `;
 
+  let queryRules = `Select r.datastructure, 
+     r.datastructureid, r.notification, r.correction, 
+     r.id as internalid, r.ruleid, r.datetime, nr.* 
+      from public."ruleauditlog" r inner join
+    "NotificationsRule" nr  on  nr.id=r.ruleid where r.datastructureid='${payload.key}'`;
+
   pg.connection().then((conn) => {
-    return conn.query(queryData, []).then((data) => {
+
+    return Promise.all([
+      conn.query(queryData, []),
+      conn.query(queryRules, [])
+    ]).then((data) => {
 
       let AttrList = [];
       let AttrListReconFinal = [];
-      let record = data.rows[0];
+      let record = data[0].rows[0];
       let attList = _.get(record, 'data.attributeList', undefined);
       let schema = _.get(record, 'structure.attributeList', undefined);
       let schemaBasic = _.get(record, 'structure', undefined);
@@ -89,7 +99,6 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
         keyAttributeName: schemaBasic.dataStructure.keyAttributeName,
         dsName: schemaBasic.dataStructure.name
       };
-
       _.set(generalData, '', undefined);
       if (attList && schema) {
         for (let key in attList) {
@@ -104,7 +113,6 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
                 sequence: parseInt(_.get(attrVal, `attribute.sequence`, "999") || "999", 10)
               });
             }
-
             else {
               let AttrListRecon = [];
               Object.keys(attrVal.systems).forEach((elem) => {
@@ -128,6 +136,7 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
       }
       AttrList = _.orderBy(AttrList, 'sequence', 'desc');
       let relationshipData = [];
+
       schemaBasic.relationshipData.forEach((data) => {
         relationshipData.push(data.relatedTo);
       });
@@ -159,7 +168,6 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
         });
       });
 
-
       let response = {
         "getDatastoreDetail": {
           "action": "getDatastoreList",
@@ -168,7 +176,8 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
             AttrListReconFinal: AttrListReconFinal,
             meta: generalData,
             relationshipData: AttrListRecon,
-            reconStatus: reconStatus
+            reconStatus: reconStatus,
+            notificationList: data[1].rows
           }
         }
       };
