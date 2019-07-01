@@ -115,6 +115,7 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
             }
             else {
               let AttrListRecon = [];
+              let reconStat = true;
               Object.keys(attrVal.systems).forEach((elem) => {
                 let isReconcile = _.get(attList, `${key}.isReconciled`, false);
                 AttrListRecon.push({
@@ -124,11 +125,13 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
                 });
                 if (!isReconcile) {
                   reconStatus = false
+                  reconStat = false;
                 }
               });
               AttrListReconFinal.push({
                 name: _.get(attrVal, `attribute.attributeLabel`, key) || key,
-                value: AttrListRecon
+                value: AttrListRecon,
+                isRecon: reconStat
               });
             }
           }
