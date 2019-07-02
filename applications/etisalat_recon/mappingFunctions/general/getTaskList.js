@@ -33,8 +33,8 @@ function getTaskList(payload, UUIDKey, route, callback, JWToken) {
       queryData += ' AND technician.name= \'' + payload.searchCriteria.searchTasks.technician + '\''
       queryCnt += ' AND technician.name= \'' + payload.searchCriteria.searchTasks.technician + '\''
     }
-    queryData += ' ORDER BY task.datetime DESC';
   }
+  queryData += ' ORDER BY task.datetime DESC';
 
   let queryCriteria = queryCnt + query;
   let queryCriteriaFull = queryData + query;
