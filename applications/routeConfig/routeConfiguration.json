@@ -1,7 +1,12 @@
 {
   "etisalat": {
     "CustomFunctionsLocation": "../../applications/etisalat_recon/mappingFunctions/",
-    
+    "getEidList": {
+      "customMapping": true,
+      "MappingfunctionName": "getEidList",
+      "CustomMappingFile": "datastore/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getDatastructureList": {
       "customMapping": true,
       "MappingfunctionName": "getDatastructureList",
@@ -62,67 +67,67 @@
       "CustomMappingFile": "NotificationRules/NotificationRules.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getNotificationRules" : {
+    "getNotificationRules": {
       "customMapping": true,
       "MappingfunctionName": "getNotificationRules",
       "CustomMappingFile": "general/getNotificationRules.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getRuleAuditLog" : {
+    "getRuleAuditLog": {
       "customMapping": true,
       "MappingfunctionName": "getRuleAuditLog",
       "CustomMappingFile": "general/getRuleAuditLog.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "insertNotificationComment" : {
+    "insertNotificationComment": {
       "customMapping": true,
       "MappingfunctionName": "insertNotificationComment",
       "CustomMappingFile": "general/insertNotificationComment.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getComments" : {
+    "getComments": {
       "customMapping": true,
       "MappingfunctionName": "getComments",
       "CustomMappingFile": "general/getComments.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "listProcedures" : {
+    "listProcedures": {
       "customMapping": true,
       "MappingfunctionName": "listProcedures",
       "CustomMappingFile": "general/getProcedureList.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "insertTask" : {
+    "insertTask": {
       "customMapping": true,
       "MappingfunctionName": "insertTask",
       "CustomMappingFile": "general/insertTask.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getTask" : {
+    "getTask": {
       "customMapping": true,
       "MappingfunctionName": "getTask",
       "CustomMappingFile": "general/getTask.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "updateTask" : {
+    "updateTask": {
       "customMapping": true,
       "MappingfunctionName": "updateTask",
       "CustomMappingFile": "general/updateTask.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getTaskList" : {
+    "getTaskList": {
       "customMapping": true,
       "MappingfunctionName": "getTaskList",
       "CustomMappingFile": "general/getTaskList.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getGovernanceDashboard" : {
+    "getGovernanceDashboard": {
       "customMapping": true,
       "MappingfunctionName": "getGovernanceDashboard",
       "CustomMappingFile": "general/getGovernanceDashboard.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getRuleActionLogReport" : {
+    "getRuleActionLogReport": {
       "customMapping": true,
       "MappingfunctionName": "getRuleActionLogReport",
       "CustomMappingFile": "general/getRuleActionLogReport.js",
@@ -162,26 +167,25 @@
       "mappingConfigFile": "ePayMapping"
     }
   },
-  
-"SampleApp": {
-  "CustomFunctionsLocation": "../../applications/SampleApp/mappingFunctions/",
-  "viewItem": {
-    "customMapping": true,
-    "MappingfunctionName": "viewItem",
-    "CustomMappingFile": "general/viewItem.js",
-    "mappingConfigFile": "ePayMapping"
-  },
-  "getAccountList": {
-    "customMapping": true,
-    "MappingfunctionName": "GetAccountList",
-    "CustomMappingFile": "blockchainAccounts/list.js",
-    "mappingConfigFile": "ePayMapping"
-  },
-  "updateAccountList": {
-    "customMapping": true,
-    "MappingfunctionName": "UpdateAccountList",
-    "CustomMappingFile": "blockchainAccounts/updates.js",
-    "mappingConfigFile": "ePayMapping"
+  "SampleApp": {
+    "CustomFunctionsLocation": "../../applications/SampleApp/mappingFunctions/",
+    "viewItem": {
+      "customMapping": true,
+      "MappingfunctionName": "viewItem",
+      "CustomMappingFile": "general/viewItem.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAccountList": {
+      "customMapping": true,
+      "MappingfunctionName": "GetAccountList",
+      "CustomMappingFile": "blockchainAccounts/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateAccountList": {
+      "customMapping": true,
+      "MappingfunctionName": "UpdateAccountList",
+      "CustomMappingFile": "blockchainAccounts/updates.js",
+      "mappingConfigFile": "ePayMapping"
+    }
   }
-}
 }
