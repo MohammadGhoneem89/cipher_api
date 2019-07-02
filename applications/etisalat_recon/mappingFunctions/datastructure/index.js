@@ -3,7 +3,7 @@ const pg = require('../../../../core/api/connectors/postgress');
 const dates = require('../../../../lib/helpers/dates');
 const _ = require('lodash');
 function getDatastructureList(payload, UUIDKey, route, callback, JWToken) {
-  let queryData = 'SELECT * FROM datastructures WHERE 1=1 ';
+  let queryData = `SELECT *, date_part('epoch'::text,"createdAt")::bigint as "dateEpoch" FROM datastructures WHERE 1=1 `;
   let queryCnt = 'SELECT count(*) FROM datastructures WHERE 1=1 ';
   let query = '';
   if (payload.searchCriteria && payload.searchCriteria.toDate && payload.searchCriteria.fromDate) {
@@ -37,6 +37,7 @@ function getDatastructureList(payload, UUIDKey, route, callback, JWToken) {
           keyAttributeName: elemt.tranxData.dataStructure.keyAttributeName,
           description: elemt.tranxData.dataStructure.description,
           createdon: elemt.createdAt,
+          dateEpoch: elemt.dateEpoch * 1000,
           updatedon: elemt.updatedAt
         });
       });
