@@ -32,7 +32,8 @@ exports.getRuleAuditLog = async function (payload, UUIDKey, route, callback, JWT
         const conn = await pg.connection();
         let sizing = ` ORDER BY "id"  DESC LIMIT ${body.pageSize} OFFSET ${((Number (body.pageNumber ) - 1 ) * Number (body.pageSize) )};`;
         let totalRecords = `Select * from public."ruleauditlog"`;
-        let query = `Select r.datastructure, r.datastructureid, r.notification, r.correction, r.id as internalid, r.ruleid, r.datetime, nr.* from public."ruleauditlog" r inner join
+        let query = `Select r.datastructure, r.datastructureid, r.notification, r.correction, r.id as internalid, r.ruleid, date_part('epoch'::text, r.datetime)::bigint as "dateEpoch", nr.* 
+        from public."ruleauditlog" r inner join
         "NotificationsRule" nr  on  nr.id=r.ruleid`;
         console.log(payload.body)
         if (searchCriteria) {
