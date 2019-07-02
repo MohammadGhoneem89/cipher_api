@@ -3,9 +3,11 @@ const pg = require('../../../../core/api/connectors/postgress');
 const _ = require('lodash');
 
 exports.getRuleAuditLog = async function (payload, UUIDKey, route, callback, JWToken) {
-    let body = payload.body;
+    console.log(JSON.stringify(payload));
+    let body = _.get(payload, 'body', undefined);
     let searchCriteria = false;
-    if (Object.keys(body.searchCriteria).length && Object.keys(body.searchCriteria).length > 0) {
+    let searchCriteriaData = _.get(body, 'searchCriteria', {});
+    if (body && Object.keys(searchCriteriaData).length && Object.keys(searchCriteriaData).length > 0) {
         searchCriteria = true
     }
     let response = {
@@ -27,30 +29,30 @@ exports.getRuleAuditLog = async function (payload, UUIDKey, route, callback, JWT
         }
     };
     try {
-        const conn = await pg.connection()
-        let sizing = ` ORDER BY "id"  DESC LIMIT ${body.pageSize} OFFSET ${body.pageNumber};`
+        const conn = await pg.connection();
+        let sizing = ` ORDER BY "id"  DESC LIMIT ${body.pageSize} OFFSET ${((Number (body.pageNumber ) - 1 ) * Number (body.pageSize) )};`;
         let totalRecords = `Select * from public."ruleauditlog"`;
         let query = `Select r.datastructure, r.datastructureid, r.notification, r.correction, r.id as internalid, r.ruleid, r.datetime, nr.* from public."ruleauditlog" r inner join
         "NotificationsRule" nr  on  nr.id=r.ruleid`;
         console.log(payload.body)
         if (searchCriteria) {
             let whereClause = null;
-            if (body.searchCriteria.dataStructure) {
-                whereClause = `"datastructure" like '%${body.searchCriteria.dataStructure}%' `
+            if (body && searchCriteriaData.dataStructure) {
+                whereClause = `"datastructure" like '%${searchCriteriaData.dataStructure}%' `
             }
 
             if (body.searchCriteria.ruleName) {
                 if (whereClause !== null) {
                     whereClause += `AND `
                 }
-                whereClause += `"rulename" LIKE '%${body.searchCriteria.ruleName}%'`
+                whereClause += `"rulename" LIKE '%${searchCriteriaData.ruleName}%'`
             }
 
-            if (body.searchCriteria.notificationStatus) {
+            if (searchCriteriaData.notificationStatus) {
                 if (whereClause !== null) {
                     whereClause += `AND `
                 }
-                whereClause += `"status" = '${body.searchCriteria.ruleName}'`
+                whereClause += `"status" = '${searchCriteriaData.ruleName}'`
             }
             if (whereClause === null) {
                 query += ` ${sizing}`;
@@ -63,7 +65,7 @@ exports.getRuleAuditLog = async function (payload, UUIDKey, route, callback, JWT
             query += sizing
         }
 
-        console.log('query', query, totalRecords)
+        console.log('query', query, totalRecords);
         const execQuery = await conn.query(query);
         const execQueryTotalRecords = await conn.query(totalRecords);
         let TotalRocoreds = 0;
