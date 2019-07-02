@@ -6,7 +6,10 @@ const pg = require('../../../../core/api/connectors/postgress');
 const _ = require('lodash');
 
 exports.updateTask = function (payload, UUIDKey, route, callback, JWToken) {
-    let taskUpdateQuery = 'UPDATE task SET status=\'' + payload.taskStatus + '\', ecd=\'' + payload.minECD + '\'WHERE taskid=\'' + payload.taskId + '\''
+    // if(payload.minECD=null) {
+    //     payload.minECD=0
+    // }
+    let taskUpdateQuery = 'UPDATE task SET status=$1::varchar, ecd=$2::bigInt WHERE taskid=$3::varchar'
     //let taskInsertQuery = 'INSERT INTO task (taskid, status, documents) values (\'' + payload.taskId + '\', \'' + payload.taskStatus  + '\', \'' + JSON.stringify(payload.documents)  + '\')';
     console.log("----", taskUpdateQuery)
 
@@ -44,7 +47,7 @@ exports.updateTask = function (payload, UUIDKey, route, callback, JWToken) {
 
     pg.connection().then((conn) => {
         return Promise.all([
-            conn.query(taskUpdateQuery, []),
+            conn.query(taskUpdateQuery, [payload.taskStatus, payload.minECD, payload.taskId]),
             conn.query(commentInsertQuery, [])
         ]).then((data) => {
 
