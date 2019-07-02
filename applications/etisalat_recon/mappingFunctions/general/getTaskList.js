@@ -7,8 +7,8 @@ function getTaskList(payload, UUIDKey, route, callback, JWToken) {
   let todate = dates.ddMMyyyyslash(payload.searchCriteria.toDate);
   
 
-  let queryData = 'SELECT task.taskid, technician.name, problem, task.status FROM ( SELECT taskdetails.taskid, SUM( CASE WHEN taskdetails.status=\'PROBLEM\' THEN 1 END ) AS problem FROM taskdetails GROUP BY taskid ) details INNER JOIN task ON details.taskid=task.taskid LEFT JOIN technician ON task.technicianid=technician.technicianid WHERE datetime BETWEEN \'' + payload.searchCriteria.fromDate + '\' AND \'' + payload.searchCriteria.toDate + '\'';
-  let queryCnt = 'SELECT count(*) FROM task WHERE datetime BETWEEN \'' + payload.searchCriteria.fromDate + '\' AND \'' + payload.searchCriteria.toDate + '\'';
+  let queryData = 'SELECT task.taskid, technician.name, problem, task.status, task.ecd FROM ( SELECT taskdetails.taskid, SUM( CASE WHEN taskdetails.status=\'PROBLEM\' THEN 1 END ) AS problem FROM taskdetails GROUP BY taskid ) details INNER JOIN task ON details.taskid=task.taskid LEFT JOIN technician ON task.technicianid=technician.technicianid';
+  let queryCnt = 'SELECT count(*) FROM task';
   let queryTaskStatus = 'SELECT status, count(*) FROM (SELECT * FROM task WHERE datetime BETWEEN \'' + payload.searchCriteria.fromDate + '\' AND \'' + payload.searchCriteria.toDate + '\') task GROUP BY status';
   let queryAttributeWise = 'SELECT attributename as attribute, SUM( CASE WHEN status=\'PROBLEM\' OR status=\'ACCEPTED\' THEN 1 ELSE 0 END ) AS reported, SUM( CASE WHEN status=\'ACCEPTED\' THEN 1 ELSE 0 END ) AS accepted FROM (select * from taskdetails where datetime between \'' + payload.searchCriteria.fromDate + '\' AND \'' + payload.searchCriteria.toDate + '\') taskdetails GROUP BY attributename HAVING attributename IN (\'eid\', \'flat\', \'splitter\', \'dropD\', \'x\', \'y\') ORDER BY attributename';
   let queryTopFive = 'SELECT actions.technicianid, technician.name as technician, COUNT(attributename) as reported FROM(SELECT* FROM taskdetails INNER JOIN task ON taskdetails.taskid=task.taskid WHERE taskdetails.status=\'ACCEPTED\' AND taskdetails.datetime BETWEEN \'' + payload.searchCriteria.fromDate +'\' AND \'' + payload.searchCriteria.toDate + '\') AS actions INNER JOIN technician ON actions.technicianid = technician.technicianid GROUP BY actions.technicianid, technician.name ORDER BY COUNT(*) DESC LIMIT 5'
@@ -18,17 +18,16 @@ function getTaskList(payload, UUIDKey, route, callback, JWToken) {
 
   if (payload.searchCriteria.searchTasks) {
     if(payload.searchCriteria.searchTasks.fromECD != undefined && payload.searchCriteria.searchTasks.toECD != undefined) {
-      queryData = 'SELECT task.taskid, technician.name, problem, task.status FROM ( SELECT taskdetails.taskid, SUM( CASE WHEN taskdetails.status=\'PROBLEM\' THEN 1 END ) AS problem FROM taskdetails left join taskcomments on taskdetails.id=taskcomments.attributeid::int4 GROUP BY taskdetails.taskid HAVING MIN(taskcomments.ecd) BETWEEN \'' + payload.searchCriteria.searchTasks.fromECD + '\' AND \'' + payload.searchCriteria.searchTasks.toECD + '\') details INNER JOIN task ON details.taskid=task.taskid LEFT JOIN technician ON task.technicianid=technician.technicianid  WHERE datetime BETWEEN \'' + payload.searchCriteria.fromDate + '\' AND \'' + payload.searchCriteria.toDate + '\''
-      queryCnt = 'SELECT COUNT(*) FROM ( SELECT taskdetails.taskid, SUM( CASE WHEN taskdetails.status=\'PROBLEM\' THEN 1 END ) AS problem FROM taskdetails left join taskcomments on taskdetails.id=taskcomments.attributeid::int4 GROUP BY taskdetails.taskid HAVING MIN(taskcomments.ecd) BETWEEN \'' + payload.searchCriteria.searchTasks.fromECD + '\' AND \'' + payload.searchCriteria.searchTasks.toECD + '\') details INNER JOIN task ON details.taskid=task.taskid LEFT JOIN technician ON task.technicianid=technician.technicianid';
+      queryData = 'SELECT task.taskid, technician.name, problem, task.status, task.ecd FROM ( SELECT taskdetails.taskid, SUM( CASE WHEN taskdetails.status=\'PROBLEM\' THEN 1 END ) AS problem FROM taskdetails GROUP BY taskdetails.taskid ) details INNER JOIN task ON details.taskid=task.taskid LEFT JOIN technician ON task.technicianid=technician.technicianid WHERE task.ecd between \'' + payload.searchCriteria.searchTasks.fromECD + '\' AND \'' + payload.searchCriteria.searchTasks.toECD + '\'';
     }
     if(payload.searchCriteria.searchTasks.status != undefined && payload.searchCriteria.searchTasks.technician) {
-        queryData += ' AND task.status = \'' + payload.searchCriteria.searchTasks.status + '\'  AND technician.name= \'' + payload.searchCriteria.searchTasks.technician + '\''
+        queryData += ' WHERE task.status = \'' + payload.searchCriteria.searchTasks.status + '\'  AND technician.name= \'' + payload.searchCriteria.searchTasks.technician + '\''
     }
     else if(payload.searchCriteria.searchTasks.status != undefined) {
-      queryData += ' AND task.status = \'' + payload.searchCriteria.searchTasks.status + '\''
+      queryData += ' WHERE task.status = \'' + payload.searchCriteria.searchTasks.status + '\''
     }
     else if(payload.searchCriteria.searchTasks.technician) {
-      queryData += ' AND technician.name= \'' + payload.searchCriteria.searchTasks.technician + '\''
+      queryData += ' WHERE technician.name= \'' + payload.searchCriteria.searchTasks.technician + '\''
     }
   }
 
@@ -61,6 +60,7 @@ function getTaskList(payload, UUIDKey, route, callback, JWToken) {
           status: elemt.status,
           technicianName: elemt.name,
           pbTl: (elemt.problem == null ? 0 : elemt.problem) + '/6',
+          ecd: elemt.ecd,
           actions: [{ "value": "1003", "type": "componentAction", "label": "View", "params": "", "iconName": "icon-docs", "URI": ["/etisalat/datastructure"] }]
         });
       });

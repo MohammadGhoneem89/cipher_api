@@ -6,7 +6,7 @@ const pg = require('../../../../core/api/connectors/postgress');
 const _ = require('lodash');
 
 exports.updateTask = function (payload, UUIDKey, route, callback, JWToken) {
-    let taskUpdateQuery = 'UPDATE task SET status=\'' + payload.taskStatus + '\' WHERE taskid=\'' + payload.taskId + '\''
+    let taskUpdateQuery = 'UPDATE task SET status=\'' + payload.taskStatus + '\', ecd=\'' + payload.minECD + '\'WHERE taskid=\'' + payload.taskId + '\''
     //let taskInsertQuery = 'INSERT INTO task (taskid, status, documents) values (\'' + payload.taskId + '\', \'' + payload.taskStatus  + '\', \'' + JSON.stringify(payload.documents)  + '\')';
     console.log("----", taskUpdateQuery)
 

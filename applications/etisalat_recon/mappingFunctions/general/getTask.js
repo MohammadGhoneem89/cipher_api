@@ -6,7 +6,7 @@ const pg = require('../../../../core/api/connectors/postgress');
 const _ = require('lodash');
 
 exports.getTask = function (payload, UUIDKey, route, callback, JWToken) {
-    let taskgetQuery = 'SELECT * FROM task where taskid = \'' + payload.taskId  + '\'';
+    let taskgetQuery = 'SELECT * FROM task left join technician on task.technicianid=technician.technicianid where task.taskid = \'' + payload.taskId  + '\'';
     console.log("----", taskgetQuery)
     let getTaskDetailsQuery = 'SELECT * FROM taskdetails where taskid = \'' + payload.taskId  + '\'';
     console.log("====",getTaskDetailsQuery)
