@@ -73,7 +73,12 @@ exports.getRuleAuditLog = async function (payload, UUIDKey, route, callback, JWT
         if (execQueryTotalRecords && execQueryTotalRecords['rows'] && execQueryTotalRecords['rows'].length) {
             TotalRocoreds = execQueryTotalRecords['rows'].length;
         }
-        if (execQuery && execQuery['rows']) {
+        if (execQuery && execQuery['rows'] && execQuery['rows'].length) {
+            for (let elem of execQuery['rows']) {
+                let date = elem.dateEpoch;
+                let newEpoch = (Number(date)) * 1000;
+                elem.dateEpoch = newEpoch;
+            }
             response.getRuleAuditLog.data.searchResult = execQuery['rows'];
             response.getRuleAuditLog.pageData.totalRecords = TotalRocoreds;
             response.getRuleAuditLog.pageData.pageSize = body.pageSize;

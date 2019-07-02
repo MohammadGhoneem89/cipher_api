@@ -158,22 +158,23 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
           "/etisalat/datastoreview/"
         ]
       }];
-      Object.keys(relList).forEach((elem) => {
-        let arrList = [];
-        relList[elem].forEach((data) => {
-          arrList.push({
+      if (relList) {
+        Object.keys(relList).forEach((elem) => {
+          let arrList = [];
+          relList[elem].forEach((data) => {
+            arrList.push({
+              dsName: elem,
+              key: data,
+              name: data.replace(elem + "_", ""),
+              actions: actions
+            });
+          });
+          AttrListRecon.push({
             dsName: elem,
-            key: data,
-            name: data.replace(elem + "_", ""),
-            actions: actions
+            list: arrList
           });
         });
-        AttrListRecon.push({
-          dsName: elem,
-          list: arrList
-        });
-      });
-
+      }
       let response = {
         "getDatastoreDetail": {
           "action": "getDatastoreList",

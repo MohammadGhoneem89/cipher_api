@@ -38,8 +38,8 @@ function getDatastructureList(payload, UUIDKey, route, callback, JWToken) {
           keyAttributeName: elemt.tranxData.dataStructure.keyAttributeName,
           description: elemt.tranxData.dataStructure.description,
           createdon: elemt.createdAt,
-          updatedon: elemt.updatedAt,
-          dateEpoch: elemt.dateEpoch
+          dateEpoch: elemt.dateEpoch * 1000,
+          updatedon: elemt.updatedAt
         });
       });
       let response = {
