@@ -21,6 +21,7 @@ function getDatastoreList(payload, UUIDKey, route, callback, JWToken) {
     let key = payload.searchCriteria.key;
     query += ` AND "key" like '%${key}%'`;
   }
+  
 
   let queryCriteria = queryCnt + query;
   let queryCriteriaFull = queryData + query;
@@ -75,7 +76,7 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
 
   let queryRules = `Select r.datastructure, 
      r.datastructureid, r.notification, r.correction, 
-     r.id as internalid, r.ruleid, r.datetime, nr.* 
+     r.id as internalid, r.ruleid, r.datetime, nr.* , date_part('epoch'::text,"datetime")::bigint*1000 as "dateEpoch"
       from public."ruleauditlog" r inner join
     "NotificationsRule" nr  on  nr.id=r.ruleid where r.datastructureid='${payload.key}'`;
 
@@ -175,6 +176,8 @@ function getDatastoreDetail(payload, UUIDKey, route, callback, JWToken) {
           });
         });
       }
+
+
       let response = {
         "getDatastoreDetail": {
           "action": "getDatastoreList",

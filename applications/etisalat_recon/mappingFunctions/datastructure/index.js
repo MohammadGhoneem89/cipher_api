@@ -96,10 +96,14 @@ function getAttributeTypeRule(payload, UUIDKey, route, callback, JWToken) {
                 "value": `${key}.attributesValue.${sys}`
               });
             });
-            outVal.push({
-              "label": `${key}.isReconciled`,
-              "value": `${key}.isReconciled`
-            });
+
+            if (_.get(outVal, `${key}.attribute.reconType`, "360") != "360") {
+              outVal.push({
+                "label": `${key}.isReconciled`,
+                "value": `${key}.isReconciled`
+              });
+             
+            }
             outVal.push({
               "label": `${key}.timeStamp`,
               "value": `${key}.timeStamp`
