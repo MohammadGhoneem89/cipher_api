@@ -6,10 +6,10 @@ const pg = require('../../../../core/api/connectors/postgress');
 const _ = require('lodash');
 
 exports.getComments = function (payload, UUIDKey, route, callback, JWToken) {
-    let queryData = 'SELECT * FROM "notificationcomments" WHERE ruleauditlogid=\'' + payload.ruleauditlogid + '\'' ;
+    let queryData = 'SELECT * FROM "notificationcomments" WHERE ruleauditlogid=$1::varchar' ;
 
     pg.connection().then((conn) => {
-        return conn.query(queryData, []).then((data) => {
+        return conn.query(queryData, [payload.ruleauditlogid]).then((data) => {
             let result = _.get(data,'rows',[])
             let response = {
                 "getComments": {

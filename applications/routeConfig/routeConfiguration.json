@@ -132,6 +132,12 @@
       "MappingfunctionName": "getRuleActionLogReport",
       "CustomMappingFile": "general/getRuleActionLogReport.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getRuleHitSummary": {
+      "customMapping": true,
+      "MappingfunctionName": "getRuleHitSummary",
+      "CustomMappingFile": "general/getRuleHitSummary.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Wasl": {

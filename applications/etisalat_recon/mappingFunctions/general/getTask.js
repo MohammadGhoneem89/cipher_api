@@ -6,18 +6,18 @@ const pg = require('../../../../core/api/connectors/postgress');
 const _ = require('lodash');
 
 exports.getTask = function (payload, UUIDKey, route, callback, JWToken) {
-    let taskgetQuery = 'SELECT * FROM task left join technician on task.technicianid=technician.technicianid where task.taskid = \'' + payload.taskId  + '\'';
+    let taskgetQuery = 'SELECT * FROM task left join technician on task.technicianid=technician.technicianid where task.taskid = $1::varchar';
     console.log("----", taskgetQuery)
-    let getTaskDetailsQuery = 'SELECT * FROM taskdetails where taskid = \'' + payload.taskId  + '\'';
+    let getTaskDetailsQuery = 'SELECT * FROM taskdetails where taskid = $1::varchar';
     console.log("====",getTaskDetailsQuery)
-    let commentGetQuery = 'SELECT * FROM taskcomments where taskid = \'' + payload.taskId  + '\' ORDER BY commentdate DESC';
+    let commentGetQuery = 'SELECT * FROM taskcomments where taskid = $1::varchar ORDER BY commentdate DESC';
     console.log("++++", commentGetQuery)
 
     pg.connection().then((conn) => {
         return Promise.all([
-            conn.query(taskgetQuery, []),
-            conn.query(getTaskDetailsQuery, []),
-            conn.query(commentGetQuery, [])
+            conn.query(taskgetQuery, [payload.taskId]),
+            conn.query(getTaskDetailsQuery, [payload.taskId]),
+            conn.query(commentGetQuery, [payload.taskId])
         ]).then((data) => {
             console.log(data);
             const task = (_.get(_.get(data,'[0]',{}),'rows',[]))
