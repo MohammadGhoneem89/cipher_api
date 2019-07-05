@@ -302,7 +302,7 @@ function createMessageAssociatedPayments(payload, data) {
             "status": item.status,
             "date": item.date,
             "amount": item.amount,
-            "bankMetaData": item.bankMetaData
+            "bankMetaData": removeChequeNumberMetaData(item.bankMetaData)
           }
         }),
         "firstPayment": isNotReplacement,
@@ -313,6 +313,14 @@ function createMessageAssociatedPayments(payload, data) {
   console.log("createMessageAssociatedPayments===========>", JSON.stringify(message), "<===========createMessageAssociatedPayments");
   return Promise.resolve(message);
 }
+
+function removeChequeNumberMetaData(bankMetaData){
+
+_.unset(bankMetaData, 'chequeNumber')
+return bankMetaData;
+
+}
+
 
 async function createMessage(payload) {
   console.log("TEMPLATE========>", JSON.stringify(payload.template, null, 2), "<=========TEMPLATE");
