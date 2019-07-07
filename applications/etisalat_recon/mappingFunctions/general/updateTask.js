@@ -11,7 +11,7 @@ exports.updateTask = function (payload, UUIDKey, route, callback, JWToken) {
     console.log("----", taskUpdateQuery)
 
     payload.taskDetails.forEach((detail) => {
-        let updateTaskDetailsQuery = 'UPDATE taskDetails set status=$1::varchar where id=$2::varchar';
+        let updateTaskDetailsQuery = 'UPDATE taskDetails set status=$1::varchar where id=$2::int';
         console.log("====", updateTaskDetailsQuery)
         pg.connection().then((conn) => {
             conn.query(updateTaskDetailsQuery, [detail.status, detail.id]).then((data) => {
@@ -23,10 +23,11 @@ exports.updateTask = function (payload, UUIDKey, route, callback, JWToken) {
     })
 
     payload.comments.forEach((comment) => {
-        let commentInsertQuery = 'INSERT INTO taskcomments (commentdate, username, commenttext, type, taskId, ecd, reason, attributeid, attributename, status) values ($1::bigInt, $2::varchar, $3::varchar, $4::varchar, $5::varchar, $6::bigInt, $7::varchar, $8::int, $9::varchar, $10::varchar)';
+        console.log("----------", JSON.stringify(comment))
+        let commentInsertQuery = 'INSERT INTO taskcomments (commentdate, username, commenttext, type, taskId, ecd, reason, attributeid, attributename, status, attributeshortname) values ($1::bigInt, $2::varchar, $3::varchar, $4::varchar, $5::varchar, $6::bigInt, $7::varchar, $8::int, $9::varchar, $10::varchar, $11::varchar)';
         console.log("++++", commentInsertQuery)
         pg.connection().then((conn) => {
-            conn.query(commentInsertQuery, [comment.commentdate, comment.username, comment.commenttext, comment.type, payload.taskId, comment.ecd, comment.reason, comment.attributeid, comment.attributename, comment.status]).then((data) => {
+            conn.query(commentInsertQuery, [comment.commentdate, comment.username, comment.commenttext, comment.type, payload.taskId, comment.ecd, comment.reason, comment.attributeid, comment.attributename, comment.status, comment.attributeShortName]).then((data) => {
                 // success
             }).catch((ex) => {
                 console.log(ex);
@@ -37,11 +38,10 @@ exports.updateTask = function (payload, UUIDKey, route, callback, JWToken) {
 
     pg.connection().then((conn) => {
         return Promise.all([
-            conn.query(taskUpdateQuery, [payload.taskStatus, payload.minECD, payload.taskId]),
-            //conn.query(commentInsertQuery, [])
+            // conn.query(taskUpdateQuery, [payload.taskStatus, payload.minECD, payload.taskId])
         ]).then((data) => {
 
-            console.log(data);
+            console.log("data-->", data);
             let result = _.get(data, 'rowCount', []);
             console.log(result)
             let response = { "responseMessage": { "action": "updateTask", "data": { "message": { "status": "OK", "errorDescription": "Task Updated Success!!", "displayToUser": true, "newPageURL": "/etisalat/taskscreenlist" } } } }

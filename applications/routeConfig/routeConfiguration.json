@@ -138,6 +138,24 @@
       "MappingfunctionName": "getRuleHitSummary",
       "CustomMappingFile": "general/getRuleHitSummary.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getRegions": {
+      "customMapping": true,
+      "MappingfunctionName": "getRegions",
+      "CustomMappingFile": "general/getRegions.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTeams": {
+      "customMapping": true,
+      "MappingfunctionName": "getTeams",
+      "CustomMappingFile": "general/getTeams.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTechnicians": {
+      "customMapping": true,
+      "MappingfunctionName": "getTechnicians",
+      "CustomMappingFile": "general/getTechnicians.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "Wasl": {
