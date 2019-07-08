@@ -1,6 +1,0 @@
-
-type <<structName>> struct{
-	<<field1>> <<fieldType>> `json:"<<field1JSON>>"` }
-
-<<structName>> := <<structName>>{
-	<<field>>:   sanitize(args[<<currentNo>>], "<<fieldType>>").(<<fieldType>>)  }
