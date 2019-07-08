@@ -6,6 +6,10 @@ const rp = require('request-promise');
 const path = require('path');
 const fs = require('fs');
 const amq = require('../../core/api/connectors/queue');
+
+
+
+
 module.exports = class Dispatcher {
   constructor(OriginalRequest, MappeedRequest, configData, UUID, typeList, JWTtoken) {
     this.oRequest = OriginalRequest;
@@ -13,6 +17,7 @@ module.exports = class Dispatcher {
     this.simucases = configData.simucases || [];
     this.UUID = UUID;
     this.typeList = typeList;
+    this.count = 0;
     this.JWT = JWTtoken;
     if (configData.isBlockchain === true) {
       let isMatched = false;
@@ -110,7 +115,7 @@ module.exports = class Dispatcher {
     }
     this.request = MappeedRequest;
   }
-  SendGetRequest() {
+  SendGetRequest(_res = undefined, _rej = undefined) {
     return new Promise((resolve, reject) => {
       let getResponse;
       let bypassSimu = _.get(this.oRequest, 'bypassSimu', false);
@@ -128,11 +133,35 @@ module.exports = class Dispatcher {
           reject(ex);
         });
       } else if (this.configdata.communicationMode === 'REST') {
-        this.connectRestService(this.configdata).then((data) => {
-          resolve(data);
-        }).catch((ex) => {
-          reject(ex);
-        });
+        let isBLK = _.get(this.configdata, 'isBlockchain', false);
+        let tranCode = _.get(this.request, 'Header.tranCode', "0002")
+        let fcname = _.get(this.request, 'Body.fcnName', "0002")
+        let count = 0;
+        if (isBLK && tranCode == "0001" && fcname == "GetContractData") {
+          if (this.count > 2) {
+            console.log("HURRAY!!!")
+            return _rej(new Error("data not found in blockchain!!"))
+          } else {
+            this.connectRestService(this.configdata).then((data) => {
+              return _res(data);
+            }).catch((ex) => {
+              this.count++;
+              console.log("RETRYING ", this.count)
+              if (_rej && _res)
+                setTimeout(this.SendGetRequest.bind(this, _res, _rej), 2000)
+              else
+                setTimeout(this.SendGetRequest.bind(this, resolve, reject), 2000)
+            });
+          }
+        } else {
+          this.connectRestService(this.configdata).then((data) => {
+            resolve(data);
+          }).catch((ex) => {
+            reject(ex);
+          });
+        }
+
+
       }
       else if (this.configdata.communicationMode === 'QUEUE') {
         this.connectQueueService().then((data) => {
@@ -150,6 +179,7 @@ module.exports = class Dispatcher {
       }
     });
   }
+
   executeCustomFunction() {
     return new Promise((resolve, reject) => {
       let generalResponse = {
@@ -179,8 +209,8 @@ module.exports = class Dispatcher {
   }
 
   connectRestService(configdata) {
-    let today = new Date();
     let isBLK = _.get(configdata, 'isBlockchain', false);
+    let today = new Date();
     if (isBLK === true) {
       _.set(this.request, 'Header.tranType', "0200");
       _.set(this.request, 'Header.UUID', this.UUID);
@@ -202,6 +232,9 @@ module.exports = class Dispatcher {
       throw new Error(ex.message);
     });
   }
+
+
+
 
   connectQueueService(responseQueue) {
     return amq.start()

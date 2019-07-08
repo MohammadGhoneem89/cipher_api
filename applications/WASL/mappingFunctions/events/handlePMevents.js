@@ -317,6 +317,7 @@ function createMessageAssociatedPayments(payload, data) {
 function removeChequeNumberMetaData(bankMetaData){
 
 _.unset(bankMetaData, 'chequeNumber')
+_.unset(bankMetaData, 'fra')
 return bankMetaData;
 
 }
