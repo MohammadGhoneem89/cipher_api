@@ -1,4 +1,13 @@
 {
+  "customs-courier": {
+    "CustomFunctionsLocation": "../../applications/customs-courier/mappingFunctions/",
+    "getDashboardData": {
+      "customMapping": true,
+      "MappingfunctionName": "getDashboardData",
+      "CustomMappingFile": "general/getDashboardData.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
   "etisalat": {
     "CustomFunctionsLocation": "../../applications/etisalat_recon/mappingFunctions/",
     "getEidList": {
