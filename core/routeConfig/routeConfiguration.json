@@ -1,6 +1,5 @@
 {
   "core": {
-    
     "upload": {
       "customMapping": true,
       "MappingfunctionName": "upload",
@@ -25,6 +24,7 @@
       "CustomMappingFile": "systemAPI/apiImport.js",
       "mappingConfigFile": "ePayMapping"
     },
+    
     "getServiceList": {
       "customMapping": true,
       "MappingfunctionName": "git",
@@ -323,6 +323,12 @@
       "customMapping": true,
       "MappingfunctionName": "getTypeDataList",
       "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAPIRequestMapping": {
+      "customMapping": true,
+      "MappingfunctionName": "getAPIRequestMapping",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
       "mappingConfigFile": "ePayMapping"
     },
     "getAPIDefinition": {
