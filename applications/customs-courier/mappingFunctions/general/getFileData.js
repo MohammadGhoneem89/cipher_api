@@ -14,20 +14,26 @@ exports.getFileData = function (payload, UUIDKey, route, callback, JWToken) {
     params.push(payload.id)
 
     if (payload.searchCriteria) {
-        if (payload.searchCriteria.status.length == 1) {
-            queryData += ' AND status=$2::int '
-            queryCnt += ' AND status=$2::int '
+        if (payload.searchCriteria.status) {
+            if (payload.searchCriteria.status.length == 1) {
+                queryData += ' AND status=$2::int '
+                queryCnt += ' AND status=$2::int '
 
-            params.push(payload.searchCriteria.status[0])
+                params.push(payload.searchCriteria.status[0])
+            }
+            else {
+                queryData += ' AND status In ($2::int, $3::int) '
+                queryCnt += ' AND status In ($2::int, $3::int) '
+
+                params.push(payload.searchCriteria.status[0])
+                params.push(payload.searchCriteria.status[1])
+            }
         }
-        else {
-            queryData += ' AND status In ($2::int, $3::int) '
-            queryCnt += ' AND status In ($2::int, $3::int) '
-
-            params.push(payload.searchCriteria.status[0])
-            params.push(payload.searchCriteria.status[1])
+        if (payload.searchCriteria.rulename) {
+            queryData += ` AND rulename=$${params.length+1}::varchar `
+            queryCnt += ` AND rulename=$${params.length+1}::varchar `
+            params.push(payload.searchCriteria.rulename)
         }
-
     }
     // queryData += ' ORDER BY datetime DESC';
 

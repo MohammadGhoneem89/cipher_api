@@ -1,6 +1,6 @@
 {
   "keyVault": {
-    "env": "etisalat_dev",
+    "env": "DC_dev",
     "header":{
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"

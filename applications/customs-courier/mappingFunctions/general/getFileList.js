@@ -6,16 +6,17 @@ const _ = require('lodash');
 exports.getFileList = function (payload, UUIDKey, route, callback, JWToken) {
 
     let params = []
-    let queryData = 'SELECT * FROM file_details ';
+    let queryData = 'SELECT *, date_part(\'epoch\'::text,"datetime")::bigint * 1000 as "dateEpoch"  FROM file_details ';
     let queryCnt = 'SELECT COUNT(*) FROM file_details ';
 
     if (payload.searchCriteria) {
-        queryData += 'WHERE name=$1::varchar '
-        queryCnt += 'WHERE name=$1::varchar '
-        params.push(payload.searchCriteria.filename)
+        if (payload.searchCriteria.filename != "") {
+            queryData += 'WHERE name=$1::varchar '
+            queryCnt += 'WHERE name=$1::varchar '
+            params.push(payload.searchCriteria.filename)
+        }
     }
     queryData += ' ORDER BY datetime DESC';
-
 
     if (payload.page) {
         queryData += ` limit ${payload.page.pageSize} OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)}`;
@@ -38,25 +39,25 @@ exports.getFileList = function (payload, UUIDKey, route, callback, JWToken) {
                 outVal.push(element);
             })
 
-                let response = {
-                    "getFileList": {
-                        "action": "getFileList",
-                        "pageData": {
-                            "pageSize": payload.page.pageSize,
-                            "currentPageNo": payload.page.currentPageNo,
-                            "totalRecords": data[1].rows[0].count
-                        },
-                        "data": {
-                            "searchResult": {
-                                fileList: outVal
-                            }
+            let response = {
+                "getFileList": {
+                    "action": "getFileList",
+                    "pageData": {
+                        "pageSize": payload.page.pageSize,
+                        "currentPageNo": payload.page.currentPageNo,
+                        "totalRecords": data[1].rows[0].count
+                    },
+                    "data": {
+                        "searchResult": {
+                            fileList: outVal
                         }
                     }
-                };
-                return callback(response);
-            });
-        }).catch((err) => {
-            console.log(err);
+                }
+            };
+            return callback(response);
         });
-    }
+    }).catch((err) => {
+        console.log(err);
+    });
+}
 
