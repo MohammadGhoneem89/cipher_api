@@ -4,7 +4,7 @@ const _ = require('lodash');
 
 exports.getOrderDetails = function (payload, UUIDKey, route, callback, JWToken) {
 
-    let queryOrderDetails = 'SELECT * FROM orderdetail WHERE internalid=$1::int';
+    let queryOrderDetails = 'SELECT * FROM orderdetail WHERE key=$1::varchar LIMIT 1';
 
     console.log("===", queryOrderDetails)
 
