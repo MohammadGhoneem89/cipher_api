@@ -795,6 +795,31 @@ async function diffPermissionsRoutes(payload, UUIDKey, route, callback, JWToken)
 async function main() {
   await zipafolder.zip('./core/mappingFunctions/systemAPI/Chaincode', './core/mappingFunctions/systemAPI/Chaincode.zip');
 }
+
+
+function getAPIRequestMapping(payload, UUIDKey, route, callback, JWToken) {
+  let pth = payload.route.split('/');
+  let p1 = _.get(pth, '[1]', '')
+  let p2 = _.get(pth, '[2]', '')
+  let data = _.get(global.routeConfig, `${p1}.${p2}.RequestMapping`, [])
+  let list = []
+  data.forEach((elem) => {
+    list.push({
+      label: elem.IN_FIELD,
+      value: elem.IN_FIELD
+    })
+  });
+  let response = {
+    "APIRequestMappingList": {
+      "data": {
+        "fieldList": list
+      }
+    }
+  };
+  callback(response);
+
+}
+exports.getAPIRequestMapping = getAPIRequestMapping
 exports.downloadChainCode = downloadChainCode;
 exports.getAPIDefinition = getAPIDefinition;
 exports.getAPIDefinitionID = getAPIDefinitionID;

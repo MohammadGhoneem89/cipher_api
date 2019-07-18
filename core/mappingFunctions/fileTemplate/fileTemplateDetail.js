@@ -42,7 +42,7 @@ var fileTemplateDetail = function (payload,fileTemplateGet_CB) {
             }
             else {
                 data = _.get(data, '[0]', {});
-				
+				data.rulesList = data.rulesList || [];
 				data.fields = data.fields || [];
 				data["fields"].forEach(function(d){
                     pointer.set(d,"/actions",[
