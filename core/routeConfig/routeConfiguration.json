@@ -843,6 +843,12 @@
       "CustomMappingFile": "org/orgDetail.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "orgDetailByCode": {
+      "customMapping": true,
+      "MappingfunctionName": "orgDetailByCode",
+      "CustomMappingFile": "org/orgDetailByCode.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "orgList": {
       "customMapping": true,
       "MappingfunctionName": "entityListOut",

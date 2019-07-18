@@ -1,6 +1,18 @@
 {
   "customs-courier": {
     "CustomFunctionsLocation": "../../applications/customs-courier/mappingFunctions/",
+    "getOrderList": {
+      "customMapping": true,
+      "MappingfunctionName": "getOrderList",
+      "CustomMappingFile": "general/getOrderList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getOrderDetails": {
+      "customMapping": true,
+      "MappingfunctionName": "getOrderDetails",
+      "CustomMappingFile": "general/getOrderDetails.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getDashboardData": {
       "customMapping": true,
       "MappingfunctionName": "getDashboardData",
