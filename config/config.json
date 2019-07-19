@@ -1,11 +1,11 @@
 {
   "keyVault": {
-    "env": "WASL_Dev",
+    "env": "STRATA_Dev",
     "header":{
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
     },
-    "url": "http://104.211.155.19:9019/keyVault"
+    "url": "http://23.97.138.116:9009/keyVault"
   },
   "coreDB":{
     "env": "core_database_list",
