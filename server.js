@@ -68,7 +68,6 @@ serverStats.upsert();
 app.options('*', cors());
 
 app.use(cors());
-app.use(bodyParser.json());
 app.use(fileUpload());
 app.use(express.static('public'));
 app.use(express.static('exports'));
