@@ -7,7 +7,7 @@
       "CustomMappingFile": "general/getOrderList.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getOrderDetails": {
+    "getEndToEndTrackingData": {
       "customMapping": true,
       "MappingfunctionName": "getOrderDetails",
       "CustomMappingFile": "general/getOrderDetails.js",

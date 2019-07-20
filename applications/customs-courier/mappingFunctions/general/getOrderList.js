@@ -6,14 +6,39 @@ const _ = require('lodash');
 exports.getOrderList = function (payload, UUIDKey, route, callback, JWToken) {
 
     let params = []
-    let queryData = 'SELECT internalid, "tranxData" FROM orderdetail ';
-    let queryCnt = 'SELECT COUNT(*) FROM orderdetail ';
+    let queryData = 'SELECT key, "tranxData"  FROM orderdetail WHERE 1=1 ';
+    let queryCnt = 'SELECT COUNT(*) FROM orderdetail WHERE 1=1 ';
 
-    if (payload.searchCriteria) {
-        if (payload.searchCriteria.filename != "") {
-            queryData += 'WHERE name=$1::varchar '
-            queryCnt += 'WHERE name=$1::varchar '
-            params.push(payload.searchCriteria.filename)
+    if (payload.searchCriteria && payload.searchCriteria != undefined) {
+        if(_.get(payload.searchCriteria, "ecommerce", "") != ""){
+            let length = params.push(payload.searchCriteria.ecommerce);
+            queryData += `AND "tranxData"->>\'eCommerceOrgCode\'=$${length}::varchar `;
+            queryCnt += `AND "tranxData"->>\'eCommerceOrgCode\'=${length}::varchar `;
+        }
+        if(_.get(payload.searchCriteria, "courier", "") != ""){
+            let length = params.push(payload.searchCriteria.courier);
+            queryData += `AND "tranxData"->>\'courierOrgCode\'=$${length}::varchar `;
+            queryCnt += `AND "tranxData"->>\'courierOrgCode\'=${length}::varchar `;
+        }
+        if(_.get(payload.searchCriteria, "orderNumber", "") != ""){
+            let length = params.push(payload.searchCriteria.orderNumber);
+            queryData += `AND "tranxData"->>\'orderID\'=$${length}::varchar `;
+            queryCnt += `AND "tranxData"->>\'orderID\'=${length}::varchar `;
+        }
+        if(_.get(payload.searchCriteria, "declaration", "") != ""){
+            let length = params.push(payload.searchCriteria.declaration);
+            queryData += `AND "tranxData"->'exportDeclaration'->(0)->>'declarationNo'=$${length}::varchar `;
+            queryCnt += `AND "tranxData"->'exportDeclaration'->(0)->>'declarationNo'=${length}::varchar `;
+        }
+        if(_.get(payload.searchCriteria, "hawbNumber", "") != ""){
+            let length = params.push(payload.searchCriteria.hawbNumber);
+            queryData += `AND "tranxData"->'ExportHAWBList'->(0)->>'HAWBNumber'=$${length}::varchar `;
+            queryCnt += `AND "tranxData"->'ExportHAWBList'->(0)->>'HAWBNumber'=${length}::varchar `;
+        }
+        if(_.get(payload.searchCriteria, "mawbNumber", "") != ""){
+            let length = params.push(payload.searchCriteria.mawbNumber);
+            queryData += `AND "tranxData"->'ExportHAWBList'->(0)->'shippingDetails'->>'MAWBNumber'=$${length}::varchar `;
+            queryCnt += `AND "tranxData"->'ExportHAWBList'->(0)->>'shippingDetails'->>'MAWBNumber'=${length}::varchar `;
         }
     }
     // queryData += ' ORDER BY \'updatedAt\' DESC';
@@ -29,20 +54,21 @@ exports.getOrderList = function (payload, UUIDKey, route, callback, JWToken) {
     pg.connection().then((conn) => {
         return Promise.all([
             conn.query(queryData, params),
-            conn.query(queryCnt, params),
+            conn.query(queryCnt, []),
         ]).then((data) => {
 
             let outVal = [];
             data[0].rows.forEach((elemt) => {
                 let element = {}
-                element.orderID = elemt.tranxData.orderID
-                element.HAWBNo = _.get(elemt.tranxData, "ExportHAWBList[0].HAWBNumber", "")
-                element.orderDate = elemt.tranxData.eCommerceOrgCode
-                element.courierOrgCode =  elemt.tranxData.eCommerceOrgCode
-                element.eCommerceOrgCode = elemt.tranxData.eCommerceOrgCode
-                element.shipTo = _.clone(elemt.tranxData.shipTo)
-                element.orderStatus = _.clone(elemt.tranxData.orderStatus)
-                element.action = [{ "value": "1003", "type": "componentAction", "label": "View", "params": "", "iconName": "icon-docs", "URI": ["/courier/orderDetails/"] }]
+                element.key = elemt.key;
+                element.orderNumber = elemt.tranxData.orderID;
+                element.hawbNumber = _.get(elemt.tranxData, "ExportHAWBList[0].HAWBNumber", "");
+                element.orderDate = elemt.tranxData.orderDate;
+                element.courierCompanyName =  elemt.tranxData.courierOrgCode;
+                element.ecommerceCompanyName = elemt.tranxData.eCommerceOrgCode;
+                element.shipTo = _.clone(elemt.tranxData.shipTo);
+                element.orderStatus = _.clone(elemt.tranxData.orderStatus);
+                element.actions = [{ "value": "1003", "type": "componentAction", "label": "View", "params": "", "iconName": "icon-docs", "URI": ["/courier/orderDetails/"] }];
                 outVal.push(element);
             })
 
@@ -50,8 +76,8 @@ exports.getOrderList = function (payload, UUIDKey, route, callback, JWToken) {
                 "orderlist": {
                     "action": "orderlist",
                     "pageData": {
-                        // "pageSize": _.get(payload, pageSize, 1),
-                        // "currentPageNo": payload.page.currentPageNo,
+                        "pageSize": _.get(payload, "pageSize", 10),
+                        "currentPageNo": _.get(payload, "page.currentPageNo", 1),
                         "totalRecords": data[1].rows[0].count
                     },
                     "data": {
