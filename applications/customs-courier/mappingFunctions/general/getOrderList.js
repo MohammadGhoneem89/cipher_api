@@ -6,8 +6,8 @@ const _ = require('lodash');
 exports.getOrderList = function (payload, UUIDKey, route, callback, JWToken) {
 
     let params = []
-    let queryData = 'SELECT key, "tranxData"  FROM orderdetail WHERE 1=1 ';
-    let queryCnt = 'SELECT COUNT(*) FROM orderdetail WHERE 1=1 ';
+    let queryData = 'SELECT key, "tranxData"  FROM orderdetails WHERE 1=1 ';
+    let queryCnt = 'SELECT COUNT(*) FROM orderdetails WHERE 1=1 ';
 
     if (payload.searchCriteria && payload.searchCriteria != undefined) {
         if(_.get(payload.searchCriteria, "ecommerce", "") != ""){
