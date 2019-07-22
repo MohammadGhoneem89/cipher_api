@@ -133,20 +133,36 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
     //   resp.errorDescription = `You don't have permission to download this file`;
     //   return callback(resp);
     // //}
+
     try {
       let document = await findDocument({
         hash: payload.queryParams.path || payload.headersParams.path
       });
+      let type = payload.queryParams.type;
       if (document) {
         if (fs.existsSync(path.normalize(document.path))) {
           let file = path.normalize(document.path);
           let mimeType = mime.lookup(file);
-
+console.log(file);
           res.set({
             'httpResponse': true,
             'Content-Type': mimeType,
             'Content-Disposition': `attachment; filename=${document.name}`
           });
+          if (type && type === 'IMAGE') {
+            res.set({
+              'httpResponse': true,
+              'Content-Type': mimeType,
+              'Content-Disposition': `filename=${document.name}`
+            });
+            return res.sendFile(path.resolve(file));
+          } else {
+            res.set({
+              'httpResponse': true,
+              'Content-Type': mimeType,
+              'Content-Disposition': `attachment; filename=${document.name}`
+            });
+          }
           let fileStream = await fs.createReadStream(file);
           return fileStream.pipe(res);
         } else {
