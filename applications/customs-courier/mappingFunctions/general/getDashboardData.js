@@ -83,24 +83,24 @@ exports.getDashboardData = async (payload, UUIDKey, route, callback, JWToken) =>
 
         let abvQ = `select (select sum(ds.totalvalue) from dashboardsummaryreport as ds where ds.orderstatus = 'DELIVERED' and orderdate
                             between '${startDate}' and '${endDate}') as dtotal,
-        (select sum(ds.totalvalue) from dashboardsummaryreport as ds where ds.orderstatus = 'FULLRETURN' and orderdate
-                            between '${startDate}' and '${endDate}')
-        +
-        (select sum(ds.totalvalue) from dashboardsummaryreport as ds where ds.orderstatus = 'PARTIALRETURN' and orderdate
+        (select sum(ds.totalvaluereturned) from dashboardsummaryreport as ds where ds.orderstatus = 'FULLRETURN' and orderdate
+                            between '${startDate}' and '${endDate}') as ftotal,
+        (select sum(ds.totalvaluereturned) from dashboardsummaryreport as ds where ds.orderstatus = 'PARTIALRETURN' and orderdate
                             between '${startDate}' and '${endDate}') as rtotal;`;
         const abvDs = await conn.query(abvQ);
         const abvQResult = _.get(abvDs, `['rows'][0]`, []);
 
-        response.getDashboardData.data.summary.orders = resultDsRow[0]['totalorders'] || 0;
-        response.getDashboardData.data.summary.couriers = resultDsRow[0]['totalcourier'] || 0;
-        response.getDashboardData.data.summary.returns = resultDsRow[0]['totalreturn'] || 0;
+        console.log('abvQabvQabvQabvQ', abvQ);
+        response.getDashboardData.data.summary.orders = _.get(resultDsRow, `[0]['totalorders']`, 0);
+        response.getDashboardData.data.summary.couriers = _.get(resultDsRow, `[0]['totalcourier']`, 0);
+        response.getDashboardData.data.summary.returns = _.get(resultDsRow, `[0]['totalreturn']`, 0);
 
         for (let elem of resultDsRow) {
             response.getDashboardData.data.orderTracking[elem.orderstatus] = elem.total;
         }
 
         response.getDashboardData.data.analysisByValue.delivered = abvQResult['dtotal'] || 0;
-        response.getDashboardData.data.analysisByValue.return = abvQResult['rtotal'] || 0;
+        response.getDashboardData.data.analysisByValue.return = (abvQResult['rtotal'] || 0) + (abvQResult['ftotal'] || 0);
 
         for (let hsc of hscodeResult) {
             response.getDashboardData.data.topStats.push({
