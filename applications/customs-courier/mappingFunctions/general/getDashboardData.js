@@ -12,15 +12,15 @@ exports.getDashboardData = async (payload, UUIDKey, route, callback, JWToken) =>
             "data": {
                 "summary": {"couriers": 1, "orders": 50, "returns": 1},
                 "orderTracking": {
-                    "finalized": 0,
-                    "hawbCreated": 0,
-                    "exportCleared": 0,
-                    "delivered": 0,
-                    "returnByCustomer": 0,
-                    "undelivered": 0,
-                    "importCleared": 0,
-                    "partialReturn": 0,
-                    "fullReturn": 0
+                    "FINALIZED": 0,
+                    "HAWBCREATED": 0,
+                    "EXPORTCLEARED": 0,
+                    "DELIVERED": 0,
+                    "RETURNBYCUSTOMER": 0,
+                    "UNDELIVERED": 0,
+                    "IMPORTCLEARED": 0,
+                    "PARTIALRETURN": 0,
+                    "FULLRETURN": 0
                 },
                 "filterCriteria": "HS Codes",
                 "topStats": [],
@@ -43,15 +43,22 @@ exports.getDashboardData = async (payload, UUIDKey, route, callback, JWToken) =>
             startDate = moment().subtract(29, 'days').startOf('day');
             endDate = moment().startOf('day');
         }
-        let totalCuriersQ = `select count(distinct(x.courierorgcode)) as courierorgcode, count(distinct(x.ecommerceorgcode)) as ecommerceorgcode, count(x.id) as totalorders,
-                       sum(x.partialreturn) + sum(x.fullreturn) as totalreturns, sum(x.finalize) as finalize, sum(x.hawbcreated) as hawbcreated,
-                       sum(x.expertcreated) as expertcreated, sum(x.delivered) as delivered, sum(x.returnbycustomer) as returnbycustomer,
-                       sum(x.undelivered) as undelivered, sum(x.importcleaned) as importcleaned, sum(x.partialreturn) as partialreturn, 
-                       sum(x.fullreturn) as fullreturn 
-                       from dashboardsummaryreport as x where x.orderdate between '${startDate}' and '${endDate}'`;
+        let totalCuriersQ = `select sum(ds.statuscount) as total, 
+                            (select count(ds.id) as totalorders from dashboardsummaryreport as ds where orderdate
+                            between '${startDate}' and '${endDate}') as totalorders,
+                            (select count(distinct(ds.courierorgcode)) from dashboardsummaryreport as ds
+                            where orderdate between '${startDate}' and '${endDate}') as totalcourier,
+                            (select count(ds.orderstatus) from dashboardsummaryreport as ds where ds.orderstatus = 'FULLRETURN' and orderdate
+                            between '${startDate}' and '${endDate}') +
+                            (select count(ds.orderstatus) from dashboardsummaryreport as ds where ds.orderstatus = 'PARTIALRETURN' and orderdate
+                            between '${startDate}' and '${endDate}') as totalreturn,
+                             ds.orderstatus from dashboardsummaryreport as ds where orderdate
+                             between '${startDate}' and '${endDate}' group by ds.orderstatus`;
+
         console.log(totalCuriersQ);
         const resultDs = await conn.query(totalCuriersQ);
-        const resultDsRow = resultDs['rows'][0];
+        const resultDsRow = resultDs['rows'];
+        console.log('resultDsRow', resultDsRow);
         let hscodeQ = ``;
         if (searchCriteria && searchCriteria.ecommerce === '001') {
             hscodeQ = `select x.ecommerceorgcode as cod, sum(x.totalvalue) as total
@@ -74,23 +81,24 @@ exports.getDashboardData = async (payload, UUIDKey, route, callback, JWToken) =>
 
         console.log('hscodeQ', hscodeQ);
 
-        let abvQ = `select (select a.totalvalue from dashboardsummaryreport as a where a.fullreturn > 0 and a.partialreturn > 0) as rtotal,
-                    (select a.totalvalue from dashboardsummaryreport as a where a.delivered > 0) as dtotal`;
+        let abvQ = `select (select sum(ds.totalvalue) from dashboardsummaryreport as ds where ds.orderstatus = 'DELIVERED' and orderdate
+                            between '${startDate}' and '${endDate}') as dtotal,
+        (select sum(ds.totalvalue) from dashboardsummaryreport as ds where ds.orderstatus = 'FULLRETURN' and orderdate
+                            between '${startDate}' and '${endDate}')
+        +
+        (select sum(ds.totalvalue) from dashboardsummaryreport as ds where ds.orderstatus = 'PARTIALRETURN' and orderdate
+                            between '${startDate}' and '${endDate}') as rtotal;`;
         const abvDs = await conn.query(abvQ);
         const abvQResult = _.get(abvDs, `['rows'][0]`, []);
 
-        response.getDashboardData.data.summary.couriers = resultDsRow['courierorgcode'] || 0;
-        response.getDashboardData.data.summary.orders = resultDsRow['totalorders'] || 0;
-        response.getDashboardData.data.summary.returns = resultDsRow['totalreturns'] || 0;
-        response.getDashboardData.data.orderTracking.finalized = resultDsRow['finalize'] || 0;
-        response.getDashboardData.data.orderTracking.hawbCreated = resultDsRow['hawbcreated'] || 0;
-        response.getDashboardData.data.orderTracking.exportCleared = resultDsRow['expertcreated'] || 0;
-        response.getDashboardData.data.orderTracking.delivered = resultDsRow['delivered'] || 0;
-        response.getDashboardData.data.orderTracking.returnByCustomer = resultDsRow['returnbycustomer'] || 0;
-        response.getDashboardData.data.orderTracking.undelivered = resultDsRow['undelivered'] || 0;
-        response.getDashboardData.data.orderTracking.importCleared = resultDsRow['importcleaned'] || 0;
-        response.getDashboardData.data.orderTracking.partialReturn = resultDsRow['partialreturn'] || 0;
-        response.getDashboardData.data.orderTracking.fullReturn = resultDsRow['fullreturn'] || 0;
+        response.getDashboardData.data.summary.orders = resultDsRow[0]['totalorders'] || 0;
+        response.getDashboardData.data.summary.couriers = resultDsRow[0]['totalcourier'] || 0;
+        response.getDashboardData.data.summary.returns = resultDsRow[0]['totalreturn'] || 0;
+
+        for (let elem of resultDsRow) {
+            response.getDashboardData.data.orderTracking[elem.orderstatus] = elem.total;
+        }
+
         response.getDashboardData.data.analysisByValue.delivered = abvQResult['dtotal'] || 0;
         response.getDashboardData.data.analysisByValue.return = abvQResult['rtotal'] || 0;
 
