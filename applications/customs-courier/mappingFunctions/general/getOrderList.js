@@ -6,14 +6,26 @@ const _ = require('lodash');
 exports.getOrderList = function (payload, UUIDKey, route, callback, JWToken) {
 
     let params = []
-    let queryData = 'SELECT key, "tranxData"  FROM orderdetail WHERE 1=1 ';
-    let queryCnt = 'SELECT COUNT(*) FROM orderdetail WHERE 1=1 ';
+    console.log(JWToken)
+    let queryData = 'SELECT key, "tranxData"  FROM orderdetails WHERE 1=1 ';
+    let queryCnt = 'SELECT COUNT(*) FROM orderdetails WHERE 1=1 ';
+
+    console.log(JWToken)
+
+    if(JWToken.orgType == 'Courier') {
+        queryData += `AND "tranxData"->>'courierOrgCode = '${JWToken.orgCode}'`
+        queryCnt += `AND "tranxData"->>'courierOrgCode = '${JWToken.orgCode}'`
+    }
+    else if(JWToken.orgType == 'ECOMMERCE') {
+        queryData += `AND "tranxData"->>'eCommerceOrgCode' = '${JWToken.orgCode}'`
+        queryCnt += `AND "tranxData"->>'eCommerceOrgCode' = '${JWToken.orgCode}'`
+    }
 
     if (payload.searchCriteria && payload.searchCriteria != undefined) {
         if(_.get(payload.searchCriteria, "ecommerce", "") != ""){
             let length = params.push(payload.searchCriteria.ecommerce);
-            queryData += `AND "tranxData"->>\'eCommerceOrgCode\'=$${length}::varchar `;
-            queryCnt += `AND "tranxData"->>\'eCommerceOrgCode\'=${length}::varchar `;
+            queryData += `AND "tranxData"->>'eCommerceOrgCode'=$${length}::varchar `;
+            queryCnt += `AND "tranxData"->>'eCommerceOrgCode'=${length}::varchar `;
         }
         if(_.get(payload.searchCriteria, "courier", "") != ""){
             let length = params.push(payload.searchCriteria.courier);
@@ -32,8 +44,8 @@ exports.getOrderList = function (payload, UUIDKey, route, callback, JWToken) {
         }
         if(_.get(payload.searchCriteria, "hawbNumber", "") != ""){
             let length = params.push(payload.searchCriteria.hawbNumber);
-            queryData += `AND "tranxData"->'ExportHAWBList'->(0)->>'HAWBNumber'=$${length}::varchar `;
-            queryCnt += `AND "tranxData"->'ExportHAWBList'->(0)->>'HAWBNumber'=${length}::varchar `;
+            queryData += `AND "tranxData"->'ExportHAWB'->>'HAWBNumber'=$${length}::varchar `;
+            queryCnt += `AND "tranxData"->'ExportHAWB'->>'HAWBNumber'=${length}::varchar `;
         }
         if(_.get(payload.searchCriteria, "mawbNumber", "") != ""){
             let length = params.push(payload.searchCriteria.mawbNumber);
@@ -62,12 +74,14 @@ exports.getOrderList = function (payload, UUIDKey, route, callback, JWToken) {
                 let element = {}
                 element.key = elemt.key;
                 element.orderNumber = elemt.tranxData.orderID;
-                element.hawbNumber = _.get(elemt.tranxData, "ExportHAWBList[0].HAWBNumber", "");
+                element.hawbNumber = _.get(elemt.tranxData, "ExportHAWB.HAWBNumber", "");
                 element.orderDate = elemt.tranxData.orderDate;
                 element.courierCompanyName =  elemt.tranxData.courierOrgCode;
                 element.ecommerceCompanyName = elemt.tranxData.eCommerceOrgCode;
-                element.shipTo = _.clone(elemt.tranxData.shipTo);
-                element.orderStatus = _.clone(elemt.tranxData.orderStatus);
+                element.shipTo = elemt.tranxData.shipTo;
+                element.orderStatus = elemt.tranxData.orderStatus;
+                element.exportDeclarationStatus = _.get(elemt.tranxData, "exportDeclaration[0].status", "");
+                element.importDeclarationStatus = _.get(elemt.tranxData, "importDeclaration[0].status", "");
                 element.actions = [{ "value": "1003", "type": "componentAction", "label": "View", "params": "", "iconName": "icon-docs", "URI": ["/courier/orderDetails/"] }];
                 outVal.push(element);
             })
