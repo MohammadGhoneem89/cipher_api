@@ -62,6 +62,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
 
   const fileExtension = getExtension(fileName);
   let completeBasePath = path.normalize(path.join(basePath, dirName));
+  // let completeFileName = path.normalize(path.join('/core/download?type=FILE&path=',  fileHash));
   let completeFileName = path.normalize(path.join(completeBasePath,  fileHash + '.' + fileExtension));
 
   if (!allowedExtensions.includes(fileExtension.toUpperCase())) {
@@ -83,7 +84,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
       "name": fileName,
       "type": type,
       "hash": fileHash,
-      "path": completeFileName,
+      "path": `/API/core/download?type=FILE&path=${fileHash}`,
       "fileReference": fileReference
     };
      try {
