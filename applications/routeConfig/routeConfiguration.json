@@ -1,4 +1,13 @@
 {
+  "STRATA": {
+    "CustomFunctionsLocation": "../../applications/STRATA/mappingFunctions/",
+    "createTypeData": {
+      "customMapping": true,
+      "MappingfunctionName": "createTypeData",
+      "CustomMappingFile": "createTypeData/createTypeData.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
   "PR": {
     "CustomFunctionsLocation": "../../applications/WASL/mappingFunctions/",
     "generalEventHandler": {

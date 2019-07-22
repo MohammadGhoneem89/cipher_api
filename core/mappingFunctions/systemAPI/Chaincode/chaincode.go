@@ -16,23 +16,23 @@ import (
   ===================================================================================*/
 
 //Struct For Chain Code
-type PRChainCode struct {
+type P2PChainCode struct {
 }
 
-var logger = shim.NewLogger("PR")
+var logger = shim.NewLogger("P2P")
 
 //Standard Functions
 func main() {
-	fmt.Println("PR ChainCode Started")
-	err := shim.Start(new(PRChainCode))
+	fmt.Println("P2P ChainCode Started")
+	err := shim.Start(new(P2PChainCode))
 	if err != nil {
-		fmt.Println("Error starting PR chaincode: %s", err)
+		fmt.Println("Error starting P2P chaincode: %s", err)
 	}
 }
 
 //Init is called during chaincode instantiation to initialize any data.
-func (t *PRChainCode) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	fmt.Println("PR ChainCode Initiated")
+func (t *P2PChainCode) Init(stub shim.ChaincodeStubInterface) pb.Response {
+	fmt.Println("P2P ChainCode Initiated")
 
 	_, args := stub.GetFunctionAndParameters()
 	fmt.Println("Init: %v", args)
@@ -60,7 +60,7 @@ func (t *PRChainCode) Init(stub shim.ChaincodeStubInterface) pb.Response {
 }
 
 //Invoke is called per transaction on the chaincode
-func (t *PRChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
+func (t *P2PChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 
 	//getting MSP
 	certOrgType, err := cid.GetMSPID(stub)
@@ -84,157 +84,112 @@ func (t *PRChainCode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 	fmt.Println("Arguments Loaded Successfully!!")
 
 	//<<Function Validation Logic-Start>>
-	if orgType == "GOVT" {						
+	if orgType == "undefined" {						
 		switch functionName := function; functionName {
 		//<<FunctionCases-Start>>
 		
-		case "AddTenant":
-			return t.AddTenant(stub, args,"AddTenant")
+		case "addItemCatalogue":
+			return t.addItemCatalogue(stub, args,"addItemCatalogue")
 					
 		//<<FunctionCases-Start>>
 		
-		case "EjariTerminationStatus":
-			return t.EjariTerminationStatus(stub, args,"EjariTerminationStatus")
+		case "addMasterContract":
+			return t.addMasterContract(stub, args,"addMasterContract")
 					
 		//<<FunctionCases-Start>>
 		
-		case "GetContractDataForEjari":
-			return t.GetContractDataForEjari(stub, args,"GetContractDataForEjari")
+		case "createInvoice":
+			return t.createInvoice(stub, args,"createInvoice")
 					
 		//<<FunctionCases-Start>>
 		
-		case "GetKYCDetail":
-			return t.GetKYCDetail(stub, args,"GetKYCDetail")
+		case "createOrder":
+			return t.createOrder(stub, args,"createOrder")
 					
 		//<<FunctionCases-Start>>
 		
-		case "Logout":
-			return t.Logout(stub, args,"Logout")
+		case "createSubOrder":
+			return t.createSubOrder(stub, args,"createSubOrder")
 					
 		//<<FunctionCases-Start>>
 		
-		case "SaveEjariHashData":
-			return t.SaveEjariHashData(stub, args,"SaveEjariHashData")
+		case "eventOnCreateOrder":
+			return t.eventOnCreateOrder(stub, args,"eventOnCreateOrder")
 					
 		//<<FunctionCases-Start>>
 		
-		case "UpdateDEWADetail":
-			return t.UpdateDEWADetail(stub, args,"UpdateDEWADetail")
+		case "eventOnInvoiceCreation":
+			return t.eventOnInvoiceCreation(stub, args,"eventOnInvoiceCreation")
 					
 		//<<FunctionCases-Start>>
 		
-		case "UpdateKYCDetail":
-			return t.UpdateKYCDetail(stub, args,"UpdateKYCDetail")
+		case "eventOnPaymentOrderCreation":
+			return t.eventOnPaymentOrderCreation(stub, args,"eventOnPaymentOrderCreation")
 					
 		//<<FunctionCases-Start>>
 		
-		case "UpdateToken":
-			return t.UpdateToken(stub, args,"UpdateToken")
-					
-		//<<FunctionCases-End>>
-		
-		default:
-			logger.Warning("Invoke did not find function: " + function)
-			return shim.Error("Received unknown function invocation: " + function)
-		}
-	} else 
-//<<Function Validation Logic-Start>>
-	if orgType == "BANKS" {						
-		switch functionName := function; functionName {
-		//<<FunctionCases-Start>>
-		
-		case "AssociatePaymentInstruments":
-			return t.AssociatePaymentInstruments(stub, args,"AssociatePaymentInstruments")
+		case "eventOnPaymentOrderCreationCustomer":
+			return t.eventOnPaymentOrderCreationCustomer(stub, args,"eventOnPaymentOrderCreationCustomer")
 					
 		//<<FunctionCases-Start>>
 		
-		case "GetContractData":
-			return t.GetContractData(stub, args,"GetContractData")
+		case "eventOnPurchaseOrder":
+			return t.eventOnPurchaseOrder(stub, args,"eventOnPurchaseOrder")
 					
 		//<<FunctionCases-Start>>
 		
-		case "UpdatePaymentInstrumentStatus":
-			return t.UpdatePaymentInstrumentStatus(stub, args,"UpdatePaymentInstrumentStatus")
-					
-		//<<FunctionCases-End>>
-		
-		default:
-			logger.Warning("Invoke did not find function: " + function)
-			return shim.Error("Received unknown function invocation: " + function)
-		}
-	} else 
-//<<Function Validation Logic-Start>>
-	if orgType == "PM" {						
-		switch functionName := function; functionName {
-		//<<FunctionCases-Start>>
-		
-		case "GetContractDetails":
-			return t.GetContractDetails(stub, args,"GetContractDetails")
+		case "eventOnPurchaseOrderCustomer":
+			return t.eventOnPurchaseOrderCustomer(stub, args,"eventOnPurchaseOrderCustomer")
 					
 		//<<FunctionCases-Start>>
 		
-		case "GetContractDetailsBackOffice":
-			return t.GetContractDetailsBackOffice(stub, args,"GetContractDetailsBackOffice")
+		case "getItemCatalogue":
+			return t.getItemCatalogue(stub, args,"getItemCatalogue")
 					
 		//<<FunctionCases-Start>>
 		
-		case "InsertPaymentMetaInfo":
-			return t.InsertPaymentMetaInfo(stub, args,"InsertPaymentMetaInfo")
+		case "getItemCatalogueCustomer":
+			return t.getItemCatalogueCustomer(stub, args,"getItemCatalogueCustomer")
 					
 		//<<FunctionCases-Start>>
 		
-		case "ProcessInstrument":
-			return t.ProcessInstrument(stub, args,"ProcessInstrument")
+		case "getMasterAgreementData":
+			return t.getMasterAgreementData(stub, args,"getMasterAgreementData")
 					
 		//<<FunctionCases-Start>>
 		
-		case "RenewContract":
-			return t.RenewContract(stub, args,"RenewContract")
+		case "getOrderDetail":
+			return t.getOrderDetail(stub, args,"getOrderDetail")
 					
 		//<<FunctionCases-Start>>
 		
-		case "ReplacePaymentInstruments":
-			return t.ReplacePaymentInstruments(stub, args,"ReplacePaymentInstruments")
+		case "getOrderDetailCustomer":
+			return t.getOrderDetailCustomer(stub, args,"getOrderDetailCustomer")
 					
 		//<<FunctionCases-Start>>
 		
-		case "ReplacePaymentInstrumentsBackOffice":
-			return t.ReplacePaymentInstrumentsBackOffice(stub, args,"ReplacePaymentInstrumentsBackOffice")
+		case "getOrganizationList":
+			return t.getOrganizationList(stub, args,"getOrganizationList")
 					
 		//<<FunctionCases-Start>>
 		
-		case "ReprocessEjari":
-			return t.ReprocessEjari(stub, args,"ReprocessEjari")
+		case "updateItemCatalogue":
+			return t.updateItemCatalogue(stub, args,"updateItemCatalogue")
 					
 		//<<FunctionCases-Start>>
 		
-		case "RequestKYC":
-			return t.RequestKYC(stub, args,"RequestKYC")
+		case "updateOrderStatus":
+			return t.updateOrderStatus(stub, args,"updateOrderStatus")
 					
 		//<<FunctionCases-Start>>
 		
-		case "TerminateContract":
-			return t.TerminateContract(stub, args,"TerminateContract")
+		case "updateOrderStatusCustomer":
+			return t.updateOrderStatusCustomer(stub, args,"updateOrderStatusCustomer")
 					
 		//<<FunctionCases-Start>>
 		
-		case "UpdateContract":
-			return t.UpdateContract(stub, args,"UpdateContract")
-					
-		//<<FunctionCases-End>>
-		
-		default:
-			logger.Warning("Invoke did not find function: " + function)
-			return shim.Error("Received unknown function invocation: " + function)
-		}
-	} else 
-//<<Function Validation Logic-Start>>
-	if orgType == "OG1" {						
-		switch functionName := function; functionName {
-		//<<FunctionCases-Start>>
-		
-		case "UpdateContractStatus":
-			return t.UpdateContractStatus(stub, args,"UpdateContractStatus")
+		case "updateSubOrderStatus":
+			return t.updateSubOrderStatus(stub, args,"updateSubOrderStatus")
 					
 		//<<FunctionCases-End>>
 		
@@ -278,598 +233,11 @@ func insertDataAndRaiseEvent(stub shim.ChaincodeStubInterface,key string,eventTy
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:AddTenant
-	Description: UAE Pass authentication token event for the user login is stamped on blockchain for both WASL and Bank.
-*/
-func (t *PRChainCode) AddTenant(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("AddTenant: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-AddTenant := &AddTenant{	
-		OrgCode:   sanitize(args[0], "string").(string),
-OrgID:   sanitize(args[1], "string").(string),
-EmiratesID:   sanitize(args[2], "string").(string),
-CustomerName:   sanitize(args[3], "string").(string),
-MobileNumber:   sanitize(args[4], "string").(string),
-EmailID:   sanitize(args[5], "string").(string),
-VisaNo:   sanitize(args[6], "string").(string),
-VisaExpiryDate:   sanitize(args[7], "string").(string),
-EmiratesIDExpiryDate:   sanitize(args[8], "string").(string),
-AuthToken:   sanitize(args[9], "string").(string),
-Timestamp:   sanitize(args[10], "string").(string),
-OrgCodeWASL:   sanitize(args[11], "string").(string),
-  }
-
-fmt.Println(AddTenant)
-	logger.Debug("AddTenant function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:EjariTerminationStatus
-	Description: When DLD will receive the termination request either from Blockchain or WASL legacy system, DLD to call this API to update the status on Blockchain when termination is successful.
-*/
-func (t *PRChainCode) EjariTerminationStatus(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("EjariTerminationStatus: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-EjariTerminationStatus := &EjariTerminationStatus{	
-		OrgCode:   sanitize(args[0], "string").(string),
-ContractID:   sanitize(args[1], "string").(string),
-EjariTerminationStatus:   sanitize(args[2], "string").(string),
-  }
-
-fmt.Println(EjariTerminationStatus)
-	logger.Debug("EjariTerminationStatus function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:GetContractDataForEjari
-	Description: The API is used by DLD to retrieve the basic detail of the contract required to process or terminate Ejari.
-*/
-func (t *PRChainCode) GetContractDataForEjari(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("GetContractDataForEjari: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-GetContractDataForEjari := &GetContractDataForEjari{	
-		OrgCode:   sanitize(args[0], "string").(string),
-ContractID:   sanitize(args[1], "string").(string),
-  }
-
-fmt.Println(GetContractDataForEjari)
-	logger.Debug("GetContractDataForEjari function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:GetKYCDetail
-	Description: WASL will call this API to get the current KYC information available on the Blockchain.
-Also, the customer selects the contract for renewal, WASL to call this API to initiate the KYC request to GDRFA. An event will be sent to WASL by calling their API to notify about the KYC detail when the information is successfully received from GDRFA.
-*/
-func (t *PRChainCode) GetKYCDetail(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("GetKYCDetail: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-GetKYCDetail := &GetKYCDetail{	
-		EIDA:   sanitize(args[0], "string").(string),
-  }
-
-fmt.Println(GetKYCDetail)
-	logger.Debug("GetKYCDetail function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:Logout
-	Description: When UAE pass session is logged out or timed out, SDG to stamp the session end event on the Blockchain.
-*/
-func (t *PRChainCode) Logout(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("Logout: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-Logout := &Logout{	
-		OrgCode:   sanitize(args[0], "string").(string),
-AuthToken:   sanitize(args[1], "string").(string),
-OrgID:   sanitize(args[2], "string").(string),
-Timestamp:   sanitize(args[3], "string").(string),
-  }
-
-fmt.Println(Logout)
-	logger.Debug("Logout function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:SaveEjariHashData
-	Description: The API consumed by DLD to stamp Ejari hash data on the blockchain when Ejari is successfully generated in the internal system and issued to the customer.
-*/
-func (t *PRChainCode) SaveEjariHashData(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("SaveEjariHashData: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-SaveEjariHashData := &SaveEjariHashData{	
-		ContractID:   sanitize(args[0], "string").(string),
-OrgCode:   sanitize(args[1], "string").(string),
-EjariNumber:   sanitize(args[2], "string").(string),
-TenantNumber:   sanitize(args[3], "string").(string),
-EjariStatus:   sanitize(args[4], "string").(string),
-EjariHash:   sanitize(args[5], "string").(string),
-SignedEjariHash:   sanitize(args[6], "string").(string),
-  }
-
-fmt.Println(SaveEjariHashData)
-	logger.Debug("SaveEjariHashData function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:UpdateDEWADetail
-	Description: The API consumed by DLD to stamp DEWA related details on the blockchain
-*/
-func (t *PRChainCode) UpdateDEWADetail(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("UpdateDEWADetail: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-UpdateDEWADetail := &UpdateDEWADetail{	
-		OrgCode:   sanitize(args[0], "string").(string),
-ContractID:   sanitize(args[1], "string").(string),
-  }
-
-fmt.Println(UpdateDEWADetail)
-	logger.Debug("UpdateDEWADetail function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:UpdateKYCDetail
-	Description: The API to be consumed by GDRFA to stamp the latest KYC information of the customer on Blockchain.
-*/
-func (t *PRChainCode) UpdateKYCDetail(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("UpdateKYCDetail: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-UpdateKYCDetail := &UpdateKYCDetail{	
-		ResidenceAddr:   sanitize(args[0], "string").(string),
-ContactPersonMobile:   sanitize(args[1], "string").(string),
-Nationality:   sanitize(args[2], "string").(string),
-DateOfBirth:   sanitize(args[3], "string").(string),
-NatId:   sanitize(args[4], "string").(string),
-NatIdExpDate:   sanitize(args[5], "string").(string),
-PoBox:   sanitize(args[6], "string").(string),
-PhoneNo:   sanitize(args[7], "string").(string),
-Gender:   sanitize(args[8], "string").(string),
-TenantNameEn:   sanitize(args[9], "string").(string),
-TenantNameAr:   sanitize(args[10], "string").(string),
-VisaNo:   sanitize(args[11], "string").(string),
-VisaIssueDate:   sanitize(args[12], "string").(string),
-VisaExpiryDate:   sanitize(args[13], "string").(string),
-VisaStatus:   sanitize(args[14], "string").(string),
-  }
-
-fmt.Println(UpdateKYCDetail)
-	logger.Debug("UpdateKYCDetail function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:UpdateToken
-	Description: When UAE pass auth token for WASL or Bank is expired, entities will refresh the new token with UAE pass and SDG will stamp the hash of newly assigned auth token on the Blockchain by calling this API.
-*/
-func (t *PRChainCode) UpdateToken(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("UpdateToken: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-UpdateToken := &UpdateToken{	
-		OrgCode:   sanitize(args[0], "string").(string),
-OrgID:   sanitize(args[1], "string").(string),
-OldAuthToken:   sanitize(args[2], "string").(string),
-NewAuthToken:   sanitize(args[3], "string").(string),
-Timestamp:   sanitize(args[4], "string").(string),
-  }
-
-fmt.Println(UpdateToken)
-	logger.Debug("UpdateToken function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:AssociatePaymentInstruments
-	Description: The API consumed by the Bank to stamp the payment instruments association on the blockchain. This could have variations to store first time payments as well as later payments done based on payment terms.
-*/
-func (t *PRChainCode) AssociatePaymentInstruments(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("AssociatePaymentInstruments: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-AssociatePaymentInstruments := &AssociatePaymentInstruments{	
-		AuthToken:   sanitize(args[0], "string").(string),
-EIDA:   sanitize(args[1], "string").(string),
-ContractID:   sanitize(args[2], "string").(string),
-OrgCode:   sanitize(args[3], "string").(string),
-  }
-
-fmt.Println(AssociatePaymentInstruments)
-	logger.Debug("AssociatePaymentInstruments function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:GetContractData
-	Description: The API is used by the banks to retrieve the basic detail of the contract and payment instruments detail.
-*/
-func (t *PRChainCode) GetContractData(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("GetContractData: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-GetContractData := &GetContractData{	
-		OrgCode:   sanitize(args[0], "string").(string),
-EIDA:   sanitize(args[1], "string").(string),
-AuthToken:   sanitize(args[2], "string").(string),
-ContractID:   sanitize(args[3], "string").(string),
-undefined:   sanitize(args[4], "string").(string),
-  }
-
-fmt.Println(GetContractData)
-	logger.Debug("GetContractData function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:UpdatePaymentInstrumentStatus
-	Description: The API consumed by the Bank to stamp the status of the payment instrument on the Blockchain.
-*/
-func (t *PRChainCode) UpdatePaymentInstrumentStatus(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("UpdatePaymentInstrumentStatus: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-UpdatePaymentInstrumentStatus := &UpdatePaymentInstrumentStatus{	
-		OrgCode:   sanitize(args[0], "string").(string),
-ContractID:   sanitize(args[1], "string").(string),
-  }
-
-fmt.Println(UpdatePaymentInstrumentStatus)
-	logger.Debug("UpdatePaymentInstrumentStatus function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:GetContractDetails
-	Description: The Rest API is used by WASL to retrieve the information of the tenancy contract from the Blockchain.
-*/
-func (t *PRChainCode) GetContractDetails(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("GetContractDetails: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-GetContractDetails := &GetContractDetails{	
-		EIDA:   sanitize(args[0], "string").(string),
-AuthToken:   sanitize(args[1], "string").(string),
-ContractID:   sanitize(args[2], "string").(string),
-OrgCode:   sanitize(args[3], "string").(string),
-  }
-
-fmt.Println(GetContractDetails)
-	logger.Debug("GetContractDetails function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:GetContractDetailsBackOffice
-	Description: The Rest API is used by WASL to retrieve the information of the tenancy contract from the Blockchain.
-*/
-func (t *PRChainCode) GetContractDetailsBackOffice(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("GetContractDetailsBackOffice: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-GetContractDetailsBackOffice := &GetContractDetailsBackOffice{	
-		EIDA:   sanitize(args[0], "string").(string),
-ContractID:   sanitize(args[1], "string").(string),
-OrgCode:   sanitize(args[2], "string").(string),
-  }
-
-fmt.Println(GetContractDetailsBackOffice)
-	logger.Debug("GetContractDetailsBackOffice function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:InsertPaymentMetaInfo
-	Description: To add Payment in blockchain
-*/
-func (t *PRChainCode) InsertPaymentMetaInfo(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("InsertPaymentMetaInfo: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-InsertPaymentMetaInfo := &InsertPaymentMetaInfo{	
-		Code:   sanitize(args[0], "string").(string),
-Name:   sanitize(args[1], "string").(string),
-BeneficiaryData:   sanitize(args[2], "string").(string),
-BankCode:   sanitize(args[3], "string").(string),
-  }
-
-fmt.Println(InsertPaymentMetaInfo)
-	logger.Debug("InsertPaymentMetaInfo function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:ProcessInstrument
-	Description: ProcessInstrument
-*/
-func (t *PRChainCode) ProcessInstrument(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("ProcessInstrument: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-ProcessInstrument := &ProcessInstrument{	
-		ContractID:   sanitize(args[0], "string").(string),
-OrgCode:   sanitize(args[1], "string").(string),
-  }
-
-fmt.Println(ProcessInstrument)
-	logger.Debug("ProcessInstrument function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:RenewContract
-	Description: The Rest API can be used to add a renewal of the tenancy contract on the Blockchain along with installments, payment method and selected bank.
-*/
-func (t *PRChainCode) RenewContract(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("RenewContract: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-RenewContract := &RenewContract{	
-		AuthToken:   sanitize(args[0], "string").(string),
-EIDA:   sanitize(args[1], "string").(string),
-ContractID:   sanitize(args[2], "string").(string),
-ContractReference:   sanitize(args[3], "string").(string),
-LastContractID:   sanitize(args[4], "string").(string),
-ContractStartDate:   sanitize(args[5], "string").(string),
-ContractEndDate:   sanitize(args[6], "string").(string),
-ContractAmount:   sanitize(args[7], "string").(string),
-TenantName:   sanitize(args[8], "string").(string),
-UserReferenceNumber:   sanitize(args[9], "string").(string),
-PropertyReferenceNumber:   sanitize(args[10], "string").(string),
-BusinessPartnerNo:   sanitize(args[11], "string").(string),
-OldeEjariNumber:   sanitize(args[12], "string").(string),
-ContractSignedHash:   sanitize(args[13], "string").(string),
-PaymentMethod:   sanitize(args[14], "string").(string),
-CheckKYCStatus:   sanitize(args[15], "string").(string),
-PaymentCount:   sanitize(args[16], "int64").(int64),
-IsLegacyContract:   sanitize(args[17], "bool").(bool),
-OrgCode:   sanitize(args[18], "string").(string),
-KYCValidationPeriod:   sanitize(args[19], "int64").(int64),
-undefined:   sanitize(args[20], "string").(string),
-  }
-
-fmt.Println(RenewContract)
-	logger.Debug("RenewContract function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:ReplacePaymentInstruments
-	Description: The Rest API consumed by WASL to replace the payment instrument DDS/ECHEQUE with any method, if the payment replacement is done by the customer through UI.
-*/
-func (t *PRChainCode) ReplacePaymentInstruments(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("ReplacePaymentInstruments: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-ReplacePaymentInstruments := &ReplacePaymentInstruments{	
-		AuthToken:   sanitize(args[0], "string").(string),
-EIDA:   sanitize(args[1], "string").(string),
-ContractID:   sanitize(args[2], "string").(string),
-undefined:   sanitize(args[3], "string").(string),
-  }
-
-fmt.Println(ReplacePaymentInstruments)
-	logger.Debug("ReplacePaymentInstruments function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:ReplacePaymentInstrumentsBackOffice
-	Description: The Rest API consumed by WASL to replace the payment instrument DDS/ECHEQUE with any method, if the payment replacement is done by the customer through UI.
-*/
-func (t *PRChainCode) ReplacePaymentInstrumentsBackOffice(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("ReplacePaymentInstrumentsBackOffice: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-ReplacePaymentInstrumentsBackOffice := &ReplacePaymentInstrumentsBackOffice{	
-		EIDA:   sanitize(args[0], "string").(string),
-ContractID:   sanitize(args[1], "string").(string),
-undefined:   sanitize(args[2], "string").(string),
-  }
-
-fmt.Println(ReplacePaymentInstrumentsBackOffice)
-	logger.Debug("ReplacePaymentInstrumentsBackOffice function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:ReprocessEjari
-	Description: The Rest API consumed by WASL to re-process or re-terminate the Ejari to DLD if the issuance or the termination of the Ejari is failed from DLD due to any reason.
-*/
-func (t *PRChainCode) ReprocessEjari(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("ReprocessEjari: %v", args)
-    
-	if len(args[0]) <= 0 {
-		return shim.Error("Invalid Argument")
-	}
-	
-	//Business Logic to be added here
-		
-ReprocessEjari := &ReprocessEjari{	
-		ContractID:   sanitize(args[0], "string").(string),
-RequestType:   sanitize(args[1], "string").(string),
-undefined:   sanitize(args[2], "string").(string),
-  }
-
-fmt.Println(ReprocessEjari)
-	logger.Debug("ReprocessEjari function executed successfully.")
-	
-	return shim.Success(nil)
-}
-
-
-//<<FunctionDefinition - Start>>
-/*
-	Function Name:RequestKYC
+	Function Name:addItemCatalogue
 	Description: 
 */
-func (t *PRChainCode) RequestKYC(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("RequestKYC: %v", args)
+func (t *P2PChainCode) addItemCatalogue(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("addItemCatalogue: %v", args)
     
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
@@ -877,13 +245,28 @@ func (t *PRChainCode) RequestKYC(stub shim.ChaincodeStubInterface, args []string
 	
 	//Business Logic to be added here
 		
-RequestKYC := &RequestKYC{	
-		OrgCode:   sanitize(args[0], "string").(string),
-EIDA:   sanitize(args[1], "string").(string),
+addItemCatalogue := &addItemCatalogue{	
+		ItemCode:   sanitize(args[0], "string").(string),
+Name:   sanitize(args[1], "string").(string),
+Description:   sanitize(args[2], "string").(string),
+Classification:   sanitize(args[3], "string").(string),
+ItemStatus:   sanitize(args[4], "string").(string),
+Image:   sanitize(args[5], "string").(string),
+Material:   sanitize(args[6], "string").(string),
+Price:   sanitize(args[7], "string").(string),
+LeadTime:   sanitize(args[8], "string").(string),
+PrintTime:   sanitize(args[9], "string").(string),
+PartNumber:   sanitize(args[10], "string").(string),
+ModelVolume:   sanitize(args[11], "string").(string),
+SupportVolume:   sanitize(args[12], "string").(string),
+ModelTip:   sanitize(args[13], "string").(string),
+SupportTip:   sanitize(args[14], "string").(string),
+Color:   sanitize(args[15], "string").(string),
+CreatedBy:   sanitize(args[16], "string").(string),
   }
 
-fmt.Println(RequestKYC)
-	logger.Debug("RequestKYC function executed successfully.")
+fmt.Println(addItemCatalogue)
+	logger.Debug("addItemCatalogue function executed successfully.")
 	
 	return shim.Success(nil)
 }
@@ -891,11 +274,11 @@ fmt.Println(RequestKYC)
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:TerminateContract
-	Description: The Rest API consumed by WASL to terminate the contract on the Blockchain.
+	Function Name:addMasterContract
+	Description: 
 */
-func (t *PRChainCode) TerminateContract(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("TerminateContract: %v", args)
+func (t *P2PChainCode) addMasterContract(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("addMasterContract: %v", args)
     
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
@@ -903,16 +286,23 @@ func (t *PRChainCode) TerminateContract(stub shim.ChaincodeStubInterface, args [
 	
 	//Business Logic to be added here
 		
-TerminateContract := &TerminateContract{	
+addMasterContract := &addMasterContract{	
 		ContractID:   sanitize(args[0], "string").(string),
-TerminationDate:   sanitize(args[1], "string").(string),
-TerminationReason:   sanitize(args[2], "string").(string),
-EjariNumber:   sanitize(args[3], "string").(string),
-TerminationType:   sanitize(args[4], "string").(string),
+DateCreated:   sanitize(args[1], "string").(string),
+StartDate:   sanitize(args[2], "string").(string),
+EndDate:   sanitize(args[3], "string").(string),
+ApprovedBy:   sanitize(args[4], "string").(string),
+ApprovedOn:   sanitize(args[5], "string").(string),
+CustomerID:   sanitize(args[6], "string").(string),
+AmountRealized:   sanitize(args[7], "string").(string),
+ShipmentType:   sanitize(args[8], "string").(string),
+Status:   sanitize(args[9], "string").(string),
+TotalPenalty:   sanitize(args[10], "string").(string),
+TotalRebate:   sanitize(args[11], "string").(string),
   }
 
-fmt.Println(TerminateContract)
-	logger.Debug("TerminateContract function executed successfully.")
+fmt.Println(addMasterContract)
+	logger.Debug("addMasterContract function executed successfully.")
 	
 	return shim.Success(nil)
 }
@@ -920,11 +310,11 @@ fmt.Println(TerminateContract)
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:UpdateContract
-	Description: The Rest API can be used by WASL to update the WASL’s CRM ticket number when the contract is successfully processed, and this information will be saved in the off-chain database.
+	Function Name:createInvoice
+	Description: When an order is dispatched, Strata will call this API to mark an invoiced as issued on the smart contract to indicate that Strata has send out an Invoice against the order. If an order is completely rejected by the customer (i.e. Scrapped), smart contract will automatically mark the invoice as null and void and further action on the order will stopped at the smart contract end.
 */
-func (t *PRChainCode) UpdateContract(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("UpdateContract: %v", args)
+func (t *P2PChainCode) createInvoice(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("createInvoice: %v", args)
     
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
@@ -932,14 +322,13 @@ func (t *PRChainCode) UpdateContract(stub shim.ChaincodeStubInterface, args []st
 	
 	//Business Logic to be added here
 		
-UpdateContract := &UpdateContract{	
-		ContractID:   sanitize(args[0], "string").(string),
-CRMTicketNo:   sanitize(args[1], "string").(string),
-OrgCode:   sanitize(args[2], "string").(string),
+createInvoice := &createInvoice{	
+		OrderID:   sanitize(args[0], "string").(string),
+InvoiceDate:   sanitize(args[1], "string").(string),
   }
 
-fmt.Println(UpdateContract)
-	logger.Debug("UpdateContract function executed successfully.")
+fmt.Println(createInvoice)
+	logger.Debug("createInvoice function executed successfully.")
 	
 	return shim.Success(nil)
 }
@@ -947,11 +336,12 @@ fmt.Println(UpdateContract)
 
 //<<FunctionDefinition - Start>>
 /*
-	Function Name:UpdateContractStatus
-	Description: The API is used by the banks to retrieve the basic detail of the contract and payment instruments detail.
+	Function Name:createOrder
+	Description: This API is called by Strata customers to initiate the order request on the Blockchain. The same API can be used by the customers to create one time order or order via master agreement as well.
+API returns the order number (system generated) in the response. This order number should be passed in updateOrderStatus API which is used to update the tracking status of the order lifecycle.
 */
-func (t *PRChainCode) UpdateContractStatus(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
-	logger.Debug("UpdateContractStatus: %v", args)
+func (t *P2PChainCode) createOrder(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("createOrder: %v", args)
     
 	if len(args[0]) <= 0 {
 		return shim.Error("Invalid Argument")
@@ -959,13 +349,483 @@ func (t *PRChainCode) UpdateContractStatus(stub shim.ChaincodeStubInterface, arg
 	
 	//Business Logic to be added here
 		
-UpdateContractStatus := &UpdateContractStatus{	
-		OrgCode:   sanitize(args[0], "string").(string),
+createOrder := &createOrder{	
+		OrderType:   sanitize(args[0], "string").(string),
 ContractID:   sanitize(args[1], "string").(string),
+RaisedBy:   sanitize(args[2], "string").(string),
+QuoteValidity:   sanitize(args[3], "string").(string),
+IncoTerms:   sanitize(args[4], "string").(string),
   }
 
-fmt.Println(UpdateContractStatus)
-	logger.Debug("UpdateContractStatus function executed successfully.")
+fmt.Println(createOrder)
+	logger.Debug("createOrder function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:createSubOrder
+	Description: This API is called by Strata to create sub order with their supplier and to tag it with the main order with the Customer on the Blockchain. Supplier products are not maintained on the Blockchain, item list of the sub order passed in the request by Strata will be stored as is on the Blockchain.
+*/
+func (t *P2PChainCode) createSubOrder(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("createSubOrder: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+createSubOrder := &createSubOrder{	
+		OrderID:   sanitize(args[0], "string").(string),
+SubOrderID:   sanitize(args[1], "string").(string),
+SupplierID:   sanitize(args[2], "string").(string),
+RaisedBy:   sanitize(args[3], "string").(string),
+OrderDate:   sanitize(args[4], "string").(string),
+OrderAmount:   sanitize(args[5], "int64").(int64),
+  }
+
+fmt.Println(createSubOrder)
+	logger.Debug("createSubOrder function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:eventOnCreateOrder
+	Description: This API is provided by the Strata. When an order is raised by the customer on the smart contract instructions are sent to STRATA SAP by calling this API.
+*/
+func (t *P2PChainCode) eventOnCreateOrder(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("eventOnCreateOrder: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+eventOnCreateOrder := &eventOnCreateOrder{	
+		OrderID:   sanitize(args[0], "string").(string),
+OldStatus:   sanitize(args[1], "string").(string),
+NewStatus:   sanitize(args[2], "string").(string),
+  }
+
+fmt.Println(eventOnCreateOrder)
+	logger.Debug("eventOnCreateOrder function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:eventOnInvoiceCreation
+	Description: This API is provided by the customer. When an invoice is created on the smart contract the same is sent as event to the customer by calling this API as well based on the original terms of invoicing defined on the smart contract.
+*/
+func (t *P2PChainCode) eventOnInvoiceCreation(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("eventOnInvoiceCreation: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+eventOnInvoiceCreation := &eventOnInvoiceCreation{	
+		OrderID:   sanitize(args[0], "string").(string),
+ContractID:   sanitize(args[1], "string").(string),
+CustomerID:   sanitize(args[2], "string").(string),
+Status:   sanitize(args[3], "string").(string),
+OrderAmount:   sanitize(args[4], "string").(string),
+TotalQuantity:   sanitize(args[5], "string").(string),
+TotalLeadTime:   sanitize(args[6], "string").(string),
+TotalPrintTime:   sanitize(args[7], "string").(string),
+Discount:   sanitize(args[8], "string").(string),
+Penalty:   sanitize(args[9], "string").(string),
+  }
+
+fmt.Println(eventOnInvoiceCreation)
+	logger.Debug("eventOnInvoiceCreation function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:eventOnPaymentOrderCreation
+	Description: This API is provided by the customer. When an payment order is created on the smart contract the same is sent as an event to the customer by calling this API as well based on the original termsdefined on the smart contract.
+*/
+func (t *P2PChainCode) eventOnPaymentOrderCreation(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("eventOnPaymentOrderCreation: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+eventOnPaymentOrderCreation := &eventOnPaymentOrderCreation{	
+		OrderID:   sanitize(args[0], "string").(string),
+OldStatus:   sanitize(args[1], "string").(string),
+NewStatus:   sanitize(args[2], "string").(string),
+  }
+
+fmt.Println(eventOnPaymentOrderCreation)
+	logger.Debug("eventOnPaymentOrderCreation function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:eventOnPaymentOrderCreationCustomer
+	Description: This API is provided by the customer. When an payment order is created on the smart contract the same is sent as event to the customer by calling this API to notify the same.
+*/
+func (t *P2PChainCode) eventOnPaymentOrderCreationCustomer(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("eventOnPaymentOrderCreationCustomer: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+eventOnPaymentOrderCreationCustomer := &eventOnPaymentOrderCreationCustomer{	
+		OrderID:   sanitize(args[0], "string").(string),
+OldStatus:   sanitize(args[1], "string").(string),
+NewStatus:   sanitize(args[2], "string").(string),
+  }
+
+fmt.Println(eventOnPaymentOrderCreationCustomer)
+	logger.Debug("eventOnPaymentOrderCreationCustomer function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:eventOnPurchaseOrder
+	Description: This API is provided by the customer. When an payment order is created on the smart contract the same is sent as event to the customer by calling this API to notify the same.
+*/
+func (t *P2PChainCode) eventOnPurchaseOrder(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("eventOnPurchaseOrder: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+eventOnPurchaseOrder := &eventOnPurchaseOrder{	
+		OrderID:   sanitize(args[0], "string").(string),
+OldStatus:   sanitize(args[1], "string").(string),
+NewStatus:   sanitize(args[2], "string").(string),
+  }
+
+fmt.Println(eventOnPurchaseOrder)
+	logger.Debug("eventOnPurchaseOrder function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:eventOnPurchaseOrderCustomer
+	Description: This API is provided by the Strata. When an purchase order is generated by the customer or auto creation of the PO by the smart contract, instructions are sent to STRATA SAP by calling this API for creating PO in the ERP.
+*/
+func (t *P2PChainCode) eventOnPurchaseOrderCustomer(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("eventOnPurchaseOrderCustomer: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+eventOnPurchaseOrderCustomer := &eventOnPurchaseOrderCustomer{	
+		OrderID:   sanitize(args[0], "string").(string),
+OldStatus:   sanitize(args[1], "string").(string),
+NewStatus:   sanitize(args[2], "string").(string),
+  }
+
+fmt.Println(eventOnPurchaseOrderCustomer)
+	logger.Debug("eventOnPurchaseOrderCustomer function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:getItemCatalogue
+	Description: This API is called by the customer to fetch the list of the products available on the Blockchain which would be required for the customer to create an order on the Blockchain from the their legacy system. Product catalogue can be fetched based on the search filter including item code, description and material
+*/
+func (t *P2PChainCode) getItemCatalogue(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("getItemCatalogue: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+getItemCatalogue := &getItemCatalogue{	
+		BLANK:   sanitize(args[0], "string").(string),  }
+
+fmt.Println(getItemCatalogue)
+	logger.Debug("getItemCatalogue function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:getItemCatalogueCustomer
+	Description: This API is called by the customer to fetch the list of the products available on the Blockchain which would be required for the customer to create an order on the Blockchain from the their legacy system. Product catalogue can be fetched based on the search filter including item code, description and material
+*/
+func (t *P2PChainCode) getItemCatalogueCustomer(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("getItemCatalogueCustomer: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+getItemCatalogueCustomer := &getItemCatalogueCustomer{	
+		BLANK:   sanitize(args[0], "string").(string),  }
+
+fmt.Println(getItemCatalogueCustomer)
+	logger.Debug("getItemCatalogueCustomer function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:getMasterAgreementData
+	Description: This API is called by the Customer to fetch the detail of the master agrement available on the Blockchain.
+*/
+func (t *P2PChainCode) getMasterAgreementData(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("getMasterAgreementData: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+getMasterAgreementData := &getMasterAgreementData{	
+		ContractID:   sanitize(args[0], "string").(string),
+  }
+
+fmt.Println(getMasterAgreementData)
+	logger.Debug("getMasterAgreementData function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:getOrderDetail
+	Description: This API is called by the Strata to fetch the detail of the specific order available on the Blockchain.
+*/
+func (t *P2PChainCode) getOrderDetail(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("getOrderDetail: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+getOrderDetail := &getOrderDetail{	
+		OrderID:   sanitize(args[0], "string").(string),
+  }
+
+fmt.Println(getOrderDetail)
+	logger.Debug("getOrderDetail function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:getOrderDetailCustomer
+	Description: This API is called by the Customer to fetch the detail of the specific order available on the Blockchain.
+*/
+func (t *P2PChainCode) getOrderDetailCustomer(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("getOrderDetailCustomer: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+getOrderDetailCustomer := &getOrderDetailCustomer{	
+		OrderID:   sanitize(args[0], "string").(string),
+  }
+
+fmt.Println(getOrderDetailCustomer)
+	logger.Debug("getOrderDetailCustomer function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:getOrganizationList
+	Description: This API is called by the Strata to fetch the list of available customer and supplier setup on Cipher. Organization list can be fetched based on the search filter including name and orgCode.
+*/
+func (t *P2PChainCode) getOrganizationList(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("getOrganizationList: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+getOrganizationList := &getOrganizationList{	
+		BLANK:   sanitize(args[0], "string").(string),  }
+
+fmt.Println(getOrganizationList)
+	logger.Debug("getOrganizationList function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:updateItemCatalogue
+	Description: 
+*/
+func (t *P2PChainCode) updateItemCatalogue(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("updateItemCatalogue: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+updateItemCatalogue := &updateItemCatalogue{	
+		ItemCode:   sanitize(args[0], "string").(string),
+Name:   sanitize(args[1], "string").(string),
+Description:   sanitize(args[2], "string").(string),
+Classification:   sanitize(args[3], "string").(string),
+ItemStatus:   sanitize(args[4], "string").(string),
+Image:   sanitize(args[5], "string").(string),
+Material:   sanitize(args[6], "string").(string),
+Price:   sanitize(args[7], "string").(string),
+LeadTime:   sanitize(args[8], "string").(string),
+PrintTime:   sanitize(args[9], "string").(string),
+PartNumber:   sanitize(args[10], "string").(string),
+ModelVolume:   sanitize(args[11], "string").(string),
+SupportVolume:   sanitize(args[12], "string").(string),
+ModelTip:   sanitize(args[13], "string").(string),
+SupportTip:   sanitize(args[14], "string").(string),
+Color:   sanitize(args[15], "string").(string),
+UpdatedBy:   sanitize(args[16], "string").(string),
+  }
+
+fmt.Println(updateItemCatalogue)
+	logger.Debug("updateItemCatalogue function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:updateOrderStatus
+	Description: API is consumed by the Strata to update the different states of the order lifecyle. Please refer business section for the detail about the possible states of the lifecycle for Strata.
+In the pilot implementation, Strata will also have the ability to mark the receiving of the product on customer behalf.
+*/
+func (t *P2PChainCode) updateOrderStatus(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("updateOrderStatus: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+updateOrderStatus := &updateOrderStatus{	
+		OrderID:   sanitize(args[0], "string").(string),
+Status:   sanitize(args[1], "string").(string),
+  }
+
+fmt.Println(updateOrderStatus)
+	logger.Debug("updateOrderStatus function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:updateOrderStatusCustomer
+	Description: API is consumed by the customers to update the different states of the order lifecyle. Please refer business section for the detail about the possible states of the lifecycle.
+*/
+func (t *P2PChainCode) updateOrderStatusCustomer(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("updateOrderStatusCustomer: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+updateOrderStatusCustomer := &updateOrderStatusCustomer{	
+		OrderID:   sanitize(args[0], "string").(string),
+Status:   sanitize(args[1], "string").(string),
+  }
+
+fmt.Println(updateOrderStatusCustomer)
+	logger.Debug("updateOrderStatusCustomer function executed successfully.")
+	
+	return shim.Success(nil)
+}
+
+
+//<<FunctionDefinition - Start>>
+/*
+	Function Name:updateSubOrderStatus
+	Description: API is consumed by the Strata to update the different states of the sub order lifecyle. Alternatively, Strata can also provision an access of this API to their supplier to mark the status of their own sub order.
+*/
+func (t *P2PChainCode) updateSubOrderStatus(stub shim.ChaincodeStubInterface, args []string, functionName string) pb.Response {
+	logger.Debug("updateSubOrderStatus: %v", args)
+    
+	if len(args[0]) <= 0 {
+		return shim.Error("Invalid Argument")
+	}
+	
+	//Business Logic to be added here
+		
+updateSubOrderStatus := &updateSubOrderStatus{	
+		SubOrderID:   sanitize(args[0], "string").(string),
+OrderID:   sanitize(args[1], "string").(string),
+Status:   sanitize(args[2], "string").(string),
+  }
+
+fmt.Println(updateSubOrderStatus)
+	logger.Debug("updateSubOrderStatus function executed successfully.")
 	
 	return shim.Success(nil)
 }

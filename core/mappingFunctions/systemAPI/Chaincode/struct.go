@@ -8,217 +8,150 @@ type MSPList struct {
 type BLANK struct {
 	BLANK string `json:"BLANK"`
 }
-type  AddTenant struct{
-	OrgCode string `json:"orgCode"`
-OrgID string `json:"orgID"`
-EmiratesID string `json:"emiratesID"`
-CustomerName string `json:"customerName"`
-MobileNumber string `json:"mobileNumber"`
-EmailID string `json:"emailID"`
-VisaNo string `json:"visaNo"`
-VisaExpiryDate string `json:"visaExpiryDate"`
-EmiratesIDExpiryDate string `json:"emiratesIDExpiryDate"`
-AuthToken string `json:"authToken"`
-Timestamp string `json:"timestamp"`
-OrgCodeWASL string `json:"orgCodeWASL"`
- }
+type addItemCatalogue struct {
+	ItemCode       string `json:"itemCode"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	Classification string `json:"classification"`
+	ItemStatus     string `json:"itemStatus"`
+	Image          string `json:"image"`
+	Material       string `json:"material"`
+	Price          string `json:"price"`
+	LeadTime       string `json:"leadTime"`
+	PrintTime      string `json:"printTime"`
+	PartNumber     string `json:"partNumber"`
+	ModelVolume    string `json:"modelVolume"`
+	SupportVolume  string `json:"supportVolume"`
+	ModelTip       string `json:"modelTip"`
+	SupportTip     string `json:"supportTip"`
+	Color          string `json:"color"`
+	CreatedBy      string `json:"createdBy"`
+}
 
+type addMasterContract struct {
+	ContractID     string `json:"contractID"`
+	DateCreated    string `json:"dateCreated"`
+	StartDate      string `json:"startDate"`
+	EndDate        string `json:"endDate"`
+	ApprovedBy     string `json:"approvedBy"`
+	ApprovedOn     string `json:"approvedOn"`
+	CustomerID     string `json:"customerID"`
+	AmountRealized string `json:"amountRealized"`
+	ShipmentType   string `json:"shipmentType"`
+	Status         string `json:"status"`
+	TotalPenalty   string `json:"totalPenalty"`
+	TotalRebate    string `json:"totalRebate"`
+}
 
-type  EjariTerminationStatus struct{
-	OrgCode string `json:"orgCode"`
-ContractID string `json:"contractID"`
-EjariTerminationStatus string `json:"ejariTerminationStatus"`
- }
+type createInvoice struct {
+	OrderID     string `json:"orderID"`
+	InvoiceDate string `json:"invoiceDate"`
+}
 
+type createOrder struct {
+	OrderType     string `json:"orderType"`
+	ContractID    string `json:"contractID"`
+	RaisedBy      string `json:"raisedBy"`
+	QuoteValidity string `json:"quoteValidity"`
+	IncoTerms     string `json:"incoTerms"`
+}
 
-type  GetContractDataForEjari struct{
-	OrgCode string `json:"orgCode"`
-ContractID string `json:"contractID"`
- }
+type createSubOrder struct {
+	OrderID     string `json:"orderID"`
+	SubOrderID  string `json:"subOrderID"`
+	SupplierID  string `json:"supplierID"`
+	RaisedBy    string `json:"raisedBy"`
+	OrderDate   string `json:"orderDate"`
+	OrderAmount int64  `json:"orderAmount"`
+}
 
+type eventOnCreateOrder struct {
+	OrderID   string `json:"orderID"`
+	OldStatus string `json:"oldStatus"`
+	NewStatus string `json:"newStatus"`
+}
 
-type  GetKYCDetail struct{
-	EIDA string `json:"EIDA"`
- }
+type eventOnInvoiceCreation struct {
+	OrderID        string `json:"orderID"`
+	ContractID     string `json:"contractID"`
+	CustomerID     string `json:"customerID"`
+	Status         string `json:"status"`
+	OrderAmount    string `json:"orderAmount"`
+	TotalQuantity  string `json:"totalQuantity"`
+	TotalLeadTime  string `json:"totalLeadTime"`
+	TotalPrintTime string `json:"totalPrintTime"`
+	Discount       string `json:"discount"`
+	Penalty        string `json:"penalty"`
+}
 
+type eventOnPaymentOrderCreation struct {
+	OrderID   string `json:"orderID"`
+	OldStatus string `json:"oldStatus"`
+	NewStatus string `json:"newStatus"`
+}
 
-type  Logout struct{
-	OrgCode string `json:"orgCode"`
-AuthToken string `json:"authToken"`
-OrgID string `json:"orgID"`
-Timestamp string `json:"timestamp"`
- }
+type eventOnPaymentOrderCreationCustomer struct {
+	OrderID   string `json:"orderID"`
+	OldStatus string `json:"oldStatus"`
+	NewStatus string `json:"newStatus"`
+}
 
+type eventOnPurchaseOrder struct {
+	OrderID   string `json:"orderID"`
+	OldStatus string `json:"oldStatus"`
+	NewStatus string `json:"newStatus"`
+}
 
-type  SaveEjariHashData struct{
+type eventOnPurchaseOrderCustomer struct {
+	OrderID   string `json:"orderID"`
+	OldStatus string `json:"oldStatus"`
+	NewStatus string `json:"newStatus"`
+}
+
+type getMasterAgreementData struct {
 	ContractID string `json:"contractID"`
-OrgCode string `json:"orgCode"`
-EjariNumber string `json:"ejariNumber"`
-TenantNumber string `json:"tenantNumber"`
-EjariStatus string `json:"ejariStatus"`
-EjariHash string `json:"ejariHash"`
-SignedEjariHash string `json:"signedEjariHash"`
- }
+}
 
+type getOrderDetail struct {
+	OrderID string `json:"orderID"`
+}
 
-type  UpdateDEWADetail struct{
-	OrgCode string `json:"orgCode"`
-ContractID string `json:"contractID"`
- }
+type getOrderDetailCustomer struct {
+	OrderID string `json:"orderID"`
+}
 
+type updateItemCatalogue struct {
+	ItemCode       string `json:"itemCode"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	Classification string `json:"classification"`
+	ItemStatus     string `json:"itemStatus"`
+	Image          string `json:"image"`
+	Material       string `json:"material"`
+	Price          string `json:"price"`
+	LeadTime       string `json:"leadTime"`
+	PrintTime      string `json:"printTime"`
+	PartNumber     string `json:"partNumber"`
+	ModelVolume    string `json:"modelVolume"`
+	SupportVolume  string `json:"supportVolume"`
+	ModelTip       string `json:"modelTip"`
+	SupportTip     string `json:"supportTip"`
+	Color          string `json:"color"`
+	UpdatedBy      string `json:"updatedBy"`
+}
 
-type  UpdateKYCDetail struct{
-	ResidenceAddr string `json:"residenceAddr"`
-ContactPersonMobile string `json:"contactPersonMobile"`
-Nationality string `json:"nationality"`
-DateOfBirth string `json:"dateOfBirth"`
-NatId string `json:"natId"`
-NatIdExpDate string `json:"natIdExpDate"`
-PoBox string `json:"poBox"`
-PhoneNo string `json:"phoneNo"`
-Gender string `json:"gender"`
-TenantNameEn string `json:"tenantNameEn"`
-TenantNameAr string `json:"tenantNameAr"`
-VisaNo string `json:"visaNo"`
-VisaIssueDate string `json:"visaIssueDate"`
-VisaExpiryDate string `json:"visaExpiryDate"`
-VisaStatus string `json:"visaStatus"`
- }
+type updateOrderStatus struct {
+	OrderID string `json:"orderID"`
+	Status  string `json:"status"`
+}
 
+type updateOrderStatusCustomer struct {
+	OrderID string `json:"orderID"`
+	Status  string `json:"status"`
+}
 
-type  UpdateToken struct{
-	OrgCode string `json:"orgCode"`
-OrgID string `json:"orgID"`
-OldAuthToken string `json:"oldAuthToken"`
-NewAuthToken string `json:"newAuthToken"`
-Timestamp string `json:"timestamp"`
- }
-
-
-type  AssociatePaymentInstruments struct{
-	AuthToken string `json:"authToken"`
-EIDA string `json:"EIDA"`
-ContractID string `json:"contractID"`
-OrgCode string `json:"orgCode"`
- }
-
-
-type  GetContractData struct{
-	OrgCode string `json:"orgCode"`
-EIDA string `json:"EIDA"`
-AuthToken string `json:"authToken"`
-ContractID string `json:"contractID"`
-undefined string `json:"undefined"`
- }
-
-
-type  UpdatePaymentInstrumentStatus struct{
-	OrgCode string `json:"orgCode"`
-ContractID string `json:"contractID"`
- }
-
-
-type  GetContractDetails struct{
-	EIDA string `json:"EIDA"`
-AuthToken string `json:"authToken"`
-ContractID string `json:"contractID"`
-OrgCode string `json:"orgCode"`
- }
-
-
-type  GetContractDetailsBackOffice struct{
-	EIDA string `json:"EIDA"`
-ContractID string `json:"contractID"`
-OrgCode string `json:"orgCode"`
- }
-
-
-type  InsertPaymentMetaInfo struct{
-	Code string `json:"code"`
-Name string `json:"name"`
-BeneficiaryData string `json:"beneficiaryData"`
-BankCode string `json:"bankCode"`
- }
-
-
-type  ProcessInstrument struct{
-	ContractID string `json:"contractID"`
-OrgCode string `json:"orgCode"`
- }
-
-
-type  RenewContract struct{
-	AuthToken string `json:"authToken"`
-EIDA string `json:"EIDA"`
-ContractID string `json:"contractID"`
-ContractReference string `json:"contractReference"`
-LastContractID string `json:"lastContractID"`
-ContractStartDate string `json:"contractStartDate"`
-ContractEndDate string `json:"contractEndDate"`
-ContractAmount string `json:"contractAmount"`
-TenantName string `json:"tenantName"`
-UserReferenceNumber string `json:"userReferenceNumber"`
-PropertyReferenceNumber string `json:"propertyReferenceNumber"`
-BusinessPartnerNo string `json:"businessPartnerNo"`
-OldeEjariNumber string `json:"oldeEjariNumber"`
-ContractSignedHash string `json:"contractSignedHash"`
-PaymentMethod string `json:"paymentMethod"`
-CheckKYCStatus string `json:"checkKYCStatus"`
-PaymentCount int64 `json:"paymentCount"`
-IsLegacyContract bool `json:"isLegacyContract"`
-OrgCode string `json:"orgCode"`
-KYCValidationPeriod int64 `json:"KYCValidationPeriod"`
-undefined string `json:"undefined"`
- }
-
-
-type  ReplacePaymentInstruments struct{
-	AuthToken string `json:"authToken"`
-EIDA string `json:"EIDA"`
-ContractID string `json:"contractID"`
-undefined string `json:"undefined"`
- }
-
-
-type  ReplacePaymentInstrumentsBackOffice struct{
-	EIDA string `json:"EIDA"`
-ContractID string `json:"contractID"`
-undefined string `json:"undefined"`
- }
-
-
-type  ReprocessEjari struct{
-	ContractID string `json:"contractID"`
-RequestType string `json:"requestType"`
-undefined string `json:"undefined"`
- }
-
-
-type  RequestKYC struct{
-	OrgCode string `json:"orgCode"`
-EIDA string `json:"EIDA"`
- }
-
-
-type  TerminateContract struct{
-	ContractID string `json:"contractID"`
-TerminationDate string `json:"terminationDate"`
-TerminationReason string `json:"terminationReason"`
-EjariNumber string `json:"ejariNumber"`
-TerminationType string `json:"terminationType"`
- }
-
-
-type  UpdateContract struct{
-	ContractID string `json:"contractID"`
-CRMTicketNo string `json:"CRMTicketNo"`
-OrgCode string `json:"orgCode"`
- }
-
-
-type  UpdateContractStatus struct{
-	OrgCode string `json:"orgCode"`
-ContractID string `json:"contractID"`
- }
-
-
+type updateSubOrderStatus struct {
+	SubOrderID string `json:"subOrderID"`
+	OrderID    string `json:"orderID"`
+	Status     string `json:"status"`
+}

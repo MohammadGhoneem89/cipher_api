@@ -10,12 +10,14 @@ const getDBFields = async function (payload, UUIDKey, route, callback, JWToken) 
     }
   };
   try {
+
     let data = await TableFields.findOne({
       adaptor: payload.adaptor,
       name: payload.object,
       type: payload.objectType
     }).lean();
-    response.getDBFields.data = data.fields;
+    // console.log(payload,"---payload")
+     response.getDBFields.data = data.fields;
     if (payload.objectType === 'storedProcedure') {
       response.getDBFields.outputFields = data.outputs;
     } else {
