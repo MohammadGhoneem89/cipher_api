@@ -51,7 +51,7 @@ exports.getOrderList = function (payload, UUIDKey, route, callback, JWToken) {
             queryCnt += `AND "tranxData"->'ExportHAWBList'->(0)->>'shippingDetails'->>'MAWBNumber'=${length}::varchar `;
         }
     }
-    // queryData += ' ORDER BY \'updatedAt\' DESC';
+    queryData += ' ORDER BY "updatedAt" DESC';
 
     if (payload.page) {
         queryData += ` limit ${payload.page.pageSize} OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)}`;
