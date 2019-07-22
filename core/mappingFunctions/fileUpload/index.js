@@ -131,7 +131,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
     // } else {
     //   resp.errorDescription = `You don't have permission to download this file`;
     //   return callback(resp);
-    // }
+    // //}
     try {
       let document = await findDocument({
         hash: payload.queryParams.path || payload.headersParams.path
