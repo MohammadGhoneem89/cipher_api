@@ -62,13 +62,13 @@ exports.getDashboardData = async (payload, UUIDKey, route, callback, JWToken) =>
         let hscodeQ = ``;
         if (searchCriteria && searchCriteria.ecommerce === '001') {
             hscodeQ = `select x.ecommerceorgcode as cod, sum(x.totalvalue) as total
-                       from dashboardsummaryreport as x where x.orderdate between '${startDate}' and '${endDate}' group by x.ecommerceorgcode`;
+                       from dashboardsummaryreport as x where x.orderdate between '${startDate}' and '${endDate}' group by x.ecommerceorgcode order by total desc`;
         } else if (searchCriteria && searchCriteria.ecommerce === '002') {
             hscodeQ = `select h.countryofdestination as cod, sum(h.totals) as total from hssummaryreport as h 
-                       where h.hsdate between '${startDate}' and '${endDate}' group by h.countryofdestination `;
+                       where h.hsdate between '${startDate}' and '${endDate}' group by h.countryofdestination order by total desc`;
         } else if (searchCriteria && searchCriteria.ecommerce === '003') {
             hscodeQ = `select h.hscode as cod, sum(h.totals) as total from hssummaryreport as h 
-                       where h.hsdate between '${startDate}' and '${endDate}' group by h.hscode `;
+                       where h.hsdate between '${startDate}' and '${endDate}' group by h.hscode order by total desc`;
         }
         const hscodeDs = await conn.query(hscodeQ);
         const hscodeResult = hscodeDs['rows'];

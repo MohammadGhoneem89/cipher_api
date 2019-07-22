@@ -84,7 +84,8 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
       "name": fileName,
       "type": type,
       "hash": fileHash,
-      "path": `/API/core/download?type=FILE&path=${fileHash}`,
+      "path": completeFileName,
+      "downloadPath": `/API/core/download?type=FILE&path=${fileHash}`,
       "fileReference": fileReference
     };
      try {
