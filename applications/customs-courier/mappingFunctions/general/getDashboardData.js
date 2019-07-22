@@ -118,7 +118,7 @@ exports.getDashboardData = async (payload, UUIDKey, route, callback, JWToken) =>
 
         return callback(response);
     } catch (error) {
-        callback(error.stack);
+        callback({error});
         throw new Error(error.stack);
     }
 };
