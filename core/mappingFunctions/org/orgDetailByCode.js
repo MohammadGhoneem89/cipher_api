@@ -32,7 +32,11 @@ var orgDetail = function (payload, entityGetCB) {
 
     Entity.findBySpCode(payload).then((result) => {
         result.forEach(element => {
-            response.orgDetailByCode.data[element.spCode] = element.entityLogo
+            let obj = {
+                name : element.entityName,
+                logo : element.entityLogo
+            }
+            response.orgDetailByCode.data[element.spCode] = obj
         });
         
         entityGetCB(response)

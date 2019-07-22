@@ -10,8 +10,6 @@ exports.getOrderList = function (payload, UUIDKey, route, callback, JWToken) {
     let queryData = 'SELECT key, "tranxData"  FROM orderdetails WHERE 1=1 ';
     let queryCnt = 'SELECT COUNT(*) FROM orderdetails WHERE 1=1 ';
 
-    console.log(JWToken)
-
     if(JWToken.orgType == 'Courier') {
         queryData += `AND "tranxData"->>'courierOrgCode = '${JWToken.orgCode}'`
         queryCnt += `AND "tranxData"->>'courierOrgCode = '${JWToken.orgCode}'`
