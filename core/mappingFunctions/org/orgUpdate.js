@@ -44,6 +44,7 @@ function orgUpdate(payload, userID, entityUpdateCB) {
     "shortCode": "",
     "orgType": "",
     "isActive": "",
+    "isConsolidate": "",
     "entityLogo": {
       "sizeSmall": "",
       "sizeMedium": ""
@@ -78,6 +79,7 @@ function orgUpdate(payload, userID, entityUpdateCB) {
           format.shortCode = data.shortCode ? data.shortCode : "";
           format.orgType = data.orgType;
           format.isActive = data.isActive ? data.isActive : "";
+          format.isConsolidate = data.isConsolidate ? data.isConsolidate : false;
           format.entityLogo.sizeSmall = data.entityLogo.sizeSmall ? data.entityLogo.sizeSmall : "";
           format.entityLogo.sizeMedium = data.entityLogo.sizeMedium ? data.entityLogo.sizeMedium : "";
           format.parentEntity = data.parentEntity ? data.parentEntity : "";
