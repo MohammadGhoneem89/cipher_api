@@ -69,6 +69,9 @@ let upload = async function(payload, UUIDKey, route, callback, JWToken) {
     case 'IPFS':
       fsObject = new Ipfs();
       break;
+    default:
+      resp.errorDescription = 'Invalid type kindly provide correct type';
+      return callback(resp);
   }
 
   try {
