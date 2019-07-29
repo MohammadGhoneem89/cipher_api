@@ -45,6 +45,7 @@ function orgUpdate(payload, userID, entityUpdateCB) {
     "orgType": "",
     "isActive": "",
     "isConsolidate": "",
+    "cutOf": 0,
     "entityLogo": {
       "sizeSmall": "",
       "sizeMedium": ""
@@ -80,6 +81,7 @@ function orgUpdate(payload, userID, entityUpdateCB) {
           format.orgType = data.orgType;
           format.isActive = data.isActive ? data.isActive : "";
           format.isConsolidate = data.isConsolidate ? data.isConsolidate : false;
+          format.cutOf = data.cutOf ? data.cutOf : 0;
           format.entityLogo.sizeSmall = data.entityLogo.sizeSmall ? data.entityLogo.sizeSmall : "";
           format.entityLogo.sizeMedium = data.entityLogo.sizeMedium ? data.entityLogo.sizeMedium : "";
           format.parentEntity = data.parentEntity ? data.parentEntity : "";
