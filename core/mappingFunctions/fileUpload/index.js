@@ -1,182 +1,192 @@
-
 'use strict';
-const path = require('path');
-const mime = require('mime');
-const fs = require('fs');
 const config = require('../../../config/index');
 const sha512 = require('../../../lib/hash/sha512');
 const { create, findDocument } = require('../../../lib/services/documents');
 
-let upload = async function (payload, UUIDKey, route, callback, JWToken) {
-  const today = new Date();
-  const dirName = `${today.getFullYear()}-${today.getMonth() +1}-${today.getDate()}`;
+const Ipfs = require('./ipfs');
+const ServerFS = require('./server-fs');
 
-  function getExtension(filename) {
-    return filename.split('.').pop();
+let upload = async function(payload, UUIDKey, route, callback, JWToken) {
+  if (!payload.files || Object.keys(payload.files).length == 0) {
+    const resp = {
+      messageStatus: 'ERROR',
+      cipherMessageId: UUIDKey,
+      errorDescription: 'Please Attach a file.',
+      errorCode: 201,
+      timestamp: new Date()
+    };
+    return callback(resp);
+  }
+
+  if (payload.files && payload.files.file.length > 1) {
+    const resp = {
+      messageStatus: 'ERROR',
+      cipherMessageId: UUIDKey,
+      errorDescription: 'Please Attach only one file at a time.',
+      errorCode: 201,
+      timestamp: new Date()
+    };
+    return callback(resp);
   }
 
   let userID, fileReference, type, source;
   if (JWToken.userID) {
     userID = JWToken.userID;
   }
-  if (payload.queryParams && payload.queryParams['fileReference'] || payload.headersParams.fileReference) {
+  if ((payload.queryParams && payload.queryParams['fileReference']) || payload.headersParams.fileReference) {
     fileReference = payload.queryParams.fileReference || payload.headersParams.fileReference;
   }
   if (payload.queryParams.source || payload.headersParams.source) {
     source = payload.queryParams.source || payload.headersParams.source;
   } else {
-    source = 'API'
+    source = 'API';
   }
   if (payload.queryParams.type || payload.headersParams.type) {
     type = payload.queryParams.type || payload.headersParams.type;
   } else {
-    type = 'FILE'
+    type = 'FILE';
   }
 
   const allowedExtensions = config.get('fileTypes');
-  let basePath = config.get('basePath');
-  basePath = String(basePath);
-
-  if (!payload.files || Object.keys(payload.files).length == 0) {
-    let resp = {
-      "messageStatus": "ERROR",
-      "cipherMessageId": UUIDKey,
-      "errorDescription": "Please Attach a file.",
-      "errorCode": 201,
-      "timestamp": new Date()
-    };
-    return callback(resp);
-  }
-  if (payload.files && payload.files.file.length > 1) {
-    let resp = {
-      "messageStatus": "ERROR",
-      "cipherMessageId": UUIDKey,
-      "errorDescription": "Please Attach only one file at a time.",
-      "errorCode": 201,
-      "timestamp": new Date()
-    };
-    return callback(resp);
-  }
   const fileName = payload.files.file.name;
-  const fileHash = sha512(fileName + new Date());
-
-  const fileExtension = getExtension(fileName);
-  let completeBasePath = path.normalize(path.join(basePath, dirName));
-  // let completeFileName = path.normalize(path.join('/core/download?type=FILE&path=',  fileHash));
-  let completeFileName = path.normalize(path.join(completeBasePath,  fileHash + '.' + fileExtension));
-
+  const fileExtension = fileName.split('.').pop();
   if (!allowedExtensions.includes(fileExtension.toUpperCase())) {
-       let resp = {
-        "messageStatus": "ERROR",
-        "cipherMessageId": UUIDKey,
-        "errorDescription": "Please upload only following file types " + allowedExtensions,
-        "errorCode": 201,
-        "timestamp": new Date()
-      };
-      return callback(resp);
-    }
-     let resp = {
-      "messageStatus": "OK",
-      "cipherMessageId": UUIDKey,
-      "errorDescription": "Processed OK!",
-      "errorCode": 200,
-      "timestamp": new Date(),
-      "name": fileName,
-      "type": type,
-      "hash": fileHash,
-      "path": completeFileName,
-      "downloadPath": `/API/core/download?type=FILE&path=${fileHash}`,
-      "fileReference": fileReference
+    const resp = {
+      messageStatus: 'ERROR',
+      cipherMessageId: UUIDKey,
+      errorDescription: 'Please upload only following file types ' + allowedExtensions,
+      errorCode: 201,
+      timestamp: new Date()
     };
-     try {
-       !fs.existsSync(completeBasePath) ?
-         fs.mkdirSync(completeBasePath, {mode: 777, recursive: true}):
-         null;
-       await payload.files.file.mv(completeFileName);
-       await create({
-         "path": completeFileName,
-         "ext": fileExtension.toUpperCase(),
-         "name": fileName,
-         "type": type,
-         "userId": JWToken._id,
-         "source": source,
-         "UUID": UUIDKey,
-         "hash": fileHash,
-         "context": "",
-         "contentType": payload.files.file.mimetype,
-         "fileReference": fileReference
-       }).catch(err => {
-         callback(err);
-       });
-       return callback(resp);
-     } catch (e) {
-       return callback(e);
-     }
+    return callback(resp);
+  }
+
+  let fsObject;
+  switch (type) {
+    case 'FILE':
+      fsObject = new ServerFS();
+      break;
+    case 'IPFS':
+      fsObject = new Ipfs();
+      break;
+  }
+
+  try {
+    const fileHash = sha512(fileName + new Date());
+
+    const filePath = await fsObject.upload(payload.files.file, fileHash);
+
+    create({
+      path: filePath,
+      ext: fileExtension.toUpperCase(),
+      name: fileName,
+      type: type,
+      userId: JWToken._id,
+      source: source,
+      UUID: UUIDKey,
+      hash: fileHash,
+      context: '',
+      contentType: payload.files.file.mimetype,
+      fileReference: fileReference
+    }).catch(err => {
+      return callback(err);
+    });
+
+    const resp = {
+      messageStatus: 'OK',
+      cipherMessageId: UUIDKey,
+      errorDescription: 'Processed OK!',
+      errorCode: 200,
+      timestamp: new Date(),
+      name: fileName,
+      type: type,
+      hash: fileHash,
+      path: filePath,
+      downloadPath: `/API/core/download?type=${type}&path=${fileHash}`,
+      fileReference: fileReference
+    };
+    return callback(resp);
+  } catch (err) {
+    return callback(err);
+  }
 };
 
-  let download = async function (payload, UUIDKey, route, callback, JWToken, res) {
-    let resp = {
-      "messageStatus": "ERROR",
-      "cipherMessageId": UUIDKey,
-      "errorDescription": "",
-      "errorCode": 201,
-      "timestamp": new Date()
-    };
-    if (!payload.queryParams.path) {
-      resp.errorDescription = `File reference Hash is required!`;
-      return callback(resp);
-    }
-    let userId;
-    // if (JWToken.userID) {
-    //   userId = JWToken._id;
-    // } else {
-    //   resp.errorDescription = `You don't have permission to download this file`;
-    //   return callback(resp);
-    // //}
-
-    try {
-      let document = await findDocument({
-        hash: payload.queryParams.path || payload.headersParams.path
-      });
-      let type = payload.queryParams.type;
-      if (document) {
-        if (fs.existsSync(path.normalize(document.path))) {
-          let file = path.normalize(document.path);
-          let mimeType = mime.lookup(file);
-console.log(file);
-          res.set({
-            'httpResponse': true,
-            'Content-Type': mimeType,
-            'Content-Disposition': `attachment; filename=${document.name}`
-          });
-          if (type && type === 'IMAGE') {
-            res.set({
-              'httpResponse': true,
-              'Content-Type': mimeType,
-              'Content-Disposition': `filename=${document.name}`
-            });
-            return res.sendFile(path.resolve(file));
-          } else {
-            res.set({
-              'httpResponse': true,
-              'Content-Type': mimeType,
-              'Content-Disposition': `attachment; filename=${document.name}`
-            });
-          }
-          let fileStream = await fs.createReadStream(file);
-          return fileStream.pipe(res);
-        } else {
-          resp.errorDescription = `There is no file found with provided hash please try another`;
-          callback(resp);
-        }
-      } else {
-        resp.errorDescription = `There is no file found with provided hash please try another`;
-        callback(resp);
-      }
-    } catch (error) {
-      callback(error.stack);
-    }
+let download = async function(payload, UUIDKey, route, callback, JWToken, res) {
+  let resp = {
+    messageStatus: 'ERROR',
+    cipherMessageId: UUIDKey,
+    errorDescription: '',
+    errorCode: 201,
+    timestamp: new Date()
   };
 
-  exports.upload = upload;
-  exports.download = download;
+  if (!payload.queryParams.path) {
+    resp.errorDescription = 'File reference Hash is required!';
+    return callback(resp);
+  }
+
+  let userId;
+  // if (JWToken.userID) {
+  //   userId = JWToken._id;
+  // } else {
+  //   resp.errorDescription = "You don't have permission to download this file";
+  //   return callback(resp);
+  // }
+
+  try {
+    const document = await findDocument({
+      hash: payload.queryParams.path || payload.headersParams.path
+    });
+    if (document) {
+      const type = payload.queryParams.type;
+
+      let fsObject;
+      switch (type === 'IMAGE' ? document.type : type) {
+        case 'FILE':
+          fsObject = new ServerFS(type);
+          break;
+        case 'IPFS':
+          fsObject = new Ipfs(type);
+          break;
+        default:
+          resp.errorDescription = 'Invalid type kindly provide correct type';
+          return callback(resp);
+      }
+
+      let result;
+      try {
+        result = await fsObject.download(document);
+      } catch (err) {
+        resp.errorDescription = 'There is no file found with provided hash please try another';
+        return callback(resp);
+      }
+
+      if (type && type === 'IMAGE') {
+        res.set({
+          httpResponse: true,
+          'Content-Type': document.contentType,
+          'Content-Disposition': `filename=${document.name}`
+        });
+        if (document.type === 'FILE') {
+          return res.sendFile(result);
+        }
+        return res.send(result);
+      } else {
+        res.set({
+          httpResponse: true,
+          'Content-Type': document.contentType,
+          'Content-Disposition': `attachment; filename=${document.name}`
+        });
+        return result.pipe(res);
+      }
+    } else {
+      resp.errorDescription = 'There is no file found with provided hash please try another';
+      return callback(resp);
+    }
+  } catch (error) {
+    return callback(error.stack);
+  }
+};
+
+exports.upload = upload;
+exports.download = download;
