@@ -75,7 +75,7 @@ let upload = async function(payload, UUIDKey, route, callback, JWToken) {
   }
 
   try {
-    const fileHash = sha512(fileName + new Date());
+    const fileHash = sha512(payload.files.file.data);
 
     const filePath = await fsObject.upload(payload.files.file, fileHash);
 
