@@ -56,11 +56,28 @@ exports.getDashboardData = async (payload, UUIDKey, route, callback, JWToken) =>
                             between '${startDate}' and '${endDate}') as totalreturn,
                              ds.orderstatus from dashboardsummaryreport as ds where orderdate
                              between '${startDate}' and '${endDate}' group by ds.orderstatus`;
+        
+        let orderTrackingQ = `select sum(ds.statuscount) as total, ds.orderstatus from dashboardsummaryreport as ds where orderdate
+        between '${startDate}' and '${endDate}' `
+        
+        let trackCourier = _.get(payload.searchCriteria, `trackCourier`, "");
+        if(trackCourier != "") {
+            orderTrackingQ += `and courierorgcode = '${trackCourier}' `
+        }
+        let trackEcommerce = _.get(payload.searchCriteria, `trackEcommerce`, "");
+        if(trackEcommerce != "") {
+            orderTrackingQ += `and ecommerceorgcode = '${trackEcommerce}' `
+        }
+        orderTrackingQ += `group by ds.orderstatus`;
 
         console.log(totalCuriersQ);
         const resultDs = await conn.query(totalCuriersQ);
         const resultDsRow = resultDs['rows'];
         console.log('resultDsRow', resultDsRow);
+        console.log("orderTrackingQ===>"+orderTrackingQ);
+        const resultOT = await conn.query(orderTrackingQ);
+        const resultOTRow = resultOT['rows'];
+        console.log("resultOTRow===>"+JSON.stringify(resultOT))
         let hscodeQ = ``;
         if (searchCriteria && searchCriteria.ecommerce === '001') {
             hscodeQ = `select x.ecommerceorgcode as cod, sum(x.totalvalue) as total
@@ -97,7 +114,7 @@ exports.getDashboardData = async (payload, UUIDKey, route, callback, JWToken) =>
         response.getDashboardData.data.summary.couriers = _.get(resultDsRow, `[0]['totalcourier']`, 0);
         response.getDashboardData.data.summary.returns = _.get(resultDsRow, `[0]['totalreturn']`, 0);
 
-        for (let elem of resultDsRow) {
+        for (let elem of resultOTRow) {
             response.getDashboardData.data.orderTracking[elem.orderstatus] = elem.total;
         }
 
