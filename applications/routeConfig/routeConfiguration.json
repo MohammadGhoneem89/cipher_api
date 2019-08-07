@@ -1,10 +1,17 @@
 {
   "STRATA": {
     "CustomFunctionsLocation": "../../applications/STRATA/mappingFunctions/",
+
     "createTypeData": {
       "customMapping": true,
       "MappingfunctionName": "createTypeData",
       "CustomMappingFile": "createTypeData/createTypeData.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getApis": {
+      "customMapping": true,
+      "MappingfunctionName": "getItemCatalogueList",
+      "CustomMappingFile": "getApis/getItemCatalogueList.js",
       "mappingConfigFile": "ePayMapping"
     }
   },
