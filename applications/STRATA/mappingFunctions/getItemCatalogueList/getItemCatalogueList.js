@@ -29,9 +29,29 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
         return Promise.all([
             conn.query(queryCriteriaFull, [])
         ]).then((data) => {
-            console.log(data[0].rows,"<----DATA")
-            console.log(data[0].rows.length,"<----length")
-            return callback(data[0].rows);
+            // console.log(data[0].rows,"<----DATA")
+            // console.log(data[0].rows.length,"<----length")
+            // return callback(data[0].rows);
+            let result = [];
+            _.get(_.get(data,'[0]',{}),'rows',[]).forEach((elemt) => {
+                result.push(elemt.tranxData);
+            });
+            console.log("result---> ",result);
+            console.log("resultlength---> ",result.length);
+            let response = {
+                "getItemCatalogue": {
+                    "action": "getItemCatalogue",
+                    "page": {
+                        "pageSize": payload.body.page.pageSize,
+                        "currentPageNo": payload.body.page.currentPageNo,
+                        "totalRecords": data[0].rows[0].count
+                    },
+                    "data": {
+                        "searchResult": result
+                    }
+                }
+            };
+            return callback(response);
             });
     }).catch((err) => {
          console.log("ERROR OCCURRED WHILE EXECUTING QUERY",err);
