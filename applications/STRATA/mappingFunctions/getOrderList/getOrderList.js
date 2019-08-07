@@ -3,23 +3,16 @@ const pg = require('../../../../core/api/connectors/postgress');
 const _ = require('lodash');
 
 
-function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
+function getOrderList(payload, UUIDKey, route, callback, JWToken) {
 
-    let queryData = `SELECT * FROM itemcatalogues WHERE 1=1`;
+    let queryData = `SELECT * FROM orders  WHERE 1=1`;
     let query = '';
 
-    if (payload.body.searchCriteria && payload.body.searchCriteria.itemCode) {
-        let itemCode = payload.body.searchCriteria.itemCode;
-        query += ` AND "tranxData" ->> 'itemCode' = '${itemCode}' `;
+    if (payload.body.searchCriteria && payload.body.searchCriteria.orderID) {
+        let orderID = payload.body.searchCriteria.orderID;
+        query += ` AND "tranxData" ->> 'orderID' = '${orderID}' `;
     }
-    if (payload.body.searchCriteria && payload.body.searchCriteria.description) {
-        let description = payload.body.searchCriteria.description;
-        query += ` AND "tranxData" ->> 'description' ='${description}'`;
-    }
-    if (payload.body.searchCriteria && payload.body.searchCriteria.material) {
-        let material = payload.body.searchCriteria.material;
-        query += ` AND "tranxData" ->> 'material' ='${material}'`;
-    }
+    //let query_ = queryCnt + query
     let queryCriteriaFull = queryData + query;
 
     if (payload.body.page) {
@@ -27,10 +20,10 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
     OFFSET ${payload.body.page.pageSize * (payload.body.page.currentPageNo - 1)}`;
     }
     console.log("queryCriteriaFull --->", queryCriteriaFull);
-
     pg.connection().then((conn) => {
         console.log("Connected to DB")
         return Promise.all([
+           //  count = conn.query(queryCnt, []),
             conn.query(queryCriteriaFull, [])
         ]).then((data) => {
             let result = [];
@@ -40,8 +33,8 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
                 });
             }
             let response = {
-                "getItemCatalogue": {
-                    "action": "getItemCatalogue",
+                "getOrders": {
+                    "action": "getOrders",
                     "pageData": {
                         "pageSize": payload.body.page.pageSize,
                         "currentPageNo": payload.body.page.currentPageNo,
@@ -52,6 +45,7 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
                     }
                 }
             };
+            console.log(response)
             return callback(response);
         });
     }).catch((err) => {
@@ -60,4 +54,4 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
     });
 }
 
-exports.getItemCatalogueList = getItemCatalogueList;
+exports.getOrderList = getOrderList;

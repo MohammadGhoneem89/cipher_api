@@ -13,6 +13,18 @@
       "MappingfunctionName": "getItemCatalogueList",
       "CustomMappingFile": "getItemCatalogueList/getItemCatalogueList.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getMasterAgreement": {
+      "customMapping": true,
+      "MappingfunctionName": "getMasterAgreement",
+      "CustomMappingFile": "getMasterAgreement/getMasterAgreement.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getOrderList": {
+      "customMapping": true,
+      "MappingfunctionName": "getOrderList",
+      "CustomMappingFile": "getOrderList/getOrderList.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "PR": {
