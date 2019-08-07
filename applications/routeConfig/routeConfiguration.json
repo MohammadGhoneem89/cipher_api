@@ -8,10 +8,10 @@
       "CustomMappingFile": "createTypeData/createTypeData.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getApis": {
+    "getItemCatalogueList": {
       "customMapping": true,
       "MappingfunctionName": "getItemCatalogueList",
-      "CustomMappingFile": "getApis/getItemCatalogueList.js",
+      "CustomMappingFile": "getItemCatalogueList/getItemCatalogueList.js",
       "mappingConfigFile": "ePayMapping"
     }
   },

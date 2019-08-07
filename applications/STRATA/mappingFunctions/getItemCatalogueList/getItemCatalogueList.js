@@ -4,7 +4,7 @@ const _ = require('lodash');
 
 
 function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
-    let queryData = 'SELECT * FROM itemcatalogues WHERE 1=1 ';
+    let queryData = `SELECT * FROM "itemcatalogues" WHERE 1=1 `;
     // let queryCnt = 'SELECT count(*) FROM deedtransfers WHERE 1=1 ';
     let query = '';
 
