@@ -42,10 +42,13 @@ function LoadConfig() {
     data[0].forEach((element) => {
       for (let key in element.data) {
         let arrEnum = [];
+        let arrEnumKey = [];
         element.data[key].forEach((object) => {
-          arrEnum.push(object.value);
+          arrEnum.push(object.label);
+          arrEnumKey.push(object.value)
         });
-        _.set(typeObj, key, arrEnum);
+        _.set(typeObj, `${key}.key`, arrEnum);
+        _.set(typeObj, `${key}.value`, arrEnumKey);
       }
     });
     let grouped = _.groupBy(data[1], 'useCase');
