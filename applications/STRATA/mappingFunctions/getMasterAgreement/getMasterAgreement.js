@@ -37,13 +37,13 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
                 "getMasterAgreement": {
                     "action": "getMasterAgreement",
                     "pageData": {
-                        "pageSize": payload.body.page.pageSize,
-                        "currentPageNo": payload.body.page.currentPageNo,
+                        "pageSize": payload.body.page ? payload.body.page.pageSize : undefined,
+                        "currentPageNo": payload.body.page ? payload.body.page.currentPageNo : 1,
                         "totalRecords": result.length
                     },
-                    "data": {
+                 
                         "searchResult": result
-                    }
+                    
                 }
             };
             console.log(response)

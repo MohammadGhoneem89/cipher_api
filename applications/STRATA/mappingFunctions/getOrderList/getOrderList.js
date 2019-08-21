@@ -23,7 +23,7 @@ function getOrderList(payload, UUIDKey, route, callback, JWToken) {
     pg.connection().then((conn) => {
         console.log("Connected to DB")
         return Promise.all([
-           //  count = conn.query(queryCnt, []),
+            //  count = conn.query(queryCnt, []),
             conn.query(queryCriteriaFull, [])
         ]).then((data) => {
             let result = [];
@@ -36,13 +36,13 @@ function getOrderList(payload, UUIDKey, route, callback, JWToken) {
                 "getOrders": {
                     "action": "getOrders",
                     "pageData": {
-                        "pageSize": payload.body.page.pageSize,
-                        "currentPageNo": payload.body.page.currentPageNo,
+                        "pageSize": payload.body.page ? payload.body.page.pageSize : undefined,
+                        "currentPageNo": payload.body.page ? payload.body.page.currentPageNo : 1,
                         "totalRecords": result.length
                     },
-                    "data": {
+                    
                         "searchResult": result
-                    }
+                    
                 }
             };
             console.log(response)
