@@ -36,15 +36,17 @@ exports.getDashboardData = async (payload, UUIDKey, route, callback, JWToken) =>
         let searchCriteria = _.get(payload, 'searchCriteria', undefined);
         let startDate, endDate;
         if (searchCriteria && searchCriteria.startDate && searchCriteria.endDate) {
-            startDate = searchCriteria.startDate;
-            endDate = searchCriteria.endDate;
-        } else {
-            console.log('inside ');
-            startDate = moment().subtract(29, 'days').startOf('day');
-            endDate = moment().startOf('day');
+            console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> inside ');
+            startDate = moment(searchCriteria.startDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
+            endDate =  moment(searchCriteria.endDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
         }
+        //  else {
+        //     console.log('inside ');
+        //     startDate = moment().subtract(29, 'days').startOf('day');
+        //     endDate = moment().startOf('day');
+        // }
         let totalCuriersQ = `select sum(ds.statuscount) as total, 
-                            (select count(ds.id) as totalorders from dashboardsummaryreport as ds where orderdate
+                            (select sum(ds.statuscount) as totalorders from dashboardsummaryreport as ds where orderdate
                             between '${startDate}' and '${endDate}') as totalorders,
                             (select count(distinct(ds.courierorgcode)) from dashboardsummaryreport as ds
                             where orderdate between '${startDate}' and '${endDate}') as totalcourier,
