@@ -47,7 +47,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
     };
     return callback(resp);
   }
-  if (payload.files && payload.files.files.length > 1) {
+  if (payload.files && payload.files.file.length > 1) {
     let resp = {
       "messageStatus": "ERROR",
       "cipherMessageId": UUIDKey,
@@ -57,7 +57,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
     };
     return callback(resp);
   }
-  const fileName = payload.files.files.name;
+  const fileName = payload.files.file.name;
   const fileHash = sha512(fileName + new Date());
 
   const fileExtension = getExtension(fileName);
@@ -87,6 +87,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
       "fileReference": fileReference
     };
      try {
+       console.log(completeBasePath,"completebasepath")
        !fs.existsSync(completeBasePath) ?
          fs.mkdirSync(completeBasePath, {mode: 777, recursive: true}):
          null;
