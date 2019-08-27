@@ -31,11 +31,11 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
         console.log("material",`'${material}'`)
         query += ` AND "tranxData" ->> 'material' LIKE '%${material}%'`;
     }
-    if (payload.body.searchCriteria && payload.body.searchCriteria.description) {
+    if (payload.body.searchCriteria && payload.body.searchCriteria.classification) {
         //let description= payload.body.searchCriteria.description.replace(/ /gi, '|')
-        let description= payload.body.searchCriteria.description
-        console.log("description",`'${description}'`)
-        query += ` AND "tranxData" ->> 'description' LIKE '%${description}%'`;
+        let classification= payload.body.searchCriteria.classification
+        console.log("classification",`'${classification}'`)
+        query += ` AND "tranxData" ->> 'classification' LIKE '%${classification}%'`;
     }
     let queryCriteriaFull = queryData + query;
     let queryCriteria = queryCnt + query;
