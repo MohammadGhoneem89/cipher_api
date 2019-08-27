@@ -6,14 +6,18 @@ const _ = require('lodash');
 function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
 
     let queryData = `SELECT * FROM masteragreements  WHERE 1=1`;
-   // let queryCnt = `SELECT COUNT(*) FROM masteragreements  WHERE 1=1`;
+    let queryCnt = `SELECT COUNT(*) FROM masteragreements  WHERE 1=1`;
     let query = '';
 
     if (payload.body.searchCriteria && payload.body.searchCriteria.contractID) {
         let contractID = payload.body.searchCriteria.contractID;
         query += ` AND "tranxData" ->> 'contractID' = '${contractID}' `;
     }
-    //let query_ = queryCnt + query
+    if (payload.body.searchCriteria && payload.body.searchCriteria.customerID) {
+        let customerID = payload.body.searchCriteria.customerID;
+        query += ` AND "tranxData" ->> 'customerID' LIKE '%${customerID}%' `;
+    }
+    let query_ = queryCnt + query
     let queryCriteriaFull = queryData + query;
 
     if (payload.body.page) {
@@ -24,12 +28,12 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
     pg.connection().then((conn) => {
         console.log("Connected to DB")
         return Promise.all([
-           //  count = conn.query(queryCnt, []),
+              conn.query(query_, []),
             conn.query(queryCriteriaFull, [])
         ]).then((data) => {
             let result = [];
             if (data) {
-                _.get(_.get(data, '[0]', {}), 'rows', []).forEach((elemt) => {
+                _.get(_.get(data, '[1]', {}), 'rows', []).forEach((elemt) => {
                     result.push(elemt.tranxData);
                 });
             }
@@ -39,7 +43,7 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
                     "pageData": {
                         "pageSize": payload.body.page ? payload.body.page.pageSize : undefined,
                         "currentPageNo": payload.body.page ? payload.body.page.currentPageNo : 1,
-                        "totalRecords": result.length
+                        "totalRecords": data[0].rows[0].count
                     },
                  
                         "searchResult": result
