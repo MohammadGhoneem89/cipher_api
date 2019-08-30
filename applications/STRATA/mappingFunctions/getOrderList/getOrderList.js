@@ -6,13 +6,30 @@ const _ = require('lodash');
 function getOrderList(payload, UUIDKey, route, callback, JWToken) {
 
     let queryData = `SELECT * FROM orders  WHERE 1=1`;
+    let queryCnt = `SELECT COUNT(*) FROM orders  WHERE 1=1`;
     let query = '';
 
     if (payload.body.searchCriteria && payload.body.searchCriteria.orderID) {
         let orderID = payload.body.searchCriteria.orderID;
         query += ` AND "tranxData" ->> 'orderID' = '${orderID}' `;
     }
-    //let query_ = queryCnt + query
+    if (payload.body.searchCriteria && payload.body.searchCriteria.contractID) {
+        let contractID = payload.body.searchCriteria.contractID;
+        query += ` AND "tranxData" ->> 'contractID' = '${contractID}' `;
+    }
+    if (payload.body.searchCriteria && payload.body.searchCriteria.orderStatus) {
+        let orderStatus = payload.body.searchCriteria.orderStatus;
+        query += ` AND "tranxData" ->> 'status' = '${orderStatus}' `;
+    }
+    if (payload.body.searchCriteria && payload.body.searchCriteria.fromDate) {
+        let fromDate = payload.body.searchCriteria.fromDate;
+        query += ` AND "tranxData" ->> 'orderDate' >= '${fromDate}' `;
+    }
+    if (payload.body.searchCriteria && payload.body.searchCriteria.toDate) {
+        let toDate = payload.body.searchCriteria.toDate;
+        query += ` AND "tranxData" ->> 'orderDate' <= '${toDate}' `;
+    }
+    let query_ = queryCnt + query
     let queryCriteriaFull = queryData + query;
 
     if (payload.body.page) {
@@ -23,12 +40,12 @@ function getOrderList(payload, UUIDKey, route, callback, JWToken) {
     pg.connection().then((conn) => {
         console.log("Connected to DB")
         return Promise.all([
-            //  count = conn.query(queryCnt, []),
+            conn.query(query_, []),
             conn.query(queryCriteriaFull, [])
         ]).then((data) => {
             let result = [];
             if (data) {
-                _.get(_.get(data, '[0]', {}), 'rows', []).forEach((elemt) => {
+                _.get(_.get(data, '[1]', {}), 'rows', []).forEach((elemt) => {
                     result.push(elemt.tranxData);
                 });
             }
@@ -38,7 +55,7 @@ function getOrderList(payload, UUIDKey, route, callback, JWToken) {
                     "pageData": {
                         "pageSize": payload.body.page ? payload.body.page.pageSize : undefined,
                         "currentPageNo": payload.body.page ? payload.body.page.currentPageNo : 1,
-                        "totalRecords": result.length
+                        "totalRecords": data[0].rows[0].count
                     },
                     
                         "searchResult": result
