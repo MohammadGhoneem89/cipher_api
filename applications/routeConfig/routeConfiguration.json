@@ -25,6 +25,12 @@
       "MappingfunctionName": "getOrderList",
       "CustomMappingFile": "getOrderList/getOrderList.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "createOrder": {
+      "customMapping": true,
+      "MappingfunctionName": "createOrder",
+      "CustomMappingFile": "createOrder/createOrder.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "PR": {
