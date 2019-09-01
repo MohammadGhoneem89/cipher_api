@@ -7,16 +7,7 @@ function createOrder(payload, UUIDKey, route, callback, JWToken) {
     };
     const data = payload.body.order;
 
-    if (data.orderType == undefined || !data.orderType.trim().length) {
-        response.statusDescription = "orderType is required!";
-        return callback(response);
-    }
-    if (data.orderType == "MASTER") {
-        if (data.contractID == undefined || !data.contractID.trim().length) {
-            response.statusDescription = "contractID is required!";
-            return callback(response);
-        }
-    }
+    
     if (data.items.length < 1) {
         response.statusDescription = "order item is required!";
         return callback(response);
@@ -43,3 +34,13 @@ function createOrder(payload, UUIDKey, route, callback, JWToken) {
 
 }
 exports.createOrder = createOrder;
+// if (data.orderType == undefined || !data.orderType.trim().length) {
+//     response.statusDescription = "orderType is required!";
+//     return callback(response);
+// }
+// if (data.orderType == "MASTER") {
+//     if (data.contractID == undefined || !data.contractID.trim().length) {
+//         response.statusDescription = "contractID is required!";
+//         return callback(response);
+//     }
+// }
