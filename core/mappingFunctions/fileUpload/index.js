@@ -70,6 +70,13 @@ let upload = async function(payload, UUIDKey, route, callback, JWToken) {
       fsObject = new Ipfs();
       break;
     default:
+        const resp = {
+          messageStatus: 'ERROR',
+          cipherMessageId: UUIDKey,
+          errorDescription: '',
+          errorCode: 201,
+          timestamp: new Date()
+        };
       resp.errorDescription = 'Invalid type kindly provide correct type';
       return callback(resp);
   }
