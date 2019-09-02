@@ -40,7 +40,7 @@ module.exports = {
       return JSON.parse(data);
     } catch (ex) {
       console.log(ex);
-      throw new Error("Could not Parse incomming data!!!");
+      throw new Error("Could not Parse incoming data!!!");
     }
   }
 

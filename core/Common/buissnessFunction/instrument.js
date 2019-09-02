@@ -121,7 +121,7 @@ module.exports = {
         element.providerMetaData = element.providerMetaData ? JSON.parse(element.providerMetaData) : undefined;
         element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
         element.beneficiaryData = element.beneficiaryData ? JSON.parse(element.beneficiaryData) : undefined;
-        _.set(element,"amount",parseFloat(_.get(element,"amount","0")).toFixed(2).toString())
+        _.set(element, "amount", parseFloat(_.get(element, "amount", "0")).toFixed(2).toString())
         _.set(element, 'contractID', undefined);
         _.set(element, 'documentName', undefined);
         _.set(element, 'key', undefined);
@@ -131,7 +131,7 @@ module.exports = {
         _.set(element, 'replacementReason', undefined);
         _.set(element, 'newInstrumentRefNo', undefined);
         _.set(element, 'oldInstrumentRefNo', undefined);
-       // _.set(element, 'failureDescription', undefined);
+        // _.set(element, 'failureDescription', undefined);
 
       });
 
@@ -157,19 +157,19 @@ module.exports = {
   },
 
   ParseContractDataForEjari: (data, payload, jwt) => {
-    let result=JSON.parse(data);
+    let result = JSON.parse(data);
     let contract = {};
     let startDate = _.get(result, "contractStartDate", undefined);
     let EndDate = _.get(result, "contractEndDate", undefined);
     result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyy(startDate) : undefined;
     result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyy(EndDate) : undefined;
-    _.set(contract, 'contractID', result.contractID||"");
-    _.set(contract, 'contractAmount', result.contractAmount||"");
-    _.set(contract, 'contractStartDate', result.contractStartDate||"");
-    _.set(contract, 'contractEndDate', result.contractEndDate||"");
-    _.set(contract, 'oldEjariNumber', result.oldEjariNumber||"");
-    _.set(contract, 'paymentCount', result.paymentCount||"");
-    _.set(contract, 'userReferenceNo', result.userReferenceNo||"");
+    _.set(contract, 'contractID', result.contractID || "");
+    _.set(contract, 'contractAmount', result.contractAmount || "");
+    _.set(contract, 'contractStartDate', result.contractStartDate || "");
+    _.set(contract, 'contractEndDate', result.contractEndDate || "");
+    _.set(contract, 'oldEjariNumber', result.oldEjariNumber || "");
+    _.set(contract, 'paymentCount', result.paymentCount || "");
+    _.set(contract, 'userReferenceNo', result.userReferenceNo || "");
 
     return contract;
 
@@ -220,8 +220,6 @@ module.exports = {
   },
 
   ParseKYCDetailSDG: (data, payload, jwt) => {
-
-
     try {
       let result = data;
       let sdgVisaExpiryDate = _.get(result, "visaExpiryDate", undefined);
@@ -232,8 +230,33 @@ module.exports = {
       console.log(ex);
       return jsonParseNoError(data, payload, jwt);
     }
-  }
+  },
+  ValidateItems: (items, payload, jwt) => {
+    console.log(">>>>>>>>>>>items\n", items)
+    try {
+      if (items == undefined || items.length == 0) {
+        throw new Error("Atleast one item is required to place the order!!!");
+      }
 
+      items.forEach(element => {
+        if (element.itemCode == undefined || !element.itemCode.trim().length) {
+          throw new Error("item code is required !!");
+        }
+        if (!element.quantity || element.quantity <= 0) {
+          throw new Error("item quantity is required!!");
+        }
+        if (element.color == undefined || element.color.length == 0) {
+          throw new Error("item color is required!!");
+        }
+      });
+
+      return items;
+    }
+    catch (ex) {
+      console.log(ex);
+      return {}
+    }
+  }
 };
 function jsonParseNoError(data, payload, jwt) {
   try {
@@ -244,3 +267,5 @@ function jsonParseNoError(data, payload, jwt) {
     return {}
   }
 }
+
+
