@@ -31,6 +31,18 @@
       "MappingfunctionName": "createOrder",
       "CustomMappingFile": "createOrder/createOrder.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "saveCustomerAssociation": {
+      "customMapping": true,
+      "MappingfunctionName": "saveCustomerAssociation",
+      "CustomMappingFile": "customerAssociation/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getCustomerAssociationDetail": {
+      "customMapping": true,
+      "MappingfunctionName": "getCustomerAssociationDetail",
+      "CustomMappingFile": "customerAssociation/index.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "PR": {

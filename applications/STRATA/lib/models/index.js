@@ -1,7 +1,6 @@
 'use strict';
 
 module.exports = {
-  Payment: require('./Payment')
- 
+    Payment: require('./Payment'),
+    CustomerAssociation: require('./CustomerAssociation')
 };
-
