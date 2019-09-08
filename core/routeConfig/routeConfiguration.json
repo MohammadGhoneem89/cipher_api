@@ -801,6 +801,20 @@
       "CustomMappingFile": "typeData/getTypeDataList.js",
       "mappingConfigFile": "ePayMapping"
     },
+    
+    "typeDataListByType": {
+      "customMapping": true,
+      "MappingfunctionName": "typeDataListByType",
+      "CustomMappingFile": "typeData/getTypeDataList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "typeDataListForType": {
+      "customMapping": true,
+      "MappingfunctionName": "typeDataListByType",
+      "CustomMappingFile": "typeData/getTypeDataList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+  
     "getTypeDataDetailByID": {
       "customMapping": true,
       "MappingfunctionName": "getTypeDataDetailById",
