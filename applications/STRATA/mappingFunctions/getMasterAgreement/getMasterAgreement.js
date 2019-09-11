@@ -15,18 +15,18 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
         query += ` AND "tranxData" ->> 'contractID' = '${contractID}' `;
     }
     //if (JWToken.orgType == 'SUPPLIER') {
-        if (payload.body.searchCriteria && payload.body.searchCriteria.customerID) {
-            let customerID = payload.body.searchCriteria.customerID;
-            query += ` AND "tranxData" ->> 'customerID' = '${customerID}' `;
-        }
-   // } 
+    if (payload.body.searchCriteria && payload.body.searchCriteria.customerID) {
+        let customerID = payload.body.searchCriteria.customerID;
+        query += ` AND "tranxData" ->> 'customerID' = '${customerID}' `;
+    }
+    // } 
     if (JWToken.orgType == 'CUSTOMER') {
         query += ` AND "tranxData" ->> 'customerID' = '${JWToken.orgCode}' `;
     }
     let query_ = queryCnt + query
     let queryCriteriaFull = queryData + query;
 
-    if (payload.body.page) {
+    if (payload.body.page && payload.body.page.pageSize && payload.body.page.currentPageNo) {
         queryCriteriaFull += ` limit ${payload.body.page.pageSize} 
     OFFSET ${payload.body.page.pageSize * (payload.body.page.currentPageNo - 1)}`;
     }

@@ -40,7 +40,7 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
     let queryCriteriaFull = queryData + query;
     let queryCriteria = queryCnt + query;
 
-    if (payload.body.page && payload.body.page.pageSize) {
+    if (payload.body.page && payload.body.page.pageSize && payload.body.page.currentPageNo) {
         queryCriteriaFull += ` limit ${payload.body.page.pageSize} 
     OFFSET ${payload.body.page.pageSize * (payload.body.page.currentPageNo - 1)}`;
     }
