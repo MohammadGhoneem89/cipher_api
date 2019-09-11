@@ -5,7 +5,8 @@ const _ = require('lodash');
 
 module.exports = {
     saveCustomerAssociation,
-    getCustomerAssociationDetail
+    getCustomerAssociationDetail,
+    findOneAsync
 };
 
 function saveCustomerAssociation(payload, UUIDKey, route, callback, JWToken) {
@@ -17,7 +18,8 @@ function saveCustomerAssociation(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function getCustomerAssociationDetail(payload, UUIDKey, route, callback, JWToken) {
-    findOneAsync(callback, payload);
+    findOneAsync(callback, payload).then((data) => { return callback(data) }).catch((e) => { return e })
+
 }
 
 async function createAsync(callback, payload) {
@@ -69,6 +71,7 @@ async function updateAsync(callback, payload) {
         response[payload.action].data.message.status = 'ERROR';
         response[payload.action].data.error = err.stack || err;
     }
+    // return response;
     return callback(response);
 }
 
@@ -86,5 +89,6 @@ async function findOneAsync(callback, payload) {
     } catch (err) {
         response[payload.action].error = err.stack || err;
     }
-    return callback(response);
+    // console.log("\n\n>>>>> ", response, ">>>>>>")
+    return response;
 }

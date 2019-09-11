@@ -44,10 +44,10 @@
       "CustomMappingFile": "customerAssociation/index.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getUserID": {
+    "getCustomerShipmentAndPaymentType": {
       "customMapping": true,
-      "MappingfunctionName": "getUserID",
-      "CustomMappingFile": "getUserID/getUserID.js",
+      "MappingfunctionName": "getCustomerShipmentAndPaymentType",
+      "CustomMappingFile": "getCustomerShipmentAndPaymentType/getCustomerShipmentAndPaymentType.js",
       "mappingConfigFile": "ePayMapping"
     }
   },
