@@ -1,3 +1,5 @@
+/* eslint-disable eqeqeq */
+/* eslint-disable no-console */
 'use strict';
 
 const _ = require('lodash');
@@ -7,9 +9,10 @@ module.exports = {
   jsonParseNoError: (data, payload, jwt) => {
     try {
       return JSON.parse(data);
-    } catch (ex) {
+    }
+    catch (ex) {
       console.log(ex);
-      return {}
+      return {};
     }
   },
   validateInstrument: (data, payload, jwt) => {
@@ -31,7 +34,7 @@ module.exports = {
     return data;
   },
   validateInstrumentObject: (data, payload, jwt) => {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>." + JSON.stringify(data))
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>." + JSON.stringify(data));
     data.forEach((element, index) => {
       element.date = dates.ddMMyyyyslash(element.date);
       element.amount = parseFloat(element.amount) || 0;
@@ -56,7 +59,8 @@ module.exports = {
         element.beneficiaryData = element.beneficiaryData ? JSON.parse(element.beneficiaryData) : undefined;
       });
       return result;
-    } catch (ex) {
+    }
+    catch (ex) {
       console.log(ex);
       return jsonParseNoError(data, payload, jwt);
     }
@@ -94,14 +98,13 @@ module.exports = {
       _.set(result, 'terminationReason', undefined);
       _.set(result, 'tranDate', undefined);
 
-
       _.set(result, 'businessPartnerNo', _.get(result, "businessPartnerNumber", undefined));
       _.set(result, 'businessPartnerNumber', undefined);
 
-
       return result;
 
-    } catch (ex) {
+    }
+    catch (ex) {
       console.log(ex);
       return jsonParseNoError(data, payload, jwt);
     }
@@ -121,7 +124,7 @@ module.exports = {
         element.providerMetaData = element.providerMetaData ? JSON.parse(element.providerMetaData) : undefined;
         element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
         element.beneficiaryData = element.beneficiaryData ? JSON.parse(element.beneficiaryData) : undefined;
-        _.set(element, "amount", parseFloat(_.get(element, "amount", "0")).toFixed(2).toString())
+        _.set(element, "amount", parseFloat(_.get(element, "amount", "0")).toFixed(2).toString());
         _.set(element, 'contractID', undefined);
         _.set(element, 'documentName', undefined);
         _.set(element, 'key', undefined);
@@ -150,7 +153,8 @@ module.exports = {
 
       return result;
 
-    } catch (ex) {
+    }
+    catch (ex) {
       console.log(ex);
       return jsonParseNoError(data, payload, jwt);
     }
@@ -189,8 +193,6 @@ module.exports = {
       let visaExpiryDate = _.get(result, "visaExpiryDate", undefined);
       let lastSyncDate = _.get(result, "lastSyncDate", undefined);
 
-
-
       _.get(result, "dateOfBirth", dateOfBirth >= 0 ? dates.MSddMMyyyy(dateOfBirth) : undefined);
       _.get(result, "natIdExpDate", natIdExpDate >= 0 ? dates.MSddMMyyyy(natIdExpDate) : undefined);
       _.get(result, "passport.passportIssueDate", passportIssueDate >= 0 ? dates.MSddMMyyyy(passportIssueDate) : undefined);
@@ -198,7 +200,6 @@ module.exports = {
       _.get(result, "visaIssueDate", visaIssueDate >= 0 ? dates.MSddMMyyyy(visaIssueDate) : undefined);
       _.get(result, "visaExpiryDate", visaExpiryDate >= 0 ? dates.MSddMMyyyy(visaExpiryDate) : undefined);
       _.get(result, "lastSyncDate", lastSyncDate >= 0 ? dates.MSddMMyyyy(lastSyncDate) : undefined);
-
 
       _.set(result, 'emiratesIDExpiryDate', undefined);
       _.set(result, 'phoneNo', _.get(result, "phoneNO", undefined));
@@ -210,10 +211,10 @@ module.exports = {
       _.set(result, 'natIdExpDate', _.get(result, "natIDExpDate", undefined));
       _.set(result, 'natIDExpDate', undefined);
 
-
       return result;
 
-    } catch (ex) {
+    }
+    catch (ex) {
       console.log(ex);
       return jsonParseNoError(data, payload, jwt);
     }
@@ -226,24 +227,26 @@ module.exports = {
       _.set(result, "visaExpiryDate", sdgVisaExpiryDate >= 0 ? dates.MSddMMyyyy(sdgVisaExpiryDate) : undefined);
       return result;
 
-    } catch (ex) {
+    }
+    catch (ex) {
       console.log(ex);
       return jsonParseNoError(data, payload, jwt);
     }
   },
   ValidateItems: (items, payload, jwt) => {
-    console.log(">>>>>>>>>>>items\n", items)
+    console.log(">>>>>>>>>>>items\n", items);
     try {
       if (items == undefined || items.length == 0) {
         throw new Error("Atleast one item is required to place the order!!!");
       }
 
-      items.forEach(element => {
+      items.forEach((element) => {
         if (element.itemCode == undefined || !element.itemCode.trim().length) {
-          throw new Error("item code is required !!");
+           throw new Error("item code is required !!");
+         
         }
         if (!element.quantity || element.quantity <= 0) {
-          throw new Error("item quantity is required!!");
+          throw new Error("item quantity is required and should be greater than zero!!");
         }
         if (element.color == undefined || element.color.length == 0) {
           throw new Error("item color is required!!");
@@ -254,7 +257,7 @@ module.exports = {
     }
     catch (ex) {
       console.log(ex);
-      return {}
+      return {};
     }
   }
 };
@@ -264,8 +267,7 @@ function jsonParseNoError(data, payload, jwt) {
   }
   catch (ex) {
     // console.log(ex);
-    return {}
+    return {};
   }
 }
-
 

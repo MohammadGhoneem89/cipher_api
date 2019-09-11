@@ -43,6 +43,12 @@
       "MappingfunctionName": "getCustomerAssociationDetail",
       "CustomMappingFile": "customerAssociation/index.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getUserID": {
+      "customMapping": true,
+      "MappingfunctionName": "getUserID",
+      "CustomMappingFile": "getUserID/getUserID.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "PR": {

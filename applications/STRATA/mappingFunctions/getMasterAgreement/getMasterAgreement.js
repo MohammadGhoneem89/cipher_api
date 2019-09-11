@@ -9,13 +9,19 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
     let queryCnt = `SELECT COUNT(*) FROM masteragreements  WHERE 1=1`;
     let query = '';
 
+    console.log(JWToken.orgCode, "JWToken")
     if (payload.body.searchCriteria && payload.body.searchCriteria.contractID) {
         let contractID = payload.body.searchCriteria.contractID;
         query += ` AND "tranxData" ->> 'contractID' = '${contractID}' `;
     }
-    if (payload.body.searchCriteria && payload.body.searchCriteria.customerID) {
-        let customerID = payload.body.searchCriteria.customerID;
-        query += ` AND "tranxData" ->> 'customerID' LIKE '%${customerID}%' `;
+    //if (JWToken.orgType == 'SUPPLIER') {
+        if (payload.body.searchCriteria && payload.body.searchCriteria.customerID) {
+            let customerID = payload.body.searchCriteria.customerID;
+            query += ` AND "tranxData" ->> 'customerID' = '${customerID}' `;
+        }
+   // } 
+    if (JWToken.orgType == 'CUSTOMER') {
+        query += ` AND "tranxData" ->> 'customerID' = '${JWToken.orgCode}' `;
     }
     let query_ = queryCnt + query
     let queryCriteriaFull = queryData + query;
@@ -28,7 +34,7 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
     pg.connection().then((conn) => {
         console.log("Connected to DB")
         return Promise.all([
-              conn.query(query_, []),
+            conn.query(query_, []),
             conn.query(queryCriteriaFull, [])
         ]).then((data) => {
             let result = [];
@@ -45,9 +51,9 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
                         "currentPageNo": payload.body.page ? payload.body.page.currentPageNo : 1,
                         "totalRecords": data[0].rows[0].count
                     },
-                 
-                        "searchResult": result
-                    
+
+                    "searchResult": result
+
                 }
             };
             console.log(response)
