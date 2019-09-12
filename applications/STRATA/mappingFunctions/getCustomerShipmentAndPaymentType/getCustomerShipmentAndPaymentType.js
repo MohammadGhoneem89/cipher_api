@@ -5,6 +5,7 @@
 const { findOneAsync } = require('../customerAssociation/index.js');
 
 function getCustomerShipmentAndPaymentType(payload, UUIDKey, route, callback, JWToken) {
+  console.log(payload);
   findOneAsync(callback, payload).then((res) => {
     let response = {
       [payload.action]: {
@@ -14,6 +15,8 @@ function getCustomerShipmentAndPaymentType(payload, UUIDKey, route, callback, JW
       }
     }
     return callback(response);
-  });
+  }).catch((err) => {
+    return err;
+  })
 }
 exports.getCustomerShipmentAndPaymentType = getCustomerShipmentAndPaymentType;
