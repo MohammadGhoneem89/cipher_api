@@ -4,13 +4,13 @@
     "cusDashboardData": {
       "customMapping": true,
       "MappingfunctionName": "cusDashboardData",
-      "CustomMappingFile": "customerDashboard.js",
+      "CustomMappingFile": "dashboard/customerDashboard.js",
       "mappingConfigFile": "ePayMapping"
     },
     "supDashboardData": {
       "customMapping": true,
       "MappingfunctionName": "supDashboardData",
-      "CustomMappingFile": "supplierDashboard.js",
+      "CustomMappingFile": "dashboard/supplierDashboard.js",
       "mappingConfigFile": "ePayMapping"
     },
     "createTypeData": {

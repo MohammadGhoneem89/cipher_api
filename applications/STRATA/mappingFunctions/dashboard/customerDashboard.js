@@ -1,6 +1,6 @@
 'use strict';
-const pg = require('../../../core/api/connectors/postgress');
-const connector = require('../../../core/api/client');
+const pg = require('../../../../core/api/connectors/postgress');
+const connector = require('../../../../core/api/client');
 const _ = require('lodash');
 
 function getTilesData(supplierID) {
@@ -75,8 +75,56 @@ function getTilesData(supplierID) {
                 }
                 return result;
             })
-    }).catch((error) => { console.log(error, " <<<<< Some error occurred!"); return [0, 0, 0, 0] });
+    }).catch((error) => { console.log(error, " <<<<< Some error occurred while working on tiles data!"); return [0, 0, 0, 0] });
 }
+
+function getGraphData(supplierID) {
+    console.log(supplierID, "SUPPLIERID")
+
+    let getGridData, purchaseOrder, orderReceived, componentManufacturing, dispatched, received,
+        accepted_rejected, inspected, paymentOrder, paid;
+
+
+    if (supplierID && supplierID != "ALL") {
+        getGridData = `SELECT count(orders.key), orders."tranxData" ->> 'status' as "status",orders."tranxData" ->> 'customerID' as "customerID"
+                FROM orders WHERE orders."tranxData" ->> 'customerID'= '${supplierID}'
+              GROUP BY  orders."tranxData" ->> 'status',orders."tranxData" ->>'customerID';`;
+    }
+    return pg.connection().then((conn) => {
+        return Promise.all([
+            conn.query(getGridData, [])
+        ]).then((data) => {
+            console.log(data[0].rows, "rows")
+
+            purchaseOrder = data[0].rows.filter(obj => obj.status === "001");
+            orderReceived = data[0].rows.filter(obj => obj.status === "002");
+            componentManufacturing = data[0].rows.filter(obj => obj.status === "003");
+            dispatched = data[0].rows.filter(obj => obj.status === "010");
+            inspected = data[0].rows.filter(obj => obj.status === "012");
+            accepted_rejected = data[0].rows.filter(obj => obj.status === "013" || obj.status === "013");
+            paymentOrder = data[0].rows.filter(obj => obj.status === "018");
+            received = data[0].rows.filter(obj => obj.status === "011");
+            paid = data[0].rows.filter(obj => obj.status === "019");
+
+
+            let result = {
+                purchaseOrder: purchaseOrder[0] ? purchaseOrder[0].count : 0,
+                orderReceived: orderReceived[0] ? orderReceived[0].count : 0,
+                componentManufacturing: componentManufacturing[0] ? componentManufacturing[0].count : 0,
+                dispatched: dispatched[0] ? dispatched[0].count : 0,
+                received: received[0] ? received[0].count : 0,
+                inspected: inspected[0] ? inspected[0].count : 0,
+                accepted_rejected: accepted_rejected[0] ? accepted_rejected[0].count : 0,
+                paymentOrder: paymentOrder[0] ? paymentOrder[0].count : 0,
+                paid: paid[0] ? paid[0].count : 0
+            }
+            return result;
+        })
+    }).catch((e) => { console.log(e, "<<< Some error occurred while working on graphData"); return e; })
+
+}
+
+
 async function getPendingOrder(payloadDashboardData, supplierID) {
     try {
         let getPendingOrder = "";
@@ -525,52 +573,6 @@ async function getSupplierWiseSettlement(payloadDashboardData, supplierID) {
     }
 }
 
-function getGraphData(supplierID) {
-    console.log(supplierID, "SUPPLIERID")
-
-    let getGridData, purchaseOrder, orderReceived, componentManufacturing, dispatched, received,
-        accepted_rejected, inspected, paymentOrder, paid;
-
-
-    if (supplierID && supplierID != "ALL") {
-        getGridData = `SELECT count(orders.key), orders."tranxData" ->> 'status' as "status",orders."tranxData" ->> 'customerID' as "customerID"
-                FROM orders WHERE orders."tranxData" ->> 'customerID'= '${supplierID}'
-              GROUP BY  orders."tranxData" ->> 'status',orders."tranxData" ->>'customerID';`;
-    }
-    return pg.connection().then((conn) => {
-        return Promise.all([
-            conn.query(getGridData, [])
-        ]).then((data) => {
-            console.log(data[0].rows, "rows")
-
-            purchaseOrder = data[0].rows.filter(obj => obj.status === "001");
-            orderReceived = data[0].rows.filter(obj => obj.status === "002");
-            componentManufacturing = data[0].rows.filter(obj => obj.status === "003");
-            dispatched = data[0].rows.filter(obj => obj.status === "010");
-            inspected = data[0].rows.filter(obj => obj.status === "012");
-            accepted_rejected = data[0].rows.filter(obj => obj.status === "013" || obj.status === "013");
-            paymentOrder = data[0].rows.filter(obj => obj.status === "018");
-            received = data[0].rows.filter(obj => obj.status === "011");
-            paid = data[0].rows.filter(obj => obj.status === "019");
-
-
-            let result = {
-                purchaseOrder: purchaseOrder[0] ? purchaseOrder[0].count : 0,
-                orderReceived: orderReceived[0] ? orderReceived[0].count : 0,
-                componentManufacturing: componentManufacturing[0] ? componentManufacturing[0].count : 0,
-                dispatched: dispatched[0] ? dispatched[0].count : 0,
-                received: received[0] ? received[0].count : 0,
-                inspected: inspected[0] ? inspected[0].count : 0,
-                accepted_rejected: accepted_rejected[0] ? accepted_rejected[0].count : 0,
-                paymentOrder: paymentOrder[0] ? paymentOrder[0].count : 0,
-                paid: paid[0] ? paid[0].count : 0
-            }
-            return result;
-        })
-    }).catch((e) => { console.log(e, "<<< Some error occurred while working on graphData"); return e; })
-
-}
-
 exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JWToken) {
     try {
         console.log(payload.dashboardPendingGridData.supplierID, "payload.dashboardPendingGridData.supplierID")
@@ -582,7 +584,9 @@ exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JW
         let settlementsRows = await getSettlements(payload.dashboardSettlementGridData, payload.dashboardSettlementGridData.supplierID);
         let supplierWiseSettlementRows = await getSupplierWiseSettlement(payload.dashboardSupplierSettlement, payload.dashboardSupplierSettlement.supplierID);
         let graphData = await getGraphData(payload.dashboardPendingGridData.supplierID);
-        console.log(graphData, "graphData")
+      
+
+
         let customerDashboardData = {
             "customerDashboardData": {
                 "data": {

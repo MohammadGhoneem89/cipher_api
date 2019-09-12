@@ -1,5 +1,5 @@
 'use strict';
-const connector = require('../../../core/api/client');
+const connector = require('../../../../core/api/client');
 const _ = require('lodash');
 
 
