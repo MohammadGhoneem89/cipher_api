@@ -2,9 +2,6 @@
 const connector = require('../../../core/api/client');
 const _ = require('lodash');
 
-const pg = await connector.createClient('pg',
-    'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
-pg ? console.log("connection success") : console.log("not connected")
 
 async function getTilesData(supplierID) {
     try {
@@ -14,12 +11,14 @@ async function getTilesData(supplierID) {
         let payable = "";
         let totalPaid = "";
 
+        const pg = await connector.createClient('pg',
+            'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
         console.log(pg, "||||| pg")
 
         if (!!supplierID && supplierID != "ALL") {
             console.log("<<<<<=======IN PENDING ", supplierID, "=========>>>>>")
             queryPendingOrder = `select COUNT(1) FROM  orders  
-        WHERE "tranxData" ->> '__JWTORG' ='${supplierID}' 
+        WHERE "tranxData" ->> 'customerID' ='${supplierID}' 
         And "tranxData" ->> 'status' NOT IN ('PAID');`;
         }
         else if (supplierID == "ALL" || !supplierID) {
@@ -33,7 +32,7 @@ async function getTilesData(supplierID) {
 
         if (!!supplierID && supplierID != "ALL") {
             queryCompletedOrders = `select COUNT(1) from  orders  
-        WHERE "tranxData" ->> 'supplierID' ='${supplierID}' And 
+        WHERE "tranxData" ->> 'customerID' ='${supplierID}' And 
         "tranxData" ->> 'status' = 'PAID' ;`;
         }
         else if (supplierID == "ALL" || !supplierID) {
@@ -63,7 +62,7 @@ async function getTilesData(supplierID) {
 
         if (!!supplierID && supplierID != "ALL") {
             payable = `select "tranxData" ->> 'amount' AS "amount" from accountings
-        WHERE "tranxData" ->> 'supplierID' ='${supplierID}' ;`;
+        WHERE "tranxData" ->> 'customerID' ='${supplierID}' ;`;
         }
         else if (supplierID == "ALL" || !supplierID) {
             payable = `select "tranxData" ->> 'amount' AS "amount" from accountings;`
@@ -77,7 +76,7 @@ async function getTilesData(supplierID) {
 
         if (!!supplierID && supplierID != "ALL") {
             totalPaid = `select "tranxData" ->> 'paidAmount' AS "paidAmount" from accountings
-        WHERE "tranxData" ->> 'supplierID' ='${supplierID}'`;
+        WHERE "tranxData" ->> 'customerID' ='${supplierID}'`;
 
         } else if (supplierID == "ALL" || !supplierID) {
             totalPaid = `select "tranxData" ->> 'paidAmount' AS "paidAmount" from accountings;`
@@ -101,11 +100,13 @@ async function getPendingOrder(payloadDashboardData, supplierID) {
     try {
         let getPendingOrder = "";
 
+        const pg = await connector.createClient('pg',
+            'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
 
         if (!!supplierID && supplierID != "ALL") {
             getPendingOrder = `select  "tranxData"  from  orders WHERE 
             "tranxData" ->> 'status' NOT IN ('Paid')
-            AND "tranxData" ->> 'supplierID' ='${supplierID}'`;
+            AND "tranxData" ->> 'customerID' ='${supplierID}'`;
         }
         else if (supplierID == "ALL" || !supplierID) {
             getPendingOrder = `select  "tranxData"  from  orders WHERE 
@@ -124,12 +125,12 @@ async function getPendingOrder(payloadDashboardData, supplierID) {
         let queryCnt = "";
         if (!!supplierID && supplierID != "ALL") {
             queryCnt = `SELECT count(*) FROM orders WHERE
-            "tranxData" ->> 'status' NOT IN('PAID')
-            And "tranxData" ->> 'supplierID' ='${supplierID}'`;
+            "tranxData" ->> 'status' NOT IN('Paid')
+            And "tranxData" ->> ''customerID'' ='${supplierID}'`;
         }
         else if (supplierID == "ALL" || !supplierID) {
             queryCnt = `SELECT count(*) FROM orders WHERE
-                       "tranxData" ->> 'status' NOT IN('PAID')`;
+                       "tranxData" ->> 'status' NOT IN('Paid')`;
         }
 
 
@@ -141,15 +142,19 @@ async function getPendingOrder(payloadDashboardData, supplierID) {
 
         if (!!supplierID && supplierID != "ALL") {
             supplierIDtest = `select * from
-            orders inner join suppliers on
-            orders."tranxData" ->> 'supplierID'=suppliers."tranxData" ->> 'supplierID'
-            WHERE   orders."tranxData" ->> 'status' NOT IN('PAID')
-            AND suppliers."tranxData" ->> 'supplierID' ='${supplierID}' `;
-        } else if (supplierID == "ALL" || !supplierID) {
+            orders where
+            orders."tranxData" ->> 'customerID'=
+            '${supplierID}'
+            AND   orders."tranxData" ->> 'status' NOT IN('PAID')
+             `;
+        }
+        else if (supplierID == "ALL" || !supplierID) {
             supplierIDtest = `select * from
-            orders inner join suppliers on
-            orders."tranxData" ->> 'supplierID'=suppliers."tranxData" ->> 'supplierID'
-            WHERE   orders."tranxData" ->> 'status' NOT IN('PAID')`;
+            orders where
+            orders."tranxData" ->> 'customerID'=
+            '${supplierID}'
+            AND   orders."tranxData" ->> 'status' NOT IN('PAID')
+             `;
         }
 
         if (payloadDashboardData.pageData) {
@@ -228,12 +233,14 @@ async function getPendingOrder(payloadDashboardData, supplierID) {
 
 async function getCompletedOrder(payloadDashboardData, supplierID) {
     try {
+        const pg = await connector.createClient('pg',
+            'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
 
         let getCompletedOrder = "";
         if (!!supplierID && supplierID != "ALL") {
             getCompletedOrder = `select  "tranxData"  from  orders
             WHERE "tranxData" ->> 'status' = 'PAID'
-            AND "tranxData" ->> 'supplierID' ='${supplierID}'`;
+            AND "tranxData" ->> 'customerID' ='${supplierID}'`;
         }
         else if (supplierID == "ALL" || !supplierID) {
             getCompletedOrder = `select  "tranxData"  from  orders
@@ -252,11 +259,11 @@ async function getCompletedOrder(payloadDashboardData, supplierID) {
 
         let queryCnt = "";
         if (!!supplierID && supplierID != "ALL") {
-            queryCnt = `SELECT count(*) FROM orders  WHERE "tranxData" ->> 'status' = 'PAID'
-            And "tranxData" ->> 'supplierID' ='${supplierID}'`;
+            queryCnt = `SELECT count(*) FROM orders  WHERE "tranxData" ->> 'status' = 'Paid'
+            And "tranxData" ->> 'customerID' ='${supplierID}'`;
         }
         else if (supplierID == "ALL" || !supplierID) {
-            queryCnt = `SELECT count(*) FROM orders  WHERE "tranxData" ->> 'status' = 'PAID'`;
+            queryCnt = `SELECT count(*) FROM orders  WHERE "tranxData" ->> 'status' = 'Paid'`;
         }
 
 
@@ -268,16 +275,14 @@ async function getCompletedOrder(payloadDashboardData, supplierID) {
         let supplierIDtest = "";
         if (!!supplierID && supplierID != "ALL") {
             supplierIDtest = `select * from
-            orders inner join suppliers on
-            orders."tranxData" ->> 'supplierID'=suppliers."tranxData" ->> 'supplierID'
-            WHERE orders."tranxData" ->> 'status' = 'PAID'
-            AND suppliers."tranxData" ->> 'supplierID' ='${supplierID}'`;
+            orders WHERE orders."tranxData" ->> 'customerID' ='${supplierID}'
+            AND orders."tranxData" ->> 'status' = 'PAID'
+            `;
         }
         else if (supplierID == "ALL" || !supplierID) {
             supplierIDtest = `select * from
-            orders inner join suppliers on
-            orders."tranxData" ->> 'supplierID'=suppliers."tranxData" ->> 'supplierID'
-            WHERE orders."tranxData" ->> 'status' = 'PAID'`;
+            orders WHERE orders."tranxData" ->> 'customerID' ='${supplierID}'
+            AND orders."tranxData" ->> 'status' = 'PAID'`;
         }
 
         if (payloadDashboardData.pageData) {
@@ -348,13 +353,15 @@ async function getCompletedOrder(payloadDashboardData, supplierID) {
 
 async function getSettlements(payloadDashboardData, supplierID) {
     try {
+        const pg = await connector.createClient('pg',
+            'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
 
 
         let getSettlements = "";
         if (!!supplierID && supplierID != "ALL") {
             getSettlements = `select "tranxData" from  orders
             where "tranxData" ->> 'status' = 'Dispatched'
-            AND "tranxData" ->> 'supplierID' ='${supplierID}'`;
+            AND "tranxData" ->> 'customerID' ='${supplierID}'`;
         }
         else
             if (supplierID == "ALL" || !supplierID) {
@@ -373,8 +380,8 @@ async function getSettlements(payloadDashboardData, supplierID) {
         let queryCnt = "";
         if (!!supplierID && supplierID != "ALL") {
             queryCnt = `SELECT count(*) FROM orders
-            where "tranxData" ->> 'status' = 'Dispatched'
-            And "tranxData" ->> 'supplierID' ='${supplierID}'`;
+            where "tranxData" ->> 'status' = 'INVOICED'
+            And "tranxData" ->> 'customerID' ='${supplierID}'`;
         }
         else
             if (supplierID == "ALL" || !supplierID) {
@@ -392,16 +399,15 @@ async function getSettlements(payloadDashboardData, supplierID) {
         let supplierIDtest = "";
         if (!!supplierID && supplierID != "ALL") {
             supplierIDtest = `select * from
-    orders inner join suppliers on
-    orders."tranxData" ->> 'supplierID'=suppliers."tranxData" ->> 'supplierID'
-    WHERE orders."tranxData" ->> 'status' = 'Dispatched'
-    AND suppliers."tranxData" ->> 'supplierID' ='${supplierID}'`;
+    orders WHERE
+    orders."tranxData" ->> 'customerID'= '${supplierID}'
+    AND orders."tranxData" ->> 'status' = 'Dispatched'`;
         }
         else if (supplierID == "ALL" || !supplierID) {
             supplierIDtest = `select * from
-            orders inner join suppliers on
-            orders."tranxData" ->> 'supplierID'=suppliers."tranxData" ->> 'supplierID'
-            WHERE orders."tranxData" ->> 'status' = 'Dispatched'`;
+            orders WHERE
+            orders."tranxData" ->> 'customerID'= '${supplierID}'
+            AND orders."tranxData" ->> 'status' = 'Dispatched'`;
         }
 
 
@@ -469,9 +475,11 @@ async function getSettlements(payloadDashboardData, supplierID) {
 async function getSupplierWiseSettlement(payloadDashboardData, supplierID) {
     try {
         let getSupplierWiseSettlement = "";
+        const pg = await connector.createClient('pg',
+            'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
         if (!!supplierID && supplierID != "ALL") {
             getSupplierWiseSettlement = `select "tranxData" from  accountings where
-            accountings."tranxData" ->> 'supplierID'= '${supplierID}'`;
+            accountings."tranxData" ->> 'customerID'= '${supplierID}'`;
         }
         else if (supplierID == "ALL" || !supplierID) {
             getSupplierWiseSettlement = `select "tranxData" from  accountings`;
@@ -489,36 +497,36 @@ async function getSupplierWiseSettlement(payloadDashboardData, supplierID) {
         let supplierWiseSettlement = queryResult.rows;
 
         let supplierIDtest = "";
-        if (!!supplierID && supplierID != "ALL") {
-            supplierIDtest = `select "tranxData" ->> 'supplierName' AS "supplierName" from
-            suppliers where "tranxData" ->> 'supplierID'= '${supplierID}' `;
-        }
-        else if (supplierID == "ALL" || !supplierID) {
-            supplierIDtest = `select "tranxData" ->> 'supplierName' AS "supplierName" from
-            suppliers`;
-        }
-        if (payloadDashboardData.pageData) {
-            supplierIDtest += ` limit ${payloadDashboardData.pageData.pageSize}
-            OFFSET ${
-                payloadDashboardData.pageData.pageSize *
-                (payloadDashboardData.pageData.currentPageNo - 1)
-                } `;
-        }
-        let queryResult2 = await pg.query(supplierIDtest);
+        // if (!!supplierID && supplierID != "ALL") {
+        //     supplierIDtest = `select "tranxData" ->> 'supplierName' AS "supplierName" from
+        //     suppliers where "tranxData" ->> 'supplierID'= '${supplierID}' `;
+        // }
+        // else if(supplierID == "ALL" || !supplierID) {
+        //     supplierIDtest = `select "tranxData" ->> 'supplierName' AS "supplierName" from
+        //     suppliers`;
+        // }
+        // if (payloadDashboardData.pageData) {
+        //     supplierIDtest += ` limit ${payloadDashboardData.pageData.pageSize}
+        //     OFFSET ${
+        //         payloadDashboardData.pageData.pageSize *
+        //         (payloadDashboardData.pageData.currentPageNo - 1)
+        //         } `;
+        // }
+        //let queryResult2 = await pg.query(supplierIDtest);
 
         let supplierWiseSettlementArray = [];
         if (supplierWiseSettlement.length !== 0) {
 
             for (let i = 0; i < supplierWiseSettlement.length; i++) {
-                if (queryResult2.rows[0].supplierName) {
-                    let response = {
+                //if (queryResult2.rows[0].supplierName) {
+                let response = {
 
-                        "toPay": supplierWiseSettlement[i].tranxData.amount,
-                        "totalPaid": supplierWiseSettlement[i].tranxData.paidAmount,
-                        "name": queryResult2.rows[0].supplierName
-                    }
-                    supplierWiseSettlementArray.push(response);
+                    "toPay": supplierWiseSettlement[i].tranxData.amount,
+                    "totalPaid": supplierWiseSettlement[i].tranxData.paidAmount,
+                    "name": 'Etihad'
                 }
+                supplierWiseSettlementArray.push(response);
+                // }
 
             }
             console.log(">>>>>>>>> supplierWiseSettlement ");
@@ -536,108 +544,102 @@ async function getSupplierWiseSettlement(payloadDashboardData, supplierID) {
     }
 }
 
-async function getGridData(supplierID) {
-    try {
-        let getGridData = "";
+// async function getGridData(supplierID) {
+//     try {
+//         let getGridData = "";
+//         const pg = await connector.createClient('pg',
+//             'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
 
-        if (!!supplierID && supplierID != "ALL") {
-            getGridData = `SELECT count(orders.key),
-                orders."tranxData" ->> 'status' as "status",
-                    suppliers."tranxData" ->> 'supplierName' as "suppliername" FROM orders
-            inner join suppliers  on
-            orders."tranxData" ->> 'supplierID'= suppliers."tranxData" ->> 'supplierID'
-            where suppliers."tranxData" ->> 'supplierID'= '${supplierID}'
-            GROUP BY orders."tranxData" ->> 'status', suppliers."tranxData" ->> 'supplierName';`;
-        }
-
-        else if (supplierID == "ALL" || !supplierID) {
-            getGridData = `SELECT count(orders.key),
-            orders."tranxData" ->> 'status' as "status",
-                suppliers."tranxData" ->> 'supplierName' as "suppliername" FROM orders
-        inner join suppliers  on
-        orders."tranxData" ->> 'supplierID'= suppliers."tranxData" ->> 'supplierID'
-        GROUP BY orders."tranxData" ->> 'status', suppliers."tranxData" ->> 'supplierName';`
-        }
-        let queryResult = await pg.query(getGridData);
-        console.log(queryResult.rows, " =======getGridData")
-
-
-        let gridData = queryResult.rows;
-        let INVOICED = [];
-        let PAID = [];
-        let PROD = [];
-        let QC = [];
-        let SHIPPED = [];
-        let SUBORDER = [];
-        let ACK_SUBORDER = [];
-        let RECEIVED_BY_EMIRATES = [];
-        let RECEIVED_BY_SUPPLIER = [];
-        let ACK = [];
-        let PO = [];
-        for (let i = 0; i < gridData.length; i++) {
-            if (gridData[i].status == 'INVOICED') {
-                console.log(gridData[i].count, "---------------------INVOICEDDDDDDDDDD")
-                gridData[i].count == undefined ? 0 : (INVOICED.push(gridData[i].count) && RECEIVED_BY_EMIRATES.push(gridData[i].count))
-            }
-            else if (gridData[i].status == 'PO') {
-                gridData[i].count == undefined ? 0 : PO.push(gridData[i].count)
-            }
-            else if (gridData[i].status == 'PROD') {
-                gridData[i].count == undefined ? 0 : PROD.push(gridData[i].count)
-
-            }
-            else if (gridData[i].status == 'SHIPPED') {
-                gridData[i].count == undefined ? 0 : SHIPPED.push(gridData[i].count)
-
-            }
-            else if (gridData[i].status == 'QC') {
-                gridData[i].count == undefined ? 0 : QC.push(gridData[i].count)
-
-            }
-            else if (gridData[i].status == 'ACK-SUBORDER') {
-                gridData[i].count == undefined ? 0 : ACK_SUBORDER.push(gridData[i].count)
-
-            }
-            else if (gridData[i].status == 'SUBORDER') {
-                gridData[i].count == undefined ? 0 : SUBORDER.push(gridData[i].count)
-
-            }
-            else if (gridData[i].status == 'PAID') {
-                gridData[i].count == undefined ? 0 : PAID.push(gridData[i].count)
-
-                // PAID[0] == undefined ? 0 : PAID.push(PAID[0].count);
-            } else if (gridData[i].status == 'ACK') {
-                gridData[i].count == undefined ? 0 : ACK.push(gridData[i].count)
-            } else if (gridData[i].status == 'RECEIVED') {
-                gridData[i].count == undefined ? 0 : RECEIVED_BY_SUPPLIER.push(gridData[i].count)
-            }
-            // else if (gridData[i].status == 'RECEIVED1') {
-            //     gridData[i].count == undefined ? 0 : RECEIVED_BY_EMIRATES.push(gridData[i].count)
-            // }
-        }
-
-        // console.log(INVOICED, "IAM INVOICED ",
-        //     PAID, " IAM PAID ", 
-        //     ACK, "IAM ACK  ", RECEIVED1,
-        //      "I AM RECEIVED1", RECEIVED2, 
-        //      " IAM RECEIVED2")
-        // return [PO,PROD,SHIPPED,QC,ACK_SUBORDER,SUBORDER, PAID, ACK, RECEIVED1, RECEIVED2];
-        return [PO, ACK, SUBORDER, ACK_SUBORDER, PROD, QC, SHIPPED, RECEIVED_BY_SUPPLIER,
-            INVOICED, PAID];
-    }
-    catch (err) {
-        console.log(err)
-    }
-}
-
-// let payload = {
-//     dashboardPendingGridData: {
-//         pageData: {
-//             currentPageNo: 1,
-//             pageSize: 10
+//         if (!!supplierID && supplierID != "ALL") {
+//             getGridData = `SELECT count(orders.key),
+//                 orders."tranxData" ->> 'status' as "status",
+//                     FROM orders
+//             WHERE
+//             orders."tranxData" ->> 'customerID'= '${supplierID}'
+//             GROUP BY orders."tranxData" ->> 'status', 'customerID';`;
 //         }
+
+//         else if (supplierID == "ALL" || !supplierID) {
+//             getGridData = `SELECT count(orders.key),
+//             orders."tranxData" ->> 'status' as "status",
+//                 FROM orders
+//         WHERE
+//         orders."tranxData" ->> 'customerID'= '${supplierID}'
+//         GROUP BY orders."tranxData" ->> 'status', 'customerID';`
+//         }
+//         let queryResult = await pg.query(getGridData);
+//         console.log(queryResult.rows, " =======getGridData")
+
+
+//         let gridData = queryResult.rows;
+//         let INVOICED = [];
+//         let PAID = [];
+//         let PROD = [];
+//         let QC = [];
+//         let SHIPPED = [];
+//         let SUBORDER = [];
+//         let ACK_SUBORDER = [];
+//         let RECEIVED_BY_EMIRATES = [];
+//         let RECEIVED_BY_SUPPLIER = [];
+//         let ACK = [];
+//         let PO = [];
+//         for (let i = 0; i < gridData.length; i++) {
+//             if (gridData[i].status == 'INVOICED') {
+//                 console.log(gridData[i].count, "---------------------INVOICEDDDDDDDDDD")
+//                 gridData[i].count == undefined ? 0 : (INVOICED.push(gridData[i].count) && RECEIVED_BY_EMIRATES.push(gridData[i].count))
+//             }
+//             else if (gridData[i].status == 'PO') {
+//                 gridData[i].count == undefined ? 0 : PO.push(gridData[i].count)
+//             }
+//             else if (gridData[i].status == 'PROD') {
+//                 gridData[i].count == undefined ? 0 : PROD.push(gridData[i].count)
+
+//             }
+//             else if (gridData[i].status == 'SHIPPED') {
+//                 gridData[i].count == undefined ? 0 : SHIPPED.push(gridData[i].count)
+
+//             }
+//             else if (gridData[i].status == 'QC') {
+//                 gridData[i].count == undefined ? 0 : QC.push(gridData[i].count)
+
+//             }
+//             else if (gridData[i].status == 'ACK-SUBORDER') {
+//                 gridData[i].count == undefined ? 0 : ACK_SUBORDER.push(gridData[i].count)
+
+//             }
+//             else if (gridData[i].status == 'SUBORDER') {
+//                 gridData[i].count == undefined ? 0 : SUBORDER.push(gridData[i].count)
+
+//             }
+//             else if (gridData[i].status == 'PAID') {
+//                 gridData[i].count == undefined ? 0 : PAID.push(gridData[i].count)
+
+//                 // PAID[0] == undefined ? 0 : PAID.push(PAID[0].count);
+//             } else if (gridData[i].status == 'ACK') {
+//                 gridData[i].count == undefined ? 0 : ACK.push(gridData[i].count)
+//             } else if (gridData[i].status == 'RECEIVED') {
+//                 gridData[i].count == undefined ? 0 : RECEIVED_BY_SUPPLIER.push(gridData[i].count)
+//             }
+//             // else if (gridData[i].status == 'RECEIVED1') {
+//             //     gridData[i].count == undefined ? 0 : RECEIVED_BY_EMIRATES.push(gridData[i].count)
+//             // }
+//         }
+
+//         // console.log(INVOICED, "IAM INVOICED ",
+//         //     PAID, " IAM PAID ", 
+//         //     ACK, "IAM ACK  ", RECEIVED1,
+//         //      "I AM RECEIVED1", RECEIVED2, 
+//         //      " IAM RECEIVED2")
+//         // return [PO,PROD,SHIPPED,QC,ACK_SUBORDER,SUBORDER, PAID, ACK, RECEIVED1, RECEIVED2];
+//         return [PO, ACK, SUBORDER, ACK_SUBORDER, PROD, QC, SHIPPED, RECEIVED_BY_SUPPLIER,
+//             INVOICED, PAID];
+//     }
+//     catch (err) {
+//         console.log(err)
 //     }
 // }
+
+
 // async function dataM() {
 //     let settlementsRows = await getSettlements(payload.dashboardPendingGridData);
 //     console.log("CALLLLLLLL", settlementsRows);
@@ -659,7 +661,7 @@ exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JW
         let completedOrderRows = await getCompletedOrder(payload.dashboardCompletedGridData, payload.dashboardCompletedGridData.supplierID);
         let settlementsRows = await getSettlements(payload.dashboardSettlementGridData, payload.dashboardSettlementGridData.supplierID);
         let supplierWiseSettlementRows = await getSupplierWiseSettlement(payload.dashboardSupplierSettlement, payload.dashboardSupplierSettlement.supplierID);
-        let gridDataArray = await getGridData(payload.dashboardPendingGridData.supplierID);
+        //  let gridDataArray = await getGridData(payload.dashboardPendingGridData.supplierID);
 
         let customerDashboardData = {
             "customerDashboardData": {
@@ -674,24 +676,30 @@ exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JW
                             "URI": ""
                         },
                         "legends": [
-                            "APPAREL FZCO",
+                            "ETIHAD",
 
                         ],
                         "chartData": {
-                            "firstBar": [
-                                gridDataArray[0] != undefined ? (Number(gridDataArray[0])) : 0,
-                                gridDataArray[1] != undefined ? (Number(gridDataArray[1])) : 0,
-                                gridDataArray[2] != undefined ? (Number(gridDataArray[2])) : 0,
-                                gridDataArray[3] != undefined ? (Number(gridDataArray[3])) : 0,
-                                gridDataArray[4] != undefined ? (Number(gridDataArray[4])) : 0,
-                                gridDataArray[5] != undefined ? (Number(gridDataArray[5])) : 0,
+                            "firstBar":
+                                [
+                                    0,
+                                    6,
+                                    7, 10, 30, 13, 5, 9, 10, 40
+                                ],
+                            // [
+                            //     gridDataArray[0] != undefined ? (Number(gridDataArray[0])) : 0,
+                            //     gridDataArray[1] != undefined ? (Number(gridDataArray[1])) : 0,
+                            //     gridDataArray[2] != undefined ? (Number(gridDataArray[2])) : 0,
+                            //     gridDataArray[3] != undefined ? (Number(gridDataArray[3])) : 0,
+                            //     gridDataArray[4] != undefined ? (Number(gridDataArray[4])) : 0,
+                            //     gridDataArray[5] != undefined ? (Number(gridDataArray[5])) : 0,
 
-                                gridDataArray[6] != undefined ? (Number(gridDataArray[6])) : 0,
-                                gridDataArray[7] != undefined ? (Number(gridDataArray[7])) : 0,
-                                // gridDataArray[8] != undefined ? (Number(gridDataArray[8])) : 0,
-                                gridDataArray[9] != undefined ? (Number(gridDataArray[9])) : 0,
-                                gridDataArray[10] != undefined ? (Number(gridDataArray[10])) : 0,
-                            ],
+                            //     gridDataArray[6] != undefined ? (Number(gridDataArray[6])) : 0,
+                            //     gridDataArray[7] != undefined ? (Number(gridDataArray[7])) : 0,
+                            //     // gridDataArray[8] != undefined ? (Number(gridDataArray[8])) : 0,
+                            //     gridDataArray[9] != undefined ? (Number(gridDataArray[9])) : 0,
+                            //     gridDataArray[10] != undefined ? (Number(gridDataArray[10])) : 0,
+                            // ],
                             "secondBar": [
                                 8,
                                 5,
@@ -702,16 +710,12 @@ exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JW
                             ]
                         },
                         "labels": [
-                            "Purchase Order",
-                            "Acknowledge",
-                            "Place Suborder",
-                            "Suborder Acknowledge",
-                            "Production",
-                            "Quality Check",
-                            "Shipped",
-                            "Received By Supplier",
-                            "Received By Emirates",
+                            "Order Received", "Purchase Order",
+                            "Component Manufacturing", "Dispatched",
+                            "Received", "Inspected",
+                            "Accepted/Rejected", "Payment Order",
                             "Paid"
+
                         ]
                     },
                     "dashboardTiles": [
