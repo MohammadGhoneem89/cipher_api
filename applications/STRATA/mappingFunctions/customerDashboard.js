@@ -3,7 +3,7 @@ const pg = require('../../../core/api/connectors/postgress');
 const connector = require('../../../core/api/client');
 const _ = require('lodash');
 
-function getTilesData(supplierID, callback) {
+function getTilesData(supplierID) {
     let queryPendingOrder, queryCompletedOrders, payable, totalPaid,
         countPendingOrders, countCompletedOrders, payableOrders, totalPaidOrders;
 
@@ -75,7 +75,7 @@ function getTilesData(supplierID, callback) {
                 }
                 return result;
             })
-    }) .catch((error) => { console.log(error, " <<<<< Some error occurred!"); return [0, 0, 0, 0] });
+    }).catch((error) => { console.log(error, " <<<<< Some error occurred!"); return [0, 0, 0, 0] });
 }
 async function getPendingOrder(payloadDashboardData, supplierID) {
     try {
@@ -525,103 +525,55 @@ async function getSupplierWiseSettlement(payloadDashboardData, supplierID) {
     }
 }
 
-async function getGridData(supplierID) {
-    try {
-        let getGridData = "";
-        const pg = await connector.createClient('pg',
-            'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
+function getGraphData(supplierID) {
+    console.log(supplierID, "SUPPLIERID")
 
-        if (!!supplierID && supplierID != "ALL") {
-            getGridData = `SELECT count(orders.key),
-                orders."tranxData" ->> 'status' as "status",
-                    FROM orders
-            WHERE
-            orders."tranxData" ->> 'customerID'= '${supplierID}'
-            GROUP BY orders."tranxData" ->> 'status', 'customerID';`;
-        }
-
-        else if (supplierID == "ALL" || !supplierID) {
-            getGridData = `SELECT count(orders.key),
-            orders."tranxData" ->> 'status' as "status",
-                FROM orders
-        WHERE
-        orders."tranxData" ->> 'customerID'= '${supplierID}'
-        GROUP BY orders."tranxData" ->> 'status', 'customerID';`
-        }
-        let queryResult = await pg.query(getGridData);
-        console.log(queryResult.rows, " =======getGridData")
+    let getGridData, purchaseOrder, orderReceived, componentManufacturing, dispatched, received,
+        accepted_rejected, inspected, paymentOrder, paid;
 
 
-        let gridData = queryResult.rows;
-        let INVOICED = [];
-        let PAID = [];
-        let PROD = [];
-        let QC = [];
-        let SHIPPED = [];
-        let SUBORDER = [];
-        let ACK_SUBORDER = [];
-        let RECEIVED_BY_EMIRATES = [];
-        let RECEIVED_BY_SUPPLIER = [];
-        let ACK = [];
-        let PO = [];
-        for (let i = 0; i < gridData.length; i++) {
-            if (gridData[i].status == 'INVOICED') {
-                console.log(gridData[i].count, "---------------------INVOICEDDDDDDDDDD")
-                gridData[i].count == undefined ? 0 : (INVOICED.push(gridData[i].count) && RECEIVED_BY_EMIRATES.push(gridData[i].count))
-            }
-            else if (gridData[i].status == 'PO') {
-                gridData[i].count == undefined ? 0 : PO.push(gridData[i].count)
-            }
-            else if (gridData[i].status == 'PROD') {
-                gridData[i].count == undefined ? 0 : PROD.push(gridData[i].count)
-
-            }
-            else if (gridData[i].status == 'SHIPPED') {
-                gridData[i].count == undefined ? 0 : SHIPPED.push(gridData[i].count)
-
-            }
-            else if (gridData[i].status == 'QC') {
-                gridData[i].count == undefined ? 0 : QC.push(gridData[i].count)
-
-            }
-            else if (gridData[i].status == 'ACK-SUBORDER') {
-                gridData[i].count == undefined ? 0 : ACK_SUBORDER.push(gridData[i].count)
-
-            }
-            else if (gridData[i].status == 'SUBORDER') {
-                gridData[i].count == undefined ? 0 : SUBORDER.push(gridData[i].count)
-
-            }
-            else if (gridData[i].status == 'PAID') {
-                gridData[i].count == undefined ? 0 : PAID.push(gridData[i].count)
-
-                // PAID[0] == undefined ? 0 : PAID.push(PAID[0].count);
-            } else if (gridData[i].status == 'ACK') {
-                gridData[i].count == undefined ? 0 : ACK.push(gridData[i].count)
-            } else if (gridData[i].status == 'RECEIVED') {
-                gridData[i].count == undefined ? 0 : RECEIVED_BY_SUPPLIER.push(gridData[i].count)
-            }
-            // else if (gridData[i].status == 'RECEIVED1') {
-            //     gridData[i].count == undefined ? 0 : RECEIVED_BY_EMIRATES.push(gridData[i].count)
-            // }
-        }
-
-        // console.log(INVOICED, "IAM INVOICED ",
-        //     PAID, " IAM PAID ", 
-        //     ACK, "IAM ACK  ", RECEIVED1,
-        //      "I AM RECEIVED1", RECEIVED2, 
-        //      " IAM RECEIVED2")
-        // return [PO,PROD,SHIPPED,QC,ACK_SUBORDER,SUBORDER, PAID, ACK, RECEIVED1, RECEIVED2];
-        return [PO, ACK, SUBORDER, ACK_SUBORDER, PROD, QC, SHIPPED, RECEIVED_BY_SUPPLIER,
-            INVOICED, PAID];
+    if (supplierID && supplierID != "ALL") {
+        getGridData = `SELECT count(orders.key), orders."tranxData" ->> 'status' as "status",orders."tranxData" ->> 'customerID' as "customerID"
+                FROM orders WHERE orders."tranxData" ->> 'customerID'= '${supplierID}'
+              GROUP BY  orders."tranxData" ->> 'status',orders."tranxData" ->>'customerID';`;
     }
-    catch (err) {
-        console.log(err)
-    }
+    return pg.connection().then((conn) => {
+        return Promise.all([
+            conn.query(getGridData, [])
+        ]).then((data) => {
+            console.log(data[0].rows, "rows")
+
+            purchaseOrder = data[0].rows.filter(obj => obj.status === "001");
+            orderReceived = data[0].rows.filter(obj => obj.status === "002");
+            componentManufacturing = data[0].rows.filter(obj => obj.status === "003");
+            dispatched = data[0].rows.filter(obj => obj.status === "010");
+            inspected = data[0].rows.filter(obj => obj.status === "012");
+            accepted_rejected = data[0].rows.filter(obj => obj.status === "013" || obj.status === "013");
+            paymentOrder = data[0].rows.filter(obj => obj.status === "018");
+            received = data[0].rows.filter(obj => obj.status === "011");
+            paid = data[0].rows.filter(obj => obj.status === "019");
+
+
+            let result = {
+                purchaseOrder: purchaseOrder[0] ? purchaseOrder[0].count : 0,
+                orderReceived: orderReceived[0] ? orderReceived[0].count : 0,
+                componentManufacturing: componentManufacturing[0] ? componentManufacturing[0].count : 0,
+                dispatched: dispatched[0] ? dispatched[0].count : 0,
+                received: received[0] ? received[0].count : 0,
+                inspected: inspected[0] ? inspected[0].count : 0,
+                accepted_rejected: accepted_rejected[0] ? accepted_rejected[0].count : 0,
+                paymentOrder: paymentOrder[0] ? paymentOrder[0].count : 0,
+                paid: paid[0] ? paid[0].count : 0
+            }
+            return result;
+        })
+    }).catch((e) => { console.log(e, "<<< Some error occurred while working on graphData"); return e; })
+
 }
 
 exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JWToken) {
     try {
+        console.log(payload.dashboardPendingGridData.supplierID, "payload.dashboardPendingGridData.supplierID")
         console.log("<<<<<<<<<<<<<<-----------------------DASHBOARD STARTED ----------------------->>>>>>>>>")
         let tilesData = await getTilesData(payload.dashboardPendingGridData.supplierID);
 
@@ -629,9 +581,8 @@ exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JW
         let completedOrderRows = await getCompletedOrder(payload.dashboardCompletedGridData, payload.dashboardCompletedGridData.supplierID);
         let settlementsRows = await getSettlements(payload.dashboardSettlementGridData, payload.dashboardSettlementGridData.supplierID);
         let supplierWiseSettlementRows = await getSupplierWiseSettlement(payload.dashboardSupplierSettlement, payload.dashboardSupplierSettlement.supplierID);
-        //  let gridDataArray = await getGridData(payload.dashboardPendingGridData.supplierID);
-        
-        console.log(tilesData, "tilesdata")
+        let graphData = await getGraphData(payload.dashboardPendingGridData.supplierID);
+        console.log(graphData, "graphData")
         let customerDashboardData = {
             "customerDashboardData": {
                 "data": {
@@ -648,26 +599,17 @@ exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JW
                             "ETIHAD",
                         ],
                         "chartData": {
-                            "firstBar":
-                                [
-                                    0,
-                                    6,
-                                    7, 10, 30, 13, 5, 9, 10, 40
+                            "firstBar": [
+                                    graphData.purchaseOrder,
+                                    graphData.orderReceived,
+                                    graphData.componentManufacturing,
+                                    graphData.dispatched,
+                                    graphData.received,
+                                    graphData.inspected,
+                                    graphData.accepted_rejected,
+                                    graphData.payableOrders,
+                                    graphData.paid,
                                 ],
-                            // [
-                            //     gridDataArray[0] != undefined ? (Number(gridDataArray[0])) : 0,
-                            //     gridDataArray[1] != undefined ? (Number(gridDataArray[1])) : 0,
-                            //     gridDataArray[2] != undefined ? (Number(gridDataArray[2])) : 0,
-                            //     gridDataArray[3] != undefined ? (Number(gridDataArray[3])) : 0,
-                            //     gridDataArray[4] != undefined ? (Number(gridDataArray[4])) : 0,
-                            //     gridDataArray[5] != undefined ? (Number(gridDataArray[5])) : 0,
-
-                            //     gridDataArray[6] != undefined ? (Number(gridDataArray[6])) : 0,
-                            //     gridDataArray[7] != undefined ? (Number(gridDataArray[7])) : 0,
-                            //     // gridDataArray[8] != undefined ? (Number(gridDataArray[8])) : 0,
-                            //     gridDataArray[9] != undefined ? (Number(gridDataArray[9])) : 0,
-                            //     gridDataArray[10] != undefined ? (Number(gridDataArray[10])) : 0,
-                            // ],
                             "secondBar": [
                                 8,
                                 5,
@@ -686,7 +628,7 @@ exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JW
 
                         ]
                     },
-                    "dashboardTiles" : tilesData.dashboardTiles,
+                    "dashboardTiles": tilesData.dashboardTiles,
                     "dashboardPendingGridData": {
                         "pageData": {
                             "pageSize": payload.dashboardPendingGridData.pageData.pageSize,
@@ -723,21 +665,11 @@ exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JW
                 }
             }
         }
-
-        // console.log("--------------RESPONSE \n", JSON.stringify(customerDashboardData))
         return callback(customerDashboardData);
     }
     catch (err) {
         return callback(err);
     }
-    // let payload = {
-    //     page: {
-    //         currentPageNo: 1,
-    //         pageSize: 10
-    //     }
-    // }
-    // data();
-
 }
 
 
