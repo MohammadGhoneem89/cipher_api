@@ -1,9 +1,9 @@
 {
   "STRATA": {
     "CustomFunctionsLocation": "../../applications/STRATA/mappingFunctions/",
-    "cusDashboardData": {
+    "customerDashboard": {
       "customMapping": true,
-      "MappingfunctionName": "cusDashboardData",
+      "MappingfunctionName": "customerDashboard",
       "CustomMappingFile": "dashboard/customerDashboard.js",
       "mappingConfigFile": "ePayMapping"
     },

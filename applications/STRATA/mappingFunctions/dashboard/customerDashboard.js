@@ -1,22 +1,25 @@
 'use strict';
 const pg = require('../../../../core/api/connectors/postgress');
-const connector = require('../../../../core/api/client');
-const _ = require('lodash');
-
-function getTilesData(supplierID) {
+function getTilesData(customerID) {
     let queryPendingOrder, queryCompletedOrders, payable, totalPaid,
         countPendingOrders, countCompletedOrders, payableOrders, totalPaidOrders;
+    let pAmount = 0, paidOrder = 0;
 
-    if (supplierID && supplierID != "ALL") {
-        queryPendingOrder = `select COUNT(1) FROM  orders WHERE "tranxData" ->> 'customerID' ='${supplierID}' And "tranxData" ->> 'status' NOT IN ('019');`;
-        queryCompletedOrders = `select COUNT(1) from  orders  WHERE "tranxData" ->> 'customerID' ='${supplierID}' And "tranxData" ->> 'status' = '019' ;`;
-        payable = `select "tranxData" ->> 'toPayAmount' AS "amount" from accountings WHERE "tranxData" ->> 'customerID' ='${supplierID}';`
-        totalPaid = `select "tranxData" ->> 'paidAmount' AS "paidAmount" from accountings WHERE "tranxData" ->> 'customerID' ='${supplierID}'`;
+    if (customerID && customerID != "ALL") {
+        queryPendingOrder = `select COUNT(1) FROM  orders WHERE "tranxData" ->> 'customerID' ='${customerID}' And "tranxData" ->> 'status' NOT IN ('019');`;
+        queryCompletedOrders = `select COUNT(1) from  orders  WHERE "tranxData" ->> 'customerID' ='${customerID}' And "tranxData" ->> 'status' = '019' ;`;
+        payable = `select "tranxData" ->> 'toPayAmount' AS "amount",
+        "tranxData" ->> 'creditNoteAmount' AS "creditNoteAmount",
+        "tranxData" ->> 'totalDiscount' AS "totalDiscount"
+          from accountings WHERE "tranxData" ->> 'customerID' ='${customerID}';`
+        totalPaid = `select "tranxData" ->> 'paidAmount' AS "paidAmount" from accountings WHERE "tranxData" ->> 'customerID' ='${customerID}'`;
     }
     else {
         queryPendingOrder = `select COUNT(1) FROM  orders WHERE "tranxData" ->> 'status' NOT IN ('019');`;
         queryCompletedOrders = `select COUNT(1) from  orders  WHERE "tranxData" ->> 'status' = '019' ;`;
-        payable = `select "tranxData" ->> 'toPayAmount' AS "amount" from accountings;`
+        payable = `select "tranxData" ->> 'toPayAmount' AS "amount"
+        "tranxData" ->> 'creditNoteAmount' AS "creditNoteAmount",
+        "tranxData" ->> 'totalDiscount' AS "totalDiscount" from accountings;`
         totalPaid = `select "tranxData" ->> 'paidAmount' AS "paidAmount" from accountings;`
     }
     return pg.connection().then((conn) => {
@@ -26,11 +29,15 @@ function getTilesData(supplierID) {
             conn.query(payable, []),
             conn.query(totalPaid, [])])
             .then((data) => {
-
+                // console.log(data[2].rows, "!!! data[2].rows\n\n\n ---->>>>")
+                console.log(data[3].rows, "!!! data[3].rows\n\n\n ---->>>>")
                 countPendingOrders = data[0].rows[0].count
                 countCompletedOrders = data[1].rows[0].count
-                payableOrders = data[2].rows[0].amount
-                totalPaidOrders = data[3].rows[0].paidAmount
+                payableOrders = data[2].rows
+                totalPaidOrders = data[3].rows
+
+                for (let i in payableOrders) { pAmount += payableOrders[i].amount - payableOrders[i].creditNoteAmount - payableOrders[i].totalDiscount; }
+                for (let i in totalPaidOrders) { paidOrder += totalPaidOrders[i].paidAmount; }
 
                 let result = {
                     dashboardTiles: [
@@ -56,7 +63,7 @@ function getTilesData(supplierID) {
                             "id": 1,
                             "title": "Payable",
                             "percentage": "100",
-                            "value": payableOrders,
+                            "value": pAmount,
                             "actionURI": "",
                             "overDue": "0",
                             "fontClass": "green-meadow"
@@ -65,7 +72,7 @@ function getTilesData(supplierID) {
                             "id": 1,
                             "title": "Total Paid",
                             "percentage": "100",
-                            "value": totalPaidOrders,
+                            "value": paidOrder,
                             "actionURI": "",
                             "overDue": "0",
                             "fontClass": "green-jungle"
@@ -78,16 +85,16 @@ function getTilesData(supplierID) {
     }).catch((error) => { console.log(error, " <<<<< Some error occurred while working on tiles data!"); return [0, 0, 0, 0] });
 }
 
-function getGraphData(supplierID) {
-    console.log(supplierID, "SUPPLIERID")
+function getGraphData(customerID) {
+    console.log(customerID, "customerID")
 
     let getGridData, purchaseOrder, orderReceived, componentManufacturing, dispatched, received,
-        accepted_rejected, inspected, paymentOrder, paid;
+        accepted, rejected, reviewed, scrapped, concession, inspected, paymentOrder, paid;
 
 
-    if (supplierID && supplierID != "ALL") {
+    if (customerID && customerID != "ALL") {
         getGridData = `SELECT count(orders.key), orders."tranxData" ->> 'status' as "status",orders."tranxData" ->> 'customerID' as "customerID"
-                FROM orders WHERE orders."tranxData" ->> 'customerID'= '${supplierID}'
+                FROM orders WHERE orders."tranxData" ->> 'customerID'= '${customerID}'
               GROUP BY  orders."tranxData" ->> 'status',orders."tranxData" ->>'customerID';`;
     }
     return pg.connection().then((conn) => {
@@ -98,14 +105,24 @@ function getGraphData(supplierID) {
 
             purchaseOrder = data[0].rows.filter(obj => obj.status === "001");
             orderReceived = data[0].rows.filter(obj => obj.status === "002");
-            componentManufacturing = data[0].rows.filter(obj => obj.status === "003");
+            componentManufacturing = data[0].rows.filter(obj =>
+                obj.status === "003" ||
+                obj.status === "004" ||
+                obj.status === "005" ||
+                obj.status === "006" ||
+                obj.status === "007" ||
+                obj.status === "008" ||
+                obj.status === "009");
             dispatched = data[0].rows.filter(obj => obj.status === "010");
             inspected = data[0].rows.filter(obj => obj.status === "012");
-            accepted_rejected = data[0].rows.filter(obj => obj.status === "013" || obj.status === "013");
+            accepted = data[0].rows.filter(obj => obj.status === "013");
+            rejected = data[0].rows.filter(obj => obj.status === "014");
+            reviewed = data[0].rows.filter(obj => obj.status === "015");
+            concession = data[0].rows.filter(obj => obj.status === "016");
+            scrapped = data[0].rows.filter(obj => obj.status === "017");
             paymentOrder = data[0].rows.filter(obj => obj.status === "018");
             received = data[0].rows.filter(obj => obj.status === "011");
             paid = data[0].rows.filter(obj => obj.status === "019");
-
 
             let result = {
                 purchaseOrder: purchaseOrder[0] ? purchaseOrder[0].count : 0,
@@ -114,7 +131,11 @@ function getGraphData(supplierID) {
                 dispatched: dispatched[0] ? dispatched[0].count : 0,
                 received: received[0] ? received[0].count : 0,
                 inspected: inspected[0] ? inspected[0].count : 0,
-                accepted_rejected: accepted_rejected[0] ? accepted_rejected[0].count : 0,
+                accepted: accepted[0] ? accepted[0].count : 0,
+                rejected: rejected[0] ? rejected[0].count : 0,
+                reviewed: reviewed[0] ? reviewed[0].count : 0,
+                concession: concession[0] ? concession[0].count : 0,
+                scrapped: scrapped[0] ? scrapped[0].count : 0,
                 paymentOrder: paymentOrder[0] ? paymentOrder[0].count : 0,
                 paid: paid[0] ? paid[0].count : 0
             }
@@ -125,467 +146,361 @@ function getGraphData(supplierID) {
 }
 
 
-async function getPendingOrder(payloadDashboardData, supplierID) {
-    try {
-        let getPendingOrder = "";
+function getPendingOrder(payloadDashboardData, customerID) {
 
-        const pg = await connector.createClient('pg',
-            'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
+    let pendingOrderData, countPendingOrders, pendingOrderDataArray = [], totPendingOrders, POdate = 0;
 
-        if (!!supplierID && supplierID != "ALL") {
-            getPendingOrder = `select  "tranxData"  from  orders WHERE 
-            "tranxData" ->> 'status' NOT IN ('Paid')
-            AND "tranxData" ->> 'customerID' ='${supplierID}'`;
-        }
-        else if (supplierID == "ALL" || !supplierID) {
-            getPendingOrder = `select  "tranxData"  from  orders WHERE 
-            "tranxData" ->> 'status' NOT IN ('Paid')`;
-        }
-
-
-        if (payloadDashboardData.pageData) {
-            getPendingOrder += ` limit ${payloadDashboardData.pageData.pageSize}
-            OFFSET ${
-                payloadDashboardData.pageData.pageSize *
-                (payloadDashboardData.pageData.currentPageNo - 1)
-                } `;
-        }
-        let queryResult = await pg.query(getPendingOrder);
-        let queryCnt = "";
-        if (!!supplierID && supplierID != "ALL") {
-            queryCnt = `SELECT count(*) FROM orders WHERE
-            "tranxData" ->> 'status' NOT IN('Paid')
-            And "tranxData" ->> ''customerID'' ='${supplierID}'`;
-        }
-        else if (supplierID == "ALL" || !supplierID) {
-            queryCnt = `SELECT count(*) FROM orders WHERE
-                       "tranxData" ->> 'status' NOT IN('Paid')`;
-        }
+    if (customerID && customerID != "ALL") {
+        pendingOrderData = `select  "tranxData"->> 'orderID' AS "ORDERID",
+        "tranxData"->> 'dateCreated' AS "PODATE",
+        "tranxData" ->> 'customerID' AS "CUSTOMERID",
+        "tranxData"->> 'orderAmount' AS "AMOUNT",
+        "tranxData"->> 'orderType' AS "ORDERTYPE",
+        "tranxData"->> 'sla' AS "sla",
+        "tranxData"->> 'activities' AS "activities",
+        "tranxData"->> 'status' AS "STATUS"
+        from  orders WHERE  "tranxData" ->> 'status'  NOT IN ('019') AND 
+		"tranxData" ->> 'customerID' = '${customerID}'`
+        countPendingOrders = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' NOT IN ('019') And "tranxData" ->> 'customerID' = '${customerID}'`
+    } else {
+        pendingOrderData = `select  "tranxData"->> 'dateCreated' AS "PODATE",
+        "tranxData" ->> 'customerID' AS "CUSTOMERID",
+        "tranxData"->> 'orderAmount' AS "AMOUNT",
+        "tranxData"->> 'sla' AS "sla",
+        "tranxData"->> 'activities' AS "activities",
+        "tranxData"->> 'orderType' AS "ORDERTYPE",
+        "tranxData"->> 'status' AS "STATUS"  from  orders WHERE "tranxData" ->> 'status' NOT IN ('019')`;
+        countPendingOrders = `SELECT count(*) FROM orders WHERE  "tranxData" ->> 'status' NOT IN('019')`;
+    }
 
 
-        let totRecords = await pg.query(queryCnt);
-        // console.log(totRecords.rows[0].count, "---->>>>>>>>>>>>>>>>>>>>>ROWSCOUNT")
-        let totRecordCount = totRecords.rows[0].count;
-        let supplierIDtest = "";
+    if (payloadDashboardData.pageData && payloadDashboardData.pageData.pageSize && payloadDashboardData.pageData.currentPageNo) {
+        pendingOrderData += ` limit ${payloadDashboardData.pageData.pageSize}
+            OFFSET ${ payloadDashboardData.pageData.pageSize * (payloadDashboardData.pageData.currentPageNo - 1)} `;
+    }
 
+    return pg.connection().then((conn) => {
+        return Promise.all([
+            conn.query(pendingOrderData, []),
+            conn.query(countPendingOrders, [])
+        ])
+            .then((data) => {
+                pendingOrderData = data[0].rows
+                totPendingOrders = data[1].rows[0].count;
 
-        if (!!supplierID && supplierID != "ALL") {
-            supplierIDtest = `select * from
-            orders where
-            orders."tranxData" ->> 'customerID'=
-            '${supplierID}'
-            AND   orders."tranxData" ->> 'status' NOT IN('PAID')
-             `;
-        }
-        else if (supplierID == "ALL" || !supplierID) {
-            supplierIDtest = `select * from
-            orders where
-            orders."tranxData" ->> 'customerID'=
-            '${supplierID}'
-            AND   orders."tranxData" ->> 'status' NOT IN('PAID')
-             `;
-        }
+                for (let i in pendingOrderData) {
+                    let PO_DATE = 0;
+                    
+                    let pendingOrderActivities = JSON.parse(pendingOrderData[i].activities);
+                    for (let j in pendingOrderActivities) {
+                        if (pendingOrderActivities[j].toStage === "002") {
+                             PO_DATE = pendingOrderActivities[j].date}
+                    }
+                    console.log(PO_DATE, " ???? PO_DATE")
 
-        if (payloadDashboardData.pageData) {
-            supplierIDtest += ` limit ${payloadDashboardData.pageData.pageSize}
-            OFFSET ${
-                payloadDashboardData.pageData.pageSize *
-                (payloadDashboardData.pageData.currentPageNo - 1)
-                } `;
-        }
+                    let response = {
+                        "orderID": pendingOrderData[i].ORDERID,
+                        "customerID": pendingOrderData[i].CUSTOMERID,
+                        "status": pendingOrderData[i].STATUS,
+                        "amount": pendingOrderData[i].AMOUNT,
+                        "dateCreated": PO_DATE,
+                        "orderType": pendingOrderData[i].ORDERTYPE,
+                        "sla": pendingOrderData[i].sla,
+                        "actions": [
+                            {
+                                "actionType": "componentAction",
+                                "iconName": "fa fa-eye",
+                                "label": "View",
+                                "URI": [
+                                    "/strata/viewOrder"
+                                ]
+                            }
+                        ]
+                    }
+                   // console.log(response.dateCreated, "response.dateCreated")
+                    pendingOrderDataArray.push(response);
+                }
+                let result = {
+                    dashboardPendingGridData: {
+                        "pageData": {
+                            "pageSize": payloadDashboardData.pageData.pageSize,
+                            "currentPageNo": payloadDashboardData.pageData.currentPageNo,
+                            "totalRecords": totPendingOrders
+                        },
 
-        let queryResult2 = await pg.query(supplierIDtest);
-
-        // console.log("@@@@@@@@@@@@@@", queryResult2.rows, "@@@@@@@@@@@@@@2")
-        let supplierDetails = queryResult2.rows;
-
-
-        let details = [];
-        if (supplierDetails != undefined) {
-            supplierDetails.map((item) => {
-                let detail = {
-                    "supplierName": {
-                        "name": item.tranxData.supplierName,
-                        "image": item.tranxData.logo
+                        pendingOrderRows: pendingOrderDataArray
                     }
                 }
-                details.push(detail);
+
+                return result;
 
             })
-        }
-        // console.log(details, "#########################")
-        let PendingOrders = queryResult.rows;
-        let pendingOrdersArray = [];
-        if (PendingOrders.length !== 0) {
-            let response = {}
-
-            for (let i = 0; i < PendingOrders.length; i++) {
-                // if(PendingOrders[i].tranxData.sla){
-                //     console.log("!!!!!!!!!!!!!!!!!!------------SLAAAAAAAAAAAAA----------!!!!!!!!!!!!!!!")
-                // }
-                response = {
-                    "orderID": PendingOrders[i].tranxData.orderID,
-                    "sla": PendingOrders[i].tranxData.sla ? PendingOrders[i].tranxData.sla : [],
-                    "status": PendingOrders[i].tranxData.status,
-                    "amount": PendingOrders[i].tranxData.orderAmount,
-                    "dateCreated": PendingOrders[i].tranxData.dateCreated * 1000,
-                    "expectedDate": PendingOrders[i].tranxData.dateCreated * 1000,
-                    "supplierName": details[i] ? details[i].supplierName.name : "",
-
-                    "actions": [
-                        {
-                            "actionType": "componentAction",
-                            "iconName": "fa fa-eye",
-                            "label": "View",
-                            "URI": [
-                                "/viewOrder"
-                            ]
-                        }
-                    ]
-                }
-                pendingOrdersArray.push(response);
-            }
-            // });
-            //  console.log(pendingOrdersArray, "<<<<PENDING ORDER ARRAY >>>");
-            return [pendingOrdersArray, totRecordCount]
-        }
-
-        else {
-            // console.log(PendingOrders, " =====PendingOrders is empty")
-            return [];
-        };
-    }
-    catch (err) {
-        console.log(err)
-    }
+    }).catch((error) => {
+        console.log(error, " <<<<< Some error occurred while working on pending order data!");
+        return [];
+    });
 }
 
-async function getCompletedOrder(payloadDashboardData, supplierID) {
-    try {
-        const pg = await connector.createClient('pg',
-            'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
+function getCompletedOrder(payloadDashboardData, customerID) {
+    let completedOrderData, countCompletedOrders, completedOrderDataArray = [], totCompletedOrder;
 
-        let getCompletedOrder = "";
-        if (!!supplierID && supplierID != "ALL") {
-            getCompletedOrder = `select  "tranxData"  from  orders
-            WHERE "tranxData" ->> 'status' = 'PAID'
-            AND "tranxData" ->> 'customerID' ='${supplierID}'`;
-        }
-        else if (supplierID == "ALL" || !supplierID) {
-            getCompletedOrder = `select  "tranxData"  from  orders
-                WHERE "tranxData" ->> 'status' = 'PAID'`;
-        }
-
-        if (payloadDashboardData.pageData) {
-            getCompletedOrder += ` limit ${payloadDashboardData.pageData.pageSize}
-            OFFSET ${
-                payloadDashboardData.pageData.pageSize *
-                (payloadDashboardData.pageData.currentPageNo - 1)
-                } `;
-        }
-        let queryResult = await pg.query(getCompletedOrder);
-
-
-        let queryCnt = "";
-        if (!!supplierID && supplierID != "ALL") {
-            queryCnt = `SELECT count(*) FROM orders  WHERE "tranxData" ->> 'status' = 'Paid'
-            And "tranxData" ->> 'customerID' ='${supplierID}'`;
-        }
-        else if (supplierID == "ALL" || !supplierID) {
-            queryCnt = `SELECT count(*) FROM orders  WHERE "tranxData" ->> 'status' = 'Paid'`;
-        }
-
-
-        let totRecords = await pg.query(queryCnt);
-        // console.log(totRecords.rows[0].count, "---->>>>>>>>>>>>>>>>>>>>>ROWSCOUNT")
-        let totRecordCount = totRecords.rows[0].count;
-
-
-        let supplierIDtest = "";
-        if (!!supplierID && supplierID != "ALL") {
-            supplierIDtest = `select * from
-            orders WHERE orders."tranxData" ->> 'customerID' ='${supplierID}'
-            AND orders."tranxData" ->> 'status' = 'PAID'
-            `;
-        }
-        else if (supplierID == "ALL" || !supplierID) {
-            supplierIDtest = `select * from
-            orders WHERE orders."tranxData" ->> 'customerID' ='${supplierID}'
-            AND orders."tranxData" ->> 'status' = 'PAID'`;
-        }
-
-        if (payloadDashboardData.pageData) {
-            supplierIDtest += ` limit ${payloadDashboardData.pageData.pageSize}
-            OFFSET ${
-                payloadDashboardData.pageData.pageSize *
-                (payloadDashboardData.pageData.currentPageNo - 1)
-                } `;
-        }
-
-        let queryResult2 = await pg.query(supplierIDtest);
-
-        let supplierDetails = queryResult2.rows;
-
-
-        let details = [];
-        supplierDetails.map((item) => {
-            let detail = {
-                "supplierName": {
-                    "name": item.tranxData.supplierName,
-                    "image": item.tranxData.logo
-                }
-            }
-            details.push(detail);
-
-        })
-
-        let CompletedOrder = queryResult.rows;
-        let completeOrderArray = [];
-        if (CompletedOrder.length !== 0) {
-
-            for (let i = 0; i < CompletedOrder.length; i++) {
-                let response = {
-                    "orderID": CompletedOrder[i].tranxData.orderID,
-                    "customerID": CompletedOrder[i].tranxData.customerID,
-                    "status": CompletedOrder[i].tranxData.status,
-                    "sla": CompletedOrder[i].tranxData.sla ? CompletedOrder[i].tranxData.sla : [],
-                    "amount": CompletedOrder[i].tranxData.orderAmount,
-                    "dateCreated": CompletedOrder[i].tranxData.dateCreated * 1000,
-                    "expectedDate": CompletedOrder[i].tranxData.dateCreated * 1000,
-                    "supplierName": details[i] ? details[i].supplierName.name : "",
-                    "actions": [
-                        {
-                            "actionType": "componentAction",
-                            "iconName": "fa fa-eye",
-                            "label": "View",
-                            "URI": [
-                                "/viewOrder"
-                            ]
-                        }
-                    ]
-                }
-                completeOrderArray.push(response);
-            }
-            // console.log(completeOrderArray, ">>>>>>>>> CompletedOrder ");
-            return [completeOrderArray, totRecordCount];
-        }
-        else {
-            // console.log(" =======CompletedOrder is empty");
-            return [];
-        }
+    if (customerID && customerID != "ALL") {
+        completedOrderData = `select  "tranxData"->> 'orderID' AS "ORDERID",
+            "tranxData"->> 'dateCreated' AS "PODATE",
+            "tranxData" ->> 'customerID' AS "CUSTOMERID",
+            "tranxData"->> 'orderAmount' AS "AMOUNT",
+            "tranxData"->> 'orderType' AS "ORDERTYPE",
+            "tranxData"->> 'sla' AS "sla",
+            "tranxData"->> 'activities' AS "activities",
+            "tranxData"->> 'status' AS "STATUS"
+            from  orders WHERE  "tranxData" ->> 'status' = '019' AND 
+            "tranxData" ->> 'customerID' = '${customerID}'`
+        countCompletedOrders = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '019' And "tranxData" ->> 'customerID' = '${customerID}'`
+    } else {
+        completedOrderData = `select  "tranxData"->> 'dateCreated' AS "PODATE",
+            "tranxData" ->> 'customerID' AS "CUSTOMERID",
+            "tranxData"->> 'orderAmount' AS "AMOUNT",
+            "tranxData"->> 'sla' AS "sla",
+            "tranxData"->> 'activities' AS "activities",
+            "tranxData"->> 'orderType' AS "ORDERTYPE",
+            "tranxData"->> 'status' AS "STATUS"  from  orders WHERE "tranxData" ->> 'status' = '019'`;
+        countPendingOrders = `SELECT count(*) FROM orders WHERE  "tranxData" ->> 'status' = '019'`;
     }
-    catch (err) {
-        console.log(err)
+
+
+    if (payloadDashboardData.pageData && payloadDashboardData.pageData.pageSize && payloadDashboardData.pageData.currentPageNo) {
+        completedOrderData += ` limit ${payloadDashboardData.pageData.pageSize}
+                OFFSET ${ payloadDashboardData.pageData.pageSize * (payloadDashboardData.pageData.currentPageNo - 1)} `;
     }
+
+    return pg.connection().then((conn) => {
+        return Promise.all([
+            conn.query(completedOrderData, []),
+            conn.query(countCompletedOrders, [])
+        ])
+            .then((data) => {
+                completedOrderData = data[0].rows
+                totCompletedOrder = data[1].rows[0].count;
+                //  console.log(data[0].rows, "<<<<getCompletedOrder  data[0].rows");
+                for (let i in completedOrderData) {
+
+                    let PO_DATE = 0;
+                    
+                    let completedOrderDataActivities = JSON.parse(completedOrderData[i].activities);
+                    for (let j in completedOrderDataActivities) {
+                        if (completedOrderDataActivities[j].toStage === "002") {
+                             PO_DATE = completedOrderDataActivities[j].date}
+                    }
+                    console.log(PO_DATE, " ???? PO_DATE")
+                    let response = {
+                        "orderID": completedOrderData[i].ORDERID,
+                        "customerID": completedOrderData[i].CUSTOMERID,
+                        "status": completedOrderData[i].STATUS,
+                        "amount": completedOrderData[i].AMOUNT,
+                        "dateCreated": PO_DATE,
+                        "orderType": completedOrderData[i].ORDERTYPE,
+                        "sla": completedOrderData[i].sla,
+                        "actions": [
+                            {
+                                "actionType": "componentAction",
+                                "iconName": "fa fa-eye",
+                                "label": "View",
+                                "URI": [
+                                    "/strata/viewOrder"
+                                ]
+                            }
+                        ]
+                    }
+                    completedOrderDataArray.push(response);
+                }
+                let result = {
+                    "dashboardCompletedGridData": {
+                        "pageData": {
+                            "pageSize": payloadDashboardData.pageData.pageSize,
+                            "currentPageNo": payloadDashboardData.pageData.currentPageNo,
+                            "totalRecords": totCompletedOrder
+                        },
+                        completedOrderRows: completedOrderDataArray
+                    }
+                }
+
+
+                return result;
+            })
+    }).catch((error) => {
+        console.log(error, " <<<<< Some error occurred while working on completed order data!");
+        return [];
+    });
 }
 
 
-async function getSettlements(payloadDashboardData, supplierID) {
-    try {
-        const pg = await connector.createClient('pg',
-            'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
+function getSettlements(payloadDashboardData, customerID) {
+    let settlementOrder, countSettlementOrder, settlementOrderArray = [], totSettledOrder;
 
-
-        let getSettlements = "";
-        if (!!supplierID && supplierID != "ALL") {
-            getSettlements = `select "tranxData" from  orders
-            where "tranxData" ->> 'status' = 'Dispatched'
-            AND "tranxData" ->> 'customerID' ='${supplierID}'`;
-        }
-        else
-            if (supplierID == "ALL" || !supplierID) {
-                getSettlements = `select "tranxData" from  orders
-            where "tranxData" ->> 'status' = 'Dispatched'`;
-            }
-
-        if (payloadDashboardData.pageData) {
-            getSettlements += ` limit ${payloadDashboardData.pageData.pageSize}
-            OFFSET ${
-                payloadDashboardData.pageData.pageSize *
-                (payloadDashboardData.pageData.currentPageNo - 1)
-                } `
-        }
-
-        let queryCnt = "";
-        if (!!supplierID && supplierID != "ALL") {
-            queryCnt = `SELECT count(*) FROM orders
-            where "tranxData" ->> 'status' = 'INVOICED'
-            And "tranxData" ->> 'customerID' ='${supplierID}'`;
-        }
-        else
-            if (supplierID == "ALL" || !supplierID) {
-                queryCnt = `SELECT count(*) FROM orders
-        where "tranxData" ->> 'status' = 'Dispatched'`;
-            }
-
-        let totRecords = await pg.query(queryCnt);
-        // console.log(totRecords.rows[0].count, "---->>>>>>>>>>>>>>>>>>>>>ROWSCOUNT")
-        let totRecordCount = totRecords.rows[0].count;
-
-        let queryResult = await pg.query(getSettlements);
-
-        let Settlements = queryResult.rows;
-        let supplierIDtest = "";
-        if (!!supplierID && supplierID != "ALL") {
-            supplierIDtest = `select * from
-    orders WHERE
-    orders."tranxData" ->> 'customerID'= '${supplierID}'
-    AND orders."tranxData" ->> 'status' = 'Dispatched'`;
-        }
-        else if (supplierID == "ALL" || !supplierID) {
-            supplierIDtest = `select * from
-            orders WHERE
-            orders."tranxData" ->> 'customerID'= '${supplierID}'
-            AND orders."tranxData" ->> 'status' = 'Dispatched'`;
-        }
-
-
-        if (payloadDashboardData.pageData) {
-            supplierIDtest += ` limit ${payloadDashboardData.pageData.pageSize}
-            OFFSET ${
-                payloadDashboardData.pageData.pageSize *
-                (payloadDashboardData.pageData.currentPageNo - 1)
-                } `;
-        }
-        let queryResult2 = await pg.query(supplierIDtest);
-        // console.log("@@@@@@@@@@@@@@", queryResult2.rows, "@@@@@@@@@@@@@@2")
-
-        let supplierDetails = queryResult2.rows;
-        let details = [];
-        supplierDetails.map((item) => {
-            let detail = {
-                "supplierName": {
-                    "name": item.tranxData.supplierName,
-                    "image": item.tranxData.logo
-                }
-            }
-            details.push(detail);
-
-        })
-        let SettlementsArray = [];
-        if (Settlements.length !== 0) {
-            // console.log(details, "DETAILSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
-            for (let i = 0; i < Settlements.length; i++) {
-                let response = {
-                    "orderID": Settlements[i].tranxData.orderID,
-                    "customerID": Settlements[i].tranxData.customerID,
-                    "status": Settlements[i].tranxData.status,
-                    "SLA": Settlements[i].tranxData.sla ? Settlements[i].tranxData.sla : [],
-                    "amount": Settlements[i].tranxData.orderAmount,
-                    "dateCreated": Settlements[i].tranxData.dateCreated * 1000,
-                    "expectedDate": Settlements[i].tranxData.dateCreated * 1000,
-                    "supplierName": details[i] ? details[i].supplierName.name : "",
-                    "actions": [
-                        {
-                            "actionType": "componentAction",
-                            "iconName": "fa fa-eye",
-                            "label": "Settle",
-                            "URI": [
-                                "/viewOrder"
-                            ]
-                        }
-                    ]
-                }
-                SettlementsArray.push(response);
-            }
-            // console.logconsole.log(SettlementsArray, "++++++++=settlements ");
-            return [SettlementsArray, totRecordCount]
-        }
-        else {
-            // console.log("++++++++=settlements  is empty");
-            return [];
-        }
+    if (customerID && customerID != "ALL") {
+        settlementOrder = `select  "tranxData"->> 'orderID' AS "ORDERID",
+            "tranxData"->> 'dateCreated' AS "PODATE",
+            "tranxData" ->> 'customerID' AS "CUSTOMERID",
+            "tranxData"->> 'orderAmount' AS "AMOUNT",
+            "tranxData"->> 'orderType' AS "ORDERTYPE",
+            "tranxData"->> 'activities' AS "activities",
+            "tranxData"->> 'sla' AS "sla",
+            "tranxData"->> 'status' AS "STATUS"
+            from  orders WHERE  "tranxData" ->> 'status'   = '018' AND 
+            "tranxData" ->> 'customerID' = '${customerID}'`
+        countSettlementOrder = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '018' And "tranxData" ->> 'customerID' = '${customerID}'`
+    } else {
+        settlementOrder = `select  "tranxData"->> 'dateCreated' AS "PODATE",
+            "tranxData" ->> 'customerID' AS "CUSTOMERID",
+            "tranxData"->> 'orderAmount' AS "AMOUNT",
+            "tranxData"->> 'sla' AS "sla",
+            "tranxData"->> 'receivedDate' AS "EXPECTEDDATE",
+            "tranxData"->> 'orderType' AS "ORDERTYPE",
+            "tranxData"->> 'status' AS "STATUS"  from  orders WHERE "tranxData" ->> 'status' = '018'`;
+        countPendingOrders = `SELECT count(*) FROM orders WHERE  "tranxData" ->> 'status' = '018'`;
     }
-    catch (err) {
-        console.log(err)
+
+
+    if (payloadDashboardData.pageData && payloadDashboardData.pageData.pageSize && payloadDashboardData.pageData.currentPageNo) {
+        settlementOrder += ` limit ${payloadDashboardData.pageData.pageSize}
+                OFFSET ${ payloadDashboardData.pageData.pageSize * (payloadDashboardData.pageData.currentPageNo - 1)} `;
     }
+
+    return pg.connection().then((conn) => {
+        return Promise.all([
+            conn.query(settlementOrder, []),
+            conn.query(countSettlementOrder, [])
+        ])
+            .then((data) => {
+                settlementOrder = data[0].rows
+                totSettledOrder = data[1].rows[0].count;
+                // console.log(data[0].rows, "<<<< getSettlements data[0].rows");
+                for (let i in settlementOrder) {
+                    let PO_DATE = 0;
+                    
+                    let settlementOrderActivities = JSON.parse(settlementOrder[i].activities);
+                    for (let j in settlementOrderActivities) {
+                        if (settlementOrderActivities[j].toStage === "002") {
+                             PO_DATE = settlementOrderActivities[j].date}
+                    }
+                    console.log(PO_DATE, " ???? PO_DATE")
+                    let response = {
+                        "orderID": settlementOrder[i].ORDERID,
+                        "customerID": settlementOrder[i].CUSTOMERID,
+                        "status": settlementOrder[i].STATUS,
+                        "amount": settlementOrder[i].AMOUNT,
+                        "dateCreated": PO_DATE,
+                        "orderType": settlementOrder[i].ORDERTYPE,
+                        "sla": settlementOrder[i].sla,
+                        "actions": [
+                            {
+                                "actionType": "componentAction",
+                                "iconName": "fa fa-eye",
+                                "label": "View",
+                                "URI": [
+                                    "/strata/viewOrder"
+                                ]
+                            }
+                        ]
+                    }
+                    settlementOrderArray.push(response);
+                }
+                let result = {
+                    dashboardSettlementGridData: {
+                        "pageData": {
+                            "pageSize": payloadDashboardData.pageData.pageSize,
+                            "currentPageNo": payloadDashboardData.pageData.currentPageNo,
+                            "totalRecords": totSettledOrder
+                        },
+                        settlementsRows: settlementOrderArray
+
+                    }
+                }
+                return result;
+            })
+    }).catch((error) => {
+        console.log(error, " <<<<< Some error occurred while working on settlement order data!");
+        return [];
+    });
 }
 
-async function getSupplierWiseSettlement(payloadDashboardData, supplierID) {
-    try {
-        let getSupplierWiseSettlement = "";
-        const pg = await connector.createClient('pg',
-            'postgresql://Admin:avanza123@23.97.138.116:5432/strata?idleTimeoutMillis=3000000');
-        if (!!supplierID && supplierID != "ALL") {
-            getSupplierWiseSettlement = `select "tranxData" from  accountings where
-            accountings."tranxData" ->> 'customerID'= '${supplierID}'`;
-        }
-        else if (supplierID == "ALL" || !supplierID) {
-            getSupplierWiseSettlement = `select "tranxData" from  accountings`;
-        }
-        if (payloadDashboardData.pageData) {
-            getSupplierWiseSettlement += ` limit ${payloadDashboardData.pageData.pageSize}
-            OFFSET ${
-                payloadDashboardData.pageData.pageSize *
-                (payloadDashboardData.pageData.currentPageNo - 1)
-                } `;
-        }
-        let queryResult = await pg.query(getSupplierWiseSettlement);
+function getCustomerWiseSettlement(payloadDashboardData, customerID) {
+    let settlementOrder, countSettlementOrder, settlementOrderArray = [], totSettledOrder, paidAmount;
 
+    settlementOrder = `select 
+        "tranxData"->> 'customerID' AS "CUSTOMERID",
+        "tranxData"->> 'paidAmount' AS "PAIDAMOUNT",
+        "tranxData"->> 'toPayAmount' AS "amount" ,
+        "tranxData"->> 'creditNoteAmount' AS "creditNoteAmount" ,
+        "tranxData"->> 'totalDiscount' AS "totalDiscount" 
+        from  accountings where 
+        accountings."tranxData" ->> 'customerID'= '${customerID}'`;
 
-        let supplierWiseSettlement = queryResult.rows;
+    countSettlementOrder = `select 
+        COUNT(1) from  accountings where 
+        accountings."tranxData" ->> 'customerID'= '${customerID}'`
 
-        let supplierIDtest = "";
-        // if (!!supplierID && supplierID != "ALL") {
-        //     supplierIDtest = `select "tranxData" ->> 'supplierName' AS "supplierName" from
-        //     suppliers where "tranxData" ->> 'supplierID'= '${supplierID}' `;
-        // }
-        // else if(supplierID == "ALL" || !supplierID) {
-        //     supplierIDtest = `select "tranxData" ->> 'supplierName' AS "supplierName" from
-        //     suppliers`;
-        // }
-        // if (payloadDashboardData.pageData) {
-        //     supplierIDtest += ` limit ${payloadDashboardData.pageData.pageSize}
-        //     OFFSET ${
-        //         payloadDashboardData.pageData.pageSize *
-        //         (payloadDashboardData.pageData.currentPageNo - 1)
-        //         } `;
-        // }
-        //let queryResult2 = await pg.query(supplierIDtest);
+    if (payloadDashboardData.pageData && payloadDashboardData.pageData.pageSize && payloadDashboardData.pageData.currentPageNo) {
+        settlementOrder += ` limit ${payloadDashboardData.pageData.pageSize}
+                OFFSET ${ payloadDashboardData.pageData.pageSize * (payloadDashboardData.pageData.currentPageNo - 1)} `;
+    }
 
-        let supplierWiseSettlementArray = [];
-        if (supplierWiseSettlement.length !== 0) {
+    return pg.connection().then((conn) => {
+        return Promise.all([
+            conn.query(settlementOrder, []),
+            conn.query(countSettlementOrder, [])
+        ])
+            .then((data) => {
+                settlementOrder = data[0].rows
+                totSettledOrder = data[1].rows[0].count;
+                //console.log(settlementOrder, "getSupplierWiseSettlement <<<< settlementOrder");
 
-            for (let i = 0; i < supplierWiseSettlement.length; i++) {
-                //if (queryResult2.rows[0].supplierName) {
-                let response = {
+                for (let i in settlementOrder) {
+                    let response = {
+                        "customerID": settlementOrder[i].CUSTOMERID,
+                        "toPay": settlementOrder[i].amount - settlementOrder[i].creditNoteAmount - settlementOrder[i].totalDiscount,
+                        "paidAmount": settlementOrder[i].PAIDAMOUNT,
 
-                    "toPay": supplierWiseSettlement[i].tranxData.amount,
-                    "totalPaid": supplierWiseSettlement[i].tranxData.paidAmount,
-                    "name": 'Etihad'
+                    }
+                    // console.log(response, "response")
+                    settlementOrderArray.push(response);
                 }
-                supplierWiseSettlementArray.push(response);
-                // }
 
-            }
-            // console.log(">>>>>>>>> supplierWiseSettlement ");
-            return supplierWiseSettlementArray
-        }
-        else {
-            // console.log(supplierWiseSettlementArray, " =======supplierWiseSettlement is empty");
-            return [];
-        }
-
-
-    }
-    catch (err) {
-        console.log(err)
-    }
+                let result = {
+                    dashboardCustomerSettlement: {
+                        "pageData": {
+                            "pageSize": payloadDashboardData.pageData.pageSize,
+                            "currentPageNo": payloadDashboardData.pageData.currentPageNo,
+                            "totalRecords": totSettledOrder
+                        },
+                        customerWiseSettlement: settlementOrderArray
+                    }
+                }
+                return result;
+            })
+    }).catch((error) => {
+        console.log(error, " <<<<< Some error occurred while working on supplierWise settlement order data!");
+        return [];
+    });
 }
 
-exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JWToken) {
+async function customerDashboard(payload, UUIDKey, route, callback, JWToken) {
     try {
-        console.log(payload.dashboardPendingGridData.supplierID, "payload.dashboardPendingGridData.supplierID")
+        console.log(payload.dashboardPendingGridData.customerID, "payload.dashboardPendingGridData.customerID")
         console.log("<<<<<<<<<<<<<<-----------------------DASHBOARD STARTED ----------------------->>>>>>>>>")
-        let tilesData = await getTilesData(payload.dashboardPendingGridData.supplierID);
 
-        let pendingOrderRows = await getPendingOrder(payload.dashboardPendingGridData, payload.dashboardPendingGridData.supplierID);
-        let completedOrderRows = await getCompletedOrder(payload.dashboardCompletedGridData, payload.dashboardCompletedGridData.supplierID);
-        let settlementsRows = await getSettlements(payload.dashboardSettlementGridData, payload.dashboardSettlementGridData.supplierID);
-        let supplierWiseSettlementRows = await getSupplierWiseSettlement(payload.dashboardSupplierSettlement, payload.dashboardSupplierSettlement.supplierID);
-        let graphData = await getGraphData(payload.dashboardPendingGridData.supplierID);
-      
+        let tilesData = await getTilesData(payload.dashboardPendingGridData.customerID);
+        let pendingOrderRows = await getPendingOrder(payload.dashboardPendingGridData, payload.dashboardPendingGridData.customerID);
+        let completedOrderRows = await getCompletedOrder(payload.dashboardCompletedGridData, payload.dashboardCompletedGridData.customerID);
+        let settlementsRows = await getSettlements(payload.dashboardSettlementGridData, payload.dashboardSettlementGridData.customerID);
+        let customerWiseSettlement = await getCustomerWiseSettlement(payload.dashboardCustomerSettlement, payload.dashboardCustomerSettlement.customerID);
+        let graphData = await getGraphData(payload.dashboardPendingGridData.customerID);
 
+        console.log(pendingOrderRows, "pendingOrderRows\n\n");
+        // console.log(completedOrderRows, "completedOrderRows\n\n");
+        // console.log(settlementsRows, "settlementsRows\n\n");
+        // console.log(JSON.stringify(customerWiseSettlement), "customerWiseSettlement\n\n");
+        // console.log(graphData, "graphData\n\n");
 
         let customerDashboardData = {
             "customerDashboardData": {
@@ -604,16 +519,20 @@ exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JW
                         ],
                         "chartData": {
                             "firstBar": [
-                                    graphData.purchaseOrder,
-                                    graphData.orderReceived,
-                                    graphData.componentManufacturing,
-                                    graphData.dispatched,
-                                    graphData.received,
-                                    graphData.inspected,
-                                    graphData.accepted_rejected,
-                                    graphData.payableOrders,
-                                    graphData.paid,
-                                ],
+                                graphData.purchaseOrder,
+                                graphData.orderReceived,
+                                graphData.componentManufacturing,
+                                graphData.dispatched,
+                                graphData.received,
+                                graphData.inspected,
+                                graphData.accepted,
+                                graphData.rejected,
+                                graphData.reviewed,
+                                graphData.concession,
+                                graphData.scrapped,
+                                graphData.paymentOrder,
+                                graphData.paid,
+                            ],
                             "secondBar": [
                                 8,
                                 5,
@@ -624,50 +543,30 @@ exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JW
                             ]
                         },
                         "labels": [
-                            "Order Received", "Purchase Order",
-                            "Component Manufacturing", "Dispatched",
-                            "Received", "Inspected",
-                            "Accepted/Rejected", "Payment Order",
+                            "Order Received",
+                            "PO",
+                            "Manufacturing",
+                            "Dispatched",
+                            "Received",
+                            "Inspected",
+                            "Accepted",
+                            "Rejected",
+                            "Reviewed",
+                            "Scrapped",
+                            "Concession",
+                            "Payment Order",
                             "Paid"
-
                         ]
                     },
                     "dashboardTiles": tilesData.dashboardTiles,
-                    "dashboardPendingGridData": {
-                        "pageData": {
-                            "pageSize": payload.dashboardPendingGridData.pageData.pageSize,
-                            "currentPageNo": payload.dashboardPendingGridData.pageData.currentPageNo,
-                            "totalRecords": pendingOrderRows !== undefined ? pendingOrderRows[1] : []
-                        },
-                        pendingOrderRows: pendingOrderRows !== undefined ? pendingOrderRows[0] : []
-                    },
-                    "dashboardCompletedGridData": {
-                        "pageData": {
-                            "pageSize": payload.dashboardCompletedGridData.pageData.pageSize,
-                            "currentPageNo": payload.dashboardCompletedGridData.pageData.currentPageNo,
-                            "totalRecords": completedOrderRows !== undefined ? completedOrderRows[1] : []
-                        },
-                        completedOrderRows: completedOrderRows !== undefined ? completedOrderRows[0] : []
-                    },
-                    "dashboardSettlementGridData": {
-                        "pageData": {
-                            "pageSize": payload.dashboardSettlementGridData.pageData.pageSize,
-                            "currentPageNo": payload.dashboardSettlementGridData.pageData.currentPageNo,
-                            "totalRecords": settlementsRows !== undefined ? settlementsRows[1] : []
-                        },
-                        settlementsRows: settlementsRows !== undefined ? settlementsRows[0] : []
+                    "dashboardPendingGridData": pendingOrderRows.dashboardPendingGridData,
+                    "dashboardCompletedGridData": completedOrderRows.dashboardCompletedGridData,
+                    "dashboardSettlementGridData": settlementsRows.dashboardSettlementGridData,
+                    "dashboardCustomerSettlement": customerWiseSettlement.dashboardCustomerSettlement
 
-                    },
-                    "dashboardSupplierSettlement": {
-                        "pageData": {
-                            "pageSize": payload.dashboardSupplierSettlement.pageData.pageSize,
-                            "currentPageNo": payload.dashboardSupplierSettlement.pageData.currentPageNo,
-                            "totalRecords": supplierWiseSettlementRows !== undefined ? supplierWiseSettlementRows.length : []
-                        },
-                        supplierWiseSettlementRows: supplierWiseSettlementRows !== undefined ? supplierWiseSettlementRows : []
-                    }
                 }
             }
+
         }
         return callback(customerDashboardData);
     }
@@ -676,5 +575,4 @@ exports.cusDashboardData = async function (payload, UUIDKey, route, callback, JW
     }
 }
 
-
-
+module.exports = { customerDashboard };
