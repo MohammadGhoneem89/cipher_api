@@ -1,5 +1,32 @@
 'use strict';
 const pg = require('../../../../core/api/connectors/postgress');
+
+function getStatusLabel(status) {
+    let label ;
+    switch (status) {
+
+        case "001": { label = "Order Received"; return label; };
+        case "002": { label = "Purchase Order"; return label; };
+        case "003": { label = "Component Manufacturing"; return label; };
+        case "004": { label = "Part Identification"; return label; };
+        case "005": { label = "Part Inspection"; return label; };
+        case "006": { label = "Final Inspection and Identification"; return label; };
+        case "007": { label = "Part Testing"; return label; };
+        case "008": { label = "Assembly"; return label; };
+        case "009": { label = "Paint/Finish"; return label; };
+        case "010": { label = "Dispatched"; return label; };
+        case "011": { label = "Received"; return label; };
+        case "012": { label = "Inspected"; return label; };
+        case "013": { label = "Accepted"; return label; };
+        case "014": { label = "Rejected"; return label; };
+        case "015": { label = "Reviewed"; return label; };
+        case "016": { label = "Concession"; return label; };
+        case "017": { label = "Scrapped"; return label; };
+        case "018": { label = "Payment Order"; return label; };
+        case "019": { label = "Paid"; return label; };
+        default: { label = label }
+    }
+}
 function getTilesData(customerID) {
     let queryPendingOrder, queryCompletedOrders, payable, totalPaid,
         countPendingOrders, countCompletedOrders, payableOrders, totalPaidOrders;
@@ -190,18 +217,19 @@ function getPendingOrder(payloadDashboardData, customerID) {
 
                 for (let i in pendingOrderData) {
                     let PO_DATE = 0;
-                    
+
                     let pendingOrderActivities = JSON.parse(pendingOrderData[i].activities);
                     for (let j in pendingOrderActivities) {
                         if (pendingOrderActivities[j].toStage === "002") {
-                             PO_DATE = pendingOrderActivities[j].date}
+                            PO_DATE = pendingOrderActivities[j].date
+                        }
                     }
                     console.log(PO_DATE, " ???? PO_DATE")
 
                     let response = {
                         "orderID": pendingOrderData[i].ORDERID,
                         "customerID": pendingOrderData[i].CUSTOMERID,
-                        "status": pendingOrderData[i].STATUS,
+                        "status": getStatusLabel(pendingOrderData[i].STATUS),
                         "amount": pendingOrderData[i].AMOUNT,
                         "dateCreated": PO_DATE,
                         "orderType": pendingOrderData[i].ORDERTYPE,
@@ -217,7 +245,7 @@ function getPendingOrder(payloadDashboardData, customerID) {
                             }
                         ]
                     }
-                   // console.log(response.dateCreated, "response.dateCreated")
+                    // console.log(response.dateCreated, "response.dateCreated")
                     pendingOrderDataArray.push(response);
                 }
                 let result = {
@@ -285,17 +313,18 @@ function getCompletedOrder(payloadDashboardData, customerID) {
                 for (let i in completedOrderData) {
 
                     let PO_DATE = 0;
-                    
+
                     let completedOrderDataActivities = JSON.parse(completedOrderData[i].activities);
                     for (let j in completedOrderDataActivities) {
                         if (completedOrderDataActivities[j].toStage === "002") {
-                             PO_DATE = completedOrderDataActivities[j].date}
+                            PO_DATE = completedOrderDataActivities[j].date
+                        }
                     }
                     console.log(PO_DATE, " ???? PO_DATE")
                     let response = {
                         "orderID": completedOrderData[i].ORDERID,
                         "customerID": completedOrderData[i].CUSTOMERID,
-                        "status": completedOrderData[i].STATUS,
+                        "status": getStatusLabel(completedOrderData[i].STATUS),
                         "amount": completedOrderData[i].AMOUNT,
                         "dateCreated": PO_DATE,
                         "orderType": completedOrderData[i].ORDERTYPE,
@@ -377,17 +406,18 @@ function getSettlements(payloadDashboardData, customerID) {
                 // console.log(data[0].rows, "<<<< getSettlements data[0].rows");
                 for (let i in settlementOrder) {
                     let PO_DATE = 0;
-                    
+
                     let settlementOrderActivities = JSON.parse(settlementOrder[i].activities);
                     for (let j in settlementOrderActivities) {
                         if (settlementOrderActivities[j].toStage === "002") {
-                             PO_DATE = settlementOrderActivities[j].date}
+                            PO_DATE = settlementOrderActivities[j].date
+                        }
                     }
                     console.log(PO_DATE, " ???? PO_DATE")
                     let response = {
                         "orderID": settlementOrder[i].ORDERID,
                         "customerID": settlementOrder[i].CUSTOMERID,
-                        "status": settlementOrder[i].STATUS,
+                        "status": getStatusLabel(settlementOrder[i].STATUS),
                         "amount": settlementOrder[i].AMOUNT,
                         "dateCreated": PO_DATE,
                         "orderType": settlementOrder[i].ORDERTYPE,
