@@ -516,15 +516,17 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
 
 async function customerDashboard(payload, UUIDKey, route, callback, JWToken) {
     try {
-        console.log(payload.dashboardPendingGridData.customerID, "payload.dashboardPendingGridData.customerID")
-        console.log("<<<<<<<<<<<<<<-----------------------DASHBOARD STARTED ----------------------->>>>>>>>>")
+        const orgCode = JWToken.orgCode;
 
-        let tilesData = await getTilesData(payload.dashboardPendingGridData.customerID);
-        let pendingOrderRows = await getPendingOrder(payload.dashboardPendingGridData, payload.dashboardPendingGridData.customerID);
-        let completedOrderRows = await getCompletedOrder(payload.dashboardCompletedGridData, payload.dashboardCompletedGridData.customerID);
-        let settlementsRows = await getSettlements(payload.dashboardSettlementGridData, payload.dashboardSettlementGridData.customerID);
-        let customerWiseSettlement = await getCustomerWiseSettlement(payload.dashboardCustomerSettlement, payload.dashboardCustomerSettlement.customerID);
-        let graphData = await getGraphData(payload.dashboardPendingGridData.customerID);
+        console.log(" !!!!------JWTOKEN------->>>>", JWToken.orgCode, " !!!!!------<<<-------JWTOKEN------->>>>")
+        console.log("<<<<<<<<<<<<<<-------------------CUSTOMER DASHBOARD STARTED ----------------------->>>>>>>>>")
+
+        let tilesData = await getTilesData(orgCode);
+        let pendingOrderRows = await getPendingOrder(payload.dashboardPendingGridData, orgCode);
+        let completedOrderRows = await getCompletedOrder(payload.dashboardCompletedGridData, orgCode);
+        let settlementsRows = await getSettlements(payload.dashboardSettlementGridData, orgCode);
+        let customerWiseSettlement = await getCustomerWiseSettlement(payload.dashboardCustomerSettlement, orgCode);
+        let graphData = await getGraphData(orgCode);
 
         console.log(pendingOrderRows, "pendingOrderRows\n\n");
         // console.log(completedOrderRows, "completedOrderRows\n\n");
@@ -545,7 +547,7 @@ async function customerDashboard(payload, UUIDKey, route, callback, JWToken) {
                             "URI": ""
                         },
                         "legends": [
-                            "ETIHAD",
+                            orgCode,
                         ],
                         "chartData": {
                             "firstBar": [
