@@ -514,7 +514,7 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
     });
 }
 
-async function customerDashboard(payload, UUIDKey, route, callback, JWToken) {
+async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken) {
     try {
         console.log(payload.dashboardPendingGridData.customerID, "payload.dashboardPendingGridData.customerID")
         console.log("<<<<<<<<<<<<<<-----------------------DASHBOARD STARTED ----------------------->>>>>>>>>")
@@ -532,8 +532,8 @@ async function customerDashboard(payload, UUIDKey, route, callback, JWToken) {
         // console.log(JSON.stringify(customerWiseSettlement), "customerWiseSettlement\n\n");
         // console.log(graphData, "graphData\n\n");
 
-        let customerDashboardData = {
-            "customerDashboardData": {
+        let supplierDashboardData = {
+            "supplierDashboardData": {
                 "data": {
                     "graphData": {
                         "graphSummary": {
@@ -598,11 +598,11 @@ async function customerDashboard(payload, UUIDKey, route, callback, JWToken) {
             }
 
         }
-        return callback(customerDashboardData);
+        return callback(supplierDashboardData);
     }
     catch (err) {
         return callback(err);
     }
 }
 
-module.exports = { customerDashboard };
+module.exports = { supplierDashboardData };

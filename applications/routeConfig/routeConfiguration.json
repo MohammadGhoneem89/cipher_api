@@ -7,9 +7,9 @@
       "CustomMappingFile": "dashboard/customerDashboard.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "supDashboardData": {
+    "supplierDashboardData": {
       "customMapping": true,
-      "MappingfunctionName": "supDashboardData",
+      "MappingfunctionName": "supplierDashboardData",
       "CustomMappingFile": "dashboard/supplierDashboard.js",
       "mappingConfigFile": "ePayMapping"
     },
