@@ -5,6 +5,9 @@
 const _ = require('lodash');
 const moment = require('moment');
 const dates = require('../../../lib/helpers/dates');
+const org = require('../../mappingFunctions/org/orgList');
+const user = require('../../../lib/repositories/user');
+
 module.exports = {
   jsonParseNoError: (data, payload, jwt) => {
     try {
@@ -110,49 +113,62 @@ module.exports = {
     }
   },
 
-  ParseContractDataForBank: (data, payload, jwt) => {
+  ParseContractDataForBank: async (data, payload, jwt) => {
     try {
       let result = JSON.parse(data);
-      let startDate = _.get(result, "contractStartDate", undefined);
-      let EndDate = _.get(result, "contractEndDate", undefined);
-      result.contractStartDate = startDate >= 0 ? dates.MSddMMyyyy(startDate) : undefined;
-      result.contractEndDate = EndDate >= 0 ? dates.MSddMMyyyy(EndDate) : undefined;
+      
+      let activities = _.get(result, "activities", []);
+      let orderDate = _.get(result, "orderDate", undefined);
+      // let receivedDate = _.get(result, "receivedDate", undefined);
+      // let quoteValidity = _.get(result, "quoteValidity", undefined);
+      
+      result.activities = activities.map(activity => {
+        activity.date = dates.MSddMMyyyyHHmmSS(validateEpoch(activity.date));
+        return activity;
+      })
+      result.orderDate = orderDate && orderDate >= 0 ? dates.MSddMMyyyyHHmmSS(orderDate) : undefined;
+      // result.receivedDate = receivedDate && receivedDate >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(receivedDate)) : undefined;
+      // result.quoteValidity = quoteValidity && quoteValidity >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(quoteValidity)) : undefined;
 
-      result.paymentInstruments.forEach((element, index) => {
-        element.date = dates.MSddMMyyyy(element.date);
-        element.amount = String(element.amount) || "0";
-        element.providerMetaData = element.providerMetaData ? JSON.parse(element.providerMetaData) : undefined;
-        element.bankMetaData = element.bankMetaData ? JSON.parse(element.bankMetaData) : undefined;
-        element.beneficiaryData = element.beneficiaryData ? JSON.parse(element.beneficiaryData) : undefined;
-        _.set(element, "amount", parseFloat(_.get(element, "amount", "0")).toFixed(2).toString());
-        _.set(element, 'contractID', undefined);
-        _.set(element, 'documentName', undefined);
-        _.set(element, 'key', undefined);
-        _.set(element, 'failureReason', undefined);
+      delete result.documentName;
+      delete result.key;
+      
+      let invoice = _.get(result, "invoice", undefined);
+      if (invoice) {
+        let invoiceDate = _.get(invoice, "invoiceDate", undefined);
+        invoice.invoiceDate = invoiceDate && invoiceDate >= 0 ? dates.MSddMMyyyyHHmmSS(invoiceDate) : undefined;
+      }
+      result.invoice = invoice;    
+      
+      let creditNotes = _.get(result, "creditNotes", undefined);
+      if (creditNotes) {
+        let creditNoteDate = _.get(creditNotes, "creditNoteDate", undefined);
+        creditNotes.creditNoteDate = creditNoteDate && creditNoteDate >= 0 ? dates.MSddMMyyyyHHmmSS(creditNoteDate) : undefined;
+      }
+      result.creditNotes = creditNotes;
+      
+      result.statusList = getStatusList(result.status, result.activities);
+      result.actionButtons = getActionButtons(result.status, jwt.orgType);
 
-        _.set(element, 'cancellationReason', undefined);
-        _.set(element, 'replacementReason', undefined);
-        _.set(element, 'newInstrumentRefNo', undefined);
-        _.set(element, 'oldInstrumentRefNo', undefined);
-        // _.set(element, 'failureDescription', undefined);
+      let promisesList = [getOrgDetail(jwt), user.findForBasicDetail({_id: jwt._id})]
+      let promisesResult = await Promise.all(promisesList);
 
-      });
+      let entity = _.get(promisesResult[0], "entityList.data.searchResult", undefined) 
+      if(entity && entity.length) {
+        let entityData = entity[0] || undefined;
+        if(entityData && !_.isEmpty(entityData)){
+          result.entityName = _.get(entityData, "entityName.name", "");
+          result.entityLogo = _.get(entityData, "entityLogo.sizeSmall", "");
+        }
+      }
 
-      _.set(result, 'documentName', undefined);
-      _.set(result, 'key', undefined);
-      _.set(result, 'instrumentList', undefined);
-      _.set(result, 'instrumentDetail', undefined);
-      _.set(result, 'checkKYCStatus', undefined);
-      _.set(result, 'contractSignedHash', undefined);
-      _.set(result, 'CRMTicketNo', undefined);
-      _.set(result, 'ejariData.contractID', undefined);
-      _.set(result, 'terminationDate', undefined);
-      _.set(result, 'terminationReason', undefined);
-      _.set(result, 'tranDate', undefined);
-      _.set(result, 'ejariData', undefined);
+      let userData = promisesResult[1] || undefined;
+      if(userData && !_.isEmpty(userData)) {
+        result.raisedByName = _.get(userData, "firstName", "") + ' ' + _.get(userData, "lastName", "");
+        result.raisedByPic = _.get(userData, "profilePic", "");
+      }
 
       return result;
-
     }
     catch (ex) {
       console.log(ex);
@@ -271,3 +287,350 @@ function jsonParseNoError(data, payload, jwt) {
   }
 }
 
+function validateEpoch(val) {
+  return val * 1000
+}
+  
+function getStatusList(status, activities) {
+  let orderReceived = "001",
+    purchaseOrder = "002",
+    componentManufacturing = "003",
+    partIdentification = "004",
+    partInspection = "005",
+    finalInspectionAndIdentification = "006",
+    partTested = "007",
+    assembly = "008",
+    paintOrFinish = "009",
+    dispatched = "010",
+    received = "011",
+    inspected = "012",
+    accepted = "013",
+    rejected = "014",
+    reviewed = "015",
+    concession = "016",
+    scrapped = "017",
+    paymentOrder = "018",
+    paid = "019";
+
+  let statusList = [
+    {
+      label: "Order Received",
+      status: false
+    },
+    {
+      label: "Purchase Order",
+      status: false
+    },
+    {
+      label: "Manufacturing Status",
+      status: false
+    },
+    {
+      label: "Dispatched",
+      status: false
+    },
+    {
+      label: "Received",
+      status: false
+    },
+    {
+      label: "Inspected",
+      status: false
+    },
+    {
+      label: "Accepted/Rejected",
+      status: false
+    },
+    {
+      label: "Payment Order",
+      status: false
+    },
+    {
+      label: "Paid",
+      status: false
+    }
+  ];
+
+  if (status === orderReceived) {
+    statusList[0].status = true;
+  } else if (status === purchaseOrder) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+  } else if (status === componentManufacturing) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].label = "Component Manufacturing";
+    statusList[2].text = "20%";
+  } else if (status === partIdentification) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].label = "Part Identification";
+    statusList[2].text = "40%";
+  } else if (status === partInspection) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].label = "Part Inspection";
+    statusList[2].text = "60%";
+  } else if (status === finalInspectionAndIdentification) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].label = "Final Inspection";
+    statusList[2].text = "80%";
+  } else if (status === partTested) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].label = "Part Tested";
+    statusList[2].text = "85%";
+  } else if (status === assembly) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].label = "Assembly";
+    statusList[2].text = "95%";
+  } else if (status === paintOrFinish) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].status = true;
+  } else if (status === dispatched) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].status = true;
+    statusList[3].status = true;
+  } else if (status === received) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].status = true;
+    statusList[3].status = true;
+    statusList[4].status = true;
+  } else if (status === inspected) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].status = true;
+    statusList[3].status = true;
+    statusList[4].status = true;
+    statusList[5].status = true;
+  } else if (status === accepted) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].status = true;
+    statusList[3].status = true;
+    statusList[4].status = true;
+    statusList[5].status = true;
+    statusList[6].status = true;
+    statusList[6].label = "Accepted";
+  } else if (status === rejected) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].status = true;
+    statusList[3].status = true;
+    statusList[4].status = true;
+    statusList[5].status = true;
+    statusList[6].status = true;
+    statusList[6].label = "Rejected";
+  } else if (status === reviewed) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].status = true;
+    statusList[3].status = true;
+    statusList[4].status = true;
+    statusList[5].status = true;
+    statusList[6].status = true;
+    statusList[6].label = "Reviewed";
+  } else if (status === concession) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].status = true;
+    statusList[3].status = true;
+    statusList[4].status = true;
+    statusList[5].status = true;
+    statusList[6].status = true;
+    statusList[6].label = "Concession";
+  } else if (status === scrapped) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].status = true;
+    statusList[3].status = true;
+    statusList[4].status = true;
+    statusList[5].status = true;
+    statusList[6].status = true;
+    statusList[6].label = "Scrapped";
+  } else if (status === paymentOrder) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].status = true;
+    statusList[3].status = true;
+    statusList[4].status = true;
+    statusList[5].status = true;
+    statusList[6].status = true;
+    statusList[6].label = getStagePriorToPaymentOrder(activities) == accepted ? "Accepted" : "Concession";
+    statusList[7].status = true;
+  } else if (status === paid) {
+    statusList[0].status = true;
+    statusList[1].status = true;
+    statusList[2].status = true;
+    statusList[3].status = true;
+    statusList[4].status = true;
+    statusList[5].status = true;
+    statusList[6].status = true;
+    statusList[6].label = getStagePriorToPaymentOrder(activities) == accepted ? "Accepted" : "Concession";
+    statusList[7].status = true;
+    statusList[8].status = true;
+  }
+  return statusList;
+}
+
+function getStagePriorToPaymentOrder(activities) {
+  let stage = _.result(_.find(activities, (activity) => {
+    return activity.toStage === "018";
+  }), 'fromStage');
+  console.log('getStagePriorToPaymentOrder found stage: ', stage)
+  return stage;
+}
+
+function getActionButtons(status, orgType) {
+  console.log('getActionButtons', status, orgType)
+  if (status === "001") { // Todo: To be applied for customer
+    return [
+      {
+        type: 1,
+        label: "Purchase Order",
+        status: "002",
+        processor: "SUPPLIER"
+      }
+    ]
+  }
+  else if (status === "002" && (orgType === "SUPPLIER")) {
+    return [
+      {
+        type: 1,
+        label: "Component Manufacture",
+        status: "003",
+        processor: orgType
+      }
+    ]
+  }
+  else if (status === "003" && (orgType === "SUPPLIER")) {
+    return [
+      {
+        type: 1,
+        label: "Part Identification",
+        status: "004",
+        processor: orgType
+      }
+    ]
+  }
+  else if (status === "004" && (orgType === "SUPPLIER")) {
+    return [
+      {
+        type: 1,
+        label: "Part Inspection",
+        status: "005",
+        processor: orgType
+      }
+    ]
+  }
+  else if (status === "005" && (orgType === "SUPPLIER")) {
+    return [
+      {
+        type: 1,
+        label: "Final Inspection and Indentification",
+        status: "006",
+        processor: orgType
+      }
+    ]
+  }
+  else if ((status === "006" || status === "007" || status === "008" || status === "009") && (orgType === "SUPPLIER")) {
+    return [
+      {
+        type: 2,
+        label: "Manufacturing Sub-Status",
+        status: "007",
+        processor: orgType
+      },
+      {
+        type: 1,
+        label: "Dispatched",
+        status: "010",
+        processor: orgType
+      }
+    ]
+  }
+
+  else if (status === "010") {
+    return [
+      {
+        type: 3,
+        label: "Received",
+        status: "011"
+      }
+    ]
+  }
+  else if (status === "011" && (orgType === "CUSTOMER")) {
+    return [
+      {
+        type: 1,
+        label: "Inspected",
+        status: "012",
+        processor: orgType
+      }
+    ]
+  }
+  else if (status === "012" && (orgType === "CUSTOMER")) {
+    return [
+      {
+        type: 1,
+        label: "Accepted",
+        status: "013",
+        processor: orgType
+      },
+      {
+        type: 1,
+        label: "Rejected",
+        status: "014",
+        processor: orgType
+      }
+    ]
+  }
+  else if (status === "014" && (orgType === "CUSTOMER")) {
+    return [
+      {
+        type: 1,
+        label: "Reviewed",
+        status: "015",
+        processor: orgType
+      }
+    ]
+  }
+  else if (status === "015" && (orgType === "CUSTOMER")) {
+    return [
+      {
+        type: 1,
+        label: "Concession",
+        status: "016",
+        processor: orgType
+      },
+      {
+        type: 1,
+        label: "Scrapped",
+        status: "017",
+        processor: orgType
+      }
+    ]
+  }
+  else if (status === "018" && (orgType === "SUPPLIER")) {
+    return [
+      {
+        type: 1,
+        label: "Paid",
+        status: "019",
+        processor: orgType
+      }
+    ]
+  }
+  else return []
+}
+
+function getOrgDetail(jwt) {
+  return new Promise((resolve, reject) => {
+    org.entityListOut({action: "entityList", page: {currentPageNo: 1, pageSize: 10}, searchCriteria: {spCode: jwt.orgCode}}, undefined, undefined, res => {resolve(res)}, jwt);
+  })
+}
