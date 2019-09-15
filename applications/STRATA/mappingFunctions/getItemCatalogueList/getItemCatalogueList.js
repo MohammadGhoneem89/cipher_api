@@ -57,6 +57,12 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
             let result = [];
             if (data) {
                 _.get(_.get(data, '[1]', {}), 'rows', []).forEach((elemt) => {
+
+                    let itemImage = {
+                        name: _.get(elemt, "tranxData.name", ""),
+                        imageURL:  _.get(elemt, "tranxData.image.hash", "") || _.get(elemt, "tranxData.image.path", "")
+                    }
+                    elemt.tranxData.itemImage = itemImage
                     result.push(elemt.tranxData);
                 });
             }

@@ -40,6 +40,7 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
             let result = [];
             if (data) {
                 _.get(_.get(data, '[1]', {}), 'rows', []).forEach((elemt) => {
+                    elemt.tranxData.uniqueId = elemt.tranxData.contractID + "/" + elemt.tranxData.customerID 
                     result.push(elemt.tranxData);
                 });
             }
