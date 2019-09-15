@@ -76,6 +76,7 @@ async function updateAsync(callback, payload) {
 }
 
 async function findOneAsync(callback, payload) {
+   
     const response = {};
     payload = payload || {};
     payload.action = payload.action || 'actionNotDefined';
@@ -88,6 +89,6 @@ async function findOneAsync(callback, payload) {
     } catch (err) {
         response[payload.action].error = err.stack || err;
     }
-    // console.log("\n\n>>>>> ", response, ">>>>>>")
+     console.log("\n\n>>>>> ", response, " RESPONSE >>>>>>")
     return response;
 }

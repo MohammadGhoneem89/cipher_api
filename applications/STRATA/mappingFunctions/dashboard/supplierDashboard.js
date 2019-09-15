@@ -160,8 +160,8 @@ function getGraphData(customerID) {
 
             function calculateCount(arr) {
                 let counter = 0;
-                console.log(arr,"arr")
-               
+                console.log(arr, "arr")
+
                 for (let i in arr) { counter += Number(arr[i].count) }
                 return counter;
             }
@@ -171,7 +171,7 @@ function getGraphData(customerID) {
                 orderReceived: orderReceived ? calculateCount(orderReceived) : 0,
                 componentManufacturing: componentManufacturing ? calculateCount(componentManufacturing) : 0,
                 dispatched: dispatched ? calculateCount(dispatched) : 0,
-                received: received ?calculateCount(received) : 0,
+                received: received ? calculateCount(received) : 0,
                 inspected: inspected ? calculateCount(inspected) : 0,
                 accepted: accepted ? calculateCount(accepted) : 0,
                 rejected: rejected ? calculateCount(rejected) : 0,
@@ -561,7 +561,7 @@ async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken)
         // console.log(completedOrderRows, "completedOrderRows\n\n");
         // console.log(settlementsRows, "settlementsRows\n\n");
         // console.log(JSON.stringify(customerWiseSettlement), "customerWiseSettlement\n\n");
-         console.log(graphData, "graphData\n\n");
+        console.log(graphData, "graphData\n\n");
 
         let supplierDashboardData = {
             "supplierDashboardData": {
