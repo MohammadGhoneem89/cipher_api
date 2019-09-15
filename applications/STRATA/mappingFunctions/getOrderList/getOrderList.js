@@ -46,6 +46,7 @@ function getOrderList(payload, UUIDKey, route, callback, JWToken) {
             let result = [];
             if (data) {
                 _.get(_.get(data, '[1]', {}), 'rows', []).forEach((elemt) => {
+                    _.set(elemt.tranxData, 'gridKey', `${_.get(elemt.tranxData, 'orderID', '')}/${_.get(elemt.tranxData, 'customerID', '')}`)
                     result.push(elemt.tranxData);
                 });
             }
