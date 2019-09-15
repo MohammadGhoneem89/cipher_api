@@ -43,8 +43,8 @@ function getTilesData(customerID) {
     }
     else {
         queryPendingOrder = `select COUNT(1) FROM  orders WHERE "tranxData" ->> 'status' NOT IN ('019');`;
-        queryCompletedOrders = `select COUNT(1) from  orders  WHERE "tranxData" ->> 'status' = '019' ;`;
-        payable = `select "tranxData" ->> 'toPayAmount' AS "amount"
+        queryCompletedOrders = `select count(1) from orders where "tranxData"->>'status' = '019'`;
+        payable = `select "tranxData" ->> 'toPayAmount' AS "amount",
         "tranxData" ->> 'creditNoteAmount' AS "creditNoteAmount",
         "tranxData" ->> 'totalDiscount' AS "totalDiscount" from accountings;`
         totalPaid = `select "tranxData" ->> 'paidAmount' AS "paidAmount" from accountings;`
@@ -57,7 +57,7 @@ function getTilesData(customerID) {
             conn.query(totalPaid, [])])
             .then((data) => {
                 // console.log(data[2].rows, "!!! data[2].rows\n\n\n ---->>>>")
-                console.log(data[3].rows, "!!! data[3].rows\n\n\n ---->>>>")
+                // console.log(data[1].rows, "!!! data[1].rows\n\n\n ---->>>>")
                 countPendingOrders = data[0].rows[0].count
                 countCompletedOrders = data[1].rows[0].count
                 payableOrders = data[2].rows
@@ -120,9 +120,15 @@ function getGraphData(customerID) {
 
 
     if (customerID && customerID != "ALL") {
+        console.log("ALLLL")
         getGridData = `SELECT count(orders.key), orders."tranxData" ->> 'status' as "status",orders."tranxData" ->> 'customerID' as "customerID"
                 FROM orders WHERE orders."tranxData" ->> 'customerID'= '${customerID}'
               GROUP BY  orders."tranxData" ->> 'status',orders."tranxData" ->>'customerID';`;
+    } else {
+        console.log("CUSTOMERID")
+        getGridData = `SELECT count(orders.key), orders."tranxData" ->> 'status' as "status",orders."tranxData" ->> 'customerID' as "customerID"
+        FROM orders
+      GROUP BY  orders."tranxData" ->> 'status',orders."tranxData" ->>'customerID';`;
     }
     return pg.connection().then((conn) => {
         return Promise.all([
@@ -150,22 +156,33 @@ function getGraphData(customerID) {
             paymentOrder = data[0].rows.filter(obj => obj.status === "018");
             received = data[0].rows.filter(obj => obj.status === "011");
             paid = data[0].rows.filter(obj => obj.status === "019");
+            //console.log(purchaseOrder,orderReceived,componentManufacturing,paid, "rows")
 
-            let result = {
-                purchaseOrder: purchaseOrder[0] ? purchaseOrder[0].count : 0,
-                orderReceived: orderReceived[0] ? orderReceived[0].count : 0,
-                componentManufacturing: componentManufacturing[0] ? componentManufacturing[0].count : 0,
-                dispatched: dispatched[0] ? dispatched[0].count : 0,
-                received: received[0] ? received[0].count : 0,
-                inspected: inspected[0] ? inspected[0].count : 0,
-                accepted: accepted[0] ? accepted[0].count : 0,
-                rejected: rejected[0] ? rejected[0].count : 0,
-                reviewed: reviewed[0] ? reviewed[0].count : 0,
-                concession: concession[0] ? concession[0].count : 0,
-                scrapped: scrapped[0] ? scrapped[0].count : 0,
-                paymentOrder: paymentOrder[0] ? paymentOrder[0].count : 0,
-                paid: paid[0] ? paid[0].count : 0
+            function calculateCount(arr) {
+                let counter = 0;
+                console.log(arr,"arr")
+               
+                for (let i in arr) { counter += Number(arr[i].count) }
+                return counter;
             }
+            let result = {
+
+                purchaseOrder: purchaseOrder ? calculateCount(purchaseOrder) : 0,
+                orderReceived: orderReceived ? calculateCount(orderReceived) : 0,
+                componentManufacturing: componentManufacturing ? calculateCount(componentManufacturing) : 0,
+                dispatched: dispatched ? calculateCount(dispatched) : 0,
+                received: received ?calculateCount(received) : 0,
+                inspected: inspected ? calculateCount(inspected) : 0,
+                accepted: accepted ? calculateCount(accepted) : 0,
+                rejected: rejected ? calculateCount(rejected) : 0,
+                reviewed: reviewed ? calculateCount(reviewed) : 0,
+                concession: concession ? calculateCount(concession) : 0,
+                scrapped: scrapped ? calculateCount(scrapped) : 0,
+                paymentOrder: paymentOrder ? calculateCount(paymentOrder) : 0,
+                paid: paid ? calculateCount(paid) : 0
+            }
+
+            console.log(result, "result")
             return result;
         })
     }).catch((e) => { console.log(e, "<<< Some error occurred while working on graphData"); return e; })
@@ -224,7 +241,7 @@ function getPendingOrder(payloadDashboardData, customerID) {
                             PO_DATE = pendingOrderActivities[j].date
                         }
                     }
-                    console.log(PO_DATE, " ???? PO_DATE")
+                    // console.log(PO_DATE, " ???? PO_DATE")
 
                     let response = {
                         "orderID": pendingOrderData[i].ORDERID,
@@ -284,6 +301,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
             from  orders WHERE  "tranxData" ->> 'status' = '019' AND 
             "tranxData" ->> 'customerID' = '${customerID}'`
         countCompletedOrders = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '019' And "tranxData" ->> 'customerID' = '${customerID}'`
+
     } else {
         completedOrderData = `select  "tranxData"->> 'dateCreated' AS "PODATE",
             "tranxData" ->> 'customerID' AS "CUSTOMERID",
@@ -292,7 +310,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
             "tranxData"->> 'activities' AS "activities",
             "tranxData"->> 'orderType' AS "ORDERTYPE",
             "tranxData"->> 'status' AS "STATUS"  from  orders WHERE "tranxData" ->> 'status' = '019'`;
-        countPendingOrders = `SELECT count(*) FROM orders WHERE  "tranxData" ->> 'status' = '019'`;
+        countCompletedOrders = `SELECT count(*) FROM orders WHERE  "tranxData" ->> 'status' = '019'`;
     }
 
 
@@ -309,7 +327,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
             .then((data) => {
                 completedOrderData = data[0].rows
                 totCompletedOrder = data[1].rows[0].count;
-                //  console.log(data[0].rows, "<<<<getCompletedOrder  data[0].rows");
+                // console.log(data[1].rows, "<<<<getCompletedOrder  data[1].rows[0].count");
                 for (let i in completedOrderData) {
 
                     let PO_DATE = 0;
@@ -320,7 +338,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
                             PO_DATE = completedOrderDataActivities[j].date
                         }
                     }
-                    console.log(PO_DATE, " ???? PO_DATE")
+                    // console.log(PO_DATE, " ???? PO_DATE")
                     let response = {
                         "orderID": completedOrderData[i].ORDERID,
                         "customerID": completedOrderData[i].CUSTOMERID,
@@ -377,7 +395,8 @@ function getSettlements(payloadDashboardData, customerID) {
             "tranxData"->> 'status' AS "STATUS"
             from  orders WHERE  "tranxData" ->> 'status'   = '018' AND 
             "tranxData" ->> 'customerID' = '${customerID}'`
-        countSettlementOrder = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '018' And "tranxData" ->> 'customerID' = '${customerID}'`
+        countSettlementOrder = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '018' And 
+        "tranxData" ->> 'customerID' = '${customerID}'`
     } else {
         settlementOrder = `select  "tranxData"->> 'dateCreated' AS "PODATE",
             "tranxData" ->> 'customerID' AS "CUSTOMERID",
@@ -386,7 +405,7 @@ function getSettlements(payloadDashboardData, customerID) {
             "tranxData"->> 'receivedDate' AS "EXPECTEDDATE",
             "tranxData"->> 'orderType' AS "ORDERTYPE",
             "tranxData"->> 'status' AS "STATUS"  from  orders WHERE "tranxData" ->> 'status' = '018'`;
-        countPendingOrders = `SELECT count(*) FROM orders WHERE  "tranxData" ->> 'status' = '018'`;
+        countSettlementOrder = `SELECT count(*) FROM orders WHERE  "tranxData" ->> 'status' = '018'`;
     }
 
 
@@ -394,7 +413,7 @@ function getSettlements(payloadDashboardData, customerID) {
         settlementOrder += ` limit ${payloadDashboardData.pageData.pageSize}
                 OFFSET ${ payloadDashboardData.pageData.pageSize * (payloadDashboardData.pageData.currentPageNo - 1)} `;
     }
-
+    // console.log(settlementOrder, "<<<< settlementOrder settlementOrder");
     return pg.connection().then((conn) => {
         return Promise.all([
             conn.query(settlementOrder, []),
@@ -406,14 +425,14 @@ function getSettlements(payloadDashboardData, customerID) {
                 // console.log(data[0].rows, "<<<< getSettlements data[0].rows");
                 for (let i in settlementOrder) {
                     let PO_DATE = 0;
-
-                    let settlementOrderActivities = JSON.parse(settlementOrder[i].activities);
+                    let settlementOrderActivities;
+                    settlementOrderActivities = settlementOrder[i].activities ? JSON.parse(settlementOrder[i].activities) : [];
                     for (let j in settlementOrderActivities) {
                         if (settlementOrderActivities[j].toStage === "002") {
                             PO_DATE = settlementOrderActivities[j].date
                         }
                     }
-                    console.log(PO_DATE, " ???? PO_DATE")
+                    // console.log(PO_DATE, " ???? PO_DATE")
                     let response = {
                         "orderID": settlementOrder[i].ORDERID,
                         "customerID": settlementOrder[i].CUSTOMERID,
