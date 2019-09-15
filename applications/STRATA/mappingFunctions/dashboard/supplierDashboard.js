@@ -2,7 +2,7 @@
 const pg = require('../../../../core/api/connectors/postgress');
 
 function getStatusLabel(status) {
-    let label ;
+    let label;
     switch (status) {
 
         case "001": { label = "Order Received"; return label; };
@@ -43,8 +43,8 @@ function getTilesData(customerID) {
     }
     else {
         queryPendingOrder = `select COUNT(1) FROM  orders WHERE "tranxData" ->> 'status' NOT IN ('019');`;
-        queryCompletedOrders = `select COUNT(1) from  orders  WHERE "tranxData" ->> 'status' = '019' ;`;
-        payable = `select "tranxData" ->> 'toPayAmount' AS "amount"
+        queryCompletedOrders = `select count(1) from orders where "tranxData"->>'status' = '019'`;
+        payable = `select "tranxData" ->> 'toPayAmount' AS "amount",
         "tranxData" ->> 'creditNoteAmount' AS "creditNoteAmount",
         "tranxData" ->> 'totalDiscount' AS "totalDiscount" from accountings;`
         totalPaid = `select "tranxData" ->> 'paidAmount' AS "paidAmount" from accountings;`
@@ -57,7 +57,7 @@ function getTilesData(customerID) {
             conn.query(totalPaid, [])])
             .then((data) => {
                 // console.log(data[2].rows, "!!! data[2].rows\n\n\n ---->>>>")
-                console.log(data[3].rows, "!!! data[3].rows\n\n\n ---->>>>")
+                // console.log(data[1].rows, "!!! data[1].rows\n\n\n ---->>>>")
                 countPendingOrders = data[0].rows[0].count
                 countCompletedOrders = data[1].rows[0].count
                 payableOrders = data[2].rows
@@ -119,16 +119,16 @@ function getGraphData(customerID) {
         accepted, rejected, reviewed, scrapped, concession, inspected, paymentOrder, paid;
 
 
-    if (customerID && customerID != "ALL") {
-        getGridData = `SELECT count(orders.key), orders."tranxData" ->> 'status' as "status",orders."tranxData" ->> 'customerID' as "customerID"
+    // if (customerID && customerID != "ALL") {
+    getGridData = `SELECT count(orders.key), orders."tranxData" ->> 'status' as "status",orders."tranxData" ->> 'customerID' as "customerID"
                 FROM orders WHERE orders."tranxData" ->> 'customerID'= '${customerID}'
               GROUP BY  orders."tranxData" ->> 'status',orders."tranxData" ->>'customerID';`;
-    }
+    //}
     return pg.connection().then((conn) => {
         return Promise.all([
             conn.query(getGridData, [])
         ]).then((data) => {
-            console.log(data[0].rows, "rows")
+            // console.log(data[0].rows, "rows")
 
             purchaseOrder = data[0].rows.filter(obj => obj.status === "001");
             orderReceived = data[0].rows.filter(obj => obj.status === "002");
@@ -224,7 +224,7 @@ function getPendingOrder(payloadDashboardData, customerID) {
                             PO_DATE = pendingOrderActivities[j].date
                         }
                     }
-                    console.log(PO_DATE, " ???? PO_DATE")
+                    // console.log(PO_DATE, " ???? PO_DATE")
 
                     let response = {
                         "orderID": pendingOrderData[i].ORDERID,
@@ -284,6 +284,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
             from  orders WHERE  "tranxData" ->> 'status' = '019' AND 
             "tranxData" ->> 'customerID' = '${customerID}'`
         countCompletedOrders = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '019' And "tranxData" ->> 'customerID' = '${customerID}'`
+
     } else {
         completedOrderData = `select  "tranxData"->> 'dateCreated' AS "PODATE",
             "tranxData" ->> 'customerID' AS "CUSTOMERID",
@@ -292,7 +293,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
             "tranxData"->> 'activities' AS "activities",
             "tranxData"->> 'orderType' AS "ORDERTYPE",
             "tranxData"->> 'status' AS "STATUS"  from  orders WHERE "tranxData" ->> 'status' = '019'`;
-        countPendingOrders = `SELECT count(*) FROM orders WHERE  "tranxData" ->> 'status' = '019'`;
+        countCompletedOrders = `SELECT count(*) FROM orders WHERE  "tranxData" ->> 'status' = '019'`;
     }
 
 
@@ -309,7 +310,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
             .then((data) => {
                 completedOrderData = data[0].rows
                 totCompletedOrder = data[1].rows[0].count;
-                //  console.log(data[0].rows, "<<<<getCompletedOrder  data[0].rows");
+                // console.log(data[1].rows, "<<<<getCompletedOrder  data[1].rows[0].count");
                 for (let i in completedOrderData) {
 
                     let PO_DATE = 0;
@@ -320,7 +321,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
                             PO_DATE = completedOrderDataActivities[j].date
                         }
                     }
-                    console.log(PO_DATE, " ???? PO_DATE")
+                    // console.log(PO_DATE, " ???? PO_DATE")
                     let response = {
                         "orderID": completedOrderData[i].ORDERID,
                         "customerID": completedOrderData[i].CUSTOMERID,
@@ -377,7 +378,8 @@ function getSettlements(payloadDashboardData, customerID) {
             "tranxData"->> 'status' AS "STATUS"
             from  orders WHERE  "tranxData" ->> 'status'   = '018' AND 
             "tranxData" ->> 'customerID' = '${customerID}'`
-        countSettlementOrder = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '018' And "tranxData" ->> 'customerID' = '${customerID}'`
+        countSettlementOrder = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '018' And 
+        "tranxData" ->> 'customerID' = '${customerID}'`
     } else {
         settlementOrder = `select  "tranxData"->> 'dateCreated' AS "PODATE",
             "tranxData" ->> 'customerID' AS "CUSTOMERID",
@@ -386,7 +388,7 @@ function getSettlements(payloadDashboardData, customerID) {
             "tranxData"->> 'receivedDate' AS "EXPECTEDDATE",
             "tranxData"->> 'orderType' AS "ORDERTYPE",
             "tranxData"->> 'status' AS "STATUS"  from  orders WHERE "tranxData" ->> 'status' = '018'`;
-        countPendingOrders = `SELECT count(*) FROM orders WHERE  "tranxData" ->> 'status' = '018'`;
+        countSettlementOrder = `SELECT count(*) FROM orders WHERE  "tranxData" ->> 'status' = '018'`;
     }
 
 
@@ -394,7 +396,7 @@ function getSettlements(payloadDashboardData, customerID) {
         settlementOrder += ` limit ${payloadDashboardData.pageData.pageSize}
                 OFFSET ${ payloadDashboardData.pageData.pageSize * (payloadDashboardData.pageData.currentPageNo - 1)} `;
     }
-
+    // console.log(settlementOrder, "<<<< settlementOrder settlementOrder");
     return pg.connection().then((conn) => {
         return Promise.all([
             conn.query(settlementOrder, []),
@@ -406,14 +408,14 @@ function getSettlements(payloadDashboardData, customerID) {
                 // console.log(data[0].rows, "<<<< getSettlements data[0].rows");
                 for (let i in settlementOrder) {
                     let PO_DATE = 0;
-
-                    let settlementOrderActivities = JSON.parse(settlementOrder[i].activities);
+                    let settlementOrderActivities;
+                    settlementOrderActivities = settlementOrder[i].activities ? JSON.parse(settlementOrder[i].activities) : [];
                     for (let j in settlementOrderActivities) {
                         if (settlementOrderActivities[j].toStage === "002") {
                             PO_DATE = settlementOrderActivities[j].date
                         }
                     }
-                    console.log(PO_DATE, " ???? PO_DATE")
+                    // console.log(PO_DATE, " ???? PO_DATE")
                     let response = {
                         "orderID": settlementOrder[i].ORDERID,
                         "customerID": settlementOrder[i].CUSTOMERID,
@@ -456,8 +458,8 @@ function getSettlements(payloadDashboardData, customerID) {
 
 function getCustomerWiseSettlement(payloadDashboardData, customerID) {
     let settlementOrder, countSettlementOrder, settlementOrderArray = [], totSettledOrder, paidAmount;
-
-    settlementOrder = `select 
+    if (customerID && customerID != "ALL") {
+        settlementOrder = `select 
         "tranxData"->> 'customerID' AS "CUSTOMERID",
         "tranxData"->> 'paidAmount' AS "PAIDAMOUNT",
         "tranxData"->> 'toPayAmount' AS "amount" ,
@@ -466,10 +468,22 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
         from  accountings where 
         accountings."tranxData" ->> 'customerID'= '${customerID}'`;
 
-    countSettlementOrder = `select 
+        countSettlementOrder = `select 
         COUNT(1) from  accountings where 
         accountings."tranxData" ->> 'customerID'= '${customerID}'`
+    }
+    else {
+        settlementOrder = `select 
+        "tranxData"->> 'customerID' AS "CUSTOMERID",
+        "tranxData"->> 'paidAmount' AS "PAIDAMOUNT",
+        "tranxData"->> 'toPayAmount' AS "amount" ,
+        "tranxData"->> 'creditNoteAmount' AS "creditNoteAmount" ,
+        "tranxData"->> 'totalDiscount' AS "totalDiscount" 
+        from  accountings`;
 
+        countSettlementOrder = `select 
+        COUNT(1) from  accountings`
+    }
     if (payloadDashboardData.pageData && payloadDashboardData.pageData.pageSize && payloadDashboardData.pageData.currentPageNo) {
         settlementOrder += ` limit ${payloadDashboardData.pageData.pageSize}
                 OFFSET ${ payloadDashboardData.pageData.pageSize * (payloadDashboardData.pageData.currentPageNo - 1)} `;
@@ -517,7 +531,7 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
 async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken) {
     try {
         console.log(payload.dashboardPendingGridData.customerID, "payload.dashboardPendingGridData.customerID")
-        console.log("<<<<<<<<<<<<<<-----------------------DASHBOARD STARTED ----------------------->>>>>>>>>")
+        console.log("\n\n<<<<<<<<<<<<<<-----------------------DASHBOARD STARTED ----------------------->>>>>>>>>")
 
         let tilesData = await getTilesData(payload.dashboardPendingGridData.customerID);
         let pendingOrderRows = await getPendingOrder(payload.dashboardPendingGridData, payload.dashboardPendingGridData.customerID);
@@ -526,7 +540,7 @@ async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken)
         let customerWiseSettlement = await getCustomerWiseSettlement(payload.dashboardCustomerSettlement, payload.dashboardCustomerSettlement.customerID);
         let graphData = await getGraphData(payload.dashboardPendingGridData.customerID);
 
-        console.log(pendingOrderRows, "pendingOrderRows\n\n");
+        //console.log(pendingOrderRows, "pendingOrderRows\n\n");
         // console.log(completedOrderRows, "completedOrderRows\n\n");
         // console.log(settlementsRows, "settlementsRows\n\n");
         // console.log(JSON.stringify(customerWiseSettlement), "customerWiseSettlement\n\n");
@@ -545,7 +559,7 @@ async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken)
                             "URI": ""
                         },
                         "legends": [
-                            "ETIHAD",
+                            payload.dashboardPendingGridData.customerID,
                         ],
                         "chartData": {
                             "firstBar": [

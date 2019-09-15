@@ -79,7 +79,6 @@ async function findOneAsync(callback, payload) {
     const response = {};
     payload = payload || {};
     payload.action = payload.action || 'actionNotDefined';
-
     response[payload.action] = {
         action: payload.action,
         data: {}
