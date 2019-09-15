@@ -119,16 +119,22 @@ function getGraphData(customerID) {
         accepted, rejected, reviewed, scrapped, concession, inspected, paymentOrder, paid;
 
 
-    // if (customerID && customerID != "ALL") {
-    getGridData = `SELECT count(orders.key), orders."tranxData" ->> 'status' as "status",orders."tranxData" ->> 'customerID' as "customerID"
+    if (customerID && customerID != "ALL") {
+        console.log("ALLLL")
+        getGridData = `SELECT count(orders.key), orders."tranxData" ->> 'status' as "status",orders."tranxData" ->> 'customerID' as "customerID"
                 FROM orders WHERE orders."tranxData" ->> 'customerID'= '${customerID}'
               GROUP BY  orders."tranxData" ->> 'status',orders."tranxData" ->>'customerID';`;
-    //}
+    } else {
+        console.log("CUSTOMERID")
+        getGridData = `SELECT count(orders.key), orders."tranxData" ->> 'status' as "status",orders."tranxData" ->> 'customerID' as "customerID"
+        FROM orders
+      GROUP BY  orders."tranxData" ->> 'status',orders."tranxData" ->>'customerID';`;
+    }
     return pg.connection().then((conn) => {
         return Promise.all([
             conn.query(getGridData, [])
         ]).then((data) => {
-            // console.log(data[0].rows, "rows")
+            console.log(data[0].rows, "rows")
 
             purchaseOrder = data[0].rows.filter(obj => obj.status === "001");
             orderReceived = data[0].rows.filter(obj => obj.status === "002");
@@ -150,22 +156,33 @@ function getGraphData(customerID) {
             paymentOrder = data[0].rows.filter(obj => obj.status === "018");
             received = data[0].rows.filter(obj => obj.status === "011");
             paid = data[0].rows.filter(obj => obj.status === "019");
+            //console.log(purchaseOrder,orderReceived,componentManufacturing,paid, "rows")
 
-            let result = {
-                purchaseOrder: purchaseOrder[0] ? purchaseOrder[0].count : 0,
-                orderReceived: orderReceived[0] ? orderReceived[0].count : 0,
-                componentManufacturing: componentManufacturing[0] ? componentManufacturing[0].count : 0,
-                dispatched: dispatched[0] ? dispatched[0].count : 0,
-                received: received[0] ? received[0].count : 0,
-                inspected: inspected[0] ? inspected[0].count : 0,
-                accepted: accepted[0] ? accepted[0].count : 0,
-                rejected: rejected[0] ? rejected[0].count : 0,
-                reviewed: reviewed[0] ? reviewed[0].count : 0,
-                concession: concession[0] ? concession[0].count : 0,
-                scrapped: scrapped[0] ? scrapped[0].count : 0,
-                paymentOrder: paymentOrder[0] ? paymentOrder[0].count : 0,
-                paid: paid[0] ? paid[0].count : 0
+            function calculateCount(arr) {
+                let counter = 0;
+                console.log(arr,"arr")
+               
+                for (let i in arr) { counter += Number(arr[i].count) }
+                return counter;
             }
+            let result = {
+
+                purchaseOrder: purchaseOrder ? calculateCount(purchaseOrder) : 0,
+                orderReceived: orderReceived ? calculateCount(orderReceived) : 0,
+                componentManufacturing: componentManufacturing ? calculateCount(componentManufacturing) : 0,
+                dispatched: dispatched ? calculateCount(dispatched) : 0,
+                received: received ?calculateCount(received) : 0,
+                inspected: inspected ? calculateCount(inspected) : 0,
+                accepted: accepted ? calculateCount(accepted) : 0,
+                rejected: rejected ? calculateCount(rejected) : 0,
+                reviewed: reviewed ? calculateCount(reviewed) : 0,
+                concession: concession ? calculateCount(concession) : 0,
+                scrapped: scrapped ? calculateCount(scrapped) : 0,
+                paymentOrder: paymentOrder ? calculateCount(paymentOrder) : 0,
+                paid: paid ? calculateCount(paid) : 0
+            }
+
+            console.log(result, "result")
             return result;
         })
     }).catch((e) => { console.log(e, "<<< Some error occurred while working on graphData"); return e; })
@@ -544,7 +561,7 @@ async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken)
         // console.log(completedOrderRows, "completedOrderRows\n\n");
         // console.log(settlementsRows, "settlementsRows\n\n");
         // console.log(JSON.stringify(customerWiseSettlement), "customerWiseSettlement\n\n");
-        // console.log(graphData, "graphData\n\n");
+         console.log(graphData, "graphData\n\n");
 
         let supplierDashboardData = {
             "supplierDashboardData": {
