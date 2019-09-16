@@ -489,144 +489,47 @@ function getStagePriorToPaymentOrder(activities) {
 function getActionButtons(status, orgType) {
   console.log('getActionButtons', status, orgType)
   if (status === "001") { // Todo: To be applied for customer
-    return [
-      {
-        type: 1,
-        label: "Purchase Order",
-        status: "002",
-        processor: "SUPPLIER"
-      }
-    ]
+    return [ actionButtonObj(1, "Purchase Order", "002", "SUPPLIER") ]
   }
   else if (status === "002" && (orgType === "SUPPLIER")) {
-    return [
-      {
-        type: 1,
-        label: "Component Manufacture",
-        status: "003",
-        processor: orgType
-      }
-    ]
+    return [ actionButtonObj(1, "Component Manufacture", "003", orgType) ]
   }
   else if (status === "003" && (orgType === "SUPPLIER")) {
-    return [
-      {
-        type: 1,
-        label: "Part Identification",
-        status: "004",
-        processor: orgType
-      }
-    ]
+    return [ actionButtonObj(1, "Part Identification", "004", orgType) ]
   }
   else if (status === "004" && (orgType === "SUPPLIER")) {
-    return [
-      {
-        type: 1,
-        label: "Part Inspection",
-        status: "005",
-        processor: orgType
-      }
-    ]
+    return [ actionButtonObj(1, "Part Inspection", "005", orgType) ]
   }
   else if (status === "005" && (orgType === "SUPPLIER")) {
-    return [
-      {
-        type: 1,
-        label: "Final Inspection and Indentification",
-        status: "006",
-        processor: orgType
-      }
-    ]
+    return [ actionButtonObj(1, "Final Inspection and Indentification", "006", orgType) ]
   }
   else if ((status === "006" || status === "007" || status === "008" || status === "009") && (orgType === "SUPPLIER")) {
-    return [
-      {
-        type: 2,
-        label: "Manufacturing Sub-Status",
-        status: "007",
-        processor: orgType
-      },
-      {
-        type: 1,
-        label: "Dispatched",
-        status: "010",
-        processor: orgType
-      }
-    ]
+    return [ actionButtonObj(2, "Manufacturing Sub-Status", "007", orgType), actionButtonObj(1, "Dispatched", "010", orgType) ]
   }
 
   else if (status === "010") {
-    return [
-      {
-        type: 3,
-        label: "Received",
-        status: "011"
-      }
-    ]
+    return [ actionButtonObj(3, "Received", "011") ]
   }
   else if (status === "011" && (orgType === "CUSTOMER")) {
-    return [
-      {
-        type: 1,
-        label: "Inspected",
-        status: "012",
-        processor: orgType
-      }
-    ]
+    return [ actionButtonObj(1, "Inspected", "012", orgType) ]
   }
   else if (status === "012" && (orgType === "CUSTOMER")) {
-    return [
-      {
-        type: 1,
-        label: "Accepted",
-        status: "013",
-        processor: orgType
-      },
-      {
-        type: 1,
-        label: "Rejected",
-        status: "014",
-        processor: orgType
-      }
-    ]
+    return [ actionButtonObj(1, "Accepted", "013", orgType), actionButtonObj(1, "Rejected", "014", orgType) ]
   }
   else if (status === "014" && (orgType === "CUSTOMER")) {
-    return [
-      {
-        type: 1,
-        label: "Reviewed",
-        status: "015",
-        processor: orgType
-      }
-    ]
+    return [ actionButtonObj(1, "Reviewed", "015", orgType) ]
   }
   else if (status === "015" && (orgType === "CUSTOMER")) {
-    return [
-      {
-        type: 1,
-        label: "Concession",
-        status: "016",
-        processor: orgType
-      },
-      {
-        type: 1,
-        label: "Scrapped",
-        status: "017",
-        processor: orgType
-      }
-    ]
+    return [ actionButtonObj(1, "Concession", "016", orgType), actionButtonObj(1, "Scrapped", "017", orgType)]
   }
   else if (status === "018" && (orgType === "SUPPLIER")) {
-    return [
-      {
-        type: 1,
-        label: "Paid",
-        status: "019",
-        processor: orgType
-      }
-    ]
+    return [ actionButtonObj(1, "Paid", "019", orgType) ]
   }
   else return []
+}
+
+function actionButtonObj(type, label, status, processor) {
+  return { type, label, status, processor };
 }
 
 function getOrgDetail(jwt) {
