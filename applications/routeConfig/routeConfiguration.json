@@ -1,6 +1,18 @@
 {
   "STRATA": {
     "CustomFunctionsLocation": "../../applications/STRATA/mappingFunctions/",
+    "encryptData":{
+      "customMapping": true,
+      "MappingfunctionName": "encryptData",
+      "CustomMappingFile": "general/viewItem.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "decryptData":{
+      "customMapping": true,
+      "MappingfunctionName": "decryptData",
+      "CustomMappingFile": "general/viewItem.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "customerDashboard": {
       "customMapping": true,
       "MappingfunctionName": "customerDashboard",
