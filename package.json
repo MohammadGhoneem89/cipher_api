@@ -38,7 +38,7 @@
     "fast-json-parse": "^1.0.3",
     "flat": "^4.1.0",
     "handlebars": "^4.1.2",
-    "ipfs-http-client": "^34.0.0",
+    "ipfs-http-client": "33.1.1",
     "js-base64": "^2.5.1",
     "json-fs-store": "^1.0.1",
     "json-pointer": "^0.6.0",
