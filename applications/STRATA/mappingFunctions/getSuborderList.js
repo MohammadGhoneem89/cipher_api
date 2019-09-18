@@ -1,5 +1,5 @@
 'use strict';
-const pg = require('../../../../core/api/connectors/postgress');
+const pg = require('../../../core/api/connectors/postgress');
 const _ = require('lodash');
 
 
@@ -9,9 +9,9 @@ function getSubOrderList(payload, UUIDKey, route, callback, JWToken) {
     let queryCnt = `SELECT COUNT(*) FROM suborders  WHERE 1=1`;
     let query = '';
 
-    if (payload.body.searchCriteria && payload.body.searchCriteria.suborderID) {
-        let suborderID = payload.body.searchCriteria.suborderID;
-        query += ` AND "tranxData" ->> 'suborderID' = '${suborderID}' `;
+    if (payload.body.searchCriteria && payload.body.searchCriteria.subOrderID) {
+        let subOrderID = payload.body.searchCriteria.subOrderID;
+        query += ` AND "tranxData" ->> 'subOrderID' = '${subOrderID}' `;
     }
     
     if (payload.body.searchCriteria && payload.body.searchCriteria.status) {
@@ -41,7 +41,7 @@ function getSubOrderList(payload, UUIDKey, route, callback, JWToken) {
                 });
             }
             let response = {
-                "getOrders": {
+                "getSubOrderList": {
                     "action": "getSubOrderList",
                     "pageData": {
                         "pageSize": payload.body.page ? payload.body.page.pageSize : undefined,
