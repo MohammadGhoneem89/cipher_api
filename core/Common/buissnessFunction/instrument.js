@@ -168,6 +168,10 @@ module.exports = {
         result.raisedByPic = _.get(userData, "profilePic", "");
       }
 
+      if ( jwt.orgType === "CUSTOMER" ){
+        delete result.subOrder
+      }
+
       return result;
     }
     catch (ex) {
