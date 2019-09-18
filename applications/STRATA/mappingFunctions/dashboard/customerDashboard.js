@@ -259,6 +259,8 @@ function getPendingOrder(payloadDashboardData, customerID) {
                                 "URI": [
                                     "/strata/viewOrder"
                                 ]
+
+                                
                             }
                         ]
                     }
@@ -570,6 +572,7 @@ async function customerDashboard(payload, UUIDKey, route, callback, JWToken) {
                         ],
                         "chartData": {
                             "firstBar": [
+                                
                                 graphData.purchaseOrder,
                                 graphData.orderReceived,
                                 graphData.componentManufacturing,

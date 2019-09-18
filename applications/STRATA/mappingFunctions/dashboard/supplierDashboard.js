@@ -580,6 +580,7 @@ async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken)
                         ],
                         "chartData": {
                             "firstBar": [
+                                
                                 graphData.purchaseOrder,
                                 graphData.orderReceived,
                                 graphData.componentManufacturing,

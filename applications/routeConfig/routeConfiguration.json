@@ -37,6 +37,12 @@
       "CustomMappingFile": "getItemCatalogueList/getItemCatalogueList.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getSubOrderList": {
+      "customMapping": true,
+      "MappingfunctionName": "getSubOrderList",
+      "CustomMappingFile": "getSubOrderList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getMasterAgreement": {
       "customMapping": true,
       "MappingfunctionName": "getMasterAgreement",
