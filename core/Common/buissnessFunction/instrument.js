@@ -150,7 +150,7 @@ module.exports = {
       result.statusList = getStatusList(result.status, result.activities);
       result.actionButtons = getActionButtons(result.status, jwt.orgType);
 
-      let promisesList = [getOrgDetail(jwt), user.findForBasicDetail({_id: jwt._id})]
+      let promisesList = [getOrgDetail(result.customerID, jwt), user.findForBasicDetail({_id: jwt._id})]
       let promisesResult = await Promise.all(promisesList);
 
       let entity = _.get(promisesResult[0], "entityList.data.searchResult", undefined) 
@@ -537,8 +537,8 @@ function actionButtonObj(type, label, status, processor) {
   return { type, label, status, processor };
 }
 
-function getOrgDetail(jwt) {
+function getOrgDetail(customerID, jwt) {
   return new Promise((resolve, reject) => {
-    org.entityListOut({action: "entityList", page: {currentPageNo: 1, pageSize: 10}, searchCriteria: {spCode: jwt.orgCode}}, undefined, undefined, res => {resolve(res)}, jwt);
+    org.entityListOut({action: "entityList", page: {currentPageNo: 1, pageSize: 10}, searchCriteria: {spCode: customerID}}, undefined, undefined, res => {resolve(res)}, jwt);
   })
 }
