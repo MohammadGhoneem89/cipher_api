@@ -393,6 +393,7 @@ function getStatusList(status, activities) {
   } else if (status === paintOrFinish) {
     statusList[0].status = true;
     statusList[1].status = true;
+    statusList[2].label = "Paint/Finish";
     statusList[2].status = true;
   } else if (status === dispatched) {
     statusList[0].status = true;
