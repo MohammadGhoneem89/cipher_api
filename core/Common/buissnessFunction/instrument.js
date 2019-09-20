@@ -151,7 +151,7 @@ module.exports = {
       result.statusList = getStatusList(result.status, result.activities);
       result.actionButtons = getActionButtons(result.status, jwt.orgType);
 
-      let promisesList = [getOrgDetail(result.customerID, jwt), user.findForBasicDetail({_id: jwt._id})]
+      let promisesList = [getOrgDetail(result.customerID, jwt), user.findOne({userID: result.raisedBy})]
       let promisesResult = await Promise.all(promisesList);
 
       let entity = _.get(promisesResult[0], "entityList.data.searchResult", undefined) 
