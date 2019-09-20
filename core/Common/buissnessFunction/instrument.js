@@ -120,7 +120,7 @@ module.exports = {
       
       let activities = _.get(result, "activities", []);
       let orderDate = _.get(result, "orderDate", undefined);
-      // let receivedDate = _.get(result, "receivedDate", undefined);
+       let receivedDate = _.get(result, "receivedDate", undefined);
       // let quoteValidity = _.get(result, "quoteValidity", undefined);
       
       result.activities = activities.map(activity => {
@@ -128,27 +128,30 @@ module.exports = {
         return activity;
       })
       result.orderDate = orderDate && orderDate >= 0 ? dates.MSddMMyyyyHHmmSS(orderDate) : undefined;
-      // result.receivedDate = receivedDate && receivedDate >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(receivedDate)) : undefined;
-      // result.quoteValidity = quoteValidity && quoteValidity >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(quoteValidity)) : undefined;
+      
+       result.receivedDate = receivedDate && receivedDate >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(receivedDate)) : undefined;
+       console.log(result.receivedDate,"result.receivedDate")
+       // result.quoteValidity = quoteValidity && quoteValidity >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(quoteValidity)) : undefined;
 
       delete result.documentName;
       delete result.key;
       
       let invoice = _.get(result, "invoice", undefined);
-      if (invoice) {
-        let invoiceDate = _.get(invoice, "invoiceDate", undefined);
-        invoice.invoiceDate = invoiceDate && invoiceDate >= 0 ? dates.MSddMMyyyyHHmmSS(invoiceDate) : undefined;
-      }
+      // if (invoice) {
+      //   let invoiceDate = _.get(invoice, "invoiceDate", undefined);
+      //   invoice.invoiceDate = invoiceDate && invoiceDate >= 0 ? dates.MSddMMyyyyHHmmSS(invoiceDate) : undefined;
+      // }
       result.invoice = invoice;    
       
       let creditNotes = _.get(result, "creditNotes", undefined);
-      if (creditNotes) {
-        let creditNoteDate = _.get(creditNotes, "creditNoteDate", undefined);
-        creditNotes.creditNoteDate = creditNoteDate && creditNoteDate >= 0 ? dates.MSddMMyyyyHHmmSS(creditNoteDate) : undefined;
-      }
+      // if (creditNotes) {
+      //   let creditNoteDate = _.get(creditNotes, "creditNoteDate", undefined);
+      //   creditNotes.creditNoteDate = creditNoteDate && creditNoteDate >= 0 ? dates.MSddMMyyyyHHmmSS(creditNoteDate) : undefined;
+      // }
       result.creditNotes = creditNotes;
       
       result.statusList = getStatusList(result.status, result.activities);
+      //console.log(result.statusList,"result.statusList")
       result.actionButtons = getActionButtons(result.status, jwt.orgType);
 
       let promisesList = [getOrgDetail(result.customerID, jwt), user.findOne({userID: result.raisedBy})]
@@ -539,7 +542,9 @@ function actionButtonObj(type, label, status, processor) {
 }
 
 function getOrgDetail(customerID, jwt) {
+  console.log(jwt,"---jwt")
   return new Promise((resolve, reject) => {
-    org.entityListOut({action: "entityList", page: {currentPageNo: 1, pageSize: 10}, searchCriteria: {spCode: customerID}}, undefined, undefined, res => {resolve(res)}, jwt);
+    org.entityListOut({action: "entityList", page: {currentPageNo: 1, pageSize: 10}, 
+    searchCriteria: {spCode: customerID}}, undefined, undefined, res => {resolve(res)}, jwt);
   })
 }

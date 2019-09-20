@@ -81,7 +81,7 @@ exports.getSubOrderList = getSubOrderList;
 async function ParseDataforSuborder(jwt) {
     console.log(jwt, "+++")
     let entityName, entityLogo;
-    let promisesList = [getOrgDetail(jwt)]
+    let promisesList = [getOrgDetail(jwt.orgCode,jwt)]
     let promisesResult = await Promise.all(promisesList)
     let entity = _.get(promisesResult[0], "entityList.data.searchResult", undefined)
     if (entity && entity.length) {
