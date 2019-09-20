@@ -1,7 +1,7 @@
 'use strict';
 const pg = require('../../../core/api/connectors/postgress');
 const _ = require('lodash');
-
+const { getOrgDetail } = require('../../../core/Common/buissnessFunction/instrument');
 
 function getSubOrderList(payload, UUIDKey, route, callback, JWToken) {
 
@@ -13,12 +13,16 @@ function getSubOrderList(payload, UUIDKey, route, callback, JWToken) {
         let subOrderID = payload.body.searchCriteria.subOrderID;
         query += ` AND "tranxData" ->> 'subOrderID' = '${subOrderID}' `;
     }
-    
+    if (payload.body.searchCriteria && payload.body.searchCriteria.orderID) {
+        let orderID = payload.body.searchCriteria.orderID;
+        query += ` AND "tranxData" ->> 'orderID' = '${orderID}' `;
+    }
+
     if (payload.body.searchCriteria && payload.body.searchCriteria.status) {
         let status = payload.body.searchCriteria.status;
         query += ` AND "tranxData" ->> 'status' = '${status}' `;
     }
-   
+
     let query_ = queryCnt + query;
     let queryCriteriaFull = queryData + query;
 
@@ -34,32 +38,58 @@ function getSubOrderList(payload, UUIDKey, route, callback, JWToken) {
             conn.query(queryCriteriaFull, [])
         ]).then((data) => {
             let result = [];
+
             if (data) {
                 _.get(_.get(data, '[1]', {}), 'rows', []).forEach((elemt) => {
-                    // _.set(elemt.tranxData, 'gridKey', `${_.get(elemt.tranxData, 'orderID', '')}/${_.get(elemt.tranxData, 'customerID', '')}`)
                     result.push(elemt.tranxData);
+
                 });
+
+                ParseDataforSuborder(JWToken).then((res) => {
+                    console.log(res, "===== result")
+                    result.forEach((ele) => {
+                        ele.entityName = res[0];
+                        ele.entityLogo = res[1];
+                    })
+                    let response = {
+                        "getSubOrderList": {
+                            "action": "getSubOrderList",
+                            "pageData": {
+                                "pageSize": payload.body.page ? payload.body.page.pageSize : undefined,
+                                "currentPageNo": payload.body.page ? payload.body.page.currentPageNo : 1,
+                                "totalRecords": data[0].rows[0].count
+                            },
+
+                            "searchResult": result
+
+                        }
+                    };
+                    console.log(response);
+                    return callback(response);
+                })
             }
-            let response = {
-                "getSubOrderList": {
-                    "action": "getSubOrderList",
-                    "pageData": {
-                        "pageSize": payload.body.page ? payload.body.page.pageSize : undefined,
-                        "currentPageNo": payload.body.page ? payload.body.page.currentPageNo : 1,
-                        "totalRecords": data[0].rows[0].count
-                    },
-                    
-                        "searchResult": result
-                    
-                }
-            };
-            console.log(response);
-            return callback(response);
-        });
-    }).catch((err) => {
-        console.log("ERROR OCCURRED WHILE EXECUTING QUERY..!!", err);
-        return callback(err);
+        })
+            .catch((err) => {
+                console.log("ERROR OCCURRED WHILE EXECUTING QUERY..!!", err);
+                return callback(err);
+            });
     });
 }
 
 exports.getSubOrderList = getSubOrderList;
+
+async function ParseDataforSuborder(jwt) {
+    console.log(jwt, "+++")
+    let entityName, entityLogo;
+    let promisesList = [getOrgDetail(jwt)]
+    let promisesResult = await Promise.all(promisesList)
+    let entity = _.get(promisesResult[0], "entityList.data.searchResult", undefined)
+    if (entity && entity.length) {
+        let entityData = entity[0] || undefined;
+        if (entityData && !_.isEmpty(entityData)) {
+            entityName = _.get(entityData, "entityName.name", "");
+            entityLogo = _.get(entityData, "entityLogo.sizeSmall", "");
+        }
+    } return [entityName, entityLogo];
+
+}

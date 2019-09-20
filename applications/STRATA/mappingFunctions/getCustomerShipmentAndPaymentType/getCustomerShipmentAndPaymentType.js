@@ -13,7 +13,8 @@ function getCustomerShipmentAndPaymentType(payload, UUIDKey, route, callback, JW
       [payload.action]: {
         customerType: res[payload.action].data.customerType,
         paymentType: res[payload.action].data.paymentType,
-        shipmentType: res[payload.action].data.shipmentType
+        shipmentType: res[payload.action].data.shipmentType,
+        purchaseOrderType: res[payload.action].data.purchaseOrderType
       }
     };
     return callback(response);

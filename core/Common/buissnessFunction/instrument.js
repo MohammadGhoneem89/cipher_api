@@ -9,6 +9,7 @@ const org = require('../../mappingFunctions/org/orgList');
 const user = require('../../../lib/repositories/user');
 
 module.exports = {
+  getOrgDetail,
   jsonParseNoError: (data, payload, jwt) => {
     try {
       return JSON.parse(data);

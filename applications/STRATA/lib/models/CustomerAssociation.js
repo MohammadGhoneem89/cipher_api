@@ -16,6 +16,10 @@ const schema = new Schema({
         type: String,
         required: true
     },
+    purchaseOrderType: {
+        type: String,
+        required: true
+    },
     userId: {
         type: String,
         required: true
