@@ -122,7 +122,7 @@ module.exports = {
       let orderDate = _.get(result, "orderDate", undefined);
       let receivedDate = _.get(result, "receivedDate", undefined);
       let tranxID = _.get(result, "transactinID", undefined);
-      // let quoteValidity = _.get(result, "quoteValidity", undefined);
+       let subOrder = _.get(result, "subOrder", undefined);
 
       result.tranxID = tranxID;
 
@@ -130,17 +130,17 @@ module.exports = {
         activity.date = dates.MSddMMyyyyHHmmSS(validateEpoch(activity.date));
         return activity;
       })
-      let items = result.items
-      items.forEach((obj) => {
-        obj.itemReceipts.forEach((ele) => {
-          ele.date = dates.MSddMMyyyyHHmmSS(validateEpoch(ele.date));
-        })
-      })
-      result.items=items;
+      // let items = result.items
+      // items.forEach((obj) => {
+      //   obj.itemReceipts.forEach((ele) => {
+      //     ele.date = dates.MSddMMyyyyHHmmSS(validateEpoch(ele.date));
+      //   })
+      // })
+      // result.items=items;
       result.orderDate = orderDate && orderDate >= 0 ? dates.MSddMMyyyyHHmmSS(orderDate) : undefined;
 
       result.receivedDate = receivedDate && receivedDate >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(receivedDate)) : undefined;
-      console.log(result.receivedDate, "result.receivedDate")
+      console.log(subOrder, "<< subOrder")
       // result.quoteValidity = quoteValidity && quoteValidity >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(quoteValidity)) : undefined;
 
       delete result.documentName;
