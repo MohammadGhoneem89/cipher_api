@@ -207,7 +207,7 @@ function getPendingOrder(payloadDashboardData, customerID) {
 		"tranxData" ->> 'customerID' = '${customerID}'`
         countPendingOrders = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' NOT IN ('019') And "tranxData" ->> 'customerID' = '${customerID}'`
     } else {
-        pendingOrderData = `select  "tranxData"->> 'dateCreated' AS "PODATE",
+        pendingOrderData = `select "tranxData"->> 'orderID' AS "ORDERID", "tranxData"->> 'dateCreated' AS "PODATE",
         "tranxData" ->> 'customerID' AS "CUSTOMERID",
         "tranxData"->> 'orderAmount' AS "AMOUNT",
         "tranxData"->> 'sla' AS "sla",
@@ -244,6 +244,7 @@ function getPendingOrder(payloadDashboardData, customerID) {
                     // console.log(PO_DATE, " ???? PO_DATE")
 
                     let response = {
+                        "gridKey": pendingOrderData[i].ORDERID + "/" + pendingOrderData[i].CUSTOMERID,
                         "orderID": pendingOrderData[i].ORDERID,
                         "customerID": pendingOrderData[i].CUSTOMERID,
                         "status": getStatusLabel(pendingOrderData[i].STATUS),
@@ -257,7 +258,7 @@ function getPendingOrder(payloadDashboardData, customerID) {
                                 "iconName": "fa fa-eye",
                                 "label": "View",
                                 "URI": [
-                                    "/strata/viewOrder"
+                                    "strata/viewOrder/"
                                 ]
 
                                 
@@ -305,7 +306,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
         countCompletedOrders = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '019' And "tranxData" ->> 'customerID' = '${customerID}'`
 
     } else {
-        completedOrderData = `select  "tranxData"->> 'dateCreated' AS "PODATE",
+        completedOrderData = `select "tranxData"->> 'orderID' AS "ORDERID", "tranxData"->> 'dateCreated' AS "PODATE",
             "tranxData" ->> 'customerID' AS "CUSTOMERID",
             "tranxData"->> 'orderAmount' AS "AMOUNT",
             "tranxData"->> 'sla' AS "sla",
@@ -342,6 +343,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
                     }
                     // console.log(PO_DATE, " ???? PO_DATE")
                     let response = {
+                        "gridKey": completedOrderData[i].ORDERID + "/" + completedOrderData[i].CUSTOMERID,
                         "orderID": completedOrderData[i].ORDERID,
                         "customerID": completedOrderData[i].CUSTOMERID,
                         "status": getStatusLabel(completedOrderData[i].STATUS),
@@ -355,7 +357,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
                                 "iconName": "fa fa-eye",
                                 "label": "View",
                                 "URI": [
-                                    "/strata/viewOrder"
+                                    "strata/viewOrder/"
                                 ]
                             }
                         ]
@@ -400,7 +402,7 @@ function getSettlements(payloadDashboardData, customerID) {
         countSettlementOrder = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '018' And 
         "tranxData" ->> 'customerID' = '${customerID}'`
     } else {
-        settlementOrder = `select  "tranxData"->> 'dateCreated' AS "PODATE",
+        settlementOrder = `select "tranxData"->> 'orderID' AS "ORDERID", "tranxData"->> 'dateCreated' AS "PODATE",
             "tranxData" ->> 'customerID' AS "CUSTOMERID",
             "tranxData"->> 'orderAmount' AS "AMOUNT",
             "tranxData"->> 'sla' AS "sla",
@@ -436,6 +438,7 @@ function getSettlements(payloadDashboardData, customerID) {
                     }
                     // console.log(PO_DATE, " ???? PO_DATE")
                     let response = {
+                        "gridKey": settlementOrder[i].ORDERID + "/" + settlementOrder[i].CUSTOMERID,
                         "orderID": settlementOrder[i].ORDERID,
                         "customerID": settlementOrder[i].CUSTOMERID,
                         "status": getStatusLabel(settlementOrder[i].STATUS),
@@ -449,7 +452,7 @@ function getSettlements(payloadDashboardData, customerID) {
                                 "iconName": "fa fa-eye",
                                 "label": "View",
                                 "URI": [
-                                    "/strata/viewOrder"
+                                    "strata/viewOrder/" 
                                 ]
                             }
                         ]
@@ -478,7 +481,7 @@ function getSettlements(payloadDashboardData, customerID) {
 function getCustomerWiseSettlement(payloadDashboardData, customerID) {
     let settlementOrder, countSettlementOrder, settlementOrderArray = [], totSettledOrder, paidAmount;
 
-    settlementOrder = `select 
+    settlementOrder = `select "tranxData"->> 'orderID' AS "ORDERID",
         "tranxData"->> 'customerID' AS "CUSTOMERID",
         "tranxData"->> 'paidAmount' AS "PAIDAMOUNT",
         "tranxData"->> 'toPayAmount' AS "amount" ,

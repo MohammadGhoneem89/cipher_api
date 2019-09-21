@@ -117,62 +117,72 @@ module.exports = {
   ParseContractDataForBank: async (data, payload, jwt) => {
     try {
       let result = JSON.parse(data);
-      
+
       let activities = _.get(result, "activities", []);
       let orderDate = _.get(result, "orderDate", undefined);
-       let receivedDate = _.get(result, "receivedDate", undefined);
+      let receivedDate = _.get(result, "receivedDate", undefined);
+      let tranxID = _.get(result, "transactinID", undefined);
       // let quoteValidity = _.get(result, "quoteValidity", undefined);
-      
+
+      result.tranxID = tranxID;
+
       result.activities = activities.map(activity => {
         activity.date = dates.MSddMMyyyyHHmmSS(validateEpoch(activity.date));
         return activity;
       })
+      let items = result.items
+      items.forEach((obj) => {
+        obj.itemReceipts.forEach((ele) => {
+          ele.date = dates.MSddMMyyyyHHmmSS(validateEpoch(ele.date));
+        })
+      })
+      result.items=items;
       result.orderDate = orderDate && orderDate >= 0 ? dates.MSddMMyyyyHHmmSS(orderDate) : undefined;
-      
-       result.receivedDate = receivedDate && receivedDate >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(receivedDate)) : undefined;
-       console.log(result.receivedDate,"result.receivedDate")
-       // result.quoteValidity = quoteValidity && quoteValidity >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(quoteValidity)) : undefined;
+
+      result.receivedDate = receivedDate && receivedDate >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(receivedDate)) : undefined;
+      console.log(result.receivedDate, "result.receivedDate")
+      // result.quoteValidity = quoteValidity && quoteValidity >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(quoteValidity)) : undefined;
 
       delete result.documentName;
       delete result.key;
-      
+
       let invoice = _.get(result, "invoice", undefined);
       // if (invoice) {
       //   let invoiceDate = _.get(invoice, "invoiceDate", undefined);
       //   invoice.invoiceDate = invoiceDate && invoiceDate >= 0 ? dates.MSddMMyyyyHHmmSS(invoiceDate) : undefined;
       // }
-      result.invoice = invoice;    
-      
+      result.invoice = invoice;
+
       let creditNotes = _.get(result, "creditNotes", undefined);
       // if (creditNotes) {
       //   let creditNoteDate = _.get(creditNotes, "creditNoteDate", undefined);
       //   creditNotes.creditNoteDate = creditNoteDate && creditNoteDate >= 0 ? dates.MSddMMyyyyHHmmSS(creditNoteDate) : undefined;
       // }
       result.creditNotes = creditNotes;
-      
+
       result.statusList = getStatusList(result.status, result.activities);
       //console.log(result.statusList,"result.statusList")
       result.actionButtons = getActionButtons(result.status, jwt.orgType);
 
-      let promisesList = [getOrgDetail(result.customerID, jwt), user.findOne({userID: result.raisedBy})]
+      let promisesList = [getOrgDetail(result.customerID, jwt), user.findOne({ userID: result.raisedBy })]
       let promisesResult = await Promise.all(promisesList);
 
-      let entity = _.get(promisesResult[0], "entityList.data.searchResult", undefined) 
-      if(entity && entity.length) {
+      let entity = _.get(promisesResult[0], "entityList.data.searchResult", undefined)
+      if (entity && entity.length) {
         let entityData = entity[0] || undefined;
-        if(entityData && !_.isEmpty(entityData)){
+        if (entityData && !_.isEmpty(entityData)) {
           result.entityName = _.get(entityData, "entityName.name", "");
           result.entityLogo = _.get(entityData, "entityLogo.sizeSmall", "");
         }
       }
 
       let userData = promisesResult[1] || undefined;
-      if(userData && !_.isEmpty(userData)) {
+      if (userData && !_.isEmpty(userData)) {
         result.raisedByName = _.get(userData, "firstName", "") + ' ' + _.get(userData, "lastName", "");
         result.raisedByPic = _.get(userData, "profilePic", "");
       }
 
-      if ( jwt.orgType === "CUSTOMER" ){
+      if (jwt.orgType === "CUSTOMER") {
         delete result.subOrder
       }
 
@@ -266,8 +276,8 @@ module.exports = {
 
       items.forEach((element) => {
         if (element.itemCode == undefined || !element.itemCode.trim().length) {
-           throw new Error("item code is required !!");
-         
+          throw new Error("item code is required !!");
+
         }
         if (!element.quantity || element.quantity <= 0) {
           throw new Error("item quantity is required and should be greater than zero!!");
@@ -298,7 +308,7 @@ function jsonParseNoError(data, payload, jwt) {
 function validateEpoch(val) {
   return val * 1000
 }
-  
+
 function getStatusList(status, activities) {
   let orderReceived = "001",
     purchaseOrder = "002",
@@ -498,41 +508,41 @@ function getStagePriorToPaymentOrder(activities) {
 function getActionButtons(status, orgType) {
   console.log('getActionButtons', status, orgType)
   if (status === "001") { // Todo: To be applied for customer
-    return [ actionButtonObj(1, "Purchase Order", "002", "SUPPLIER") ]
+    return [actionButtonObj(1, "Purchase Order", "002", "SUPPLIER")]
   }
   else if (status === "002" && (orgType === "SUPPLIER")) {
-    return [ actionButtonObj(1, "Component Manufacture", "003", orgType) ]
+    return [actionButtonObj(1, "Component Manufacture", "003", orgType)]
   }
   else if (status === "003" && (orgType === "SUPPLIER")) {
-    return [ actionButtonObj(1, "Part Identification", "004", orgType) ]
+    return [actionButtonObj(1, "Part Identification", "004", orgType)]
   }
   else if (status === "004" && (orgType === "SUPPLIER")) {
-    return [ actionButtonObj(1, "Part Inspection", "005", orgType) ]
+    return [actionButtonObj(1, "Part Inspection", "005", orgType)]
   }
   else if (status === "005" && (orgType === "SUPPLIER")) {
-    return [ actionButtonObj(1, "Final Inspection and Indentification", "006", orgType) ]
+    return [actionButtonObj(1, "Final Inspection and Indentification", "006", orgType)]
   }
   else if ((status === "006" || status === "007" || status === "008" || status === "009") && (orgType === "SUPPLIER")) {
-    return [ actionButtonObj(2, "Manufacturing Sub-Status", "007", orgType), actionButtonObj(1, "Dispatched", "010", orgType) ]
+    return [actionButtonObj(2, "Manufacturing Sub-Status", "007", orgType), actionButtonObj(1, "Dispatched", "010", orgType)]
   }
 
   else if (status === "010") {
-    return [ actionButtonObj(3, "Received", "011") ]
+    return [actionButtonObj(3, "Received", "011")]
   }
   else if (status === "011" && (orgType === "CUSTOMER")) {
-    return [ actionButtonObj(1, "Inspected", "012", orgType) ]
+    return [actionButtonObj(1, "Inspected", "012", orgType)]
   }
   else if (status === "012" && (orgType === "CUSTOMER")) {
-    return [ actionButtonObj(1, "Accepted", "013", orgType), actionButtonObj(1, "Rejected", "014", orgType) ]
+    return [actionButtonObj(1, "Accepted", "013", orgType), actionButtonObj(1, "Rejected", "014", orgType)]
   }
   else if (status === "014" && (orgType === "CUSTOMER")) {
-    return [ actionButtonObj(1, "Reviewed", "015", orgType) ]
+    return [actionButtonObj(1, "Reviewed", "015", orgType)]
   }
   else if (status === "015" && (orgType === "CUSTOMER")) {
-    return [ actionButtonObj(1, "Concession", "016", orgType), actionButtonObj(1, "Scrapped", "017", orgType)]
+    return [actionButtonObj(1, "Concession", "016", orgType), actionButtonObj(1, "Scrapped", "017", orgType)]
   }
   else if (status === "018" && (orgType === "SUPPLIER")) {
-    return [ actionButtonObj(1, "Paid", "019", orgType) ]
+    return [actionButtonObj(1, "Paid", "019", orgType)]
   }
   else return []
 }
@@ -542,9 +552,11 @@ function actionButtonObj(type, label, status, processor) {
 }
 
 function getOrgDetail(customerID, jwt) {
-  console.log(jwt,"---jwt")
+  console.log(jwt, "---jwt")
   return new Promise((resolve, reject) => {
-    org.entityListOut({action: "entityList", page: {currentPageNo: 1, pageSize: 10}, 
-    searchCriteria: {spCode: customerID}}, undefined, undefined, res => {resolve(res)}, jwt);
+    org.entityListOut({
+      action: "entityList", page: { currentPageNo: 1, pageSize: 10 },
+      searchCriteria: { spCode: customerID }
+    }, undefined, undefined, res => { resolve(res) }, jwt);
   })
 }

@@ -51,6 +51,7 @@ function getSubOrderList(payload, UUIDKey, route, callback, JWToken) {
                         ele.entityName = res[0];
                         ele.entityLogo = res[1];
                     })
+
                     let response = {
                         "getSubOrderList": {
                             "action": "getSubOrderList",
@@ -70,7 +71,7 @@ function getSubOrderList(payload, UUIDKey, route, callback, JWToken) {
             }
         })
             .catch((err) => {
-                console.log("ERROR OCCURRED WHILE EXECUTING QUERY..!!", err);
+                console.log("Error occurred while executing query..!!", err);
                 return callback(err);
             });
     });
