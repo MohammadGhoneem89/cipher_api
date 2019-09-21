@@ -5,7 +5,7 @@ const _ = require('lodash');
 
 function getOrderList(payload, UUIDKey, route, callback, JWToken) {
 
-    let queryData = `SELECT * FROM orders  WHERE 1=1`;
+    let queryData = `SELECT "tranxData","txnid" FROM orders  WHERE 1=1`;
     let queryCnt = `SELECT COUNT(*) FROM orders  WHERE 1=1`;
     let query = '';
 
@@ -43,13 +43,20 @@ function getOrderList(payload, UUIDKey, route, callback, JWToken) {
             conn.query(query_, []),
             conn.query(queryCriteriaFull, [])
         ]).then((data) => {
+            // console.log(data[1].rows, "???? data")
             let result = [];
             if (data) {
+                let info = data[1].rows
+                for (let i in info) {
+                    data[1].rows[i].tranxData.trxid = data[1].rows[i].txnid;
+                }
                 _.get(_.get(data, '[1]', {}), 'rows', []).forEach((elemt) => {
-                    _.set(elemt.tranxData, 'gridKey', `${_.get(elemt.tranxData, 'orderID', '')}/${_.get(elemt.tranxData, 'customerID', '')}`)
+                    _.set(elemt.tranxData, 'gridKey', `${_.get(elemt.tranxData, 'orderID', '')}/${_.get(elemt.tranxData, 'customerID', '')}`);
+
                     result.push(elemt.tranxData);
                 });
             }
+            console.log(result, "???? data");
             let response = {
                 "getOrders": {
                     "action": "getOrders",
@@ -58,9 +65,9 @@ function getOrderList(payload, UUIDKey, route, callback, JWToken) {
                         "currentPageNo": payload.body.page ? payload.body.page.currentPageNo : 1,
                         "totalRecords": data[0].rows[0].count
                     },
-                    
-                        "searchResult": result
-                    
+
+                    "searchResult": result
+
                 }
             };
             console.log(response)

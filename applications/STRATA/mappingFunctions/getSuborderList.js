@@ -5,7 +5,7 @@ const { getOrgDetail } = require('../../../core/Common/buissnessFunction/instrum
 
 function getSubOrderList(payload, UUIDKey, route, callback, JWToken) {
 
-    let queryData = `SELECT * FROM suborders  WHERE 1=1`;
+    let queryData = `SELECT "tranxData","txnid" FROM suborders  WHERE 1=1`;
     let queryCnt = `SELECT COUNT(*) FROM suborders  WHERE 1=1`;
     let query = '';
 
@@ -40,6 +40,10 @@ function getSubOrderList(payload, UUIDKey, route, callback, JWToken) {
             let result = [];
 
             if (data) {
+                let info = data[1].rows;
+                for (let i in info) {
+                    data[1].rows[i].tranxData.trxid = data[1].rows[i].txnid;
+                }
                 _.get(_.get(data, '[1]', {}), 'rows', []).forEach((elemt) => {
                     result.push(elemt.tranxData);
 
@@ -82,7 +86,7 @@ exports.getSubOrderList = getSubOrderList;
 async function ParseDataforSuborder(jwt) {
     console.log(jwt, "+++")
     let entityName, entityLogo;
-    let promisesList = [getOrgDetail(jwt.orgCode,jwt)]
+    let promisesList = [getOrgDetail(jwt.orgCode, jwt)]
     let promisesResult = await Promise.all(promisesList)
     let entity = _.get(promisesResult[0], "entityList.data.searchResult", undefined)
     if (entity && entity.length) {
