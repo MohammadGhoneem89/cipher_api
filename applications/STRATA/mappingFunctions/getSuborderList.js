@@ -49,7 +49,7 @@ function getSubOrderList(payload, UUIDKey, route, callback, JWToken) {
 
                 });
 
-                ParseDataforSuborder(JWToken).then((res) => {
+                ParseDataforSuborder(JWToken, result.length > 0 ? result[0].supplierID: '').then((res) => {
                     console.log(res, "===== result")
                     result.forEach((ele) => {
                         ele.entityName = res[0];
@@ -83,10 +83,10 @@ function getSubOrderList(payload, UUIDKey, route, callback, JWToken) {
 
 exports.getSubOrderList = getSubOrderList;
 
-async function ParseDataforSuborder(jwt) {
-    console.log(jwt, "+++")
+async function ParseDataforSuborder(jwt, supplierID) {
+    console.log('==================================' ,supplierID)
     let entityName, entityLogo;
-    let promisesList = [getOrgDetail(jwt.orgCode, jwt)]
+    let promisesList = [getOrgDetail(supplierID, jwt)]
     let promisesResult = await Promise.all(promisesList)
     let entity = _.get(promisesResult[0], "entityList.data.searchResult", undefined)
     if (entity && entity.length) {

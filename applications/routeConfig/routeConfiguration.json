@@ -40,7 +40,7 @@
     "getSubOrderList": {
       "customMapping": true,
       "MappingfunctionName": "getSubOrderList",
-      "CustomMappingFile": "getSubOrderList.js",
+      "CustomMappingFile": "getSuborderList.js",
       "mappingConfigFile": "ePayMapping"
     },
     "getMasterAgreement": {
