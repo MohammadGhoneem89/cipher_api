@@ -11,31 +11,31 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
     
     if (payload.body.searchCriteria && payload.body.searchCriteria.itemCode) {
         let itemCode = payload.body.searchCriteria.itemCode;
-        query += ` AND "tranxData" ->> 'itemCode' = '${itemCode}' `;
+        query += ` AND lower("tranxData" ->> 'itemCode') = lower('${itemCode}') `;
     }
     if (payload.body.searchCriteria && payload.body.searchCriteria.name) {
        let name = payload.body.searchCriteria.name;
         //let name= payload.body.searchCriteria.name.replace(/ /gi, '|')
         console.log("NAME",`'${name}'`)
-        query += ` AND "tranxData" ->> 'name' LIKE '%${name}%'`;
+        query += ` AND lower("tranxData" ->> 'name') LIKE lower('%${name}%')`;
     }
     if (payload.body.searchCriteria && payload.body.searchCriteria.description) {
         //let description= payload.body.searchCriteria.description.replace(/ /gi, '|')
         let description= payload.body.searchCriteria.description
         console.log("description",`'${description}'`)
-        query += ` AND "tranxData" ->> 'description' LIKE '%${description}%'`;
+        query += ` AND lower("tranxData" ->> 'description') LIKE lower('%${description}%')`;
     }
     if (payload.body.searchCriteria && payload.body.searchCriteria.material) {
         //let material= payload.body.searchCriteria.material.replace(/ /gi, '|')
         let material= payload.body.searchCriteria.material
         console.log("material",`'${material}'`)
-        query += ` AND "tranxData" ->> 'material' LIKE '%${material}%'`;
+        query += ` AND lower("tranxData" ->> 'material') LIKE lower('%${material}%')`;
     }
     if (payload.body.searchCriteria && payload.body.searchCriteria.classification) {
         //let description= payload.body.searchCriteria.description.replace(/ /gi, '|')
         let classification= payload.body.searchCriteria.classification
         console.log("classification",`'${classification}'`)
-        query += ` AND "tranxData" ->> 'classification' LIKE '%${classification}%'`;
+        query += ` AND lower("tranxData" ->> 'classification') LIKE lower('%${classification}%')`;
     }
     let queryCriteriaFull = queryData + query;
     let queryCriteria = queryCnt + query;
