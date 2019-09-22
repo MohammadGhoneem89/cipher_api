@@ -1,6 +1,30 @@
 'use strict';
 const pg = require('../../../../core/api/connectors/postgress');
 
+
+function amountFormat(val){
+    let negativeAmount = false;
+  if(val.toString().indexOf('(') > -1)
+  {
+    negativeAmount = true;
+    val = val.replace('(', '');
+    val = val.replace(')', '');
+
+  }
+
+  let nStr = parseFloat(val).toFixed(2);
+  var x = nStr.split('.');
+  var x1 = x[0];
+  var x2 = x.length > 1 ? '.' + x[1] : '';
+  var rgx = /(\d+)(\d{3})/;
+  while (rgx.test(x1)) {
+    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+  }
+  let retVal = x1 + x2;
+  if(negativeAmount)
+    retVal = '(' + retVal + ')'
+  return retVal;
+}
 function getStatusLabel(status) {
     let label;
     switch (status) {
@@ -32,7 +56,7 @@ function getTilesData(customerID) {
         countPendingOrders, countCompletedOrders, payableOrders, totalPaidOrders;
     let pAmount = 0, paidOrder = 0;
 
-    if (customerID && customerID != "ALL") {
+    if (customerID != "") {
         queryPendingOrder = `select COUNT(1) FROM  orders WHERE "tranxData" ->> 'customerID' ='${customerID}' And "tranxData" ->> 'status' NOT IN ('019');`;
         queryCompletedOrders = `select COUNT(1) from  orders  WHERE "tranxData" ->> 'customerID' ='${customerID}' And "tranxData" ->> 'status' = '019' ;`;
         payable = `select "tranxData" ->> 'toPayAmount' AS "amount",
@@ -99,7 +123,7 @@ function getTilesData(customerID) {
                             "id": 1,
                             "title": "Total Paid",
                             "percentage": "100",
-                            "value": paidOrder,
+                            "value": amountFormat(paidOrder),
                             "actionURI": "",
                             "overDue": "0",
                             "fontClass": "green-jungle"
@@ -242,8 +266,6 @@ function getPendingOrder(payloadDashboardData, customerID) {
                             PO_DATE = pendingOrderActivities[j].date
                         }
                     }
-                    console.log(pendingOrderData[i].ORDERID, " ???? pendingOrderData[i].ORDERID")
-
                     let response = {
                         "gridKey":pendingOrderData[i].ORDERID + "/" + pendingOrderData[i].CUSTOMERID,
                         "orderID": pendingOrderData[i].ORDERID,
@@ -401,6 +423,7 @@ function getSettlements(payloadDashboardData, customerID) {
         countSettlementOrder = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '018' And 
         "tranxData" ->> 'customerID' = '${customerID}'`
     } else {
+        console.log(settlementOrder,"settlementOrder")
         settlementOrder = `select "tranxData"->> 'orderID' AS "ORDERID", "tranxData"->> 'dateCreated' AS "PODATE",
             "tranxData" ->> 'customerID' AS "CUSTOMERID",
             "tranxData"->> 'orderAmount' AS "AMOUNT",
@@ -434,9 +457,7 @@ function getSettlements(payloadDashboardData, customerID) {
                         if (settlementOrderActivities[j].toStage === "002") {
                             PO_DATE = settlementOrderActivities[j].date
                         }
-                    }
-                    _.set(elemt.tranxData, 'gridKey', `${_.get(elemt.tranxData, 'orderID', '')}/${_.get(elemt.tranxData, 'customerID', '')}`)
-                    // console.log(PO_DATE, " ???? PO_DATE")
+                    } // console.log(PO_DATE, " ???? PO_DATE")
                     let response = {
                         "gridKey":settlementOrder[i].ORDERID + "/" + settlementOrder[i].CUSTOMERID,
                         "orderID": settlementOrder[i].ORDERID,
@@ -552,7 +573,7 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
 
 async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken) {
     try {
-        console.log(payload.dashboardPendingGridData.customerID, "payload.dashboardPendingGridData.customerID")
+        console.log(payload.dashboardPendingGridData.customerID, "customerID")
         console.log("\n\n<<<<<<<<<<<<<<-----------------------DASHBOARD STARTED ----------------------->>>>>>>>>")
 
         let tilesData = await getTilesData(payload.dashboardPendingGridData.customerID);
@@ -562,10 +583,10 @@ async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken)
         let customerWiseSettlement = await getCustomerWiseSettlement(payload.dashboardCustomerSettlement, payload.dashboardCustomerSettlement.customerID);
         let graphData = await getGraphData(payload.dashboardPendingGridData.customerID);
 
-        //console.log(pendingOrderRows, "pendingOrderRows\n\n");
-        // console.log(completedOrderRows, "completedOrderRows\n\n");
-        // console.log(settlementsRows, "settlementsRows\n\n");
-        // console.log(JSON.stringify(customerWiseSettlement), "customerWiseSettlement\n\n");
+        console.log(pendingOrderRows, "pendingOrderRows\n\n");
+        console.log(completedOrderRows, "completedOrderRows\n\n");
+        console.log(settlementsRows, "<<settlementsRows\n\n");
+       console.log(JSON.stringify(customerWiseSettlement), "customerWiseSettlement\n\n");
         console.log(graphData, "graphData\n\n");
 
         let supplierDashboardData = {

@@ -7,7 +7,6 @@ const _ = require('lodash');
 const dateFormat = require('../../../lib/helpers/dates');
 
 let entityListOut = function (payload, UUIDKey, route, callback, JWToken) {
-  console.log(JWToken,"---jwt")
   logger.debug(" [ Entity List ] PAYLOAD : " + JSON.stringify(payload, null, 2));
   logger.debug(" [ Entity List ] UUID : " + UUIDKey);
   logger.debug(" [ Entity List ] Route : " + route);
@@ -22,7 +21,6 @@ function orgList(body, entityList_CB, JWToken) {
   logger.debug(" [ Entity List ] Entity list Data : " + JSON.stringify(body));
 
   let isEntity = false;
-console.log(JWToken,"JWTOKEN")
   if (JWToken.orgType === 'Entity') {
     if (JWToken.orgType === 'Entity') {
       isEntity = true;
