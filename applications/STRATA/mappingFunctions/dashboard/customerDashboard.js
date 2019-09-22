@@ -1,6 +1,29 @@
 'use strict';
 const pg = require('../../../../core/api/connectors/postgress');
 
+function amountFormat(val){
+    let negativeAmount = false;
+  if(val.toString().indexOf('(') > -1)
+  {
+    negativeAmount = true;
+    val = val.replace('(', '');
+    val = val.replace(')', '');
+
+  }
+
+  let nStr = parseFloat(val).toFixed(2);
+  var x = nStr.split('.');
+  var x1 = x[0];
+  var x2 = x.length > 1 ? '.' + x[1] : '';
+  var rgx = /(\d+)(\d{3})/;
+  while (rgx.test(x1)) {
+    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+  }
+  let retVal = x1 + x2;
+  if(negativeAmount)
+    retVal = '(' + retVal + ')'
+  return retVal;
+}
 function getStatusLabel(status) {
     let label ;
     switch (status) {
@@ -99,7 +122,7 @@ function getTilesData(customerID) {
                             "id": 1,
                             "title": "Total Paid",
                             "percentage": "100",
-                            "value": paidOrder,
+                            "value": amountFormat(paidOrder),
                             "actionURI": "",
                             "overDue": "0",
                             "fontClass": "green-jungle"
