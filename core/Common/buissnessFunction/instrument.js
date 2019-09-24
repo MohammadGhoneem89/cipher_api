@@ -399,15 +399,20 @@ function getStatusList(status, activities) {
     statusList[1].status = true;
     statusList[2].label = "Part Tested";
     statusList[2].text = "85%";
+    // true for any option selected
+    statusList[2].status = true;
   } else if (status === assembly) {
     statusList[0].status = true;
     statusList[1].status = true;
     statusList[2].label = "Assembly";
     statusList[2].text = "95%";
+    // true for any option selected
+    statusList[2].status = true;
   } else if (status === paintOrFinish) {
     statusList[0].status = true;
     statusList[1].status = true;
     statusList[2].label = "Paint/Finish";
+    // true for any option selected
     statusList[2].status = true;
   } else if (status === dispatched) {
     statusList[0].status = true;
