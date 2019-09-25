@@ -111,7 +111,7 @@ function getTilesData(customerID) {
                         },
                         {
                             "id": 1,
-                            "title": "Payable",
+                            "title": "Receivable",
                             "percentage": "100",
                             "value": pAmount,
                             "actionURI": "",
@@ -120,7 +120,7 @@ function getTilesData(customerID) {
                         },
                         {
                             "id": 1,
-                            "title": "Total Paid",
+                            "title": "Amount Received",
                             "percentage": "100",
                             "value": amountFormat(paidOrder),
                             "actionURI": "",
