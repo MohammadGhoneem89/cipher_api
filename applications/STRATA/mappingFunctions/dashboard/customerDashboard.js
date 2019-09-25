@@ -122,7 +122,7 @@ function getTilesData(customerID) {
                             "id": 1,
                             "title": "Amount Received",
                             "percentage": "100",
-                            "value": amountFormat(paidOrder),
+                            "value": paidOrder,
                             "actionURI": "",
                             "overDue": "0",
                             "fontClass": "green-jungle"
