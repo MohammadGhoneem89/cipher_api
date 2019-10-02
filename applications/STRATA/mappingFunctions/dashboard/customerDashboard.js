@@ -86,7 +86,7 @@ function getTilesData(customerID) {
                 payableOrders = data[2].rows
                 totalPaidOrders = data[3].rows
 
-                for (let i in payableOrders) { pAmount += payableOrders[i].amount - payableOrders[i].totalDiscount; }
+                for (let i in payableOrders) { pAmount += payableOrders[i].amount; }
                 for (let i in totalPaidOrders) { paidOrder += totalPaidOrders[i].paidAmount; }
 
                 let result = {
@@ -535,7 +535,7 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
                 for (let i in settlementOrder) {
                     let response = {
                         "customerID": settlementOrder[i].CUSTOMERID,
-                        "toPay": settlementOrder[i].amount - settlementOrder[i].totalDiscount,
+                        "toPay": settlementOrder[i].amount ,
                         "paidAmount": settlementOrder[i].PAIDAMOUNT,
                         "creditNoteAmount": settlementOrder[i].creditNoteAmount
 

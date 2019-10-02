@@ -59,18 +59,14 @@ function getTilesData(customerID) {
     if (customerID != "") {
         queryPendingOrder = `select COUNT(1) FROM  orders WHERE "tranxData" ->> 'customerID' ='${customerID}' And "tranxData" ->> 'status' NOT IN ('019');`;
         queryCompletedOrders = `select COUNT(1) from  orders  WHERE "tranxData" ->> 'customerID' ='${customerID}' And "tranxData" ->> 'status' = '019' ;`;
-        payable = `select "tranxData" ->> 'toPayAmount' AS "amount",
-        "tranxData" ->> 'creditNoteAmount' AS "creditNoteAmount",
-        "tranxData" ->> 'totalDiscount' AS "totalDiscount"
+        payable = `select "tranxData" ->> 'toPayAmount' AS "amount"
           from accountings WHERE "tranxData" ->> 'customerID' ='${customerID}';`
         totalPaid = `select "tranxData" ->> 'paidAmount' AS "paidAmount" from accountings WHERE "tranxData" ->> 'customerID' ='${customerID}'`;
     }
     else {
         queryPendingOrder = `select COUNT(1) FROM  orders WHERE "tranxData" ->> 'status' NOT IN ('019');`;
         queryCompletedOrders = `select count(1) from orders where "tranxData"->>'status' = '019'`;
-        payable = `select "tranxData" ->> 'toPayAmount' AS "amount",
-        "tranxData" ->> 'creditNoteAmount' AS "creditNoteAmount",
-        "tranxData" ->> 'totalDiscount' AS "totalDiscount" from accountings;`
+        payable = `select "tranxData" ->> 'toPayAmount' AS "amount" from accountings;`
         totalPaid = `select "tranxData" ->> 'paidAmount' AS "paidAmount" from accountings;`
     }
     return pg.connection().then((conn) => {
@@ -87,7 +83,7 @@ function getTilesData(customerID) {
                 payableOrders = data[2].rows
                 totalPaidOrders = data[3].rows
 
-                for (let i in payableOrders) { pAmount += payableOrders[i].amount - payableOrders[i].totalDiscount; }
+                for (let i in payableOrders) { pAmount += payableOrders[i].amount ; }
                 for (let i in totalPaidOrders) { paidOrder += totalPaidOrders[i].paidAmount; }
 
                 let result = {
@@ -506,8 +502,7 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
         "tranxData"->> 'customerID' AS "CUSTOMERID",
         "tranxData"->> 'paidAmount' AS "PAIDAMOUNT",
         "tranxData"->> 'toPayAmount' AS "amount" ,
-        "tranxData"->> 'creditNoteAmount' AS "creditNoteAmount" ,
-        "tranxData"->> 'totalDiscount' AS "totalDiscount" 
+        "tranxData"->> 'creditNoteAmount' AS "creditNoteAmount"
         from  accountings where 
         accountings."tranxData" ->> 'customerID'= '${customerID}'`;
 
@@ -520,8 +515,7 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
         "tranxData"->> 'customerID' AS "CUSTOMERID",
         "tranxData"->> 'paidAmount' AS "PAIDAMOUNT",
         "tranxData"->> 'toPayAmount' AS "amount" ,
-        "tranxData"->> 'creditNoteAmount' AS "creditNoteAmount" ,
-        "tranxData"->> 'totalDiscount' AS "totalDiscount" 
+        "tranxData"->> 'creditNoteAmount' AS "creditNoteAmount" 
         from  accountings`;
 
         countSettlementOrder = `select 
@@ -545,7 +539,7 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
                 for (let i in settlementOrder) {
                     let response = {
                         "customerID": settlementOrder[i].CUSTOMERID,
-                        "toPay": settlementOrder[i].amount - settlementOrder[i].totalDiscount,
+                        "toPay": settlementOrder[i].amount ,
                         "paidAmount": settlementOrder[i].PAIDAMOUNT,
                         "creditNoteAmount": settlementOrder[i].creditNoteAmount
 
