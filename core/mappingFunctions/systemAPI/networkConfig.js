@@ -269,13 +269,13 @@ function getUserList(payload, UUIDKey, route, callback, JWToken) {
       };
       arrayList.forEach((data) => {
         let tuppleList = [];
-        let tupple = { label: "", value: "", orgType: "" }
-        tupple.orgType = data.orginizationAlias
         data.peerUser.forEach((elem) => {
+          let tupple = { label: "", value: "", orgType: "" }
+          tupple.orgType = data.orginizationAlias
           tupple.label = `${data.networkName}-${elem.userName}`
           tupple.value = `${data.networkName}-${elem.userName}`
           tuppleList.push(tupple);
-          console.log(tupple, "-----------copiedcodefromwasl")
+          
         });
         if (data.type == "Quorum") {
           tuppleList.forEach((elem) => {

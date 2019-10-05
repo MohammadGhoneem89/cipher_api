@@ -68,7 +68,6 @@ serverStats.upsert();
 app.options('*', cors());
 
 app.use(cors());
-app.use(bodyParser.json());
 app.use(fileUpload());
 app.use(express.static('public'));
 app.use(express.static('exports'));
@@ -86,8 +85,8 @@ if (config.get('enableMQRead') == '1') {
 //         logger.error(e, 'JS report error');
 //     });
 
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 app.use(requestLog);
 
