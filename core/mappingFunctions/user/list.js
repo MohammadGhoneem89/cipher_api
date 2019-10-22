@@ -5,7 +5,7 @@ const user = require('../../../lib/services/user');
 
 function userListOut(payload, UUIDKey, route, callback, JWToken) {
   payload.userId = JWToken._id;
-  if (config.get('filterUsers') && JWToken.userID != 'admin' && JWToken.userID != 'Admin') {
+  if (!(JWToken.orgType==='MASTER') && JWToken.userID != 'admin' && JWToken.userID != 'Admin') {
     payload.searchCriteria.orgCode = JWToken.orgCode;
   }
     
