@@ -74,7 +74,7 @@
     "uuid": "^3.0.0",
     "validator": "^9.4.1",
     "when": "^3.7.7",
-    "xml-formatter": "^1.1.0",
+    "xml-formatter": "^1.2.0",
     "zip-a-folder": "0.0.7"
   },
   "devDependencies": {
