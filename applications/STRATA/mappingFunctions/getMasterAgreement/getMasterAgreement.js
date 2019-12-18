@@ -19,6 +19,10 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
         let customerID = payload.body.searchCriteria.customerID;
         query += ` AND "tranxData" ->> 'customerID' = '${customerID}' `;
     }
+    if (payload.body.searchCriteria && payload.body.searchCriteria.status) {
+        let status = payload.body.searchCriteria.status;
+        query += ` AND "tranxData" ->> 'status' =  upper('${status}') `;
+    }
     // } 
     if (JWToken.orgType == 'CUSTOMER') {
         query += ` AND "tranxData" ->> 'customerID' = '${JWToken.orgCode}' `;
@@ -40,7 +44,7 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
             let result = [];
             if (data) {
                 _.get(_.get(data, '[1]', {}), 'rows', []).forEach((elemt) => {
-                    elemt.tranxData.uniqueId = elemt.tranxData.contractID + "/" + elemt.tranxData.customerID 
+                    elemt.tranxData.uniqueId = elemt.tranxData.contractID + "/" + elemt.tranxData.customerID
                     result.push(elemt.tranxData);
                 });
             }
