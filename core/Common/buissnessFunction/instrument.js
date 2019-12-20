@@ -505,7 +505,7 @@ function getStagePriorToPaymentOrder(activities) {
 function getActionButtons(status, orgType) {
     console.log('getActionButtons', status, orgType)
     if (status === "001" && (orgType === "CUSTOMER")) { // Todo: To be applied for customer
-        return [actionButtonObj(1, "Purchase Order", "002", "SUPPLIER")]
+        return [actionButtonObj(1, "Purchase Order", "002", "CUSTOMER")]
     } else if (status === "002" && (orgType === "SUPPLIER")) {
         return [actionButtonObj(1, "Component Manufacture", "003", orgType)]
     } else if (status === "003" && (orgType === "SUPPLIER")) {
