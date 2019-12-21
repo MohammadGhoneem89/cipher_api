@@ -157,9 +157,11 @@ module.exports = {
             // }
             result.creditNotes = creditNotes;
 
-            result.statusList = getStatusList(result.status, result.activities);
-            console.log("\n\n\n result.raisedBy", result.raisedBy)
-            result.actionButtons = getActionButtons(result.status, jwt.orgType);
+            result.statusList = getStatusList(result.status, result.activities)[0];
+            let optionalstatus = getStatusList(result.status, result.activities)[1];
+
+            console.log("\n\n\n ###########################################################        getStatusList(result.status, result.activities) >>> ", getStatusList(result.status, result.activities))
+            result.actionButtons = getActionButtons(result.status, jwt.orgType, optionalstatus);
 
             let promisesList = [getOrgDetail(result.customerID, jwt), user.findOne({ userID: result.raisedBy })]
             let promisesResult = await Promise.all(promisesList);
@@ -175,10 +177,8 @@ module.exports = {
 
             let userData = promisesResult[1] || undefined;
 
-            console.log(" \n\n\n############################# promisesResult ", promisesResult[1])
             if (userData && !_.isEmpty(userData)) {
 
-                console.log(" \n\n\n############################# _.get(userData, firstName, )", _.get(userData, "firstName", ""))
                 result.raisedByName = _.get(userData, "firstName", "") + ' ' + _.get(userData, "lastName", "");
                 result.raisedByPic = _.get(userData, "profilePic", "");
             }
@@ -307,6 +307,14 @@ function validateEpoch(val) {
 }
 
 function getStatusList(status, activities) {
+
+    let optionalstatus = true;
+    // for (let i = 0; i < activities.length; i++) {
+    //     if (activities[i].status == '007') {
+    //         optionalstatus = false;
+    //         break;
+    //     }
+    // }
     let orderReceived = "001",
         purchaseOrder = "002",
         componentManufacturing = "003",
@@ -481,7 +489,7 @@ function getStatusList(status, activities) {
         statusList[4].status = true;
         statusList[5].status = true;
         statusList[6].status = true;
-        statusList[6].label = getStagePriorToPaymentOrder(activities) == accepted ? "Accepted" : "Concession";
+        statusList[6].label = getStagePriorToPaymentOrder(activities) == inspected ? "Accepted" : "Concession";
         statusList[7].status = true;
     } else if (status === paid) {
         statusList[0].status = true;
@@ -491,11 +499,11 @@ function getStatusList(status, activities) {
         statusList[4].status = true;
         statusList[5].status = true;
         statusList[6].status = true;
-        statusList[6].label = getStagePriorToPaymentOrder(activities) == accepted ? "Accepted" : "Concession";
+        statusList[6].label = getStagePriorToPaymentOrder(activities) == inspected ? "Accepted" : "Concession";
         statusList[7].status = true;
         statusList[8].status = true;
     }
-    return statusList;
+    return [statusList, optionalstatus];
 }
 
 function getStagePriorToPaymentOrder(activities) {
@@ -506,7 +514,7 @@ function getStagePriorToPaymentOrder(activities) {
     return stage;
 }
 
-function getActionButtons(status, orgType) {
+function getActionButtons(status, orgType, optionalstatus) {
     console.log('getActionButtons', status, orgType)
     if (status === "001" && (orgType === "CUSTOMER")) { // Todo: To be applied for customer
         return [actionButtonObj(1, "Purchase Order", "002", "CUSTOMER")]
@@ -520,8 +528,13 @@ function getActionButtons(status, orgType) {
         return [actionButtonObj(1, "Final Inspection and Indentification", "006", orgType)]
     } else if ((status === "006" || status === "007" || status === "008" || status === "009") && (orgType === "SUPPLIER")) {
         return [actionButtonObj(2, "Manufacturing Sub-Status", "007", orgType),
-            actionButtonObj(1, "Dispatched", "010", orgType)
-        ]
+                actionButtonObj(1, "Dispatched", "010", orgType)
+            ]
+            // if (optionalstatus) {
+            //     return [actionButtonObj(2, "Manufacturing Sub-Status", "007", orgType),
+            //         actionButtonObj(1, "Dispatched", "010", orgType)
+            //     ]
+            // } else return [actionButtonObj(1, "Dispatched", "010", orgType)]
     } else if (status === "010") {
         return [actionButtonObj(3, "Received", "011", orgType)]
     } else if (status === "011" && (orgType === "CUSTOMER")) {
