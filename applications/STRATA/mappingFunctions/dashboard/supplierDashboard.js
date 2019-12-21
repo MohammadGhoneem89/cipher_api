@@ -2,59 +2,81 @@
 const pg = require('../../../../core/api/connectors/postgress');
 
 
-function amountFormat(val){
+function amountFormat(val) {
     let negativeAmount = false;
-  if(val.toString().indexOf('(') > -1)
-  {
-    negativeAmount = true;
-    val = val.replace('(', '');
-    val = val.replace(')', '');
+    if (val.toString().indexOf('(') > -1) {
+        negativeAmount = true;
+        val = val.replace('(', '');
+        val = val.replace(')', '');
 
-  }
+    }
 
-  let nStr = parseFloat(val).toFixed(2);
-  var x = nStr.split('.');
-  var x1 = x[0];
-  var x2 = x.length > 1 ? '.' + x[1] : '';
-  var rgx = /(\d+)(\d{3})/;
-  while (rgx.test(x1)) {
-    x1 = x1.replace(rgx, '$1' + ',' + '$2');
-  }
-  let retVal = x1 + x2;
-  if(negativeAmount)
-    retVal = '(' + retVal + ')'
-  return retVal;
+    let nStr = parseFloat(val).toFixed(2);
+    var x = nStr.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    let retVal = x1 + x2;
+    if (negativeAmount)
+        retVal = '(' + retVal + ')'
+    return retVal;
 }
+
 function getStatusLabel(status) {
     let label;
     switch (status) {
 
-        case "001": { label = "Order Received"; return label; };
-        case "002": { label = "Purchase Order"; return label; };
-        case "003": { label = "Component Manufacturing"; return label; };
-        case "004": { label = "Part Identification"; return label; };
-        case "005": { label = "Part Inspection"; return label; };
-        case "006": { label = "Final Inspection and Identification"; return label; };
-        case "007": { label = "Part Testing"; return label; };
-        case "008": { label = "Assembly"; return label; };
-        case "009": { label = "Paint/Finish"; return label; };
-        case "010": { label = "Dispatched"; return label; };
-        case "011": { label = "Received"; return label; };
-        case "012": { label = "Inspected"; return label; };
-        case "013": { label = "Accepted"; return label; };
-        case "014": { label = "Rejected"; return label; };
-        case "015": { label = "Reviewed"; return label; };
-        case "016": { label = "Concession"; return label; };
-        case "017": { label = "Scrapped"; return label; };
-        case "018": { label = "Payment Order"; return label; };
-        case "019": { label = "Paid"; return label; };
-        default: { label = label }
+        case "001":
+            { label = "Order Received"; return label; };
+        case "002":
+            { label = "Purchase Order"; return label; };
+        case "003":
+            { label = "Component Manufacturing"; return label; };
+        case "004":
+            { label = "Part Identification"; return label; };
+        case "005":
+            { label = "Part Inspection"; return label; };
+        case "006":
+            { label = "Final Inspection and Identification"; return label; };
+        case "007":
+            { label = "Part Testing"; return label; };
+        case "008":
+            { label = "Assembly"; return label; };
+        case "009":
+            { label = "Paint/Finish"; return label; };
+        case "010":
+            { label = "Dispatched"; return label; };
+        case "011":
+            { label = "Received"; return label; };
+        case "012":
+            { label = "Inspected"; return label; };
+        case "013":
+            { label = "Accepted"; return label; };
+        case "014":
+            { label = "Rejected"; return label; };
+        case "015":
+            { label = "Reviewed"; return label; };
+        case "016":
+            { label = "Concession"; return label; };
+        case "017":
+            { label = "Scrapped"; return label; };
+        case "018":
+            { label = "Payment Order"; return label; };
+        case "019":
+            { label = "Paid"; return label; };
+        default:
+            { label = label }
     }
 }
+
 function getTilesData(customerID) {
     let queryPendingOrder, queryCompletedOrders, payable, totalPaid,
         countPendingOrders, countCompletedOrders, payableOrders, totalPaidOrders;
-    let pAmount = 0, paidOrder = 0;
+    let pAmount = 0,
+        paidOrder = 0;
 
     if (customerID != "") {
         queryPendingOrder = `select COUNT(1) FROM  orders WHERE "tranxData" ->> 'customerID' ='${customerID}' And "tranxData" ->> 'status' NOT IN ('019');`;
@@ -62,8 +84,7 @@ function getTilesData(customerID) {
         payable = `select "tranxData" ->> 'toPayAmount' AS "amount"
           from accountings WHERE "tranxData" ->> 'customerID' ='${customerID}';`
         totalPaid = `select "tranxData" ->> 'paidAmount' AS "paidAmount" from accountings WHERE "tranxData" ->> 'customerID' ='${customerID}'`;
-    }
-    else {
+    } else {
         queryPendingOrder = `select COUNT(1) FROM  orders WHERE "tranxData" ->> 'status' NOT IN ('019');`;
         queryCompletedOrders = `select count(1) from orders where "tranxData"->>'status' = '019'`;
         payable = `select "tranxData" ->> 'toPayAmount' AS "amount" from accountings;`
@@ -71,10 +92,11 @@ function getTilesData(customerID) {
     }
     return pg.connection().then((conn) => {
         return Promise.all([
-            conn.query(queryPendingOrder, []),
-            conn.query(queryCompletedOrders, []),
-            conn.query(payable, []),
-            conn.query(totalPaid, [])])
+                conn.query(queryPendingOrder, []),
+                conn.query(queryCompletedOrders, []),
+                conn.query(payable, []),
+                conn.query(totalPaid, [])
+            ])
             .then((data) => {
                 // console.log(data[2].rows, "!!! data[2].rows\n\n\n ---->>>>")
                 // console.log(data[1].rows, "!!! data[1].rows\n\n\n ---->>>>")
@@ -83,12 +105,11 @@ function getTilesData(customerID) {
                 payableOrders = data[2].rows
                 totalPaidOrders = data[3].rows
 
-                for (let i in payableOrders) { pAmount += payableOrders[i].amount ; }
+                for (let i in payableOrders) { pAmount += payableOrders[i].amount; }
                 for (let i in totalPaidOrders) { paidOrder += totalPaidOrders[i].paidAmount; }
 
                 let result = {
-                    dashboardTiles: [
-                        {
+                    dashboardTiles: [{
                             "id": 1,
                             "title": "Pending Orders",
                             "percentage": 100,
@@ -212,7 +233,8 @@ function getGraphData(customerID) {
 
 function getPendingOrder(payloadDashboardData, customerID) {
 
-    let pendingOrderData, countPendingOrders, pendingOrderDataArray = [], totPendingOrders, POdate = 0;
+    let pendingOrderData, countPendingOrders, pendingOrderDataArray = [],
+        totPendingOrders, POdate = 0;
 
     if (customerID && customerID != "ALL") {
         pendingOrderData = `select  "tranxData"->> 'orderID' AS "ORDERID",
@@ -246,9 +268,9 @@ function getPendingOrder(payloadDashboardData, customerID) {
 
     return pg.connection().then((conn) => {
         return Promise.all([
-            conn.query(pendingOrderData, []),
-            conn.query(countPendingOrders, [])
-        ])
+                conn.query(pendingOrderData, []),
+                conn.query(countPendingOrders, [])
+            ])
             .then((data) => {
                 pendingOrderData = data[0].rows
                 totPendingOrders = data[1].rows[0].count;
@@ -263,26 +285,24 @@ function getPendingOrder(payloadDashboardData, customerID) {
                         }
                     }
                     let response = {
-                        "gridKey":pendingOrderData[i].ORDERID + "/" + pendingOrderData[i].CUSTOMERID,
-                        "orderID": pendingOrderData[i].ORDERID,
-                        "customerID": pendingOrderData[i].CUSTOMERID,
-                        "status": getStatusLabel(pendingOrderData[i].STATUS),
-                        "amount": pendingOrderData[i].AMOUNT,
-                        "dateCreated": PO_DATE,
-                        "orderType": pendingOrderData[i].ORDERTYPE,
-                        "sla": pendingOrderData[i].sla,
-                        "actions": [
-                            {
+                            "gridKey": pendingOrderData[i].ORDERID + "/" + pendingOrderData[i].CUSTOMERID,
+                            "orderID": pendingOrderData[i].ORDERID,
+                            "customerID": pendingOrderData[i].CUSTOMERID,
+                            "status": getStatusLabel(pendingOrderData[i].STATUS),
+                            "amount": pendingOrderData[i].AMOUNT,
+                            "dateCreated": PO_DATE,
+                            "orderType": pendingOrderData[i].ORDERTYPE,
+                            "sla": pendingOrderData[i].sla,
+                            "actions": [{
                                 "actionType": "componentAction",
                                 "iconName": "fa fa-eye",
                                 "label": "View",
                                 "URI": [
                                     "strata/viewOrder/"
                                 ]
-                            }
-                        ]
-                    }
-                    // console.log(response.dateCreated, "response.dateCreated")
+                            }]
+                        }
+                        // console.log(response.dateCreated, "response.dateCreated")
                     pendingOrderDataArray.push(response);
                 }
                 let result = {
@@ -307,7 +327,8 @@ function getPendingOrder(payloadDashboardData, customerID) {
 }
 
 function getCompletedOrder(payloadDashboardData, customerID) {
-    let completedOrderData, countCompletedOrders, completedOrderDataArray = [], totCompletedOrder;
+    let completedOrderData, countCompletedOrders, completedOrderDataArray = [],
+        totCompletedOrder;
 
     if (customerID && customerID != "ALL") {
         completedOrderData = `select  "tranxData"->> 'orderID' AS "ORDERID",
@@ -341,9 +362,9 @@ function getCompletedOrder(payloadDashboardData, customerID) {
 
     return pg.connection().then((conn) => {
         return Promise.all([
-            conn.query(completedOrderData, []),
-            conn.query(countCompletedOrders, [])
-        ])
+                conn.query(completedOrderData, []),
+                conn.query(countCompletedOrders, [])
+            ])
             .then((data) => {
                 completedOrderData = data[0].rows
                 totCompletedOrder = data[1].rows[0].count;
@@ -360,7 +381,7 @@ function getCompletedOrder(payloadDashboardData, customerID) {
                     }
                     // console.log(PO_DATE, " ???? PO_DATE")
                     let response = {
-                        "gridKey":completedOrderData[i].ORDERID + "/" + completedOrderData[i].CUSTOMERID,
+                        "gridKey": completedOrderData[i].ORDERID + "/" + completedOrderData[i].CUSTOMERID,
                         "orderID": completedOrderData[i].ORDERID,
                         "customerID": completedOrderData[i].CUSTOMERID,
                         "status": getStatusLabel(completedOrderData[i].STATUS),
@@ -368,16 +389,14 @@ function getCompletedOrder(payloadDashboardData, customerID) {
                         "dateCreated": PO_DATE,
                         "orderType": completedOrderData[i].ORDERTYPE,
                         "sla": completedOrderData[i].sla,
-                        "actions": [
-                            {
-                                "actionType": "componentAction",
-                                "iconName": "fa fa-eye",
-                                "label": "View",
-                                "URI": [
-                                    "strata/viewOrder/"
-                                ]
-                            }
-                        ]
+                        "actions": [{
+                            "actionType": "componentAction",
+                            "iconName": "fa fa-eye",
+                            "label": "View",
+                            "URI": [
+                                "strata/viewOrder/"
+                            ]
+                        }]
                     }
                     completedOrderDataArray.push(response);
                 }
@@ -403,7 +422,8 @@ function getCompletedOrder(payloadDashboardData, customerID) {
 
 
 function getSettlements(payloadDashboardData, customerID) {
-    let settlementOrder, countSettlementOrder, settlementOrderArray = [], totSettledOrder;
+    let settlementOrder, countSettlementOrder, settlementOrderArray = [],
+        totSettledOrder;
 
     if (customerID && customerID != "ALL") {
         settlementOrder = `select  "tranxData"->> 'orderID' AS "ORDERID","tranxData"->> 'orderID' AS "ORDERID",
@@ -419,7 +439,7 @@ function getSettlements(payloadDashboardData, customerID) {
         countSettlementOrder = `SELECT count(*) FROM orders WHERE "tranxData" ->> 'status' = '018' And 
         "tranxData" ->> 'customerID' = '${customerID}'`
     } else {
-        console.log(settlementOrder,"settlementOrder")
+        console.log(settlementOrder, "settlementOrder")
         settlementOrder = `select "tranxData"->> 'orderID' AS "ORDERID", "tranxData"->> 'dateCreated' AS "PODATE",
             "tranxData" ->> 'customerID' AS "CUSTOMERID",
             "tranxData"->> 'orderAmount' AS "AMOUNT",
@@ -438,9 +458,9 @@ function getSettlements(payloadDashboardData, customerID) {
     // console.log(settlementOrder, "<<<< settlementOrder settlementOrder");
     return pg.connection().then((conn) => {
         return Promise.all([
-            conn.query(settlementOrder, []),
-            conn.query(countSettlementOrder, [])
-        ])
+                conn.query(settlementOrder, []),
+                conn.query(countSettlementOrder, [])
+            ])
             .then((data) => {
                 settlementOrder = data[0].rows
                 totSettledOrder = data[1].rows[0].count;
@@ -455,7 +475,7 @@ function getSettlements(payloadDashboardData, customerID) {
                         }
                     } // console.log(PO_DATE, " ???? PO_DATE")
                     let response = {
-                        "gridKey":settlementOrder[i].ORDERID + "/" + settlementOrder[i].CUSTOMERID,
+                        "gridKey": settlementOrder[i].ORDERID + "/" + settlementOrder[i].CUSTOMERID,
                         "orderID": settlementOrder[i].ORDERID,
                         "customerID": settlementOrder[i].CUSTOMERID,
                         "status": getStatusLabel(settlementOrder[i].STATUS),
@@ -463,16 +483,14 @@ function getSettlements(payloadDashboardData, customerID) {
                         "dateCreated": PO_DATE,
                         "orderType": settlementOrder[i].ORDERTYPE,
                         "sla": settlementOrder[i].sla,
-                        "actions": [
-                            {
-                                "actionType": "componentAction",
-                                "iconName": "fa fa-eye",
-                                "label": "View",
-                                "URI": [
-                                    "strata/viewOrder/"
-                                ]
-                            }
-                        ]
+                        "actions": [{
+                            "actionType": "componentAction",
+                            "iconName": "fa fa-eye",
+                            "label": "View",
+                            "URI": [
+                                "strata/viewOrder/"
+                            ]
+                        }]
                     }
                     settlementOrderArray.push(response);
                 }
@@ -496,7 +514,8 @@ function getSettlements(payloadDashboardData, customerID) {
 }
 
 function getCustomerWiseSettlement(payloadDashboardData, customerID) {
-    let settlementOrder, countSettlementOrder, settlementOrderArray = [], totSettledOrder, paidAmount;
+    let settlementOrder, countSettlementOrder, settlementOrderArray = [],
+        totSettledOrder, paidAmount;
     if (customerID && customerID != "ALL") {
         settlementOrder = `select 
         "tranxData"->> 'customerID' AS "CUSTOMERID",
@@ -509,8 +528,7 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
         countSettlementOrder = `select 
         COUNT(1) from  accountings where 
         accountings."tranxData" ->> 'customerID'= '${customerID}'`
-    }
-    else {
+    } else {
         settlementOrder = `select 
         "tranxData"->> 'customerID' AS "CUSTOMERID",
         "tranxData"->> 'paidAmount' AS "PAIDAMOUNT",
@@ -528,9 +546,9 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
 
     return pg.connection().then((conn) => {
         return Promise.all([
-            conn.query(settlementOrder, []),
-            conn.query(countSettlementOrder, [])
-        ])
+                conn.query(settlementOrder, []),
+                conn.query(countSettlementOrder, [])
+            ])
             .then((data) => {
                 settlementOrder = data[0].rows
                 totSettledOrder = data[1].rows[0].count;
@@ -538,13 +556,13 @@ function getCustomerWiseSettlement(payloadDashboardData, customerID) {
 
                 for (let i in settlementOrder) {
                     let response = {
-                        "customerID": settlementOrder[i].CUSTOMERID,
-                        "toPay": settlementOrder[i].amount ,
-                        "paidAmount": settlementOrder[i].PAIDAMOUNT,
-                        "creditNoteAmount": settlementOrder[i].creditNoteAmount
+                            "customerID": settlementOrder[i].CUSTOMERID,
+                            "toPay": settlementOrder[i].amount,
+                            "paidAmount": settlementOrder[i].PAIDAMOUNT,
+                            "creditNoteAmount": settlementOrder[i].creditNoteAmount
 
-                    }
-                    // console.log(response, "response")
+                        }
+                        // console.log(response, "response")
                     settlementOrderArray.push(response);
                 }
 
@@ -581,7 +599,7 @@ async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken)
         console.log(pendingOrderRows, "pendingOrderRows\n\n");
         console.log(completedOrderRows, "completedOrderRows\n\n");
         console.log(settlementsRows, "<<settlementsRows\n\n");
-       console.log(JSON.stringify(customerWiseSettlement), "customerWiseSettlement\n\n");
+        console.log(JSON.stringify(customerWiseSettlement), "customerWiseSettlement\n\n");
         console.log(graphData, "graphData\n\n");
 
         let supplierDashboardData = {
@@ -601,7 +619,7 @@ async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken)
                         ],
                         "chartData": {
                             "firstBar": [
-                                
+
                                 graphData.purchaseOrder,
                                 graphData.orderReceived,
                                 graphData.componentManufacturing,
@@ -635,8 +653,8 @@ async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken)
                             "Accepted",
                             "Rejected",
                             "Reviewed",
-                            "Scrapped",
                             "Concession",
+                            "Scrapped",
                             "Payment Order",
                             "Paid"
                         ]
@@ -652,8 +670,7 @@ async function supplierDashboardData(payload, UUIDKey, route, callback, JWToken)
 
         }
         return callback(supplierDashboardData);
-    }
-    catch (err) {
+    } catch (err) {
         return callback(err);
     }
 }
