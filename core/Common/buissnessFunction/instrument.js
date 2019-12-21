@@ -158,7 +158,7 @@ module.exports = {
             result.creditNotes = creditNotes;
 
             result.statusList = getStatusList(result.status, result.activities);
-            //console.log(result.statusList,"result.statusList")
+            console.log("\n\n\n result.raisedBy", result.raisedBy)
             result.actionButtons = getActionButtons(result.status, jwt.orgType);
 
             let promisesList = [getOrgDetail(result.customerID, jwt), user.findOne({ userID: result.raisedBy })]
@@ -174,7 +174,11 @@ module.exports = {
             }
 
             let userData = promisesResult[1] || undefined;
+
+            console.log(" \n\n\n############################# promisesResult ", promisesResult[1])
             if (userData && !_.isEmpty(userData)) {
+
+                console.log(" \n\n\n############################# _.get(userData, firstName, )", _.get(userData, "firstName", ""))
                 result.raisedByName = _.get(userData, "firstName", "") + ' ' + _.get(userData, "lastName", "");
                 result.raisedByPic = _.get(userData, "profilePic", "");
             }
@@ -515,7 +519,9 @@ function getActionButtons(status, orgType) {
     } else if (status === "005" && (orgType === "SUPPLIER")) {
         return [actionButtonObj(1, "Final Inspection and Indentification", "006", orgType)]
     } else if ((status === "006" || status === "007" || status === "008" || status === "009") && (orgType === "SUPPLIER")) {
-        return [actionButtonObj(2, "Manufacturing Sub-Status", "007", orgType), actionButtonObj(1, "Dispatched", "010", orgType)]
+        return [actionButtonObj(2, "Manufacturing Sub-Status", "007", orgType),
+            actionButtonObj(1, "Dispatched", "010", orgType)
+        ]
     } else if (status === "010") {
         return [actionButtonObj(3, "Received", "011", orgType)]
     } else if (status === "011" && (orgType === "CUSTOMER")) {
