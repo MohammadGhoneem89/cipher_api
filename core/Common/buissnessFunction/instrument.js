@@ -7,6 +7,7 @@ const moment = require('moment');
 const dates = require('../../../lib/helpers/dates');
 const org = require('../../mappingFunctions/org/orgList');
 const user = require('../../../lib/repositories/user');
+const getOrderTranxID = require('../../../applications/STRATA/mappingFunctions/getOrderList/getTransactionID');
 
 module.exports = {
     getOrgDetail,
@@ -118,52 +119,32 @@ module.exports = {
             let activities = _.get(result, "activities", []);
             let orderDate = _.get(result, "orderDate", undefined);
             let receivedDate = _.get(result, "receivedDate", undefined);
-            let tranxID = _.get(result, "transactinID", undefined);
+            let txnID = await getTxnID(result.orderID);
+            result.tranxID = txnID;
             let subOrder = _.get(result, "subOrder", undefined);
-
-            result.tranxID = tranxID;
-
             result.activities = activities.map(activity => {
-                    activity.date = dates.MSddMMyyyyHHmmSS(validateEpoch(activity.date));
-                    return activity;
-                })
-                // let items = result.items
-                // items.forEach((obj) => {
-                //   obj.itemReceipts.forEach((ele) => {
-                //     ele.date = dates.MSddMMyyyyHHmmSS(validateEpoch(ele.date));
-                //   })
-                // })
-                // result.items=items;
+                activity.date = dates.MSddMMyyyyHHmmSS(validateEpoch(activity.date));
+                return activity;
+            })
             result.orderDate = orderDate && orderDate >= 0 ? dates.MSddMMyyyyHHmmSS(orderDate) : undefined;
 
             result.receivedDate = receivedDate && receivedDate >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(receivedDate)) : undefined;
-            console.log(subOrder, "<< subOrder")
-                // result.quoteValidity = quoteValidity && quoteValidity >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(quoteValidity)) : undefined;
-
             delete result.documentName;
             delete result.key;
 
             let invoice = _.get(result, "invoice", undefined);
-            // if (invoice) {
-            //   let invoiceDate = _.get(invoice, "invoiceDate", undefined);
-            //   invoice.invoiceDate = invoiceDate && invoiceDate >= 0 ? dates.MSddMMyyyyHHmmSS(invoiceDate) : undefined;
-            // }
             result.invoice = invoice;
 
             let creditNotes = _.get(result, "creditNotes", undefined);
-            // if (creditNotes) {
-            //   let creditNoteDate = _.get(creditNotes, "creditNoteDate", undefined);
-            //   creditNotes.creditNoteDate = creditNoteDate && creditNoteDate >= 0 ? dates.MSddMMyyyyHHmmSS(creditNoteDate) : undefined;
-            // }
             result.creditNotes = creditNotes;
 
             result.statusList = getStatusList(result.status, result.activities)[0];
             let optionalstatus = getStatusList(result.status, result.activities)[1];
-
-            console.log("\n\n\n ###########################################################        getStatusList(result.status, result.activities) >>> ", getStatusList(result.status, result.activities))
             result.actionButtons = getActionButtons(result.status, jwt.orgType, optionalstatus);
 
-            let promisesList = [getOrgDetail(result.customerID, jwt), user.findOne({ userID: result.raisedBy })]
+            let promisesList = [getOrgDetail(result.customerID, jwt), user.findOne({
+                userID: result.raisedBy
+            })]
             let promisesResult = await Promise.all(promisesList);
 
             let entity = _.get(promisesResult[0], "entityList.data.searchResult", undefined)
@@ -510,12 +491,10 @@ function getStagePriorToPaymentOrder(activities) {
     let stage = _.result(_.find(activities, (activity) => {
         return activity.toStage === "018";
     }), 'fromStage');
-    console.log('getStagePriorToPaymentOrder found stage: ', stage)
     return stage;
 }
 
 function getActionButtons(status, orgType, optionalstatus) {
-    console.log('getActionButtons', status, orgType)
     if (status === "001" && (orgType === "CUSTOMER")) { // Todo: To be applied for customer
         return [actionButtonObj(1, "Purchase Order", "002", "CUSTOMER")]
     } else if (status === "002" && (orgType === "SUPPLIER")) {
@@ -551,16 +530,39 @@ function getActionButtons(status, orgType, optionalstatus) {
 }
 
 function actionButtonObj(type, label, status, processor) {
-    return { type, label, status, processor };
+    return {
+        type,
+        label,
+        status,
+        processor
+    };
 }
 
 function getOrgDetail(customerID, jwt) {
-    console.log(jwt, "---jwt")
     return new Promise((resolve, reject) => {
         org.entityListOut({
             action: "entityList",
-            page: { currentPageNo: 1, pageSize: 10 },
-            searchCriteria: { spCode: customerID }
-        }, undefined, undefined, res => { resolve(res) }, jwt);
+            page: {
+                currentPageNo: 1,
+                pageSize: 10
+            },
+            searchCriteria: {
+                spCode: customerID
+            }
+        }, undefined, undefined, res => {
+            resolve(res)
+        }, jwt);
     })
+}
+
+
+function getTxnID(orderID) {
+    const transactionID = getOrderTranxID.getOrderTranxID(orderID);
+    return transactionID
+        .then((txnID) => {
+            return txnID.txnid;
+        })
+        .catch((err) => {
+            return err;
+        });
 }
