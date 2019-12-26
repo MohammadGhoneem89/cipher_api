@@ -122,10 +122,10 @@ module.exports = {
             let txnID = await getTxnID(result.orderID);
             result.tranxID = txnID;
             let subOrder = _.get(result, "subOrder", undefined);
-            result.activities = activities.map(activity => {
-                activity.date = dates.MSddMMyyyyHHmmSS(validateEpoch(activity.date));
-                return activity;
-            })
+            // result.activities = activities.map(activity => {
+            //     activity.date = dates.MSddMMyyyyHHmmSS(validateEpoch(activity.date));
+            //     return activity;
+            // })
             result.orderDate = orderDate && orderDate >= 0 ? dates.MSddMMyyyyHHmmSS(orderDate) : undefined;
 
             result.receivedDate = receivedDate && receivedDate >= 0 ? dates.MSddMMyyyyHHmmSS(validateEpoch(receivedDate)) : undefined;
