@@ -71,15 +71,20 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
                 documents: result,
                 upload: permissionConst.productList.upload,
                 download: permissionConst.productList.download,
-                page: permissionConst.productList.pageId
+                page: permissionConst.productList.pageId,
+                component: permissionConst.productList.component.searchGrid
             };
 
             permissionsHelper.embed(params)
                 .then((res) => {
+
                     gridActions.push({
                         pageActions: res.pageActions,
+                        component: res.component,
                         upload: res.upload,
                         download: res.download
+                        // view: res.view,
+                        // edit: res.edit
                     });
                     let response = {
                         "getItemCatalogue": {
