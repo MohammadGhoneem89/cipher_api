@@ -1,15 +1,16 @@
 'use strict';
 const pg = require('../../../../core/api/connectors/postgress');
 const _ = require('lodash');
-
+const permissionsHelper = require('../../../../lib/helpers/permissions');
+const permissionConst = require('../../../../lib/constants/permissions');
 
 function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
-
+    let gridActions = [];
     let queryData = `SELECT * FROM masteragreements  WHERE 1=1`;
     let queryCnt = `SELECT COUNT(*) FROM masteragreements  WHERE 1=1`;
     let query = '';
 
-    console.log(JWToken.orgCode, "JWToken")
+    console.log(JWToken.orgCode, "JWToken");
     if (payload.body.searchCriteria && payload.body.searchCriteria.contractID) {
         let contractID = payload.body.searchCriteria.contractID;
         query += ` AND "tranxData" ->> 'contractID' = '${contractID}' `;
@@ -48,24 +49,44 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
                     result.push(elemt.tranxData);
                 });
             }
-            let response = {
-                "getMasterAgreement": {
-                    "action": "getMasterAgreement",
-                    "pageData": {
-                        "pageSize": payload.body.page ? payload.body.page.pageSize : undefined,
-                        "currentPageNo": payload.body.page ? payload.body.page.currentPageNo : 1,
-                        "totalRecords": data[0].rows[0].count
-                    },
 
-                    "searchResult": result
 
-                }
+            const params = {
+                userId: JWToken._id,
+                docType: 'actions',
+                documents: result,
+                page: permissionConst.masterAgreementList.pageId,
+                component: permissionConst.masterAgreementList.component.searchGrid
             };
-            console.log(response)
-            return callback(response);
+
+            permissionsHelper.embed(params)
+                .then((res) => {
+                    gridActions.push({
+                        pageActions: res.pageActions,
+                        component: res.component
+                    });
+
+                    let response = {
+                        "getMasterAgreement": {
+                            "action": "getMasterAgreement",
+                            "pageData": {
+                                "pageSize": payload.body.page ? payload.body.page.pageSize : undefined,
+                                "currentPageNo": payload.body.page ? payload.body.page.currentPageNo : 1,
+                                "totalRecords": data[0].rows[0].count
+                            },
+
+                            "searchResult": result,
+                            "actions": gridActions
+                        }
+                    };
+                    return callback(response);
+                }).catch((err) => {
+                    console.log("Error occurred while fetching permissions  ", err);
+                    return callback(err);
+                });
         });
     }).catch((err) => {
-        console.log("ERROR OCCURRED WHILE EXECUTING QUERY", err);
+        console.log("Error occurred while executing query ", err);
         return callback(err);
     });
 }
