@@ -7,6 +7,18 @@
       "CustomMappingFile": "general/viewItem.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "passwordReset": {
+      "customMapping": true,
+      "MappingfunctionName": "reset",
+      "CustomMappingFile": "password/reset.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "setPassword": {
+      "customMapping": true,
+      "MappingfunctionName": "password",
+      "CustomMappingFile": "password/set.js",
+      "mappingConfigFile": "ePayMapping"
+  },
     "decryptData":{
       "customMapping": true,
       "MappingfunctionName": "decryptData",

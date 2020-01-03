@@ -10,6 +10,7 @@ function decrypt() {
 }
 
 function _decrypt(str){
+  console.log(str, 'STR');
    const decipher = crypto.createDecipher('aes-256-ctr', 'abcdefg1234567890!@#$%^&*()');
    const crypt = decipher.update(str, 'hex', 'utf8');
    try {
@@ -20,3 +21,7 @@ function _decrypt(str){
    }
 }
 decrypt();
+
+module.exports = { 
+  _decrypt
+};
