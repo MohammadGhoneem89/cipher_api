@@ -1,11 +1,12 @@
 {
+    "discovery": true,
     "keyVault": {
-        "env": "DC_dev",
+        "env": "DPW",
         "header": {
             "username": "vaultKeeper",
             "password": "DSGkeeper@321"
         },
-        "url": "http://40.68.19.116:30001/keyVault"
+        "url": "ws://127.0.0.1:9009/keyVault"
     },
     "coreDB": {
         "env": "core_database_list",

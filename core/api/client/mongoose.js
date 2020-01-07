@@ -11,7 +11,8 @@ module.exports = async function (connectionURL) {
     const hash = crypto.createHash('md5').update(connectionURL).digest("hex");
     if (MGExistingList[hash]) {
         console.log('Returning an existing Mongo instance');
-        if (MGExistingList[hash].readyState !== 1 || MGExistingList[hash].readyState !== 2) {
+        console.log('connection state ',MGExistingList[hash].readyState)
+        if (MGExistingList[hash].readyState !== 1) {
             MGExistingList[hash] = await createConnection();
         }
     } else {

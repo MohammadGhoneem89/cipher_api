@@ -206,25 +206,21 @@ module.exports = class Dispatcher {
   connectQueueService(responseQueue) {
     return amq.start()
       .then((ch) => {
-        return ch.assertQueue(this.configdata.requestServiceQueue, {
-          durable: false
-        })
-          .then(() => {
-            let generalResponse = {
-              "error": false,
-              "message": "Processed OK!"
-            };
-            let responseQueue = [];
-            let today = new Date();
-            responseQueue.push(this.configdata.responseQueue);
-            _.set(this.request, 'Header.tranType', "0200");
-            _.set(this.request, 'Header.UUID', this.UUID);
-            _.set(this.request, 'Header.ResponseMQ', responseQueue);
-            _.set(this.request, 'Header.timeStamp', today.toISOString());
-            console.log(JSON.stringify(this.request, null, 2))
-            ch.sendToQueue(this.configdata.requestServiceQueue, new Buffer(JSON.stringify(this.request)));
-            return generalResponse;
-          });
+        let generalResponse = {
+          "error": false,
+          "message": "Processed OK!"
+        };
+        let responseQueue = [];
+        let today = new Date();
+        responseQueue.push(this.configdata.responseQueue);
+        _.set(this.request, 'Header.tranType', "0200");
+        _.set(this.request, 'Header.UUID', this.UUID);
+        _.set(this.request, 'Header.ResponseMQ', responseQueue);
+        _.set(this.request, 'Header.timeStamp', today.toISOString());
+        console.log(JSON.stringify(this.request, null, 2))
+        ch.channelWrapper.sendToQueue(this.configdata.requestServiceQueue, new Buffer(JSON.stringify(this.request)));
+        return generalResponse;
       });
+
   };
 };
