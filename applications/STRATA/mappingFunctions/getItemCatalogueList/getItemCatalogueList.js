@@ -12,7 +12,7 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
 
     if (payload.body.searchCriteria && payload.body.searchCriteria.itemCode) {
         let itemCode = payload.body.searchCriteria.itemCode;
-        query += ` AND lower("tranxData" ->> 'itemCode') = lower('${itemCode}') `;
+        query += ` AND lower("tranxData" ->> 'itemCode') LIKE lower('%${itemCode}%') `;
     }
     if (payload.body.searchCriteria && payload.body.searchCriteria.name) {
         let name = payload.body.searchCriteria.name;
@@ -68,7 +68,7 @@ function getItemCatalogueList(payload, UUIDKey, route, callback, JWToken) {
             const params = {
                 userId: JWToken._id,
                 docType: 'actions',
-                documents: result,
+                documents: result ? result : [],
                 upload: permissionConst.productList.upload,
                 download: permissionConst.productList.download,
                 page: permissionConst.productList.pageId,

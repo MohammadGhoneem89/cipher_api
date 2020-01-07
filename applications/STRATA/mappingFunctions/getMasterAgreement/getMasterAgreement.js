@@ -54,7 +54,7 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
             const params = {
                 userId: JWToken._id,
                 docType: 'actions',
-                documents: result,
+                documents: result ? result : [],
                 page: permissionConst.masterAgreementList.pageId,
                 component: permissionConst.masterAgreementList.component.searchGrid
             };

@@ -1,6 +1,5 @@
 'use strict';
 const pg = require('../../../../core/api/connectors/postgress');
-const _ = require('lodash');
 
 
 async function getOrderTranxID(orderID) {
