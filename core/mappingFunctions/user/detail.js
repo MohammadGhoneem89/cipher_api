@@ -13,6 +13,7 @@ function detail(payload, UUIDKey, route, callback, JWToken) {
 function _detail(payload, callback) {
   user.getDetails(payload)
     .then((user) => {
+      console.log("PAYLOAD !!!!",payload)
       const response = {};
       response[payload.action] = {
         action: payload.action,

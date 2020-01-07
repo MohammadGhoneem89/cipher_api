@@ -376,8 +376,10 @@ app.post('/login', function (req, res) {
     .then((user) => {
       if (user.userType == "API") {
         apiResponse.token = user.token;
+        console.log("user ?????? ",user);
         res.send(apiResponse);
       } else {
+        console.log("response.loginResponse.data ?????? ",response.loginResponse.data)
         response.loginResponse.data.token = user.token;
         response.loginResponse.data.firstScreen = user.firstScreen;
         res.send(response);
