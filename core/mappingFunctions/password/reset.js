@@ -33,7 +33,7 @@ function _reset(payload, callback) {
           data: {
             message: {
               status: 'ERROR',
-              errorDescription: 'User password not updated',
+              errorDescription: 'Invalid User ID or Password',
               displayToUser: true
             },
             error: error
