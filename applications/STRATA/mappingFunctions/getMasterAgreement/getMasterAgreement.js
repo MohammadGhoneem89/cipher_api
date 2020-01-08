@@ -13,7 +13,7 @@ function getMasterAgreement(payload, UUIDKey, route, callback, JWToken) {
     console.log(JWToken.orgCode, "JWToken");
     if (payload.body.searchCriteria && payload.body.searchCriteria.contractID) {
         let contractID = payload.body.searchCriteria.contractID;
-        query += ` AND "tranxData" ->> 'contractID' = '${contractID}' `;
+        query += ` AND "tranxData" ->> 'contractID' LIKE lower('%${contractID}%') `;
     }
     //if (JWToken.orgType == 'SUPPLIER') {
     if (payload.body.searchCriteria && payload.body.searchCriteria.customerID) {

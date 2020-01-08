@@ -15,7 +15,7 @@ function userListOut(payload, UUIDKey, route, callback, JWToken) {
 function userList(payload, callback) {
   user.getList(payload)
     .then((usersDetails) => {
-      const response = {
+      let response = {
         userList: {
           action: payload.action,
           pageData: {
@@ -29,6 +29,34 @@ function userList(payload, callback) {
           }
         }
       };
+
+      response.userList.data.actions = [{
+        "value" : "4043",
+        "type" : "pageAction",
+        "label" : "ADD",
+        "labelName" : "COM_AB_Add",
+        "actionType" : "PORTLET_LINK",
+        "iconName" : "fa fa-plus",
+        "URI" : "/userSetup"
+    }]
+      for (let rowCount=0; rowCount < response.userList.data.searchResult.length; rowCount++) {
+        response.userList.data.searchResult[rowCount].actions = [
+          {
+            "URI": [
+              "/userSetup/"
+            ],
+            "value": "4042",
+            "type": "componentAction",
+            "label": "Edit",
+            "params": "",
+            "iconName": "icon-docs"
+          }
+
+        ]
+
+      }
+
+
       callback(response);
     })
     .catch((err) => {

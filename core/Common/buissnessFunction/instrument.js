@@ -515,7 +515,7 @@ function getActionButtons(status, orgType, optionalstatus) {
             //     ]
             // } else return [actionButtonObj(1, "Dispatched", "010", orgType)]
     } else if (status === "010") {
-        return [actionButtonObj(3, "Received", "011", orgType)]
+        return [actionButtonObj(3, "Received", "011", "CUSTOMER")]
     } else if (status === "011" && (orgType === "CUSTOMER")) {
         return [actionButtonObj(1, "Inspected", "012", orgType)]
     } else if (status === "012" && (orgType === "CUSTOMER")) {
