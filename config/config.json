@@ -1,6 +1,6 @@
 {
   "keyVault": {
-    "env": "STRATA_Dev",
+    "env": "etisalat_smiles_dev",
     "header":{
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
