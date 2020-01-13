@@ -1,11 +1,14 @@
 'use strict';
 const factory = require('../client/index');
 const crypto = require('../../../lib/helpers/crypto');
-
-module.exports.connection = function(dbConfig) {
-  dbConfig = crypto.decrypt(dbConfig);
+const config = require('../../../config/index');
+module.exports.connection = function (dbConfig) {
+  if (!dbConfig)
+    dbConfig = crypto.decrypt(config.get('mongodb.url'));
+  else
+    dbConfig = crypto.decrypt(dbConfig);
   return new Promise(async (resolve, reject) => {
-    try{
+    try {
       let mongoConnection = await factory.createClient('mongo', dbConfig);
       return resolve(mongoConnection);
     }

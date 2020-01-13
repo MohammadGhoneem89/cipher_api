@@ -31,7 +31,23 @@ module.exports = class GeneralRequestProcessor {
 
         let controller = new Dispatcher(this.request, message, this.configdata, this.UUID, global.enumInfo, this.JWTokenData);
         return controller.SendGetRequest().then((response) => {
-          resolve(response);
+          if (response.success || response.error === true) {
+            resolve(response);
+          } else {
+            let responseObj = {
+              __cipherSuccessStatus: false,
+              __cipherMessage: response.message || "Some unknown error occured, please check logs",
+              __cipherUIErrorStatus: constants.cipherUIFailure,
+              __cipherExternalErrorStatus: constants.cipherExternalFailure,
+              __cipherMetaData: constants.errRequestParsing,
+              ...response
+            };
+            _.set(responseObj, 'success', undefined);
+            _.set(responseObj, 'message', undefined);
+            resolve(responseObj);
+          }
+
+
         });
       }).catch((ex) => {
         let successStatus = false;
@@ -47,4 +63,3 @@ module.exports = class GeneralRequestProcessor {
     });
   }
 };
-

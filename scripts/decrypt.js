@@ -9,21 +9,21 @@ function decrypt() {
   console.log({ decrypt: decryptStr }); //eslint-disable-line
 }
 
-function _decrypt(str){
+function _decrypt(str) {
   console.log(str, 'STR');
-   const decipher = crypto.createDecipher('aes-256-ctr', 'abcdefg1234567890!@#$%^&*()');
-   console.log("decipher ?????? ",decipher)
-   const crypt = decipher.update(str, 'hex', 'utf8');
-   try {
-   return JSON.parse(crypt);
-   }
-   catch (err) {
-	 console.log(err.stack)
-   return crypt;
-   }
+  const decipher = crypto.createDecipher('aes-256-ctr', 'abcdefg1234567890!@#$%^&*()');
+  console.log("decipher ?????? ", decipher)
+  const crypt = decipher.update(str, 'hex', 'utf8');
+  try {
+    return JSON.parse(crypt);
+  }
+  catch (err) {
+    console.log(err.stack)
+    return crypt;
+  }
 }
 decrypt();
 
-module.exports = { 
+module.exports = {
   _decrypt
 };

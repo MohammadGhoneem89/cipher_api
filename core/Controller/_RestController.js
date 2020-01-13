@@ -3,10 +3,10 @@
 const logger = require('../api/connectors/logger').app;
 let config = require('../../AppConfig');
 let routeConfiguration = Object.assign(require('../routeConfig/routeConfiguration.json'), require('../../applications/routeConfig/routeConfiguration.json'));
-let pointer = require('json-pointer');
 const apiPayloadRepo = require('../../lib/repositories/apiPayload');
 const _ = require('lodash');
-const apiFilter = ['RenewContract'];
+const vaultConfig = require('../../config');
+const apiFilter = vaultConfig.get('apiFilter');
 
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
   if (apiFilter.indexOf(incommingRoute) >= 0) {

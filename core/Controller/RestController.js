@@ -2,14 +2,14 @@
 
 const logger = require('../api/connectors/logger').app;
 const _ = require('lodash');
-const config = require('../../AppConfig');
+const vaultConfig = require('../../config');
 const apiPayloadRepo = require('../../lib/repositories/apiPayload');
 const GeneralRequestProcessor = require('./requestProcessor');
 const constants = require('../Common/constants_en.js');
 const ObjectMapper = require('./objectMapper');
 const OldRestController = require('./_RestController');
 const APIDefination = require('../mappingFunctions/systemAPI/APIDefination');
-const apiFilter = ['RenewContract'];
+const apiFilter = vaultConfig.get('apiFilter');
 
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
 

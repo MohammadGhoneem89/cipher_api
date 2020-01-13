@@ -12,6 +12,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "amqp-connection-manager": "^3.1.1",
     "amqplib": "~0.5.1",
     "amqplib-auto-recovery": "^0.1.0",
     "atob": "^2.1.2",
@@ -32,6 +33,7 @@
     "express": "^4.16.4",
     "express-bearer-token": "^2.1.0",
     "express-fileupload": "^0.3.0",
+    "express-healthcheck": "^0.1.0",
     "express-jwt": "^5.1.0",
     "express-session": "^1.15.2",
     "express-ws": "^4.0.0",
@@ -39,6 +41,7 @@
     "flat": "^4.1.0",
     "handlebars": "^4.1.2",
     "ipfs-http-client": "33.1.1",
+    "is-reachable": "^4.0.0",
     "js-base64": "^2.5.1",
     "json-fs-store": "^1.0.1",
     "json-pointer": "^0.6.0",
@@ -75,6 +78,7 @@
     "uuid": "^3.0.0",
     "validator": "^9.4.1",
     "when": "^3.7.7",
+    "ws": "^7.2.1",
     "xml-formatter": "^1.2.0",
     "zip-a-folder": "0.0.7"
   },
