@@ -6,7 +6,7 @@
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
     },
-    "url": "ws://127.0.0.1:9009/keyVault"
+    "url": "ws://23.97.138.116:9009/keyVault"
   },
   "coreDB": {
     "env": "core_database_list",
