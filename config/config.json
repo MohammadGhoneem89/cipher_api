@@ -1,12 +1,12 @@
 {
-  "discovery": true,
+
   "keyVault": {
     "env": "etisalat_smiles_dev",
     "header": {
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
     },
-    "url": "ws://23.97.138.116:9009/keyVault"
+    "url": "http://23.97.138.116:9009/keyVault"
   },
   "coreDB": {
     "env": "core_database_list",
