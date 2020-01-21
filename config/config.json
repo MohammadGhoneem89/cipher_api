@@ -1,8 +1,4 @@
 {
-<<<<<<< HEAD
-
-=======
->>>>>>> changes
   "keyVault": {
     "env": "etisalat_smiles_dev",
     "header":{
