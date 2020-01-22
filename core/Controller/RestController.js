@@ -88,6 +88,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     let simuStatus = configdata.isSimulated === true && bypassSimu === false;
     if (configdata.isResValBypass === false && simuStatus === false) {
       let successStatus = true;
+      console.log(">>>>>>>>>> response >>>>>> ", response);
       if (!response.__cipherMessage) {
         _.set(response, '__cipherSuccessStatus', successStatus);
         _.set(response, '__cipherMessage', constants.cipherGeneralSuccess);
@@ -98,6 +99,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       return objMapper.start().then((mappedData) => {
         return mappedData;
       }).catch((ex) => {
+        
         let errResponse = {};
         _.set(errResponse, '__cipherSuccessStatus', successStatus);
         _.set(errResponse, '__cipherMessage', ex);
