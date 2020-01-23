@@ -1,4 +1,16 @@
 {
+  
+  "SMILES": {
+    "CustomFunctionsLocation": "../../applications/etisalat_smiles/mappingFunctions/",
+    "getPointConversionTransactionLists":{
+      "customMapping": true,
+      "MappingfunctionName": "getPointConversionTransactionList",
+      "CustomMappingFile": "Transactions/getPointConversionTransactionList.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
+
+
   "STRATA": {
     "CustomFunctionsLocation": "../../applications/STRATA/mappingFunctions/",
     "encryptData":{
