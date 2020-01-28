@@ -8,7 +8,7 @@ const emitter = new events.EventEmitter();
 const skipBottomLines = 0;
 const skipLines = 1;
 const Sequelize = require('sequelize');
-const pgModels = require('./PostgreModel.js')
+const pgModels = require('../PostgreModel.js')
 var filename = "";
 const { Op } = require("sequelize");
 
