@@ -1,4 +1,28 @@
 {
+  
+  "SMILES": {
+    "CustomFunctionsLocation": "../../applications/etisalat_smiles/mappingFunctions/",
+    "getPointConversionTransactionLists":{
+      "customMapping": true,
+      "MappingfunctionName": "getPointConversionTransactionList",
+      "CustomMappingFile": "Transactions/getPointConversionTransactionList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getPartnersList":{
+      "customMapping": true,
+      "MappingfunctionName": "getPartnersList",
+      "CustomMappingFile": "partnerSetup/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "settleTransaction":   {
+      "customMapping": true,
+      "MappingfunctionName": "settleTransaction",
+      "CustomMappingFile": "settlement/settleTransaction.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
+
+
   "STRATA": {
     "CustomFunctionsLocation": "../../applications/STRATA/mappingFunctions/",
     "encryptData":{
