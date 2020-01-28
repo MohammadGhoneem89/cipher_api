@@ -8,6 +8,12 @@
       "CustomMappingFile": "Transactions/getPointConversionTransactionList.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getTransactionList":{
+      "customMapping": true,
+      "MappingfunctionName": "getTransactionList",
+      "CustomMappingFile": "Transactions/getTransactionList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getPartnersList":{
       "customMapping": true,
       "MappingfunctionName": "getPartnersList",
