@@ -12,10 +12,10 @@ const pgModels = require('./PostgreModel.js')
 var filename = "";
 const { Op } = require("sequelize");
 
-async function getPointConversionTransactionList(payload, UUIDKey, route, callback, JWToken) {
+async function getOrderList(payload, UUIDKey, route, callback, JWToken) {
     let response = {
-        "getPointConversionTransactionList": {
-            "action": "getPointConversionTransactionList",
+        "getOrderList": {
+            "action": "getOrderList",
             "pageData": {
                 "currentPageNo": 1,
                 "pageSize": 10
@@ -26,19 +26,19 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
         }
     }
 
-    let db = pgModels.makeModel('transaction')
+    let db = pgModels.makeModel('orders')
     const obj = {
         tranxData: {
         }
     }
 
+    //CONDITIONS TO BE ADDED BASED ON SEARCH CRITERIA PROVIDED
     if (payload.body.searchCriteria.startDate && payload.body.searchCriteria.endDate) {
         obj.tranxData['"transactionDate"'] = {
             [Op.gte]: payload.body.searchCriteria.startDate,
             [Op.lte]: payload.body.searchCriteria.endDate
         }
     }
-
     if (payload.body.searchCriteria.Status) {
         obj.tranxData['"internalStatus"'] = {
             [Op.eq]: payload.body.searchCriteria.Status,
@@ -49,9 +49,8 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
             [Op.eq]: payload.body.partnerCode
         }
     }
-
-    let obj1
-    // let result = await 
+    
+    //QUERY FOR FECTHING LISTS
     let result = await db.findAndCountAll({
         where: obj,
         raw: false,
@@ -61,7 +60,7 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
         console.log("Error " + err)
         return callback(err)
     });
-
+    
     // let finalObject = [];
     // if (result && result.length) {
     //     for (let elem of result) {
@@ -77,41 +76,16 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
     //         }
     //     }
     // }
-    let actions = {
-        "value": "1003",
-        "type": "componentAction",
-        "label": "View",
-        "params": "",
-        "iconName": "icon-docs",
-        "URI": ["/View/Detail/"]
-    }
 
-  
-
-    let rows = _.get(result, 'rows', null)
-
-    console.log('-----',rows[0])
-    if (rows) {
-        rows.forEach((row, index) => {
-            rows[index].dataValues.actions =actions
-        });
-    }
-
-    // let arr = _.get(result,'rows',null)
-    // arr.forEach(element => {
-    //     arr(element).push(actions)
-    // });
     if (result) {
-
-        response.getPointConversionTransactionList.data.searchResult = rows
+        response.getPointConversionTransactionList.data.searchResult = result
         response.getPointConversionTransactionList.pageData.currentPageNo = payload.body.page.currentPageNo
         response.getPointConversionTransactionList.pageData.pageSize = payload.body.page.pageSize
         return callback(response);
     }
-
-
-
-
-
+    // return callback(result)
 }
+
 exports.getPointConversionTransactionList = getPointConversionTransactionList
+
+
