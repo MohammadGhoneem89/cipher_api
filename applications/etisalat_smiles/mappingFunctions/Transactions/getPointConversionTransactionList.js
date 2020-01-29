@@ -103,7 +103,7 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
     // });
     if (result) {
 
-        response.getPointConversionTransactionList.data.searchResult = rows
+        response.getPointConversionTransactionList.data.searchResult = result
         response.getPointConversionTransactionList.pageData.currentPageNo = payload.body.page.currentPageNo
         response.getPointConversionTransactionList.pageData.pageSize = payload.body.page.pageSize
         return callback(response);
