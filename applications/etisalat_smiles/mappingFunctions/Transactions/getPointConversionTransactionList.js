@@ -62,47 +62,27 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
         return callback(err)
     });
 
-    // let finalObject = [];
-    // if (result && result.length) {
-    //     for (let elem of result) {
-    //         console.log('\n\n\n\n\n', elem, '\n\n\n\n\n');
-    //         if (elem.tranxData && Object.keys(elem.tranxData).length) {
-    //             let tranxData = { ...elem.tranxData }
-    //             finalObject.push({
-    //                 ...tranxData,
-    //                 sourceTransactionId: tranxData.sourceTransactionId,
-    //                 accountNo: tranxData.accountNo,
-    //                 points: _.get(tranxData, 'accrual[0].points', null)
-    //             })
-    //         }
-    //     }
-    // }
-    let actions = {
+
+
+
+    let actions = [{
         "value": "1003",
         "type": "componentAction",
         "label": "View",
         "params": "",
         "iconName": "icon-docs",
         "URI": ["/View/Detail/"]
-    }
+    }];
 
-  
+    let rows = _.get(result, 'rows', [])
+    rows.forEach((row) => {
+        row.dataValues.actions = actions
+    });
 
-    let rows = _.get(result, 'rows', null)
 
-    console.log('-----',rows[0])
-    if (rows) {
-        rows.forEach((row, index) => {
-            rows[index].dataValues.actions =actions
-        });
-    }
 
-    // let arr = _.get(result,'rows',null)
-    // arr.forEach(element => {
-    //     arr(element).push(actions)
-    // });
     if (result) {
-
+        result.rows = rows;
         response.getPointConversionTransactionList.data.searchResult = result
         response.getPointConversionTransactionList.pageData.currentPageNo = payload.body.page.currentPageNo
         response.getPointConversionTransactionList.pageData.pageSize = payload.body.page.pageSize
