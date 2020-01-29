@@ -18,7 +18,7 @@ const dates = require('../../../../lib/helpers/dates.js')
 // WHERE [condition];
 function apiForAccrual(payload, UUIDKey, route, callback, JWToken) {
     console.log("\n\npayload from accrual api  >>> ",payload.body)
-    let queryData = `UPDATE LMS SET "currentpoints" = "currentpoints" + ${500} where 
+    let queryData = `UPDATE LMS SET "currentpoints" = "currentpoints" + ${payload.body.points} where 
     "program_name" = 'SMILES' AND
      "membershipno"='${payload.body.membershipNo}'`;
 
@@ -34,7 +34,7 @@ function apiForAccrual(payload, UUIDKey, route, callback, JWToken) {
                     statusCode: "200",
                     statusdescription: "SUCCESSFUL TRANSACTION",
                     paymentRef: "XYZ",
-                    pointsCredited:4505,
+                    pointsCredited:payload.body.points,
                     isRetry: "false",
                     isReversal: "false"
                 
