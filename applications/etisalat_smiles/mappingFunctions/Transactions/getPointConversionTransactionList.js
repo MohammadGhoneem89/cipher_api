@@ -71,12 +71,14 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
         "label": "View",
         "params": "",
         "iconName": "icon-docs",
-        "URI": ["/smiles/View/Detail/"]
+        "URI": ["/smiles/transaction/view/"]
     }];
 
     let rows = _.get(result, 'rows', [])
     rows.forEach((row) => {
         row.dataValues.actions = actions
+        
+        row.dataValues.transactionId=`${row.tranxData.partnerCode}_${row.tranxData.sourceTransactionId}`
     });
 
 
