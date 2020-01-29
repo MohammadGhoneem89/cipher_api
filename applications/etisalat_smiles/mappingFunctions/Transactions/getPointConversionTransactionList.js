@@ -71,7 +71,7 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
         "label": "View",
         "params": "",
         "iconName": "icon-docs",
-        "URI": ["/View/Detail/"]
+        "URI": ["/smiles/View/Detail/"]
     }];
 
     let rows = _.get(result, 'rows', [])
