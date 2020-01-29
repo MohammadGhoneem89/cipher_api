@@ -12,7 +12,7 @@ const pgModels = require('../PostgreModel.js')
 var filename = "";
 const { Op } = require("sequelize");
 
-async function getPointConversionTransactionList(payload, UUIDKey, route, callback, JWToken) {
+async function getTransactionList(payload, UUIDKey, route, callback, JWToken) {
     let db= pgModels.makeModel('transaction')
     const obj = {
         tranxData:{
@@ -48,6 +48,6 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
     return callback(response);
 }
 
-exports.getViewTransactions = getViewTransactions
+exports.getTransactionList = getTransactionList
 
 
