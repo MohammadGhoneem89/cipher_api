@@ -25,10 +25,20 @@
       "MappingfunctionName": "settleTransaction",
       "CustomMappingFile": "settlement/settleTransaction.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "handleAccrualEvent":   {
+      "customMapping": true,
+      "MappingfunctionName": "handleAccrualEvent",
+      "CustomMappingFile": "eventData/handleAccrualEvent.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "apiForAccrual":   {
+      "customMapping": true,
+      "MappingfunctionName": "apiForAccrual",
+      "CustomMappingFile": "eventData/apiForAccrual.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
-
-
   "STRATA": {
     "CustomFunctionsLocation": "../../applications/STRATA/mappingFunctions/",
     "encryptData":{
