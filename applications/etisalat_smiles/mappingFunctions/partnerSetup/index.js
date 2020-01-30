@@ -14,7 +14,8 @@ function getPartnersList(payload, UUIDKey, route, callback, JWToken) {
                             "tranxData" ->>'partnerCode' as "partnerCode",
                             "tranxData" ->>'partnerErCode' as "partnerErCode",
                             "tranxData" ->>'rejectedBy' as "rejectedBy",
-                            "tranxData" ->>'status' as "status"
+                            "tranxData" ->>'status' as "status",
+                            "tranxData" ->>'contractParams' as "contractParams"
                         from public."interims" 
                         where 1=1`;
 
