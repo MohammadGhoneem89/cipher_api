@@ -14,13 +14,15 @@ async function handleAccrualEvent(payload, UUIDKey, route, callback, JWToken) {
             case "EventOnPostTransactionToBlockchain": {
                 try {
                     let data = await getEventResponse(payload, EventOnPostTransactionToBlockchain(payload), callback);
-                    callback({
+                    return callback({
                         status: "success",
-                        RESULT: data
+                        RESULT: data,
+                        error: false
                     })
-                } catch(error){
+
+                } catch (error) {
                     console.log("\n\n ERROR ????? ", error)
-                    return error ;
+                    return callback({ error: true });
                 }
             }
 
@@ -64,7 +66,7 @@ async function getEventResponse(payload, fnToExecute, confirmTransaction, callba
     try {
         let updateLMS = await fnToExecute();
 
-        console.log(">>>>>> updateLMS >>>>  ", updateLMS," updateLMS   ++++++++++++++++++++  \n\n ");
+        console.log(">>>>>> updateLMS >>>>  ", updateLMS, " updateLMS   ++++++++++++++++++++  \n\n ");
         //let confrmTxn = await confirmTransaction(updateLMS, payload);
 
         // return async () => {
@@ -83,7 +85,7 @@ async function getEventResponse(payload, fnToExecute, confirmTransaction, callba
                     "membershipNo": updateLMS.membershipNo,
                     "transactionType": payload.body.transactionType,
                     "transactionID": payload.body.key,
-                    "pointsAwarded": updateLMS.pointsCredited,
+                    "pointsAwarded": parseInt(updateLMS.pointsCredited),
 
                     "status": updateLMS.status,
                     "errorReason": updateLMS.statusCode,
@@ -103,11 +105,8 @@ async function getEventResponse(payload, fnToExecute, confirmTransaction, callba
         // return confrmTxn;
     } catch (error) {
         console.log("ERROR OCCURRED WHILE EXECUTING getEventResponse ", error)
-        return callback({
-            error: false,
-            message: payload.body.eventName + " Dispatched",
-            error: error
-        })
+        return error
+
     }
 
     // fnToExecute().then(response => {
