@@ -47,7 +47,7 @@ function apiForAccrual(payload, UUIDKey, route, callback, JWToken) {
     }
     console.log("points >>> ", points)
     let queryData = `UPDATE LMS SET "currentpoints" = "currentpoints" + ${points} where 
-    "program_name" = 'SMILES' AND
+    "program_name" = '${payload.body.withPartnerCode}' AND
      "membershipno"='${payload.body.membershipNo}'`;
 
     console.log("\n\n querydata >>> ", queryData)

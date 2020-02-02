@@ -21,7 +21,6 @@ function getLMSData(payload, UUIDKey, route, callback, JWToken) {
                         "currentPageNo": 1,
                         "totalRecords": data[0].rows.length
                     },
-
                     "searchResult": data[0].rows
 
                 }
