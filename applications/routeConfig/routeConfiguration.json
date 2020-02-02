@@ -37,6 +37,12 @@
       "MappingfunctionName": "apiForAccrual",
       "CustomMappingFile": "eventData/apiForAccrual.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getLMSData":{
+      "customMapping": true,
+      "MappingfunctionName": "getLMSData",
+      "CustomMappingFile": "eventData/getLMSData.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "STRATA": {
