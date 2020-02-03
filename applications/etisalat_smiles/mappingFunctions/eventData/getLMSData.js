@@ -1,36 +1,41 @@
 'use strict';
 const pg = require('../../../../core/api/connectors/postgress');
+const moment = require('moment');
+const timestamp = moment().format('DD/MM/YYYY HH:mm:ss a');
 
-function getLMSData(payload, UUIDKey, route, callback, JWToken) {
-    let queryData = `select * from LMS`;
-
-    pg.connection().then((conn) => {
-        console.log("Connected to DB successfully !")
-        return Promise.all([
-            conn.query(queryData, [])
-
-        ]).then((data) => {
-            console.log(data[0].rows, "DATA")
-            let result = [];
-
-            let response = {
-                "getLMSData": {
-                    "action": "getLMSData",
-                    "pageData": {
-                        "pageSize": data[0].rows.length,
-                        "currentPageNo": 1,
-                        "totalRecords": data[0].rows.length
-                    },
-                    "searchResult": data[0].rows
-
-                }
-            };
-            return callback(response);
+async function getLMSData(payload, UUIDKey, route, callback, JWToken) {
+    const queryData = `select * from LMS`;
+    try {
+        const connection = await pg.connection();
+        const queryResult = await connection.query(queryData);
+        console.log(queryResult.rows, " << queryResult");
+        return callback({
+            messageStatus: "Processed OK!",
+            errorCode: 200,
+            errorDescription: "",
+            timestamp,
+            "getLMSData": {
+                "action": "getLMSData",
+                "pageData": {
+                    "pageSize": queryResult.rows.length,
+                    "currentPageNo": 1,
+                    "totalRecords": queryResult.rows.length
+                },
+                "searchResult": queryResult.rows
+            }
         });
-    }).catch((err) => {
-        console.log("Some Error occurred while executing query..! ", err);
-        return callback(err);
-    });
+    }
+    catch (err) {
+        console.log("Error occurred while executing query..! ", err);
+        return callback({
+            messageStatus: "ERROR",
+            errorCode: 201,
+            errorDescription: err,
+            timestamp,
+            "searchResult": []
+
+        });
+    };
 }
 
-exports.getLMSData = getLMSData
+exports.getLMSData = getLMSData;

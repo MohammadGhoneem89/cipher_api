@@ -2,6 +2,7 @@
 const pg = require('../../../core/api/connectors/postgress');
 const moment = require('moment');
 const timestamp = moment().format('DD/MM/YYYY HH:mm:ss a');
+
 async function getAllPossibleConversionConfig(payload, UUIDKey, route, callback, JWToken) {
     let result = [];
     const queryData = `select 
@@ -49,7 +50,7 @@ async function getAllPossibleConversionConfig(payload, UUIDKey, route, callback,
             errorCode: 200,
             errorDescription: "",
             timestamp,
-            "conversionConfigurations": result
+            conversionConfigurations: result
         });
     }
     catch (error) {
