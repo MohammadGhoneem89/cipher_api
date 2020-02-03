@@ -43,6 +43,18 @@
       "MappingfunctionName": "getLMSData",
       "CustomMappingFile": "eventData/getLMSData.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getAllpossibleConversions":{
+      "customMapping": true,
+      "MappingfunctionName": "getAllPossibleConversionConfig",
+      "CustomMappingFile": "getAllpossibleConversions.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getExchangeRates":{
+      "customMapping": true,
+      "MappingfunctionName": "getExchangeRates",
+      "CustomMappingFile": "getExchangeRates.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "STRATA": {
