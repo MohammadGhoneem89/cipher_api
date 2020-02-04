@@ -10,7 +10,7 @@ async function getAllPossibleConversionConfig(payload, UUIDKey, route, callback,
     "tranxData"->>'partnerCode' as "partnerCode",
     "tranxData"->>'partnerErCode' as "fromToken",
     "tranxData"->>'fromConversionFactor' as "fromRate"
-    from interims where 
+    from partners where 
     "tranxData"->>'isPointConversionPartner' = 'true';`
     try {
         const connection = await pg.connection();
