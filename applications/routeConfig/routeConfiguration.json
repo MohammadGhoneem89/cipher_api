@@ -20,9 +20,9 @@
       "CustomMappingFile": "partnerSetup/index.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "settleTransaction":   {
+    "getSettlementList":   {
       "customMapping": true,
-      "MappingfunctionName": "settleTransaction",
+      "MappingfunctionName": "getSettlementList",
       "CustomMappingFile": "settlement/settleTransaction.js",
       "mappingConfigFile": "ePayMapping"
     },

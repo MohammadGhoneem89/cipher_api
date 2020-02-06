@@ -65,17 +65,19 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
 
 
 
-    let actions = [{
-        "value": "1003",
-        "type": "componentAction",
-        "label": "View",
-        "params": "",
-        "iconName": "icon-docs",
-        "URI": ["/smiles/transaction/view/"]
-    }];
+    
 
     let rows = _.get(result, 'rows', [])
     rows.forEach((row) => {
+
+        let actions = [{
+            "value": "1003",
+            "type": "componentAction",
+            "label": "View",
+            "params": "",
+            "iconName": "icon-docs",
+            "URI": [`/smiles/transaction/view/${row.tranxData.partnerCode}/${row.tranxData.withPartnerCode}`]
+        }];
         row.dataValues.actions = actions
         
         row.dataValues.transactionId=`${row.tranxData.partnerCode}_${row.tranxData.sourceTransactionId}`

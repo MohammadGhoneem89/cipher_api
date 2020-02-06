@@ -806,6 +806,12 @@
             "CustomMappingFile": "passwordPolicy/fetchAll.js",
             "mappingConfigFile": "ePayMapping"
         },
+        "entityTypedata":{
+            "customMapping": true,
+            "MappingfunctionName": "entityTypedata",
+            "CustomMappingFile": "org/orgDetail.js",
+            "mappingConfigFile": "ePayMapping"
+        },
         "orgDetail": {
             "customMapping": true,
             "MappingfunctionName": "entityDetailOut",

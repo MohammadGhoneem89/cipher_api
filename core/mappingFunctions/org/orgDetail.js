@@ -25,11 +25,15 @@ var orgDetail = function (payload, entityGetCB) {
       "data": ""
     }
   };
-  payload.entityID = payload.entityID || "";
+  let out = {}
+  if (payload.entityID)
+    out.id = payload.entityID || undefined;
+  if (payload.spCode)
+    out.spCode = payload.spCode || undefined;
 
-  global.db.select("Entity", {
-    "id": payload.entityID
-  }, "", function (err, data) {
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>.", JSON.stringify(out))
+
+  global.db.select("Entity", out, "", function (err, data) {
     if (err) {
       logger.error(" [Entity Detail] Error : " + err);
       return entityGetCB(response);
@@ -84,4 +88,36 @@ var orgDetail = function (payload, entityGetCB) {
 
 };
 
+var entityTypedata = function (payload, UUIDKey, route, callback, JWToken) {
+
+  logger.debug(" [Entity Detail] Entity ID : " + payload.entityID);
+
+  let out = {}
+
+  global.db.select("Entity", out, "", function (err, data) {
+    if (err) {
+      logger.error(" [Entity Detail] Error : " + err);
+      return entityGetCB(response);
+    }
+    let typeList = [];
+    data.forEach((elem) => {
+      typeList.push({
+        "label": elem.entityName,
+        "value": elem.spCode,
+        "orgType": elem.orgType,
+        "logo": elem.entityLogo.sizeSmall
+      });
+    });
+    var response = {
+      "entityTypedata": {
+        "action": "entityTypedata",
+        "data": typeList
+      }
+    };
+    callback(response);
+
+  });
+};
+
 exports.entityDetailOut = entityDetailOut;
+exports.entityTypedata = entityTypedata;
