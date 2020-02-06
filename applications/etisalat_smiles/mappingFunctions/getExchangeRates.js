@@ -15,17 +15,16 @@ async function getExchangeRates(payload, UUIDKey, route, callback, JWToken) {
         const queryResult = await connection.query(queryData);
         const exchangeRates = queryResult.rows;
         console.log("\n\n >> Query result >> ", exchangeRates);
-        let response = {
+        return callback({
             messageStatus: "Processed OK!",
             errorCode: 200,
             errorDescription: "",
             timestamp,
-            "getExchangeRates": {
-                "action": "getExchangeRates",
-                "exchangeRates": exchangeRates
+            getExchangeRates: {
+                action: "getExchangeRates",
+                exchangeRates
             }
-        };
-        return callback(response);
+        });
     }
     catch (err) {
         console.log("Error occurred while executing query..! ", err);
