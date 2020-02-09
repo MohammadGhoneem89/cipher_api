@@ -26,6 +26,13 @@
       "CustomMappingFile": "settlement/settleTransaction.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getDashboardData":   {
+      "customMapping": true,
+      "MappingfunctionName": "getDashboardData",
+      "CustomMappingFile": "dashboard/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    
     "handleAccrualEvent":   {
       "customMapping": true,
       "MappingfunctionName": "handleAccrualEvent",

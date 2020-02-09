@@ -26,7 +26,7 @@ async function getSettlementList(payload, UUIDKey, route, callback, JWToken) {
         }
     }
 
-    let db = pgModels.makeModel('Settlements')
+    let db = await pgModels.makeModel('Settlements')
     const obj = {
         tranxData: {
         }

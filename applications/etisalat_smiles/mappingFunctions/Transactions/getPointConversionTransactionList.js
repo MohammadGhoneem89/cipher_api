@@ -26,7 +26,7 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
         }
     }
 
-    let db = pgModels.makeModel('transaction')
+    let db = await pgModels.makeModel('transactions')
     const obj = {
         tranxData: {
         }

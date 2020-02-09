@@ -1,11 +1,13 @@
 const Sequelize = require('sequelize');
 const crypto = require('crypto');
-
+const config = require('../../../config')
 var SQExistingList = {};
 
-
-module.exports = async function (connectionURL) {
-    const hash = crypto.createHash('md5').update(connectionURL).digest("hex");
+const cryptoDec = require('../../../lib/helpers/crypto');
+module.exports = async function () {
+    let connectionURL = cryptoDec.decrypt(config.get('postgres.url'));
+    console.log(">>>>>>>>>>>", connectionURL)
+    const hash = crypto.createHash('md5').update(cryptoDec.decrypt(config.get('postgres.url'))).digest("hex");
     const createNewInstance = async () => {
         const sequelize = new Sequelize(connectionURL, {
             define: {
