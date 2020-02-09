@@ -81,25 +81,24 @@ async function getEventResponse(payload, fnToExecute, confirmTransaction, callba
                     "password": "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
                 },
                 body: {
-                    "loyaltyProgramCode": "SMILES",
+                    "loyaltyProgramCode": payload.body.from,
                     "membershipNo": updateLMS.membershipNo,
                     "transactionType": payload.body.transactionType,
                     "transactionID": payload.body.key,
                     "pointsAwarded": parseInt(updateLMS.pointsCredited),
-
                     "status": updateLMS.status,
                     "errorReason": updateLMS.statusCode,
                     "errorDescription": updateLMS.statusDescription,
                     "paymentRef": updateLMS.paymentRef,
                     "isRetry": updateLMS.isRetry,
                     "isReversal": updateLMS.isReversal,
-                    "targetLoyaltyProgramCode": "ETIHAD"
+                    "targetLoyaltyProgramCode":  payload.body.to
                 }
 
             },
             json: true
         };
-        // console.log("REQUEST===============>", options.body, "<===============REQUEST");
+      
         return rp(options);
         // }
         // return confrmTxn;
@@ -161,7 +160,8 @@ function confirmTransaction(response, payload) {
                     "password": "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9"
                 },
                 body: {
-                    "loyaltyProgramCode": "SMILES",
+                    "loyaltyProgramCode": "CBD",
+                    "targetLoyaltyProgramCode": "ETISALAT",
                     "membershipNo": response.membershipNo,
                     "transactionType": payload.body.transactionType,
                     "transactionID": "0d497140-41e3-11ea-abe1-9fbc7547ae36",
