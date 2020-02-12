@@ -1,5 +1,43 @@
 {
-  
+  "etisalat": {
+    "getFileList": {
+      "customMapping": true,
+      "MappingfunctionName": "getFileList",
+      "CustomMappingFile": "general/getFileList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getFileData": {
+      "customMapping": true,
+      "MappingfunctionName": "getFileData",
+      "CustomMappingFile": "general/getFileData.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "CustomFunctionsLocation": "../../applications/etisalat_smiles/mappingFunctions/",
+    "getEidList": {
+      "customMapping": true,
+      "MappingfunctionName": "getEidList",
+      "CustomMappingFile": "datastore/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getDBEndpointListView": {
+      "customMapping": true,
+      "MappingfunctionName": "DBListView",
+      "CustomMappingFile": "endpoint/endpointDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTableNames": {
+      "customMapping": true,
+      "MappingfunctionName": "getTableNames",
+      "CustomMappingFile": "endpoint/getTableNames.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getFieldsList": {
+      "customMapping": true,
+      "MappingfunctionName": "getFieldsList",
+      "CustomMappingFile": "endpoint/getFieldsList.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
   "SMILES": {
     "CustomFunctionsLocation": "../../applications/etisalat_smiles/mappingFunctions/",
     "getPointConversionTransactionLists":{

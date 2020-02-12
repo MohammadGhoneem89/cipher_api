@@ -12,11 +12,11 @@ var entityDetailOut = function (payload, UUIDKey, route, callback, JWToken) {
   logger.debug(" [ Entity Detail ] JWToken : " + JSON.stringify(JWToken, null, 2));
 
   payload.userId = JWToken._id;
-  orgDetail(payload, callback);
+  orgDetail(payload, callback, JWToken);
 
 };
 
-var orgDetail = function (payload, entityGetCB) {
+var orgDetail = function (payload, entityGetCB, JWToken) {
 
   logger.debug(" [Entity Detail] Entity ID : " + payload.entityID);
   var response = {
@@ -30,6 +30,10 @@ var orgDetail = function (payload, entityGetCB) {
     out.id = payload.entityID || undefined;
   if (payload.spCode)
     out.spCode = payload.spCode || undefined;
+
+  if (payload.spCode == 'SELF')
+    out.spCode = JWToken.orgCode;
+
 
   console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>.", JSON.stringify(out))
 

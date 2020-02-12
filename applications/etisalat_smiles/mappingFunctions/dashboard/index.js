@@ -15,17 +15,17 @@ function getDashboardData(payload, UUIDKey, route, callback, JWToken) {
     var a = moment(payload.body.searchCriteria.fromDate, 'DD/MM/YYYY');
     var b = moment(payload.body.searchCriteria.toDate, 'DD/MM/YYYY');
     let general = {}
-    for (var m = moment(a); m.isBefore(b); m.add(1, 'days')) {
+    for (var m = moment(a); m.isSameOrBefore(b); m.add(1, 'days')) {
         _.set(general, m.format('DD/MM/YYYY'), 0)
     }
     console.log(JWToken.orgCode);
-    let queryCnt = `select  to_char(datecreated, 'DD/MM/YYYY') as datecreated,status,sum(occurence)
+    let queryCnt = `select  to_char(datecreated, 'DD/MM/YYYY') as datecreated,settlementstatus,status,sum(occurence)
     from public.dashboard_tx_summary where 
-    "to"='${JWToken.orgCode}' group by datecreated,status`;
+    "to"='${JWToken.orgCode}' group by datecreated,status,settlementstatus`;
 
-    let querySummary = `select  to_char(datecreated, 'DD/MM/YYYY') as datecreated,status,sum(occurence), sum(amount) as amount
+    let querySummary = `select  to_char(datecreated, 'DD/MM/YYYY') as datecreated,settlementstatus,status,sum(occurence), sum(amount) as amount
     from public.dashboard_tx_summary where 
-    "to"='${JWToken.orgCode}' group by datecreated,status`;
+    "to"='${JWToken.orgCode}' group by datecreated,status,settlementstatus`;
 
 
     let querySummaryPayables = `select  to_char(datecreated, 'DD/MM/YYYY') as datecreated,status,sum(occurence),  sum(amount) as amount
@@ -66,27 +66,27 @@ function getDashboardData(payload, UUIDKey, route, callback, JWToken) {
             let payables = 0;
             resultSummary.forEach(element => {
                 listdates.push(element.datecreated)
-                if (element.settlementstatus != 'PAID')
+                if (element.settlementstatus != 'RECIEVED')
                     payables += parseFloat(element.amount) || 0;
             });
             resultSummaryRecv.forEach(element => {
                 listdates.push(element.datecreated)
-                if (element.settlementstatus != 'PAID')
+                if (element.settlementstatus != 'RECIEVED')
                     recievables += parseFloat(element.amount) || 0;
             });
-            let finaldates=[]
-            let finalConfirm=[]
-            for(let key in listConfirmed){
+            let finaldates = []
+            let finalConfirm = []
+            for (let key in listConfirmed) {
                 finaldates.push(key);
                 finalConfirm.push(listConfirmed[key]);
             }
-            let finalPending=[]
-            for(let key in listConfirmed){
+            let finalPending = []
+            for (let key in listConfirmed) {
                 finalPending.push(listPending[key]);
             }
 
-            let finalRejected=[]
-            for(let key in listConfirmed){
+            let finalRejected = []
+            for (let key in listConfirmed) {
                 finalRejected.push(listRejected[key]);
             }
 
@@ -94,12 +94,12 @@ function getDashboardData(payload, UUIDKey, route, callback, JWToken) {
                 "getDashboardData": {
                     "action": "getPartnersList",
                     data: {
-                        listdates:finaldates,
-                        listConfirmed:finalConfirm,
-                        listPending:finalPending,
-                        listRejected:finalRejected,
-                        recievables,
-                        payables
+                        listdates: finaldates,
+                        listConfirmed: finalConfirm,
+                        listPending: finalPending,
+                        listRejected: finalRejected,
+                        payables: Math.round(payables * 100) / 100,
+                        recievables: Math.round(recievables * 100) / 100
                     }
                 }
             };

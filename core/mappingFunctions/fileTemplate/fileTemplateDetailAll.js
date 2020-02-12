@@ -22,7 +22,7 @@ var fileTemplateDetailOut = function(payload,UUIDKey,route,callback,JWToken){
 
 var fileTemplateDetail = function (payload,fileTemplateGet_CB) {
 
-    logger.debug(" [ File Template Detail ] File Template ID : " + payload.fileTemplateID);
+    // logger.debug(" [ File Template Detail ] File Template ID : " + payload.fileTemplateID);
     var response = {
         "fileTemplateDetail": {
             "action": "fileTemplateDetail",
@@ -30,37 +30,18 @@ var fileTemplateDetail = function (payload,fileTemplateGet_CB) {
         }
     };
 
-	payload.fileTemplateID = payload.fileTemplateID || "";
+	// payload.fileTemplateID = payload.fileTemplateID || "";
 	
   
         global.db.select("FileTemplate",{
-            "id" : payload.fileTemplateID
+            // "id" : payload.fileTemplateID
         },"",function (err, data) {
             if (err) {
                 logger.error(" [ File Template Detail ] Error : "+ err);
                 fileTemplateGet_CB(response);
             }
             else {
-                data = _.get(data, '[0]', {});
-				data.rulesList = data.rulesList || [];
-                data.fields = data.fields || [];
-                if(data.fileType != 'Database') {
-                    data["fields"].forEach(function(d){
-                        pointer.set(d,"/actions",[
-                            {
-                                "label": "Edit",
-                                "iconName": "fa fa-edit",
-                                "actionType": "COMPONENT_FUNCTION"
-                            },
-                            {
-                                "label": "Delete",
-                                "iconName": "fa fa-trash",
-                                "actionType": "COMPONENT_FUNCTION"
-                            }
-                        ]);
-                    });
-                }
-				
+               
 				const params = {
                     userId: payload.userId,
                     documents: data,
@@ -78,4 +59,4 @@ var fileTemplateDetail = function (payload,fileTemplateGet_CB) {
         });
 };
 
-exports.fileTemplateDetailOut = fileTemplateDetailOut;
+exports.fileTemplateDetailOutAll = fileTemplateDetailOut;
