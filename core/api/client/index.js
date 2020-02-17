@@ -5,14 +5,14 @@ const pg = require('./pg');
 const sequelize = require('./sequelize');
 
 module.exports = {
-    createClient: async function (type, connectionURL) {
+    createClient: async function (type, connectionURL, QUEUE_NAME) {
         let client;
         switch (type) {
             case 'mongo':
                 client = await mongo(connectionURL);
                 break;
             case 'amqp':
-                client = await amqp(connectionURL);
+                client = await amqp(connectionURL, QUEUE_NAME);
                 break;
             case 'redis':
                 client = await redis(connectionURL);

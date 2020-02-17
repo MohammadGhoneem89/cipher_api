@@ -207,7 +207,7 @@ module.exports = class Dispatcher {
 
   connectQueueService(responseQueue) {
     return amq.start()
-      .then((ch) => {
+      .then((channelWrapper, connection) => {
         let generalResponse = {
           "error": false,
           "message": "Processed OK!"
@@ -220,9 +220,25 @@ module.exports = class Dispatcher {
         _.set(this.request, 'Header.ResponseMQ', responseQueue);
         _.set(this.request, 'Header.timeStamp', today.toISOString());
         console.log(JSON.stringify(this.request, null, 2))
-        ch.channelWrapper.sendToQueue(this.configdata.requestServiceQueue, new Buffer(JSON.stringify(this.request)));
-        return generalResponse;
+
+        return channelWrapper.sendToQueue(this.configdata.requestServiceQueue, this.request)
+          .then(async function () {
+            console.log("Message sent");
+            await wait(100);
+            channelWrapper.close();
+            return generalResponse;
+          })
+          .catch(err => {
+            console.log("Message was rejected:", err.stack);
+            channelWrapper.close();
+          });
       });
 
   };
 };
+
+function wait(timeInMs) {
+  return new Promise(function (resolve) {
+    return setTimeout(resolve, timeInMs);
+  });
+}
