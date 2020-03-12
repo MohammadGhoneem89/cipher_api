@@ -1,0 +1,31 @@
+
+{
+    
+    "name" : "EventOnPostTransactionToBlockchain",
+    "data" : {
+        "Dependency" : "{{Dependency}}",
+        "additionalParams" : "{{additionalParams}}",
+        "batchID" : "{{batchID}}",
+        "createdOn" : "{{createdOn}}",
+        "documentName" : "{{tenantNameAr}}",
+        "errorDescription" : "{{errorDescription}}",
+        "errorReason" : "{{errorReason}}",
+        "from" : "{{from}}",
+        "internalStatus" : "{{internalStatus}}",
+        "isReversed" : "{{isReversed}}",
+        "key" : "{{key}}",
+        "lastUpdateTimestamp" : "{{lastUpdateTimestamp}}",
+        "masterRecordId" : "{{masterRecordId}}",
+        "membershipNo" : "{{membershipNo}}",
+        "paymentref" : "{{paymentref}}",
+        "processingType" : "{{processingType}}",
+        "to" : "{{to}}",
+        "transactionSubType" : "{{transactionSubType}}",
+        "transactionType" : "{{residenceAddr}}"
+        
+        
+       
+    },
+    "__v" : 0,
+    "type" : "Event"
+}

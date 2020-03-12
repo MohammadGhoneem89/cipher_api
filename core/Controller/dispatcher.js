@@ -218,7 +218,7 @@ module.exports = class Dispatcher {
         _.set(this.request, 'Header.ResponseMQ', responseQueue);
         _.set(this.request, 'Header.timeStamp', today.toISOString());
         console.log(JSON.stringify(this.request, null, 2))
-        ch.channelWrapper.sendToQueue(this.configdata.requestServiceQueue, new Buffer(JSON.stringify(this.request)));
+        ch.channelWrapper.sendToQueue(this.configdata.requestServiceQueue, this.request);
         return generalResponse;
       });
 
