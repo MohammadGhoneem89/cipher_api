@@ -10,6 +10,7 @@ module.exports = {
     return data;
   },
   ...ds,
+  ...inst,
   getDate: (data, payload, jwt) => {
     let format = 'YYYY/MM/DD HH:mm:ss ZZ';
     return moment().format(format);
