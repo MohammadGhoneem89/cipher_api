@@ -70,6 +70,12 @@
       "CustomMappingFile": "dashboard/index.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getAllConnectedPartner":   {
+      "customMapping": true,
+      "MappingfunctionName": "getAllConnectedPartner",
+      "CustomMappingFile": "partnerSetup/getAllConnectedPartner.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     
     "handleAccrualEvent":   {
       "customMapping": true,
