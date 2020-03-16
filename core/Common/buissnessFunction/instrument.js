@@ -7,6 +7,7 @@ const moment = require('moment');
 const dates = require('../../../lib/helpers/dates');
 const org = require('../../mappingFunctions/org/orgList');
 const user = require('../../../lib/repositories/user');
+const uuid = require('uuid/v1');
 const getOrderTranxID = require('../../../applications/STRATA/mappingFunctions/getOrderList/getTransactionID');
 
 module.exports = {
@@ -246,6 +247,19 @@ module.exports = {
             return jsonParseNoError(data, payload, jwt);
         }
     },
+
+    modifyOTP: (data, payload, jwt) => {
+
+        console.log("zain"+JSON.stringify(payload.body.operation))
+        if(payload.body.operation=="R"){
+            
+            return uuid()
+        }
+     return data;
+    },
+
+
+
     ValidateItems: (items, payload, jwt) => {
         console.log(">>>>>>>>>>>items\n", items);
         try {
