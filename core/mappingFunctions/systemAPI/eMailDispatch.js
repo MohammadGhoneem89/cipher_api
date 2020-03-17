@@ -49,6 +49,7 @@ function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
         });
       });
     }).catch((err) => {
+      console.log(err)
       callback({ success: false, message: err.message });
     });
   }

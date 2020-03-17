@@ -250,7 +250,7 @@ module.exports = {
 
     modifyOTP: (data, payload, jwt) => {
 
-        console.log("zain"+JSON.stringify(payload.body.operation))
+        
         var uid=uuid();
 
         uid=uid.substring(uid.length-1,uid.length-5)
