@@ -13,6 +13,8 @@ var filename = "";
 const { Op } = require("sequelize");
 
 async function getTransactionList(payload, UUIDKey, route, callback, JWToken) {
+
+    try{
     let db= pgModels.makeModel('transaction')
     const obj = {
         tranxData:{
@@ -46,6 +48,10 @@ async function getTransactionList(payload, UUIDKey, route, callback, JWToken) {
     });
     if(response)
     return callback(response);
+}catch(e){
+    console.log(e.stack)
+    callback({"Error":"failed"});
+}
 }
 
 exports.getTransactionList = getTransactionList

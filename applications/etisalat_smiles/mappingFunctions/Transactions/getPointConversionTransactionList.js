@@ -15,7 +15,7 @@ const { Op } = require("sequelize");
 
 async function getPointConversionTransactionList(payload, UUIDKey, route, callback, JWToken) {
 
-    
+    try{
     let response = {
         "getPointConversionTransactionList": {
            "pageNo":0,
@@ -134,7 +134,10 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
         return new Date(epoch);
     }
 
-
+    }catch(e){
+        console.log(e.stack)
+        callback({"Error":"failed"});
+    }
 
 }
 exports.getPointConversionTransactionList = getPointConversionTransactionList
