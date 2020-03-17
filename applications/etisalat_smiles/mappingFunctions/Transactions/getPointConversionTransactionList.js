@@ -46,27 +46,18 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
             [Op.eq]: payload.body.loyaltyProgramCode,
         }
     }
-
-    if (payload.body.membershipNo) {
-        obj.tranxData['"membershipNo"'] = {
-            [Op.eq]: payload.body.membershipNo,
+    if (payload.body.searchCriteria.partner) {
+        obj.tranxData['"partnerCode"'] = {
+            [Op.eq]: payload.body.searchCriteria.partner
         }
     }
 
-
-    if (payload.body.transactionType) {
-        obj.tranxData['"transactionType"'] = {
-            [Op.eq]: payload.body.transactionType,
-        }
-    }
-    if (payload.body.partnerCode) {
-        obj.tranxData['"withPartnerCode"'] = {
-            [Op.eq]: payload.body.partnerCode
+    if (payload.body.searchCriteria.key) {
+        obj['"key"'] = {
+            [Op.eq]: payload.body.searchCriteria.key
         }
     }
 
-
-    let obj1
     // let result = await 
     let result = await db.findAndCountAll({
         where: obj,
