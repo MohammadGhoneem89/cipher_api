@@ -21,7 +21,7 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
            "pageNo":0,
            "totalNoOfRecords":0,
             "result":{
-"transactions":{}
+            "transactions":{}
 
             }
             
@@ -56,7 +56,9 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
 
     if (payload.body.transactionType) {
         obj.tranxData['"transactionType"'] = {
-            [Op.eq]: payload.body.transactionType,
+
+            
+            [Op.eq]: payload.body.transactionType=="C"?"POINTCONVERSION":payload.body.transactionType,
         }
     }
     if (payload.body.partnerCode) {
@@ -92,7 +94,7 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
     rows.forEach((row) => {
 
       var obj={};
-      obj['transactionType']=row.tranxData.transactionType;
+      obj['transactionType']=row.tranxData.transactionType=="POINTCONVERSION"?"C":"";
       obj['transactionSubType']=row.tranxData.transactionSubType;
       obj['sourceLoyaltyProgram']=row.tranxData.partnerCode;
       obj['sourcemembershipNo']=row.tranxData.membershipNo;
