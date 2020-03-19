@@ -55,8 +55,6 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
     let result = await db.findAndCountAll({
         where: obj,
         raw: false,
-        limit: payload.body.page.pageSize,
-        offset: (payload.body.page.currentPageNo - 1) * payload.body.page.pageSize
     }).error((err) => {
         console.log("Error " + err)
         return callback(err)

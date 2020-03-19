@@ -3,10 +3,10 @@
 const logger = require('../api/connectors/logger').app;
 let config = require('../../AppConfig');
 let routeConfiguration = Object.assign(require('../routeConfig/routeConfiguration.json'), require('../../applications/routeConfig/routeConfiguration.json'));
+let pointer = require('json-pointer');
 const apiPayloadRepo = require('../../lib/repositories/apiPayload');
 const _ = require('lodash');
-const vaultConfig = require('../../config');
-const apiFilter = vaultConfig.get('apiFilter');
+const apiFilter = ['RenewContract'];
 
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
   if (apiFilter.indexOf(incommingRoute) >= 0) {
@@ -39,13 +39,13 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       responseCallback.send(error);
       return responseCallback.end();
     }
-    logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, JSON.stringify(data, null, 2));
+    //logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, JSON.stringify(data, null, 2));
     logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, "=========== [" + UUIDKey + "]!!! ============");
     if (responderMethod) {
       responderMethod(responseCallback);
     }
-    responseCallback.send(data);
-    return;
+    responseCallback.json(data);
+    return responseCallback.end();
   };
   let route = incommingRoute;
   try {
@@ -55,11 +55,13 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       handleCustomMappingFunction(routeConfig.MappingfunctionName, routeConfig.CustomMappingFile, payload, UUIDKey, route, ResponseCaller, JWToken, responseCallback, routeConfiguration, channel);
       return;
     }
-    responseCallback.send(errorResponse("custom mapping must be true", UUIDKey));
+    responseCallback.json(errorResponse("custom mapping must be true", UUIDKey));
+    return responseCallback.end();
   }
   catch (exp) {
     logger.error(exp);
-    responseCallback.send(errorResponse(" Route Configuration invalid", UUIDKey));
+    responseCallback.json(errorResponse(" Route Configuration invalid", UUIDKey));
+    return responseCallback.end();
   }
 
 };

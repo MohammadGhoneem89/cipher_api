@@ -31,7 +31,7 @@ module.exports = class GeneralRequestProcessor {
 
         let controller = new Dispatcher(this.request, message, this.configdata, this.UUID, global.enumInfo, this.JWTokenData);
         return controller.SendGetRequest().then((response) => {
-          if (response.success || response.error === true) {
+          if (response.success || response.error === false) {
             resolve(response);
           } else {
             let responseObj = {
@@ -63,3 +63,4 @@ module.exports = class GeneralRequestProcessor {
     });
   }
 };
+

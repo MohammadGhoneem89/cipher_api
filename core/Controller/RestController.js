@@ -2,14 +2,14 @@
 
 const logger = require('../api/connectors/logger').app;
 const _ = require('lodash');
-const vaultConfig = require('../../config');
+const config = require('../../AppConfig');
 const apiPayloadRepo = require('../../lib/repositories/apiPayload');
 const GeneralRequestProcessor = require('./requestProcessor');
 const constants = require('../Common/constants_en.js');
 const ObjectMapper = require('./objectMapper');
 const OldRestController = require('./_RestController');
 const APIDefination = require('../mappingFunctions/systemAPI/APIDefination');
-const apiFilter = vaultConfig.get('apiFilter');
+const apiFilter = ['RenewContract'];
 
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
 
@@ -51,18 +51,18 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         }
       };
       responseCallback.status(500);
-      responseCallback.send(error);
+      responseCallback.json(error);
       return responseCallback.end();
     }
-    logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, JSON.stringify(data, null, 2));
+    //logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, JSON.stringify(data, null, 2));
     logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, "=========== [" + UUIDKey + "]!!! ============");
     let apiSample = _.cloneDeep(payload);
     if (_.get(apiSample, '_apiRecorder', false) === true) {
       apiSample = _.omit(apiSample, 'token', 'action', 'channel', 'ipAddress', '_apiRecorder', 'JWToken', 'header', 'CipherJWT');
       APIDefination.updateRequestStub(apiSample, incommingRoute, channel);
     }
-    responseCallback.send(data);
-    return;
+    responseCallback.json(data);
+    return responseCallback.end();
   };
   let configdata = _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
   if (!configdata) {
@@ -88,7 +88,6 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     let simuStatus = configdata.isSimulated === true && bypassSimu === false;
     if (configdata.isResValBypass === false && simuStatus === false) {
       let successStatus = true;
-      console.log(">>>>>>>>>> response >>>>>> ", response);
       if (!response.__cipherMessage) {
         _.set(response, '__cipherSuccessStatus', successStatus);
         _.set(response, '__cipherMessage', constants.cipherGeneralSuccess);
@@ -99,7 +98,6 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       return objMapper.start().then((mappedData) => {
         return mappedData;
       }).catch((ex) => {
-        
         let errResponse = {};
         _.set(errResponse, '__cipherSuccessStatus', successStatus);
         _.set(errResponse, '__cipherMessage', ex);

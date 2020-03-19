@@ -27,75 +27,42 @@ async function getAllConnectedPartner(payload, UUIDKey, route, callback, JWToken
         }
     }
 
-    // if (payload.body.searchCriteria.startDate && payload.body.searchCriteria.endDate) {
-    //     obj.tranxData['"transactionDate"'] = {
-    //         [Op.gte]: payload.body.searchCriteria.startDate,
-    //         [Op.lte]: payload.body.searchCriteria.endDate
-    //     }
-    // }
-
-    // if (payload.body.searchCriteria.Status) {
-    //     obj.tranxData['"internalStatus"'] = {
-    //         [Op.eq]: payload.body.searchCriteria.Status,
-    //     }
-    // }
-    // if (payload.body.searchCriteria.Partner) {
-    //     obj.tranxData['"partnerCode"'] = {
-    //         [Op.eq]: payload.body.partnerCode
-    //     }
-    // }
-
     let obj1
     // let result = await 
     let result = await db.findAndCountAll({
         where: obj,
         raw: false,
-        limit: payload.body.page.pageSize,
-        offset: (payload.body.page.currentPageNo - 1) * payload.body.page.pageSize
     }).error((err) => {
         console.log("Error " + err)
         return callback(err)
     });
 
-
-
-
-
-
-
-    let rows = _.get(result, 'rows', [])
-    rows.forEach((row) => {
-
-        let actions = [{
-            "value": "1003",
-            "type": "componentAction",
-            "label": "View",
-            "params": "",
-            "iconName": "icon-docs"
-            // "URI": [`/smiles/settlement/view/${row.tranxData.partenerCode}/${row.tranxData.withPartenerCode}`]
-        }];
-        row.dataValues.actions = actions
-
-        row.dataValues.transactionId = `${row.tranxData.key}`
-    });
-    // response.searchResult[]
-
     let tranxData = {}
 
+
+    var d = new Date(0);
 
     let { rows: resultRows = [] } = result;
     let partners = resultRows.map(obj => {
         tranxData.sourceLoyaltyProgramCode = obj.tranxData.partnerCode
 
         for (var key in obj.tranxData.contractParams) {
-            //set targetLoyalty here   
+            if (obj.tranxData.contractParams[key].isPointConversionPartner == false) {
+                return null
+            }   //set targetLoyalty here   
             tranxData.targetLoyaltyProgramCode = key
             var obj1 = obj.tranxData.contractParams[key].conversionBillingRates
             tranxData.linkingParam = obj.tranxData.contractParams[key].authMethod
             obj1.forEach((elem) => {
-                tranxData.startDate = elem.startDate
-                tranxData.endDate = elem.endDate
-                tranxData.conversionRate = elem.rate
+                if (elem.startDate != "" && elem.endDate == "") {
+                    tranxData.startDate = EpochToDate(elem.startDate)
+                    tranxData.endDate = EpochToDate(elem.endDate)
+                    tranxData.conversionRate = elem.rate
+                }
+                else {
+                    return null
+                }
+
 
             })
         }
@@ -106,6 +73,7 @@ async function getAllConnectedPartner(payload, UUIDKey, route, callback, JWToken
         return tranxData
     });
 
+    partners = partners.filter(word => word != null)
 
     console.log(partners);
 
@@ -113,11 +81,17 @@ async function getAllConnectedPartner(payload, UUIDKey, route, callback, JWToken
 
 
     if (result) {
-        result.rows = rows;
+        // result.rows = rows;
         response.data.partners = partners
         // response.getAllConnectedPartner.pageData.currentPageNo = payload.body.page.currentPageNo
         // response.getAllConnectedPartner.pageData.pageSize = payload.body.page.pageSize
         return callback(response);
     }
+}
+function EpochToDate(epoch) {
+    if (epoch < 10000000000)
+        epoch *= 1000; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+    var epoch = epoch + (new Date().getTimezoneOffset() * -1); //for timeZone        
+    return new Date(epoch);
 }
 exports.getAllConnectedPartner = getAllConnectedPartner

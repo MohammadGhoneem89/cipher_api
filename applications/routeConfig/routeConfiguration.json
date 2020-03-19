@@ -76,6 +76,12 @@
       "CustomMappingFile": "partnerSetup/getAllConnectedPartner.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getAllOrgMap":   {
+      "customMapping": true,
+      "MappingfunctionName": "getAllOrgMap",
+      "CustomMappingFile": "partnerSetup/getAllOrgMap.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     
     "handleAccrualEvent":   {
       "customMapping": true,

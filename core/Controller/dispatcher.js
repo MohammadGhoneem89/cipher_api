@@ -2,9 +2,14 @@
 const _ = require('lodash');
 const Simulator = require('./simulator');
 const Endpoint = require('./endpoint');
+const rp = require('request-promise');
 const path = require('path');
 const fs = require('fs');
 const amq = require('../../core/api/connectors/queue');
+
+
+
+
 module.exports = class Dispatcher {
   constructor(OriginalRequest, MappeedRequest, configData, UUID, typeList, JWTtoken) {
     this.oRequest = OriginalRequest;
@@ -12,6 +17,7 @@ module.exports = class Dispatcher {
     this.simucases = configData.simucases || [];
     this.UUID = UUID;
     this.typeList = typeList;
+    this.count = 0;
     this.JWT = JWTtoken;
     if (configData.isBlockchain === true) {
       let isMatched = false;
@@ -81,7 +87,6 @@ module.exports = class Dispatcher {
             abi = _.get(elem.smartcontractid, 'abi', undefined);
             contractAddress = _.get(elem.smartcontractid, 'contractAddress', undefined);
           }
-
           channelName = elem.channel.channelName;
           networkName = elem.channel.networkName;
           smartContractName = elem.smartcontract;
@@ -94,15 +99,16 @@ module.exports = class Dispatcher {
         throw new Error(`blockchain routing error | matching rule not found!!!`);
       }
       else {
-        let userIDJWT = _.get(this.JWT, 'userID', '');
-        let orgType = _.get(this.JWT, 'orgType', '');
-        let orgCode = _.get(this.JWT, 'orgCode', '');
-        _.set(MappeedRequest, 'BCData.generalArgs', [userIDJWT, orgType, orgCode, UUID]);
+
         _.set(MappeedRequest, 'Header.tranCode', tranCode || "0002");
         _.set(MappeedRequest, 'Header.userID', userID);
         _.set(MappeedRequest, 'Header.network', networkName);
         _.set(MappeedRequest, 'BCData.channelName', channelName);
         _.set(MappeedRequest, 'BCData.smartContractName', smartContractName);
+        let userIDJWT = _.get(this.JWT, 'userID', '');
+        let orgType = _.get(this.JWT, 'orgType', '');
+        let orgCode = _.get(this.JWT, 'orgCode', '');
+        _.set(MappeedRequest, 'BCData.generalArgs', [userIDJWT, orgType, orgCode, UUID]);
         _.set(MappeedRequest, 'Body.fcnName', smartContractFunc);
         //  Quorrum details
         _.set(MappeedRequest, 'BCData.privateFor', endorsementPolicy);
@@ -113,8 +119,9 @@ module.exports = class Dispatcher {
     }
     this.request = MappeedRequest;
   }
-  SendGetRequest() {
+  SendGetRequest(_res = undefined, _rej = undefined) {
     return new Promise((resolve, reject) => {
+      let getResponse;
       let bypassSimu = _.get(this.oRequest, 'bypassSimu', false);
       if (this.configdata.isSimulated && this.configdata.isSimulated === true && bypassSimu === false) {
         let simu = new Simulator(this.oRequest, this.simucases);
@@ -130,11 +137,35 @@ module.exports = class Dispatcher {
           reject(ex);
         });
       } else if (this.configdata.communicationMode === 'REST') {
-        this.connectRestService(this.configdata).then((data) => {
-          resolve(data);
-        }).catch((ex) => {
-          reject(ex);
-        });
+        let isBLK = _.get(this.configdata, 'isBlockchain', false);
+        let tranCode = _.get(this.request, 'Header.tranCode', "0002")
+        let fcname = _.get(this.request, 'Body.fcnName', "0002")
+        let count = 0;
+        if (isBLK && tranCode == "0001" && fcname == "GetContractData") {
+          if (this.count > 2) {
+            console.log("HURRAY!!!")
+            return _rej(new Error("data not found in blockchain!!"))
+          } else {
+            this.connectRestService(this.configdata).then((data) => {
+              return _res(data);
+            }).catch((ex) => {
+              this.count++;
+              console.log("RETRYING ", this.count)
+              if (_rej && _res)
+                setTimeout(this.SendGetRequest.bind(this, _res, _rej), 2000)
+              else
+                setTimeout(this.SendGetRequest.bind(this, resolve, reject), 2000)
+            });
+          }
+        } else {
+          this.connectRestService(this.configdata).then((data) => {
+            resolve(data);
+          }).catch((ex) => {
+            reject(ex);
+          });
+        }
+
+
       }
       else if (this.configdata.communicationMode === 'QUEUE') {
         this.connectQueueService().then((data) => {
@@ -152,6 +183,7 @@ module.exports = class Dispatcher {
       }
     });
   }
+
   executeCustomFunction() {
     return new Promise((resolve, reject) => {
       let generalResponse = {
@@ -181,8 +213,8 @@ module.exports = class Dispatcher {
   }
 
   connectRestService(configdata) {
-    let today = new Date();
     let isBLK = _.get(configdata, 'isBlockchain', false);
+    let today = new Date();
     if (isBLK === true) {
       _.set(this.request, 'Header.tranType', "0200");
       _.set(this.request, 'Header.UUID', this.UUID);
@@ -193,9 +225,9 @@ module.exports = class Dispatcher {
     let ServiceURL = _.get(this.configdata, 'ServiceURL', "");
     return _endpoint.executeEndpoint(this.configdata.endpointName, ServiceURL).then((resp) => {
       if (resp) {
-        if (resp.success === false || resp.error === true) {
-          throw new Error(resp.message);
-        }
+        // if (resp.success === false || resp.error === true) {
+        //   throw new Error(resp.message);
+        // }
         return resp.data;
       }
       return resp;
@@ -205,40 +237,31 @@ module.exports = class Dispatcher {
     });
   }
 
+
+
+
   connectQueueService(responseQueue) {
     return amq.start()
-      .then((channelWrapper, connection) => {
-        let generalResponse = {
-          "error": false,
-          "message": "Processed OK!"
-        };
-        let responseQueue = [];
-        let today = new Date();
-        responseQueue.push(this.configdata.responseQueue);
-        _.set(this.request, 'Header.tranType', "0200");
-        _.set(this.request, 'Header.UUID', this.UUID);
-        _.set(this.request, 'Header.ResponseMQ', responseQueue);
-        _.set(this.request, 'Header.timeStamp', today.toISOString());
-        console.log(JSON.stringify(this.request, null, 2))
-
-        return channelWrapper.sendToQueue(this.configdata.requestServiceQueue, this.request)
-          .then(async function () {
-            console.log("Message sent");
-            await wait(100);
-            channelWrapper.close();
+      .then((ch) => {
+        return ch.assertQueue(this.configdata.requestServiceQueue, {
+          durable: false
+        })
+          .then(() => {
+            let generalResponse = {
+              "error": false,
+              "message": "Processed OK!"
+            };
+            let responseQueue = [];
+            let today = new Date();
+            responseQueue.push(this.configdata.responseQueue);
+            _.set(this.request, 'Header.tranType', "0200");
+            _.set(this.request, 'Header.UUID', this.UUID);
+            _.set(this.request, 'Header.ResponseMQ', responseQueue);
+            _.set(this.request, 'Header.timeStamp', today.toISOString());
+            console.log(JSON.stringify(this.request, null, 2))
+            ch.sendToQueue(this.configdata.requestServiceQueue, new Buffer(JSON.stringify(this.request)));
             return generalResponse;
-          })
-          .catch(err => {
-            console.log("Message was rejected:", err.stack);
-            channelWrapper.close();
           });
       });
-
   };
 };
-
-function wait(timeInMs) {
-  return new Promise(function (resolve) {
-    return setTimeout(resolve, timeInMs);
-  });
-}
