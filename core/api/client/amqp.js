@@ -5,11 +5,10 @@ const amqp = require('amqp-connection-manager');
 module.exports = async function (connectionURL) {
     const hash = crypto.createHash('md5').update(connectionURL).digest("hex");
 
-    let connection = amqp.connect([connectionURL]);
-
     if (AMQPExistingList[hash]) {
         console.log('Returning a MQ instance');
     } else {
+        let connection = amqp.connect([connectionURL]);
         let channelWrapper = connection.createChannel({
             json: true,
             setup: function (channel) {
