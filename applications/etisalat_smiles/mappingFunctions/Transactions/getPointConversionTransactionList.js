@@ -14,16 +14,22 @@ var filename = "";
 const { Op } = require("sequelize");
 
 async function getPointConversionTransactionList(payload, UUIDKey, route, callback, JWToken) {
-
+UUIDKey
     try{
     let response = {
-        "getPointConversionTransactionList": {
+        "messageStatus": "OK",
+        "messageId": UUIDKey,
+        "errorDescription": "",
+        "errorCode": 200,
+        "timestamp": EpochToDate(dates.newDate()),
+        
+      
            "pageNo":0,
            "totalNoOfRecords":0,
             "result":{
             "transactions":{}
 
-            }
+            
             
         }
     }
@@ -123,9 +129,9 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
 
     if (result) {
         result.transactions = data;
-        response.getPointConversionTransactionList.result.transactions = data
-        response.getPointConversionTransactionList.totalNoOfRecords = count
-        response.getPointConversionTransactionList.pageNo = payload.body.pageNo
+        response.result.transactions = data
+        response.totalNoOfRecords = count
+        response.pageNo = payload.body.pageNo
         return callback(response);
     }
 
@@ -137,8 +143,18 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
     }
 
     }catch(e){
+
+
+        response = {
+            "messageStatus": "error",
+            "messageId": UUIDKey,
+            "errorDescription": "error while fetching error.",
+            "errorCode": 500,
+            "timestamp": dates.newDate(),
+        }
+
         console.log(e.stack)
-        callback({"success":false});
+        callback(response);
     }
 
 }

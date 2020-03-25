@@ -46,6 +46,13 @@
       "CustomMappingFile": "Transactions/getPointConversionTransactionList.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "processConversionFlow":{
+      "customMapping": true,
+      "MappingfunctionName": "processConversionFlow",
+      "CustomMappingFile": "Transactions/processConversionFlow.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+    ,
     "getPointConversionTransactionUIList":{
       "customMapping": true,
       "MappingfunctionName": "getPointConversionTransactionList",

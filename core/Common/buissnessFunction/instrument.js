@@ -8,6 +8,7 @@ const dates = require('../../../lib/helpers/dates');
 const org = require('../../mappingFunctions/org/orgList');
 const user = require('../../../lib/repositories/user');
 const uuid = require('uuid/v1');
+
 const getOrderTranxID = require('../../../applications/STRATA/mappingFunctions/getOrderList/getTransactionID');
 
 module.exports = {
@@ -20,6 +21,10 @@ module.exports = {
             return {};
         }
     },
+
+    unixCurrent: (data, payload, jwt) => {
+        return moment().unix(0)
+    } ,
     validateInstrument: (data, payload, jwt) => {
         if (!(data instanceof Array)) {
             throw new Error("Instrumentation Field(s) missing");
