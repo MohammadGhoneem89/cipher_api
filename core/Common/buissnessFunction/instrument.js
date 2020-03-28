@@ -23,7 +23,7 @@ module.exports = {
     },
 
     unixCurrent: (data, payload, jwt) => {
-        return moment().unix(0)
+        return moment().unix(0)+"000"
     } ,
     validateInstrument: (data, payload, jwt) => {
         if (!(data instanceof Array)) {

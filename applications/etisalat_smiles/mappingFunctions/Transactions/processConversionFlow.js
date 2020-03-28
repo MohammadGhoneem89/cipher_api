@@ -38,37 +38,37 @@ async function processConversionFlow(payload, UUIDKey, route, callback, JWToken)
         _.set(pdatac,"status","SUCCESS");
         //executeQuery(queryData)
     }else if (processingType.includes('REVERSECREDIT')){
-        sign="+"
+        sign="-"
         isExecute=true
         _.set(pdatac,"status","SUCCESS");
         //executeQuery(queryData)
-    }else if((txid.includes('[SS]') || txid.includes('[SF]') || txid.includes('[ST]')) && processingType.includes('DEBIT')){
+    }else if((txid.includes('_SS_') || txid.includes('_SF_') || txid.includes('_ST_')) && processingType.includes('DEBIT')){
             _.set(pdatac,"status","SUCCESS");
             sign="-"
             isExecute=true
             
-        }else if(txid.includes('[F]')  && processingType.includes('DEBIT')){
+        }else if(txid.includes('_F_')  && processingType.includes('DEBIT')){
             _.set(pdatac,"status","FAILURE");
             //sign="-"
             isExecute=false
             
-        }else if(txid.includes('[T]')  && processingType.includes('DEBIT')){
+        }else if(txid.includes('_T_')  && processingType.includes('DEBIT')){
             
             console.log("going for time out")
             _.set(pdatac,"status","TIMEOUT");
             sign="-"
             isExecute=true
             
-        }else if (txid.includes('[SS]') && processingType.includes('CREDIT')){
+        }else if (txid.includes('_SS_') && processingType.includes('CREDIT')){
        
             sign="+"
             _.set(pdatac,"status","SUCCESS");
             isExecute=true
-        }else if (txid.includes('[SF]') && processingType.includes('CREDIT')){
+        }else if (txid.includes('_SF_') && processingType.includes('CREDIT')){
             //sign="-"
             _.set(pdatac,"status","FAILURE");
             isExecute=false
-        }else if (txid.includes('[ST]') && processingType.includes('CREDIT')){
+        }else if (txid.includes('_ST_') && processingType.includes('CREDIT')){
             sign="+"
             _.set(pdatac,"status","TIMEOUT");
             isExecute=true
@@ -86,6 +86,7 @@ async function processConversionFlow(payload, UUIDKey, route, callback, JWToken)
         "program_name" = '${loyaltyProgramCode}' AND
          "membershipno"='${membershipNo}'`;
          if(isExecute){
+             console.log("action+  "+ processingType+" Query "+queryData)
          executeQuery(queryData)
          }
 
