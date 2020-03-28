@@ -1,6 +1,7 @@
 'use strict';
 const pg = require('../../../../core/api/connectors/postgress');
 const _ = require('lodash');
+const sequelize = require('sequelize');
 const fs = require('fs');
 const { resolve, basename, dirname } = require('path');
 const events = require('events').EventEmitter;
@@ -55,9 +56,14 @@ let obj1
 // let result = await
 let result = await db.findAndCountAll({
 where: obj,
+order:  [
+    [Sequelize.literal(`"transactions"."block_num"`), "DESC"],
+  ],
 raw: false,
 limit: payload.body.page.pageSize,
-offset: (payload.body.page.currentPageNo - 1) * payload.body.page.pageSize
+
+offset: (payload.body.page.currentPageNo - 1) * payload.body.page.pageSize,
+
 }).error((err) => {
 console.log("Error " + err)
 return callback(err)
