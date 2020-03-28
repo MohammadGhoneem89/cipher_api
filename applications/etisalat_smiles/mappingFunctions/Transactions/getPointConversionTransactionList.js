@@ -106,9 +106,10 @@ UUIDKey
       obj['sourcemembershipNo']=row.tranxData.membershipNo;
       obj['targetLoyaltyProgram']=row.tranxData.withPartnerCode;
       obj['targetmembershipNo']=row.tranxData.conversionParams.targetMemberShipNo;
-      obj['pointsConverted']=row.tranxData.conversionParams.pointsToBeConverted;
       obj['transactionDate']=EpochToDate(row.tranxData.createdOn);
       obj['status']=row.tranxData.internalStatus;
+      obj['pointsSource']=row.tranxData.conversionParams.pointsToBeConverted || 0;
+      obj['pointsConverted']= row.tranxData.pointsAwarded || 0
       data.push(obj)
       
       
