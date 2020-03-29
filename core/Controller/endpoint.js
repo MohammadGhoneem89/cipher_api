@@ -2,6 +2,7 @@
 const _ = require('lodash');
 const rp = require('request-promise');
 const moment = require('moment');
+const format = require('xml-formatter');
 const Base64 = require('js-base64').Base64;
 let generalResponse = {
   "error": true,
@@ -12,6 +13,7 @@ module.exports = class Endpoint {
     this._requestBody = body;
   }
   executeEndpoint(endpoint, ServiceURI, ignoreBody) {
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> endpoint --------- ", JSON.stringify(endpoint, null, 2))
     let ServiceURL = "";
     let postfix = ServiceURI == '/' ? "" : ServiceURI;
     ServiceURL = `${endpoint.address}${postfix}`;
@@ -19,18 +21,20 @@ module.exports = class Endpoint {
     switch (endpoint.authType) {
       case "bearer":
         // if (endpoint.auth.endpoint.auth.endpoint) {
-        //   generalResponse.error = true;
-        //   generalResponse.message = "Circualr JWT Request Cannot be Processed Please Check Endpoint!!";
-        //   return Promise.resolve(generalResponse);
+        //   console.log("Circualr JWT Request Cannot be Processed Please Check Endpoint!!")
+        //   // return Promise.resolve(generalResponse);
         // };
         let tokenfield = _.get(endpoint, 'auth.field', undefined);
         if (!tokenfield) {
-          throw new Error("Cred Header Authorization Credentials are required!!");
+          throw new Error("Token field not available Please Check Endpoint!!");
         };
         return this.executeEndpoint(endpoint.auth.endpoint, "/", 1).then((data) => {
           let tokenValue = _.get(data, `data.${tokenfield}`, undefined);
           if (!tokenValue) {
-            throw new Error(`Not able to fetch field from success authentication response | field : ${tokenfield}`);
+            throw new Error("Not able to fetch field from success authentication response | field : ${tokenfield}");
+          }
+          else if (data.error && data.error === true) {
+            return Promise.resolve(data);
           }
           return this.executeBarerAuthEndpoint(endpoint, this._requestBody, ServiceURL, tokenValue).then((resp) => {
             if (resp.error === true) {
@@ -72,6 +76,7 @@ module.exports = class Endpoint {
     let header = this.computeHeaders(endpoint);
     let data = this.computeFormBody(endpoint, body);
     return this.callWebService({
+      type: endpoint.requestType,
       serviceURL: url,
       ...data,
       headers: header
@@ -83,27 +88,30 @@ module.exports = class Endpoint {
     let header = this.computeHeaders(endpoint);
     let data = this.computeFormBody(endpoint, body);
     _.set(header, 'Authorization', authorizationHeader);
+    _.set(body, 'header', undefined);
     return this.callWebService({
+      type: endpoint.requestType,
       serviceURL: url,
       ...data,
       headers: header
     });
   }
   executeCredHeaderBody(endpoint, body, url) {
-    let authorizationHeader;
+    // let authorizationHeader;
     if (!endpoint.auth || !endpoint.auth.username || !endpoint.auth.password) {
       throw new Error("Cred Header Authorization Credentials are required!!");
     }
     let header = this.computeHeaders(endpoint);
     let data = this.computeFormBody(endpoint, body);
-    _.set(body, 'username', endpoint.auth.username);
-    _.set(body, 'password', endpoint.auth.password);
-    _.set(header, 'username', endpoint.auth.username);
-    _.set(header, 'password', endpoint.auth.password);
-    authorizationHeader = `Basic ${Base64.encode(`${endpoint.auth.username}:${endpoint.auth.password}`)}`;
+    _.set(body, 'header.username', endpoint.auth.username);
+    _.set(body, 'header.password', endpoint.auth.password);
+    // _.set(header, 'username', endpoint.auth.username);
+    // _.set(header, 'password', endpoint.auth.password);
+    // authorizationHeader = `Basic ${Base64.encode(`${endpoint.auth.username}:${endpoint.auth.password}`)}`;
 
-    _.set(header, 'Authorization', authorizationHeader);
+    // _.set(header, 'Authorization', authorizationHeader);
     return this.callWebService({
+      type: endpoint.requestType,
       serviceURL: url,
       ...data,
       headers: header
@@ -119,6 +127,7 @@ module.exports = class Endpoint {
     let data = this.computeFormBody(endpoint, body);
     _.set(header, 'Authorization', authorizationHeader);
     return this.callWebService({
+      type: endpoint.requestType,
       serviceURL: url,
       ...data,
       headers: header,
@@ -127,7 +136,7 @@ module.exports = class Endpoint {
   }
   computeHeaders(endpoint) {
     let header = {};
-    let requestDate = new Date();
+    let requestDate = new Date().getTime();
     if (endpoint.header) {
       endpoint.header.forEach((elem) => {
         switch (elem.headerType) {
@@ -140,13 +149,13 @@ module.exports = class Endpoint {
             _.set(header, elem.headerKey, `${datetime}`);
             break;
           case "DatetimeEpoch":
-            _.set(header, elem.headerKey, `${elem.headerPrefix}${requestDate}`);
+            _.set(header, elem.headerKey, requestDate);
             break;
           case "UUID":
             _.set(header, elem.headerKey, `${elem.headerPrefix}${this._UUID}`);
             break;
           case "dynamicField":
-            let dynifield = _.get(this._requestBody, elem.headerPrefix, "")
+            let dynifield = _.get(this._requestBody, elem.headerPrefix, "");
             _.set(header, elem.headerKey, `${dynifield}`);
             break;
           case "UUIDN":

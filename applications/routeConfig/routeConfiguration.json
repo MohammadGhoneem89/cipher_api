@@ -40,62 +40,92 @@
   },
   "SMILES": {
     "CustomFunctionsLocation": "../../applications/etisalat_smiles/mappingFunctions/",
-    "getPointConversionTransactionLists":{
+    "getPointConversionTransactionLists": {
       "customMapping": true,
       "MappingfunctionName": "getPointConversionTransactionList",
       "CustomMappingFile": "Transactions/getPointConversionTransactionList.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getTransactionList":{
+    "processConversionFlow":{
+      "customMapping": true,
+      "MappingfunctionName": "processConversionFlow",
+      "CustomMappingFile": "Transactions/processConversionFlow.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+    ,
+    "getPointConversionTransactionUIList":{
+      "customMapping": true,
+      "MappingfunctionName": "getPointConversionTransactionList",
+      "CustomMappingFile": "Transactions/getPointConversionTransactionUIList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTransactionList": {
       "customMapping": true,
       "MappingfunctionName": "getTransactionList",
       "CustomMappingFile": "Transactions/getTransactionList.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getPartnersList":{
+    "getPartnersList": {
       "customMapping": true,
       "MappingfunctionName": "getPartnersList",
       "CustomMappingFile": "partnerSetup/index.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getSettlementList":   {
+    "getSettlementList": {
       "customMapping": true,
       "MappingfunctionName": "getSettlementList",
       "CustomMappingFile": "settlement/settleTransaction.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getDashboardData":   {
+    "getDashboardData": {
       "customMapping": true,
       "MappingfunctionName": "getDashboardData",
       "CustomMappingFile": "dashboard/index.js",
       "mappingConfigFile": "ePayMapping"
     },
-    
-    "handleAccrualEvent":   {
+    "getAllConnectedPartner": {
+      "customMapping": true,
+      "MappingfunctionName": "getAllConnectedPartner",
+      "CustomMappingFile": "partnerSetup/getAllConnectedPartner.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAllMembershipsData": {
+      "customMapping": true,
+      "MappingfunctionName": "getAllMembershipsData",
+      "CustomMappingFile": "partnerSetup/getAllMembershipsData.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAllOrgMap": {
+      "customMapping": true,
+      "MappingfunctionName": "getAllOrgMap",
+      "CustomMappingFile": "partnerSetup/getAllOrgMap.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "handleAccrualEvent": {
       "customMapping": true,
       "MappingfunctionName": "handleAccrualEvent",
       "CustomMappingFile": "eventData/handleAccrualEvent.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "apiForAccrual":   {
+    "apiForAccrual": {
       "customMapping": true,
       "MappingfunctionName": "apiForAccrual",
       "CustomMappingFile": "eventData/apiForAccrual.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getLMSData":{
+    "getLMSData": {
       "customMapping": true,
       "MappingfunctionName": "getLMSData",
       "CustomMappingFile": "eventData/getLMSData.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getAllpossibleConversions":{
+    "getAllpossibleConversions": {
       "customMapping": true,
       "MappingfunctionName": "getAllPossibleConversionConfig",
       "CustomMappingFile": "getAllpossibleConversions.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "getExchangeRates":{
+    "getExchangeRates": {
       "customMapping": true,
       "MappingfunctionName": "getExchangeRates",
       "CustomMappingFile": "getExchangeRates.js",
@@ -104,7 +134,7 @@
   },
   "STRATA": {
     "CustomFunctionsLocation": "../../applications/STRATA/mappingFunctions/",
-    "encryptData":{
+    "encryptData": {
       "customMapping": true,
       "MappingfunctionName": "encryptData",
       "CustomMappingFile": "general/viewItem.js",
@@ -121,8 +151,8 @@
       "MappingfunctionName": "password",
       "CustomMappingFile": "password/set.js",
       "mappingConfigFile": "ePayMapping"
-  },
-    "decryptData":{
+    },
+    "decryptData": {
       "customMapping": true,
       "MappingfunctionName": "decryptData",
       "CustomMappingFile": "general/viewItem.js",

@@ -20,12 +20,12 @@ function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
       });
     }).then((userList) => {
       emailTemplateRepo.findAndFormat(payload.data.templateId, payload.data.templateParams).then((format) => {
-        let senderEmail = 'bilal.mahroof@avanzainnovations.com';
+        let senderEmail = 'lostpassportservice.dp@gmail.com';
         let transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
             user: senderEmail,
-            pass: 'Bilal123@@'
+            pass: 'Aisitaisi4696'
           }
         });
         let mailList = [];
@@ -49,6 +49,7 @@ function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
         });
       });
     }).catch((err) => {
+      console.log(err)
       callback({ success: false, message: err.message });
     });
   }
