@@ -80,6 +80,9 @@ UUIDKey
         where: obj,
         raw: false,
         limit: payload.body.pageSize,
+        order:  [
+            [Sequelize.literal(`"transactions"."block_num"`), "DESC"],
+          ],
         offset: (payload.body.pageNo - 1) * payload.body.pageSize
     }).error((err) => {
         console.log("Error " + err)

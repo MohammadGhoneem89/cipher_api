@@ -14,6 +14,8 @@ const pgModels = require('../PostgreModel.js')
 var filename = "";
 const { Op } = require("sequelize");
 
+const config = require('./../../../../config');
+
 
 
 async function processConversionFlow(payload, UUIDKey, route, callback, JWToken) {
@@ -149,7 +151,7 @@ function confirmTransaction(response, payload) {
    
         let options = {
             method: 'POST',
-            url: 'http://localhost:9089/API/SMILES/confirmTransaction',
+            url: 'http://localhost:'+config.get("port")+'/API/SMILES/confirmTransaction',
             body:
             {
                 header:
