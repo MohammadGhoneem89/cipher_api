@@ -91,24 +91,26 @@ async function getAllConnectedPartner(payload, UUIDKey, route, callback, JWToken
 
     let partners = resultRows.map(ptnr => {
         // console.log(ptnr.tranxData)
-        data.sourceLoyaltyProgramCode = ptnr.tranxData.partnerCode
+        data.sourceLoyaltyProgramCode = ""
         if (ptnr.tranxData.contractParams != null) {
             for (let key in ptnr.tranxData.contractParams) {
                 if (ptnr.tranxData.contractParams[key].isPointConversionPartner != false) {
-                    data.targetLoyaltyProgramCode = key
+                    data.targetLoyaltyProgramCode = ptnr.tranxData.contractParams[key].conversionPartnerProgramName || "" 
                     data.logo = ptnr.tranxData.contractParams[key].logo || ""
                     data.linkingParam = ptnr.tranxData.contractParams[key].authType || ""
-                    data.termsAndConditions = ptnr.tranxData.contractParams[key].termsandConditionsAr
-                    data.minConversion = ptnr.tranxData.contractParams[key].minPoints
+                    data.termsAndConditions = ptnr.tranxData.contractParams[key].termsandConditionsEn
+                    data.minConversion = ptnr.tranxData.contractParams[key].minPoints || 0
+
                     let obj = ptnr.tranxData.contractParams[key].conversionBillingRates
                     // console.log("contractParams: ", obj)
                     obj.forEach(elem => {
+                        data.sourceLoyaltyProgramCode = elem.sourceToken
                         data.startDate = EpochToDate(elem.startDate)
                         data.endDate = EpochToDate(elem.endDate)
-                        data.conversionRate = elem.rate
+                        data.conversionRate = elem.rate || 0.00
                     })
                     data.feeType = ""
-                    data.feeValue = ""
+                    data.feeValue = 0
                     console.log(data)
                     arr.push({...data})
                     console.log(arr)

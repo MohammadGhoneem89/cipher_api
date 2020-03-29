@@ -87,25 +87,29 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
 
     let partners = resultRows.map(ptnr => {
         // console.log(ptnr.tranxData)
-        data.sourceLoyaltyProgramCode = ptnr.tranxData.partnerCode
+        data.sourceLoyaltyProgramCode = ""
         if (ptnr.tranxData.contractParams != null) {
             for (let key in ptnr.tranxData.contractParams) {
                 if (ptnr.tranxData.contractParams[key].isPointConversionPartner != false) {
-                    data.targetLoyaltyProgramCode = key
+                    data.targetLoyaltyProgramCode = ptnr.tranxData.contractParams[key].conversionPartnerProgramName || "" 
                     data.logo = ptnr.tranxData.contractParams[key].logo || ""
                     data.linkingParam = ptnr.tranxData.contractParams[key].authType || ""
-                    data.termsAndConditions = ptnr.tranxData.contractParams[key].termsandConditionsAr || ""
-                    data.minConversion = ptnr.tranxData.contractParams[key].minPoints || ""
+                    data.termsAndConditions = ptnr.tranxData.contractParams[key].termsandConditionsEn || ""
+                    data.minConversion = ptnr.tranxData.contractParams[key].minPoints || 0
+                    if (typeof(data.minConversion) === "string"){
+                        data.minConversion = parseInt(data.minConversion)
+                    }
                     let obj = ptnr.tranxData.contractParams[key].conversionBillingRates
                     // console.log("contractParams: ", obj)
                     obj.forEach(elem => {
+                        data.sourceLoyaltyProgramCode = elem.sourceToken
                         data.startDate = EpochToDate(elem.startDate) || ""
                         data.endDate = EpochToDate(elem.endDate) || ""
-                        data.conversionRate = elem.rate || ""
+                        data.conversionRate = elem.rate || 0.00
                     })
                     data.feeType = ""
-                    data.feeValue = ""
-                    data.OTPLength = ""
+                    data.feeValue = 0
+                    data.OTPLength = 0
                     // console.log(data)
                     arr.push({ ...data })
                     // console.log(arr)
@@ -142,8 +146,9 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
         for (key in link.tranxData.linkInfo) {
             if (link.tranxData.linkInfo[key].status == "A" || link.tranxData.linkInfo[key].status == "P") {
                 linkedData.status = link.tranxData.linkInfo[key].status || ""
-                linkedData.targetLoyaltyProgramCode = link.tranxData.targetOrgCode
-                // linkedData.targetLoyaltyProgramCode = key
+                // linkedData.targetLoyaltyProgramCode = link.tranxData.targetOrgCode
+                linkedData.targetLoyaltyProgramCode = key
+                linkedData.targetMembershipNo = link.tranxData.linkInfo[key].targetMembershipNo
                 linkedData.points = link.tranxData.linkInfo[key].points || 0
                 linkedArr.push({ ...linkedData })
             }
@@ -157,11 +162,13 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
         let index = myMap.get(obj.targetLoyaltyProgramCode)
         console.log(typeof (index))
         if (!(typeof (index) === 'undefined')) {
-            let temp = arr[index]
-            temp.points = obj.points || 0
-            temp.status = obj.status
-            partArr.push({ ...temp })
+            let temp = {}
             if (index >= 0) {
+                temp = arr[index]
+                temp.targetMembershipNo = obj.targetMembershipNo
+                temp.points = obj.points
+                temp.status = obj.status
+                partArr.push({ ...temp })
                 console.log("here")
                 arr.splice(index, 1)
                 console.log(index + "\n\n")
@@ -191,4 +198,4 @@ function EpochToDate(epoch) {
     return new Date(epoch);
 }
 
-exports.getAllMembershipsData = getAllMembershipsData
+exports.getAllMembershipsData = getAllMembershipsData 
