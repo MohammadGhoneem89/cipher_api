@@ -16,7 +16,7 @@ async function getAllPossibleConversionConfig(payload, UUIDKey, route, callback,
         const connection = await pg.connection();
         const queryResult = await connection.query(queryData);
         const pointConvpartners = queryResult.rows;
-        const pointConvpartnerlength = pointConvpartners.length;
+        const pointConvpartnerlength = pointConvpartners.length;``
         const response = {
             messageStatus: "ERROR",
             errorCode: 201,

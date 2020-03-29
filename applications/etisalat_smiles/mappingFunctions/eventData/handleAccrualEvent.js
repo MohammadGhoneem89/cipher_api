@@ -181,6 +181,7 @@ function confirmTransaction(response, payload) {
         return rp(options);
     }
 }
+
 exports.handleAccrualEvent = handleAccrualEvent;
 
 
