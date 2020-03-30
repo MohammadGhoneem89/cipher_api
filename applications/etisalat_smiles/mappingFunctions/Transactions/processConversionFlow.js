@@ -21,6 +21,8 @@ const config = require('./../../../../config');
 async function processConversionFlow(payload, UUIDKey, route, callback, JWToken) {
 
     try{
+
+        
         let pdatac={}
         let txid=_.get(payload,"body.key","")
         let processingType=_.get(payload,"body.processingType","")
@@ -28,12 +30,19 @@ async function processConversionFlow(payload, UUIDKey, route, callback, JWToken)
         let targetLoyaltyProgramCode=_.get(payload,"body.to","")
         let points=_.get(payload,"body.points","")
         let membershipNo=_.get(payload,"body.membershipNo","")
+        _.set(pdatac,"errorReason","");
+        _.set(pdatac,"errorDescription","");
 
 
+
+      
+      
         console.log("TXNID "+txid+"  processingType  "+processingType)
        let queryData="";
        let sign=""
        let isExecute=false;
+      
+
      if (processingType.includes('REVERSEDEBIT')){
         sign="+"
         isExecute=true
@@ -74,8 +83,15 @@ async function processConversionFlow(payload, UUIDKey, route, callback, JWToken)
             sign="+"
             _.set(pdatac,"status","TIMEOUT");
             isExecute=true
+        }else if(processingType.includes('CREDIT')){
+            sign="+"
+            _.set(pdatac,"status","SUCCESS");
+            isExecute=true
+        }else if(processingType.includes('DEBIT')){
+            _.set(pdatac,"status","SUCCESS");
+            sign="-"
+            isExecute=true
         }else{
-
             return callback({
                 status: "failed",
                 RESULT: "not found flow things",
@@ -84,6 +100,16 @@ async function processConversionFlow(payload, UUIDKey, route, callback, JWToken)
            
         }
         
+
+        let isPointsAvailable = await getLmsdata(loyaltyProgramCode,membershipNo,parseFloat(points));
+
+        if(processingType=='DEBIT' && !isPointsAvailable ){
+            _.set(pdatac,"status","FAILURE");
+            _.set(pdatac,"errorReason","Point are not available")
+            isExecute=false
+           }
+
+
         queryData = `UPDATE LMS SET "currentpoints" = "currentpoints" ${sign} ${points} where 
         "program_name" = '${loyaltyProgramCode}' AND
          "membershipno"='${membershipNo}'`;
@@ -101,9 +127,7 @@ async function processConversionFlow(payload, UUIDKey, route, callback, JWToken)
                    _.set(pdatac,"pointsAwarded",parseInt(points));
                     _.set(pdatac,"pointsDebited",parseInt(points));
                   // _.set(pdatac,"status","SUCCESS");
-                    _.set(pdatac,"errorReason","");
-                    _.set(pdatac,"errorDescription","");
-
+                   
 
 
 
@@ -143,6 +167,22 @@ function executeQuery(queryData){
             conn.query(queryData, [])
         ]).then((data) => {})
     });
+}
+
+async function  getLmsdata(loyaltyProgramCode,membershipNo,points){
+    const queryData = `select * from LMS where "program_name" = '${loyaltyProgramCode}' AND
+    "membershipno"='${membershipNo}'`;
+    try {
+        const connection = await pg.connection();
+        const queryResult = await connection.query(queryData);
+
+        console.log("POINT AVAILABLE"+queryResult.rows[0].currentpoints+" Conversion required "+points)
+        return queryResult.rows[0].currentpoints>=points
+      //  console.log(">> data"+ JSON.stringify(queryResult.rows[0]))
+       
+    }catch(err){
+console.log(err)
+    }
 }
 
 function confirmTransaction(response, payload) {

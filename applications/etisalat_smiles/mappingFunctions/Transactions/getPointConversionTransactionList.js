@@ -39,12 +39,17 @@ UUIDKey
         tranxData: {
         }
     }
-
+let sortType='DESC'
     if (payload.body.startDate && payload.body.endDate) {
-        obj.tranxData['lastUpdateTimestamp'] = {
+        obj.tranxData['createdOn'] = {
             [Op.gte]: dates.ddMMyyyyHHmmSSMS(payload.body.startDate),
             [Op.lte]: dates.ddMMyyyyHHmmSSMS(payload.body.endDate)
         }
+    }
+
+
+    if (payload.body.sortType && payload.body.sortType=="A") {
+        sortType="ASC"
     }
 
     if (payload.body.loyaltyProgramCode) {
@@ -81,7 +86,7 @@ UUIDKey
         raw: false,
         limit: payload.body.pageSize,
         order:  [
-            [Sequelize.literal(`"transactions"."block_num"`), "DESC"],
+            [Sequelize.literal(`"transactions"."tranxData"#>>'{createdOn}'`), sortType],
           ],
         offset: (payload.body.pageNo - 1) * payload.body.pageSize
     }).error((err) => {
@@ -105,6 +110,7 @@ UUIDKey
       var obj={};
       obj['transactionType']=row.tranxData.transactionType=="POINTCONVERSION"?"C":"";
       obj['transactionSubType']=row.tranxData.transactionSubType;
+      obj['sourceTransactionId']=row.tranxData.sourceTransactionId;
       obj['sourceLoyaltyProgram']=row.tranxData.partnerCode;
       obj['sourcemembershipNo']=row.tranxData.membershipNo;
       obj['targetLoyaltyProgram']=row.tranxData.withPartnerCode;
@@ -149,7 +155,7 @@ UUIDKey
     }catch(e){
 
 
-        response = {
+      let  response = {
             "messageStatus": "error",
             "messageId": UUIDKey,
             "errorDescription": "error while fetching error.",
