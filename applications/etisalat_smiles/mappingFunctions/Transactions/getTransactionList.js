@@ -52,6 +52,16 @@ async function getTransactionList(payload, UUIDKey, route, callback, JWToken) {
             [Op.eq]: payload.body.searchCriteria.withPartnerCode
         }
     }
+    if (payload.body.searchCriteria.actualTo) {
+        obj.tranxData['"actualTo"'] = {
+            [Op.eq]: payload.body.searchCriteria.actualTo
+        }
+    }
+    if (payload.body.searchCriteria.actualFrom) {
+        obj.tranxData['"actualFrom"'] = {
+            [Op.eq]: payload.body.searchCriteria.actualFrom
+        }
+    }
 
     // let result = await 
     let result = await db.findAndCountAll({

@@ -53,7 +53,7 @@ let sortType='DESC'
     }
 
     if (payload.body.loyaltyProgramCode) {
-        obj.tranxData['"partnerCode"'] = {
+        obj.tranxData['"sourceLoyaltyProgram"'] = {
             [Op.eq]: payload.body.loyaltyProgramCode,
         }
     }
@@ -111,10 +111,10 @@ let sortType='DESC'
       obj['transactionType']=row.tranxData.transactionType=="POINTCONVERSION"?"C":"";
       obj['transactionSubType']=row.tranxData.transactionSubType;
       obj['sourceTransactionId']=row.tranxData.sourceTransactionId;
-      obj['sourceLoyaltyProgram']=row.tranxData.partnerCode;
-      obj['sourcemembershipNo']=row.tranxData.membershipNo;
-      obj['targetLoyaltyProgram']=row.tranxData.withPartnerCode;
-      obj['targetmembershipNo']=row.tranxData.conversionParams.targetMemberShipNo;
+      obj['sourceLoyaltyProgram']=row.tranxData.sourceLoyaltyProgram;
+      obj['sourceMembershipNo']=row.tranxData.membershipNo;
+      obj['targetLoyaltyProgram']=row.tranxData.targetLoyalTyProgram;
+      obj['targetMembershipNo']=row.tranxData.conversionParams.targetMemberShipNo;
       obj['transactionDate']=EpochToDate(row.tranxData.createdOn);
       obj['status']=row.tranxData.internalStatus;
       obj['pointsSource']=row.tranxData.conversionParams.pointsToBeConverted || 0;
