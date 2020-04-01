@@ -22,20 +22,94 @@ async function initiateSettlement(payload, UUIDKey, route, callback, JWToken) {
 
     try{
 
-
+        //let count=_.get(payload,"body.transactionCount","")
         let settlementID=UUIDKey+"_settlement"
         let transactionList=_.get(payload,"body.transactionList","")
-        let count=_.get(payload,"body.transactionCount","")
-        let toCode=_.get(payload,"body.toCode","")
-        let fromCode=_.get(payload,"body.fromCode","")
+        let count = transactionList.length
+        let toCode=_.get(payload,"body.toCode","")        // etisalat 
+        let fromCode=_.get(payload,"body.fromCode","")  // etihad
+        let totalamount=_.get(payload,"body.totalamount")
+        let commission=_.get(payload,"body.commission")
+        let pointsawarded=_.get(payload,"body.pointsawarded")
+        let status=_.get(payload,"body.status")
+
+
+
+        console.log("-------------settlementID", settlementID)
+        console.log("-------------transactionList", transactionList)
+        console.log("-------------count", count)
+        console.log("-------------toCode", toCode)
+        console.log("-------------fromCode", fromCode)
+
+        console.log("-------------totalamount", totalamount)
+        console.log("-------------commission", commission)
+        console.log("-------------pointsawarded", pointsawarded)
+
+        var createdAt = new Date();
+        console.log("-------------date", createdAt)
+        console.log("-------------status", status)
+
+        let queryData
+       //queryData=`INSERT INTO "SettlementBatchInterimDetail" ("status", "settlementId", "TransactionID","createdAt","updatedAt") VALUES('${status}', '${settlementID}', '${transactionList}','${createdAt}','${createdAt}');`
+       // queryData=`INSERT INTO "SettlementBatchInterimDetail" ("status", "settlementId", "TransactionID","createdAt","updatedAt") VALUES('${status}', '${settlementID}', '${transactionList}','2020-04-01T11:19:38.167Z','2020-04-01T11:19:38.167Z');`
+
+             
+        if(status=="pending"){
+            queryData=`INSERT INTO "SettlementBatchInterimDetail" ("status", "settlementId", "TransactionID","createdAt","updatedAt") VALUES('${status}', '${settlementID}', '${transactionList}', current_timestamp ,current_timestamp);`
+              console.log("---------------------->", status)
+            }
+        else{
+         //queryData=`INSERT INTO SettlementBatchInterimMaster (status, key, createdAt, updatedAt,transactioncount, actualto,actualfrom,fromdate,todate,totalAmount,commission,pointsAwarded) VALUES(${status}, ${settlementID}, ${createdAt},${createdAt} ,${count},  ${toCode}, ${fromCode}, '','',${totalamount},${commission},${pointsawarded});`
+         //   working queryData=`INSERT INTO "SettlementBatchInterimMaster" ("status", "key", "createdAt", "updatedAt","transactioncount", "actualto","actualfrom","fromdate","todate","totalamount","commission","pointsawarded") VALUES('${status}', '${settlementID}', '2020-04-01T11:19:38.167Z','2020-04-01T11:19:38.167Z' ,'${count}',  '${toCode}', '${fromCode}', '020-04-01T11:19:38.167Z','020-04-01T11:19:38.167Z','${totalamount}','${commission}','${pointsawarded}');`
+         queryData=`INSERT INTO "SettlementBatchInterimMaster" ("status", "key", "createdAt", "updatedAt","transactioncount", "actualto","actualfrom","fromdate","todate","totalamount","commission","pointsawarded") VALUES('${status}', '${settlementID}', current_timestamp ,current_timestamp  ,'${count}',  '${toCode}', '${fromCode}', current_timestamp , current_timestamp,'${totalamount}','${commission}','${pointsawarded}');`
+
+
+           
+        }
+
+
+
+        console.log(queryData)
+        
+
         
 
 
-        let queryData="INSERT INTO SettlementBatchInterimDetail (status, settlementId, TransactionID, createdAt, updatedAt,transactioncount, actualto, actualfrom) VALUES('INVALID'::character varying, '', '', '', '', 0, '', '');"
+        //let queryData="INSERT INTO SettlementBatchInterimDetail (status, settlementId, TransactionID, createdAt, updatedAt,transactioncount, actualto, actualfrom) VALUES('INVALID'::character varying, '', '', '', '', 0, '', '');"
+           
+        pg.connection().then((conn) => {
+            console.log("Connected to DB successfully !")
+            return Promise.all([
+                conn.query(queryData, [])
+            ]).then((data) => {
+                let response={}
+                response.message = "SUCCESS"
+                response.data = data
+                return callback({response});
+          })
+        });
+        
+        // pg.connection().then((conn) => {
+        //     console.log("Connected to DB successfully !")
+        //     return Promise.all([
+        //         conn.query(queryData, [])
+        //     ]).then((data) => {}))
+        //     //.catch(err=> console.log("Error",err))
+        // });
 
 
+        //amount // float 
+        //commision float 
 
 
+//  settlementbat detai
+// master table there match id 
+
+// status pending    SettlementBatchInterimDetail
+// master  status  initiate       
+
+// 
+ 
 //console.log(tarray+"\n")
 //tarray=[];
 
@@ -161,25 +235,25 @@ async function initiateSettlement(payload, UUIDKey, route, callback, JWToken) {
 
 */
 
-return callback({
-    status: "success",
-    RESULT: "error",
-    error: false
-})
+// return callback({
+//     status: "success",
+//     RESULT: "error",
+//     error: false
+// })
     }catch(e){
 
 
-       let response = {
-            "messageStatus": "error",
-            "messageId": UUIDKey,
-            "errorDescription": "error while fetching error.",
-            "errorCode": 500,
-            "timestamp": dates.newDate(),
-        }
+//        let response = {
+//             "messageStatus": "error",
+//             "messageId": UUIDKey,
+//             "errorDescription": "error while fetching error.",
+//             "errorCode": 500,
+//             "timestamp": dates.newDate(),
+//         }
 
-        console.log(e.stack)
-        callback(response);
-    }
+//         console.log(e.stack)
+//         callback(response);
+     }
 
 }
 
