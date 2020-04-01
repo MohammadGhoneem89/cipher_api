@@ -77,6 +77,12 @@
       "CustomMappingFile": "settlement/settleTransaction.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "initiateSettlement": {
+      "customMapping": true,
+      "MappingfunctionName": "initiateSettlement",
+      "CustomMappingFile": "settlement/initiateSettlement.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getDashboardData": {
       "customMapping": true,
       "MappingfunctionName": "getDashboardData",
