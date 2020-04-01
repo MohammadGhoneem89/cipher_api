@@ -49,6 +49,8 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
         }
     }
 
+
+
     let arr = []
     let data = {}
     let myMap = new Map()
@@ -96,6 +98,8 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
                     data.linkingParam = ptnr.tranxData.contractParams[key].authType || ""
                     data.termsAndConditions = ptnr.tranxData.contractParams[key].termsandConditionsEn || ""
                     data.minConversion = ptnr.tranxData.contractParams[key].minPoints || 0
+                    data.unitType = ptnr.tranxData.contractParams[key].unitType || ""
+                    data.validationRegEx = ptnr.tranxData.contractParams[key].validationRegEx || ""
                     if (typeof(data.minConversion) === "string"){
                         data.minConversion = parseInt(data.minConversion)
                     }
