@@ -31,6 +31,10 @@ async function initiateSettlement(payload, UUIDKey, route, callback, JWToken) {
         
 
 
+        let queryData="INSERT INTO SettlementBatchInterimDetail (status, settlementId, TransactionID, createdAt, updatedAt,transactioncount, actualto, actualfrom) VALUES('INVALID'::character varying, '', '', '', '', 0, '', '');"
+
+
+
 
 //console.log(tarray+"\n")
 //tarray=[];
