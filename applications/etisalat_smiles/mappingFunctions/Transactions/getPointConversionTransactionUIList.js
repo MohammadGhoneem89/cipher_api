@@ -35,7 +35,7 @@ tranxData: {
 }
 
 if (payload.body.searchCriteria.startDate && payload.body.searchCriteria.endDate) {
-obj.tranxData['"transactionDate"'] = {
+obj.tranxData['"createdOn"'] = {
 [Op.gte]: payload.body.searchCriteria.startDate,
 [Op.lte]: payload.body.searchCriteria.endDate
 }
@@ -48,16 +48,36 @@ obj.tranxData['"internalStatus"'] = {
 }
 if (payload.body.searchCriteria.Partner) {
 obj.tranxData['"partnerCode"'] = {
-[Op.eq]: payload.body.partnerCode
+[Op.eq]: payload.body.Partner
 }
 }
+
+
+if (payload.body.searchCriteria.direction) {
+    obj.tranxData['"transactionSubType"'] = {
+    [Op.eq]: payload.body.searchCriteria.direction
+    }
+    }
+
+
+    if (payload.body.searchCriteria.key) {
+        obj.tranxData['"key"'] = {
+        [Op.eq]: payload.body.searchCriteria.key
+        }
+        }
+
+    if (payload.body.searchCriteria.key) {
+        obj.tranxData['"key"'] = {
+        [Op.eq]: payload.body.searchCriteria.key
+        }
+        }
 
 let obj1
 // let result = await
 let result = await db.findAndCountAll({
 where: obj,
 order:  [
-    [Sequelize.literal(`"transactions"."block_num"`), "DESC"],
+    [Sequelize.literal(`"transactions"."tranxData"#>>'{createdOn}'`), "DESC"],
   ],
 raw: false,
 limit: payload.body.page.pageSize,
