@@ -32,6 +32,8 @@ let db = await pgModels.makeModel('transactions')
 const obj = {
 tranxData: {
 }
+,
+[Op.or]: sequelize.literal(`"transactions"."tranxData"#>>'{partnerCode}'='${JWToken.orgCode}' or "transactions"."tranxData"#>>'{withPartnerCode}'='${JWToken.orgCode}' `)
 }
 
 if (payload.body.searchCriteria.startDate && payload.body.searchCriteria.endDate) {
@@ -66,12 +68,11 @@ if (payload.body.searchCriteria.direction) {
         }
         }
 
-    if (payload.body.searchCriteria.key) {
-        obj.tranxData['"key"'] = {
-        [Op.eq]: payload.body.searchCriteria.key
-        }
-        }
+  
 
+
+
+        console.log(JSON.stringify(JWToken.orgCode))
 let obj1
 // let result = await
 let result = await db.findAndCountAll({
