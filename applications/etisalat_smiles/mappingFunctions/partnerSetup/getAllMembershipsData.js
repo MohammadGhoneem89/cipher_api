@@ -94,7 +94,7 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
             for (let key in ptnr.tranxData.contractParams) {
                 if (ptnr.tranxData.contractParams[key].isPointConversionPartner != false) {
                     data.targetLoyaltyProgramCode = ptnr.tranxData.contractParams[key].conversionPartnerProgramName || "" 
-                    data.logo = ptnr.tranxData.contractParams[key].logo || ""
+                    data.logo = ptnr.tranxData.logo || ptnr.tranxData.contractParams[key].logo
                     data.linkingParam = ptnr.tranxData.contractParams[key].authType || ""
                     data.termsAndConditions = ptnr.tranxData.contractParams[key].termsandConditionsEn || ""
                     data.minConversion = ptnr.tranxData.contractParams[key].minPoints || 0
@@ -110,10 +110,11 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
                         data.startDate = EpochToDate(elem.startDate) || ""
                         data.endDate = EpochToDate(elem.endDate) || ""
                         data.conversionRate = elem.rate || 0.00
+                        data.conversionRate2 = elem.Rate2 || 0.00
                     })
                     data.feeType = ""
                     data.feeValue = 0
-                    data.OTPLength = 0
+                    data.OTPLength = ptnr.tranxData.contractParams[key].OTPLength
                     // console.log(data)
                     arr.push({ ...data })
                     // console.log(arr)
@@ -125,11 +126,13 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
 
     })
 
-    arr = arr.filter(word => word != null)
+    arr = arr.filter(word => word != null && typeof(word) !== "undefined")
     let partArr = []
 
+    console.log(arr)
+
     arr.forEach(obj => {
-        console.log(obj.targetLoyaltyProgramCode)
+        // console.log(obj.targetLoyaltyProgramCode)
         myMap.set(obj.targetLoyaltyProgramCode, i)
         i++
     })
@@ -160,23 +163,24 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
         return linkedData
     })
 
-    console.log(linkedArr)
-
+    // console.log("\n\n\n DATA >> ",linkedArr)
+    let tempArr = [...arr]
     linkedArr.forEach(obj => {
         let index = myMap.get(obj.targetLoyaltyProgramCode)
-        console.log(typeof (index))
-        if (!(typeof (index) === 'undefined')) {
-            let temp = {}
+        // console.log(typeof (index))
+        if (!(typeof (index) === 'undefined') && index <= arr.length) {
             if (index >= 0) {
-                temp = arr[index]
+                let temp = {}
+                temp = tempArr[index]
+                console.log("\n\nTARGET MEMBERSHIP >> ", index)
                 temp.targetMembershipNo = obj.targetMembershipNo
                 temp.points = obj.points
                 temp.status = obj.status
                 partArr.push({ ...temp })
-                console.log("here")
+                // console.log("here")
                 arr.splice(index, 1)
-                console.log(index + "\n\n")
-                console.log(arr + "\n\n")
+                console.log("\n\nLENGTH>> ", arr.length + "\n\n")
+                // console.log(arr + "\n\n")
                 myMap.set(obj.targetLoyaltyProgramCode, -1)
             }
         }
