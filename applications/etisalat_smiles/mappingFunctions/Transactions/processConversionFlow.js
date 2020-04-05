@@ -172,6 +172,8 @@ function executeQuery(queryData){
 async function  getLmsdata(loyaltyProgramCode,membershipNo,points){
     const queryData = `select * from LMS where "program_name" = '${loyaltyProgramCode}' AND
     "membershipno"='${membershipNo}'`;
+
+    console.log("currentpoints >>>"+queryData)
     try {
         const connection = await pg.connection();
         const queryResult = await connection.query(queryData);
@@ -182,6 +184,7 @@ async function  getLmsdata(loyaltyProgramCode,membershipNo,points){
        
     }catch(err){
 console.log(err)
+return false;
     }
 }
 

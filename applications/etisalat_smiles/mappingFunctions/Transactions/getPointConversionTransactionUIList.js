@@ -33,7 +33,7 @@ const obj = {
 tranxData: {
 }
 ,
-[Op.or]: sequelize.literal(`"transactions"."tranxData"#>>'{partnerCode}'='${JWToken.orgCode}' or "transactions"."tranxData"#>>'{withPartnerCode}'='${JWToken.orgCode}' `)
+[Op.or]: sequelize.literal(`("transactions"."tranxData"#>>'{partnerCode}'='${JWToken.orgCode}' or "transactions"."tranxData"#>>'{withPartnerCode}'='${JWToken.orgCode}') `)
 }
 
 if (payload.body.searchCriteria.startDate && payload.body.searchCriteria.endDate) {

@@ -23,7 +23,7 @@ async function initiateSettlement(payload, UUIDKey, route, callback, JWToken) {
     try{
 
         //let count=_.get(payload,"body.transactionCount","")
-        let settlementID=UUIDKey+"_settlement"
+        let settlementID=_.get(payload,"body.bthid","")
         let transactionList=_.get(payload,"body.transactionList","")
         let count = _.get(payload,"body.count","")
         let actualTo=_.get(payload,"body.actualTo","")        // etisalat 
@@ -228,11 +228,15 @@ async function initiateSettlement(payload, UUIDKey, route, callback, JWToken) {
 */
 //AudioDestinationNode.asda.asda
 
-return callback({
-    status: "500",
-    send: "error",
-    "errorCode": 500,
-})
+let response={
+    "message":{"status": "OK"},
+    "messageId": UUIDKey,
+    "data":"none",
+    "errorDescription": "",
+    "errorCode": 200,
+    "responseMessage":{"data":{"message":{"status":"ok"}}}
+};
+return callback(response)
     }catch(e){
 
      
@@ -242,6 +246,7 @@ return callback({
             "errorDescription": "error while fetching error.",
             "errorCode": 500,
             "timestamp": dates.newDate(),
+           
         }
 
       console.log(e.stack)
@@ -264,6 +269,8 @@ function executeQuery(queryData){
 async function  getLmsdata(loyaltyProgramCode,membershipNo,points){
     const queryData = `select * from LMS where "program_name" = '${loyaltyProgramCode}' AND
     "membershipno"='${membershipNo}'`;
+
+    console.log(queryData+"<<< sql")
     try {
         const connection = await pg.connection();
         const queryResult = await connection.query(queryData);
