@@ -64,6 +64,7 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
       return callback(errorResponse("Invalid Chain Pack File Path!!! ", UUIDKey));
     }
   }
+  console.log("-------->>>>>>>>>>>>-----****---->>>>>>>>>>>>Payload : ", JSON.stringify(payload));
   let RPCRequest = {
     Header: {
       tranType: "0200",
@@ -75,6 +76,16 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
       ResponseMQ: []
     },
     BCData: {
+      "orderer":payload.orderer,
+      "ordererDomain":payload.ordererDomain,
+      "ordererPort":payload.ordererPort,
+      "MSP":payload.MSP,
+      "peer":payload.peer,
+      "peerDomain":payload.peerDomain,
+      "peerPort":payload.peerPort,
+      "signaturePolicy":payload.signaturePolicy,
+      "sequence":payload.sequence,
+      "smartContractArgs":payload.smartContractArgs,
       "channelName": payload.channelName,
       "smartContractName": payload.smartContractName,
       "channelConfig": envelope,
@@ -88,6 +99,7 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
       arguments: payload.smartContractArgs
     }
   };
+  console.log("-------->>>>>>>>>>>>-----****---->>>>>>>>>>>>Request : ", JSON.stringify(RPCRequest));
   sendRequestBLA(grpcConfig, RPCRequest, UUIDKey, (data) => {
     let response = {
       HyperledgerConnect: {
@@ -100,6 +112,7 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
 };
 
 function sendRequestBLA(srvcAddressNPort, Request, UUIDKey, responseCallback) {
+  console.log("-------------------****---->>>>>>>>>>>>Request : ", JSON.stringify(Request));
   logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, ' [sendGRPCRequest] srvc Address and Port: ' + srvcAddressNPort);
   logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, ' [sendGRPCRequest] Sending query to Micservice');
   let url = `http://${srvcAddressNPort}/process`;
@@ -109,7 +122,14 @@ function sendRequestBLA(srvcAddressNPort, Request, UUIDKey, responseCallback) {
     body: Request,
     json: true // Automatically stringifies the body to JSON
   };
+  console.log("-------------------****--------------------------");
+  console.log("-------------------****--------------------------");
+  console.log("-------------------****--------------------------");
+  console.log("-------------------****--------------------------");
   logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, "[RP][SEND]", url, JSON.stringify(rpOptions.body || rpOptions));
+  console.log("-------------------****--------------------------");
+  console.log("-------------------****--------------------------");
+  console.log("-------------------****--------------------------");
   return rp(rpOptions).then((msg) => {
     logger.debug(' [sendGRPCRequest] Response MSG: ' + JSON.stringify(msg, null, 2));
     responseCallback(msg);
