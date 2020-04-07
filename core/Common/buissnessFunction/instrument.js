@@ -261,7 +261,13 @@ module.exports = {
         uid=uid.substring(uid.length-1,uid.length-5)
            return uid
     },
-
+    addUserName: (data, payload, jwt) => {
+        if (data == undefined) {
+          return jwt.userID
+        } else {
+          return data
+        }
+      },
 
 
     ValidateItems: (items, payload, jwt) => {

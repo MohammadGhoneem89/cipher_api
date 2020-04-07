@@ -40,7 +40,7 @@ async function getSettlementList(payload, UUIDKey, route, callback, JWToken) {
     }
 
     if (payload.body.searchCriteria.Status) {
-        obj.tranxData['"internalStatus"'] = {
+        obj.tranxData['"Status"'] = {
             [Op.eq]: payload.body.searchCriteria.Status,
         }
     }
