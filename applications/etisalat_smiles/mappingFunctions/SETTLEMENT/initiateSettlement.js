@@ -21,9 +21,40 @@ const config = require('../../../../config');
 async function initiateSettlement(payload, UUIDKey, route, callback, JWToken) {
 
     try{
+        let settlementID=_.get(payload,"body.bthid","")
+        let status=_.get(payload,"body.status","")
+
+
+
+
+
+if(status=="APPROVED"){
+    let updateQuery=`update  "SettlementBatchInterimMaster" set status='approved' where key  = '${settlementID}'`;
+    console.log(updateQuery)
+     transactionDataMaster = await getData(updateQuery);
+     let response={
+        "message":{"status": "OK"},
+        "messageId": UUIDKey,
+        "data":"none",
+        "errorDescription": "",
+        "errorCode": 200,
+        "responseMessage":{"data":{"message":{"status":"ok"}}}
+    };
+    return callback(response)
+
+
+}
+
+
+
+
+
+
+
+
 
         //let count=_.get(payload,"body.transactionCount","")
-        let settlementID=_.get(payload,"body.bthid","")
+      //  let settlementID=_.get(payload,"body.bthid","")
         let transactionList=_.get(payload,"body.transactionList","")
         let count = _.get(payload,"body.count","")
         let actualTo=_.get(payload,"body.actualTo","")        // etisalat 
@@ -52,7 +83,7 @@ async function initiateSettlement(payload, UUIDKey, route, callback, JWToken) {
        // queryData=`INSERT INTO "SettlementBatchInterimDetail" ("status", "settlementId", "TransactionID","createdAt","updatedAt") VALUES('${status}', '${settlementID}', '${transactionList}','2020-04-01T11:19:38.167Z','2020-04-01T11:19:38.167Z');`
 
                    
-         queryData=`INSERT INTO "SettlementBatchInterimMaster" ("status", "key", "createdAt", "updatedAt","transactioncount", "actualto","actualfrom","fromdate","todate","totalamount","commission","pointsawarded") VALUES('initiated', '${settlementID}', current_timestamp ,current_timestamp  ,'${count}',  '${actualTo}', '${actualFrom}', current_timestamp , current_timestamp,'${totalamount}','${commission}','${pointsawarded}');`
+         queryData=`INSERT INTO "SettlementBatchInterimMaster" ("status", "key", "createdAt", "updatedAt","transactioncount", "actualto","actualfrom","fromdate","todate","totalamount","commission","pointsawarded") VALUES('approved', '${settlementID}', current_timestamp ,current_timestamp  ,'${count}',  '${actualTo}', '${actualFrom}', current_timestamp , current_timestamp,'${totalamount}','${commission}','${pointsawarded}');`
 
          executeQuery(queryData) 
          queryData=`INSERT INTO "SettlementBatchInterimDetail" ("status", "settlementId", "TransactionID","createdAt","updatedAt") VALUES `
