@@ -56,12 +56,22 @@ async function getAllOrgMap(payload, UUIDKey, route, callback, JWToken) {
         return tranxData
     });
 
-    console.log(transData)
+    transData.forEach(elem => {
+        let actions = [{
+            label: "View",
+            iconName: "fa fa-view",
+            params: "_id",
+            actionType: "COMPONENT_FUNCTION"
+        }];
+        elem.actions = actions
+    });
+
+    // console.log(transData)
 
     if (result) {
         // result.rows = rows;
         response.getAllOrgMap.data.searchResult = transData
-    
+        console.log("\n\n RES >> ", response.getAllOrgMap.data.searchResult)
         return callback(response);
     }
 

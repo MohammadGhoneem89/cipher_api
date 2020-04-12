@@ -111,6 +111,11 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
                         data.endDate = EpochToDate(elem.endDate) || ""
                         data.conversionRate = elem.rate || 0.00
                         data.conversionRate2 = elem.rate2 || 0.00
+                        data.minConversion2 = 0
+                        data.multipleOf = 0
+                        data.multipleOf2 = 0
+                        data.roundOffMethod1 = "Floor"
+                        data.roundOffMethod2 = "Ceiling"
                     })
                     data.feeType = ""
                     data.feeValue = 0
