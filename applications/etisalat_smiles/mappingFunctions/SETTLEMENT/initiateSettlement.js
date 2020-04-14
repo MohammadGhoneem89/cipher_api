@@ -83,7 +83,7 @@ if(status=="APPROVED"){
        // queryData=`INSERT INTO "SettlementBatchInterimDetail" ("status", "settlementId", "TransactionID","createdAt","updatedAt") VALUES('${status}', '${settlementID}', '${transactionList}','2020-04-01T11:19:38.167Z','2020-04-01T11:19:38.167Z');`
 
                    
-         queryData=`INSERT INTO "SettlementBatchInterimMaster" ("status", "key", "createdAt", "updatedAt","transactioncount", "actualto","actualfrom","fromdate","todate","totalamount","commission","pointsawarded") VALUES('approved', '${settlementID}', current_timestamp ,current_timestamp  ,'${count}',  '${actualTo}', '${actualFrom}', current_timestamp , current_timestamp,'${totalamount}','${commission}','${pointsawarded}');`
+         queryData=`INSERT INTO "SettlementBatchInterimMaster" ("status", "key", "createdAt", "updatedAt","transactioncount", "actualto","actualfrom","fromdate","todate","totalamount","commission","pointsawarded") VALUES('initiated', '${settlementID}', current_timestamp ,current_timestamp  ,'${count}',  '${actualTo}', '${actualFrom}', current_timestamp , current_timestamp,'${totalamount}','${commission}','${pointsawarded}');`
 
          executeQuery(queryData) 
          queryData=`INSERT INTO "SettlementBatchInterimDetail" ("status", "settlementId", "TransactionID","createdAt","updatedAt") VALUES `
