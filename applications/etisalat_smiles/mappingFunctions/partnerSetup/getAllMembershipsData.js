@@ -19,7 +19,7 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
         "errorDescription": "",
         "errorCode": 200,
         "timestamp": dates.newDate(),
-        "OtherPartners": {},
+        "otherPartners": {},
         "linkedPartners": {}
     }
 
@@ -31,7 +31,7 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
         }
     }
 
-    let db_2 = await pgModels.makeModel('memberships')
+    let db_2 = await pgModels.makeModel('linkedmember_verifieds')
 
     const obj2 = {
         tranxData: {
@@ -39,20 +39,29 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
     }
 
     if (payload.body.sourceLoyaltyProgramCode) {
-        obj2.tranxData['"sourceLoyaltyProgramCode"'] = {
+        obj2.tranxData['"programCode"'] = {
             [Op.eq]: payload.body.sourceLoyaltyProgramCode
         }
     }
     if (payload.body.membershipNo) {
-        obj2.tranxData['"membershipNo"'] = {
+        obj2.tranxData['"membershipno"'] = {
             [Op.eq]: payload.body.membershipNo
         }
+        flag = 1
     }
 
 
 
     let arr = []
-    let data = {}
+    let data = {
+        sourceLoyaltyProgramCode: "",
+        targetLoyaltyProgramCode: "",
+        logo: "",
+        linkingParam: "",
+        termsAndConditions: "",
+        SO: {},
+        OS: {}
+    }
     let myMap = new Map()
     let linkedarr = []
 
@@ -93,14 +102,14 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
         if (ptnr.tranxData.contractParams != null) {
             for (let key in ptnr.tranxData.contractParams) {
                 if (ptnr.tranxData.contractParams[key].isPointConversionPartner != false) {
-                    data.targetLoyaltyProgramCode = ptnr.tranxData.contractParams[key].conversionPartnerProgramName || "" 
+                    data.targetLoyaltyProgramCode = ptnr.tranxData.contractParams[key].conversionPartnerProgramName || ""
                     data.logo = ptnr.tranxData.logo || ptnr.tranxData.contractParams[key].logo
                     data.linkingParam = ptnr.tranxData.contractParams[key].authType || ""
                     data.termsAndConditions = ptnr.tranxData.contractParams[key].termsandConditionsEn || ""
-                    data.minConversion = ptnr.tranxData.contractParams[key].minPoints || 0
+                    data.SO.minConversion = ptnr.tranxData.contractParams[key].minPoints || 0
                     data.unitType = ptnr.tranxData.contractParams[key].unitType || ""
                     data.validationRegEx = ptnr.tranxData.contractParams[key].validationRegEx || ""
-                    if (typeof(data.minConversion) === "string"){
+                    if (typeof (data.minConversion) === "string") {
                         data.minConversion = parseInt(data.minConversion)
                     }
                     let obj = ptnr.tranxData.contractParams[key].conversionBillingRates
@@ -109,17 +118,17 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
                         data.sourceLoyaltyProgramCode = elem.sourceToken
                         data.startDate = EpochToDate(elem.startDate) || ""
                         data.endDate = EpochToDate(elem.endDate) || ""
-                        data.conversionRate = elem.rate || 0.00
-                        data.conversionRate2 = elem.rate2 || 0.00
-                        data.minConversion2 = 0
-                        data.multipleOf = 0
-                        data.multipleOf2 = 0
-                        data.roundOffMethod1 = "Floor"
-                        data.roundOffMethod2 = "Ceiling"
+                        data.SO.conversionRate = elem.rate || 0.00                 //2 is OS, 1 is SO.
+                        data.OS.conversionRate = elem.rate2 || 0.00
+                        data.OS.minConversion = 0
+                        data.SO.multipleOf = 0
+                        data.OS.multipleOf = 0
+                        data.SO.roundOffMethod = "Floor"
+                        data.OS.roundOffMethod = "Ceiling"
                     })
                     data.feeType = ""
                     data.feeValue = 0
-                    data.OTPLength = ptnr.tranxData.contractParams[key].OTPLength
+                    data.OTPLength = ptnr.tranxData.contractParams[key].OTPLength || 0
                     // console.log(data)
                     arr.push({ ...data })
                     // console.log(arr)
@@ -131,7 +140,7 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
 
     })
 
-    arr = arr.filter(word => word != null && typeof(word) !== "undefined")
+    arr = arr.filter(word => word != null && typeof (word) !== "undefined")
     let partArr = []
 
     console.log(arr)
@@ -155,47 +164,49 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
     let linkedData = {}
     let linkedArr = []
     let linkMem = resultRows_link.map(link => {
-        for (key in link.tranxData.linkInfo) {
-            if (link.tranxData.linkInfo[key].status == "A" || link.tranxData.linkInfo[key].status == "P") {
-                linkedData.status = link.tranxData.linkInfo[key].status || ""
-                // linkedData.targetLoyaltyProgramCode = link.tranxData.targetOrgCode
-                linkedData.targetLoyaltyProgramCode = key
-                linkedData.targetMembershipNo = link.tranxData.linkInfo[key].targetMembershipNo
-                linkedData.points = link.tranxData.linkInfo[key].points || 0
+        for (key in link.tranxData.linkedMembersDetails) {
+                linkedData.targetLoyaltyProgramCode = link.tranxData.linkedMembersDetails[key].programCode  //change here programCode
+                linkedData.targetMembershipNo = link.tranxData.linkedMembersDetails[key].linkedMembershipNo
+                linkedData.points =  0
                 linkedArr.push({ ...linkedData })
-            }
+            
         }
         return linkedData
     })
 
-    // console.log("\n\n\n DATA >> ",linkedArr)
+    console.log("\n\n\n DATA >> ", linkedArr)
     let tempArr = [...arr]
-    linkedArr.forEach(obj => {
-        let index = myMap.get(obj.targetLoyaltyProgramCode)
-        // console.log(typeof (index))
-        if (!(typeof (index) === 'undefined') && index <= arr.length) {
-            if (index >= 0) {
-                let temp = {}
-                temp = tempArr[index]
-                console.log("\n\nTARGET MEMBERSHIP >> ", index)
-                temp.targetMembershipNo = obj.targetMembershipNo
-                temp.points = obj.points
-                temp.status = obj.status
-                partArr.push({ ...temp })
-                // console.log("here")
-                arr.splice(index, 1)
-                console.log("\n\nLENGTH>> ", arr.length + "\n\n")
-                // console.log(arr + "\n\n")
-                myMap.set(obj.targetLoyaltyProgramCode, -1)
+
+    if (linkedArr.length > 0) {
+        linkedArr.forEach(obj => {
+            let index = myMap.get(obj.targetLoyaltyProgramCode)
+            // console.log(typeof (index))
+            if (!(typeof (index) === 'undefined') && index <= arr.length) {
+                if (index >= 0) {
+                    let temp = {}
+                    temp = tempArr[index]
+                    console.log("\n\nTARGET MEMBERSHIP >> ", index)
+                    temp.targetMembershipNo = obj.targetMembershipNo
+                    temp.points = obj.points
+                    temp.status = "A"
+                    partArr.push({ ...temp })
+                    // console.log("here")
+                    arr.splice(index, 1)
+                    console.log("\n\n\n ARR>> ", arr)
+                    console.log("\n\nLENGTH>> ", arr.length + "\n\n")
+                    // console.log(arr + "\n\n")
+                    myMap.set(obj.targetLoyaltyProgramCode, -1)
+                }
             }
-        }
-    })
+        })
+    }
+
 
 
 
     if (result) {
         // result.rows = rows;
-        response.OtherPartners = arr
+        response.otherPartners = arr
         response.linkedPartners = partArr
 
         // response.getAllConnectedPartner.pageData.currentPageNo = payload.body.page.currentPageNo
