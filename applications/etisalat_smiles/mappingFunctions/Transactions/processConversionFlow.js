@@ -57,7 +57,7 @@ async function processConversionFlow(payload, UUIDKey, route, callback, JWToken)
     } else if (processingType == "CREDIT") {
 
         flow = flow.concat(config.get("flow.AccuralforPartner"))
-    } else if (processingType == "COMMITDEBIT") {
+    } else if (processingType == "CommitDebit") {
 
         flow = flow.concat(config.get("flow.CommitRedemPoints"))
     } else {
@@ -71,27 +71,47 @@ async function processConversionFlow(payload, UUIDKey, route, callback, JWToken)
 
     let error = null;
 
+    let KeyValue = {}
     for (let i = 0; i < flow.length; i++) {
 
         error = await postTemplateOnGivenPayload(payload, flow[i].action, flow[i].errorPath, flow[i].failureMessage)
+        _.set(pdatac, "otherParty." + flow[i].action + ".request", _.get(payload, flow[i].action + "_request"));
+        _.set(pdatac, "otherParty." + flow[i].action + ".response", _.get(payload, flow[i].action));
         if (error) {
             _.set(pdatac, "status", "FAILURE");
+
             _.set(pdatac, "errorReason", JSON.stringify(error))
             _.set(pdatac, "status", "FAILURE");
             break;
 
+        } else if (flow[i].details != undefined && flow[i].details != null) {
+
+            valuesSet(payload, KeyValue, flow[i].details)
         }
     }
 
-    let data = await confirmTransaction({}, pdatac);
+    _.set(pdatac, "details", KeyValue)
+
+    if (loyaltyProgramCode != "ETISALAT") {
+        _.set(pdatac, "status", null);
+        _.set(pdatac, "errorReason", null)
+        _.set(pdatac, "status", "SUCCESS");
+
+
+    }
+
+    let requestConfirm = {}
+    let data = await confirmTransaction(requestConfirm, pdatac);
 
 
 
 
     if (error) {
         return callback({
-
+            otherParty: _.get(pdatac, "otherParty", null),,
             status: "Failure",
+            confirmRequest: requestConfirm,
+            confirmResponse: data,
             message: error,
             messageId: UUIDKey
         });
@@ -99,6 +119,8 @@ async function processConversionFlow(payload, UUIDKey, route, callback, JWToken)
 
         return callback({
             data: data,
+            otherParty: _.get(pdatac, "otherParty", null),
+            confirmRequest: requestConfirm,
             status: "Success",
             message: "Processed OK",
             messageId: UUIDKey
@@ -293,6 +315,14 @@ async function processConversionFlow(payload, UUIDKey, route, callback, JWToken)
 }
 
 
+function valuesSet(payload, sdata, valuesarray) {
+    Object.keys(valuesarray).forEach(key => {
+
+        _.set(sdata, key, _.get(payload, valuesarray[key], null))
+    })
+
+}
+
 function executeQuery(queryData) {
 
     pg.connection().then((conn) => {
@@ -339,8 +369,10 @@ async function postTemplateOnGivenPayload(payload, templateName, errorPath, fail
     try {
 
         let transformedTemplate = await getAndTransformTemplate(payload, templateName)
-        let responseData = await getPostData({ method: 'POST', form: transformedTemplate.form, url: transformedTemplate.url, headers: transformedTemplate.header, body: transformedTemplate.data, json: true })
+        let request = { method: 'POST', form: transformedTemplate.form, url: transformedTemplate.url, headers: transformedTemplate.header, body: transformedTemplate.data, json: true };
+        let responseData = await getPostData(request)
         payload[templateName] = responseData;
+        payload[templateName + "_request"] = request
         let errorStatus = _.get(responseData, errorPath, null)
         if (errorPath != null && errorStatus == failureStatus) {
             return { Error: responseData, Message: "Error when Trying " + templateName }
@@ -382,7 +414,7 @@ async function getAndTransformTemplate(payload, templateName) {
 
 
 
-function confirmTransaction(response, payload) {
+function confirmTransaction(request, payload) {
     console.log("PAYLOADY=====================> ",
         payload, " <=====================PAYLOADY");
 
@@ -399,7 +431,7 @@ function confirmTransaction(response, payload) {
             body: {
                 "loyaltyProgramCode": _.get(payload, "loyaltyProgramCode", ""),
                 "targetLoyaltyProgramCode": _.get(payload, "targetLoyaltyProgramCode", ""),
-                //"membershipNo": response.membershipNo,
+                "details": _.get(payload, "details", ""),
                 "transactionType": "POINTCONVERSION",
                 "transactionID": _.get(payload, "transactionID", null),
                 "pointsAwarded": _.get(payload, "pointsAwarded", null),
@@ -412,6 +444,7 @@ function confirmTransaction(response, payload) {
         },
         json: true
     };
+    request = options.body
     console.log("REQUEST===============>", options.body, "<===============REQUEST");
     return rp(options);
 

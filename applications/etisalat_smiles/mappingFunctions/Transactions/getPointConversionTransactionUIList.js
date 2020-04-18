@@ -108,7 +108,7 @@ async function getPointConversionTransactionList(payload, UUIDKey, route, callba
             }];
             row.dataValues.actions = actions
 
-            row.dataValues.transactionId = `${row.tranxData.partnerCode}_${row.tranxData.sourceTransactionId}`
+            row.dataValues.transactionId = `${row.tranxData.key}`
         });
 
 
