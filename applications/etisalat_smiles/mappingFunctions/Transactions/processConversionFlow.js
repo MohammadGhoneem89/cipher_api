@@ -108,7 +108,7 @@ async function processConversionFlow(payload, UUIDKey, route, callback, JWToken)
 
     if (error) {
         return callback({
-            otherParty: _.get(pdatac, "otherParty", null),,
+            otherParty: _.get(pdatac, "otherParty", null),
             status: "Failure",
             confirmRequest: requestConfirm,
             confirmResponse: data,
@@ -406,9 +406,29 @@ async function getPostData(options) {
     return rp(options)
 }
 
+
+let functionList = {
+    oauthTokenverifyEtisalat: (checkingObject) =>{ 
+     let  consentON= _.get(checkingObject,"consented_on",null)
+     if(consentON!=null){
+         console.log("consent on >>>>" +consentON)
+         console.log("expires_in  >>>>" +expires_in)
+         console.log("current time >>>>" + dates.newDate()-30)
+        let  expires_in= _.get(checkingObject,"expires_in",null)
+        let totalTime=consentON+expires_in;
+        dates.newDate()-30 < totalTime ? true :false
+        
+     }
+     return false;
+ 
+}
+}
+
+
 async function getAndTransformTemplate(payload, templateName) {
-    let template = await apiTemplate.findOneByName({ name: templateName })
-    return transformTemplate(template, payload)
+   // let template = await apiTemplate.findOneByName({ name: templateName })
+   let template = global.apiTemplatesg[templateName] 
+   return transformTemplate(template, payload)
 
 }
 
