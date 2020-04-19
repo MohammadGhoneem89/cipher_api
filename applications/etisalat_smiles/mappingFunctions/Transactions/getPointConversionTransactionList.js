@@ -119,6 +119,7 @@ let sortType='DESC'
       obj['status']=row.tranxData.internalStatus;
       obj['pointsSource']=row.tranxData.conversionParams.pointsToBeConverted || 0;
       obj['pointsConverted']= row.tranxData.pointsAwarded || 0
+      obj['unitType']= _.get(row.tranxData,"TargetUnitType",null) 
       data.push(obj)
       
       
