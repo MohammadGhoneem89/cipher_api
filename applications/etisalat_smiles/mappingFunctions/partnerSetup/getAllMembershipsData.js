@@ -56,6 +56,7 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
     let data = {
         sourceLoyaltyProgramCode: "",
         targetLoyaltyProgramCode: "",
+        targetOrgCode: "",
         logo: "",
         linkingParam: "",
         termsAndConditions: "",
@@ -104,6 +105,7 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
                 if (ptnr.tranxData.contractParams[key].isPointConversionPartner != false) {
                     data.targetLoyaltyProgramCode = ptnr.tranxData.contractParams[key].conversionPartnerProgramName || ""
                     data.logo = ptnr.tranxData.logo || ptnr.tranxData.contractParams[key].logo
+                    data.targetOrgCode = key
                     data.linkingParam = ptnr.tranxData.contractParams[key].authType || ""
                     data.termsAndConditions = ptnr.tranxData.contractParams[key].termsandConditionsEn || ""
                     data.SO.minConversion = ptnr.tranxData.contractParams[key].minPoints || 0
@@ -116,6 +118,7 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
                     // console.log("contractParams: ", obj)
                     obj.forEach(elem => {
                         data.sourceLoyaltyProgramCode = elem.sourceToken
+                        
                         data.startDate = EpochToDate(elem.startDate) || ""
                         data.endDate = EpochToDate(elem.endDate) || ""
                         data.SO.conversionRate = elem.rate || 0.00                 //2 is OS, 1 is SO.
@@ -165,10 +168,13 @@ async function getAllMembershipsData(payload, UUIDKey, route, callback, JWToken)
     let linkedArr = []
     let linkMem = resultRows_link.map(link => {
         for (key in link.tranxData.linkedMembersDetails) {
+            if (link.tranxData.linkedMembersDetails[key].status != "I" && link.tranxData.linkedMembersDetails[key].status != "P" ){
                 linkedData.targetLoyaltyProgramCode = link.tranxData.linkedMembersDetails[key].programCode  //change here programCode
                 linkedData.targetMembershipNo = link.tranxData.linkedMembersDetails[key].linkedMembershipNo
                 linkedData.points =  0
                 linkedArr.push({ ...linkedData })
+            }
+                
             
         }
         return linkedData

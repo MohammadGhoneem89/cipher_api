@@ -10,12 +10,19 @@ const dates = require('../../../../lib/helpers/dates.js')
 
 function getPartnersList(payload, UUIDKey, route, callback, JWToken) {
     let queryData = `select "tranxData" ->>'_id' as "_id",
-                            "tranxData" ->>'approvedBy' as "approvedBy",
-                            "tranxData" ->>'partnerCode' as "partnerCode",
-                            "tranxData" ->>'partnerErCode' as "partnerErCode",
-                            "tranxData" ->>'rejectedBy' as "rejectedBy",
-                            "tranxData" ->>'status' as "status",
-                            "tranxData" ->>'contractParams' as "contractParams"
+                         "tranxData" ->>'approvedBy' as "approvedBy",
+                         "tranxData" ->>'partnerCode' as "partnerCode",
+                         "tranxData" ->>'partnerErCode' as "partnerErCode",
+                         "tranxData" ->>'rejectedBy' as "rejectedBy",
+                          "tranxData" ->>'status' as "status",
+                          "tranxData" ->>'Contacts' as "contacts",
+                          "tranxData" ->>'isPointConversionPartner' as "isPointConversionPartner",
+                          "tranxData" ->>'isAccrualPartner' as "isAccrualPartner",
+                          "tranxData" ->>'settlement' as "settlement",
+                          "tranxData" ->>'sourcePartnerCode' as "sourcePartnerCode",
+                          "tranxData" ->>'sourceProgramCode' as "sourceProgramCode",
+                          "tranxData" ->>'partnerProgramCode' as "partnerProgramCode",    
+                         "tranxData" ->>'contractParamsPCEx' as "contractParamsPCEx"
                         from public."interims" 
                         where 1=1`;
 
@@ -30,7 +37,7 @@ function getPartnersList(payload, UUIDKey, route, callback, JWToken) {
         let status = payload.body.searchCriteria.status;
         query += ` AND lower("tranxData" ->> 'status') = lower('${status}') `;
     }
-    
+
     let queryCriteriaFull = queryData + query;
     let queryCriteria = queryCnt + query;
 
