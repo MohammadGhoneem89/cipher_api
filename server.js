@@ -12,6 +12,7 @@ const rp = require('request-promise');
 let app = express();
 const expressWs = require('express-ws')(app);
 const crypto = require('./lib/helpers/crypto');
+const apiTemplate = require('./lib/repositories/apiTemplate');
 const RestController = require('./core/Controller/RestController.js');
 const mongoDB = require('./core/api/connectors/mongoDB');
 const fileUpload = require('express-fileupload');
@@ -47,6 +48,19 @@ routeData.LoadConfig().then(() => {
     console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
   });
 });
+
+apiTemplate.find().then(templates=>{
+
+  var templatesg={}
+  templates.forEach(function(template) {
+    templatesg[template.name] = template;
+  });
+
+  global.apiTemplatesg=templatesg;
+})
+
+
+
 
 app.options('*', cors());
 app.use(cors());
