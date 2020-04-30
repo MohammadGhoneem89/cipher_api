@@ -1,5 +1,47 @@
 {
     "core": {
+        "uploadEx": {
+            "customMapping": true,
+            "MappingfunctionName": "upload",
+            "CustomMappingFile": "fileUploadEx/index.js",
+            "mappingConfigFile": "ePayMapping"
+        },
+        "downloadEx": {
+            "customMapping": true,
+            "MappingfunctionName": "download",
+            "CustomMappingFile": "fileUploadEx/index.js",
+            "mappingConfigFile": "ePayMapping"
+        },
+        "getRelayNetworkConfigListTd": {
+            "customMapping": true,
+            "MappingfunctionName": "getServiceList",
+            "CustomMappingFile": "systemAPI/relayConfig.js",
+            "mappingConfigFile": "ePayMapping"
+        },
+        "updateRelayNetworkConfig": {
+            "customMapping": true,
+            "MappingfunctionName": "updateRelayNetworkConfig",
+            "CustomMappingFile": "systemAPI/relayConfig.js",
+            "mappingConfigFile": "ePayMapping"
+        },
+        "getRelayNetworkConfigList": {
+            "customMapping": true,
+            "MappingfunctionName": "getRelayNetworkConfigList",
+            "CustomMappingFile": "systemAPI/relayConfig.js",
+            "mappingConfigFile": "ePayMapping"
+        },
+        "getRelayNetworkConfig": {
+            "customMapping": true,
+            "MappingfunctionName": "getRelayNetworkConfig",
+            "CustomMappingFile": "systemAPI/relayConfig.js",
+            "mappingConfigFile": "ePayMapping"
+        },
+        "getRelayNetworkConfigByID": {
+            "customMapping": true,
+            "MappingfunctionName": "getRelayNetworkConfigByID",
+            "CustomMappingFile": "systemAPI/relayConfig.js",
+            "mappingConfigFile": "ePayMapping"
+        },
         "upload": {
             "customMapping": true,
             "MappingfunctionName": "upload",
@@ -767,6 +809,18 @@
         "typeDataList": {
             "customMapping": true,
             "MappingfunctionName": "typeDataList",
+            "CustomMappingFile": "typeData/getTypeDataList.js",
+            "mappingConfigFile": "ePayMapping"
+        },
+        "typeDataListByType": {
+            "customMapping": true,
+            "MappingfunctionName": "typeDataListByType",
+            "CustomMappingFile": "typeData/getTypeDataList.js",
+            "mappingConfigFile": "ePayMapping"
+        },
+        "typeDataListForType": {
+            "customMapping": true,
+            "MappingfunctionName": "typeDataListByType",
             "CustomMappingFile": "typeData/getTypeDataList.js",
             "mappingConfigFile": "ePayMapping"
         },

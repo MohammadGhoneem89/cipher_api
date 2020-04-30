@@ -1,11 +1,9 @@
 'use strict';
-
 const config = require('./config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const uuid = require('uuid/v1');
-const db = require('./core/database/db')(); // eslint-disable-line
-
+require('./core/database/db')(); // eslint-disable-line
 const url = require('url');
 const cors = require('cors');
 const rp = require('request-promise');
@@ -23,20 +21,22 @@ const requestLog = require('./lib/middleware/requesLog');
 const authUser = require('./lib/auth/user');
 const logger = require('./core/api/connectors/logger').app;
 const _ = require('lodash');
-
-process.on('uncaughtException', (err) => {
-  logger.error({ fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack }, 'uncaught exception');
-});
-
-process.on('unhandledRejection', function (err) {
-  logger.error({ fs: 'app.js', func: 'unhandledRejection', error: err, stack: err.stack }, 'unhandled Rejection');
-});
+let HealthCheckHelper = require('./core/utils/health.js');
+const routeData = require('./core/mappingFunctions/systemAPI/APIDefination');
+const getUpload = require('./core/validation/getDocUploadEx.js');
+const getDocUpload = require('./core/validation/getDocUpload.js');
 global.appDir = __dirname;
 mongoDB.connection(config.get('mongodb.url'));
 console.log(config.get('mongodb.url'))
 app = expressWs.app;
-
-const routeData = require('./core/mappingFunctions/systemAPI/APIDefination');
+app.options('*', cors());
+app.use(cors());
+app.use(fileUpload());
+app.use(express.static('public'));
+app.use(express.static('exports'));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(requestLog);
 let appServer;
 routeData.LoadConfig().then(() => {
   console.log('Configurations Loaded For Request Processing!!');
@@ -49,50 +49,36 @@ routeData.LoadConfig().then(() => {
   });
 });
 
-apiTemplate.find().then(templates=>{
-
-  var templatesg={}
-  templates.forEach(function(template) {
+apiTemplate.find().then((templates) => {
+  let templatesg = {}
+  templates.forEach(function (template) {
     templatesg[template.name] = template;
   });
-
-  global.apiTemplatesg=templatesg;
-})
-
-
-
-
-app.options('*', cors());
-app.use(cors());
-app.use(fileUpload());
-app.use(express.static('public'));
-app.use(express.static('exports'));
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
-app.use(requestLog);
-
-// health Check block
-let HealthCheckHelper = require('./core/utils/health.js');
-app.use('/health', HealthCheckHelper.router);
-//==================
-
+  global.apiTemplatesg = templatesg;
+});
 
 function contains(input, checkval) {
   return (input.indexOf(checkval) !== -1);
 }
 function checkbadinput(req) {
   const payload = req.body;
-  console.log("checking for illeagal characters.");
   const requestString = JSON.stringify(payload);
   if (contains(requestString, "$")) {
-    console.log("illeagal characters Found Sending Error!!");
-    logger.error({ fs: 'app.js', func: 'login', error: err.stack || err }, 'illeagal characters Found Sending Error!!');
+    logger.error({fs: 'app.js', func: 'login', error: err.stack || err}, 'illeagal characters Found Sending Error!!');
     return true;
   }
-  console.log("request OK!.");
   return false;
 }
 
+process.on('uncaughtException', (err) => {
+  logger.error({fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack}, 'uncaught exception');
+});
+
+process.on('unhandledRejection', function (err) {
+  logger.error({fs: 'app.js', func: 'unhandledRejection', error: err, stack: err.stack}, 'unhandled Rejection');
+});
+
+app.use('/health', HealthCheckHelper.router);
 app.post('/login', function (req, res) {
   const payload = req.body;
   payload.action = '/login';
@@ -137,10 +123,10 @@ app.post('/login', function (req, res) {
     .then((user) => {
       if (user.userType == "API") {
         apiResponse.token = user.token;
-        console.log("user ?????? ",user);
+        console.log("user ?????? ", user);
         res.send(apiResponse);
       } else {
-        console.log("response.loginResponse.data ?????? ",response.loginResponse.data)
+        console.log("response.loginResponse.data ?????? ", response.loginResponse.data)
         response.loginResponse.data.token = user.token;
         response.loginResponse.data.firstScreen = user.firstScreen;
         res.send(response);
@@ -158,10 +144,9 @@ app.post('/login', function (req, res) {
       res.send(response);
     });
 });
-
 app.post('/uploadFile/:action', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" }
+    let resperr = {'error': "illeagal character found in request"}
     res.send(resperr);
     return;
   }
@@ -204,8 +189,7 @@ app.post('/uploadFile/:action', permissions, function (req, res) {
         res.send(response);
         res.end();
       });
-  }
-  else {
+  } else {
     console.log('=============Organization is not entity==============');
     const JWToken = req.get('token');
     const decoded = crypto.decrypt(JWToken);
@@ -226,8 +210,7 @@ app.post('/uploadFile/:action', permissions, function (req, res) {
         func: 'uploadFile'
       }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
       res.send('File does not exist');
-    }
-    else {
+    } else {
       fileUploadValid(file, UUID, ext, params, userID, source, context, function (data) {
         console.log(data)
         res.send(data);
@@ -236,10 +219,9 @@ app.post('/uploadFile/:action', permissions, function (req, res) {
 
   }
 });
-
 app.post('/uploadImg', function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" }
+    let resperr = {'error': "illeagal character found in request"}
     res.send(resperr);
     return;
   }
@@ -254,36 +236,29 @@ app.post('/uploadImg', function (req, res) {
   const context = req.body.context;
 
   if (!data) {
-    logger.debug({ fs: 'app.js', func: 'uploadImg' }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
+    logger.debug({fs: 'app.js', func: 'uploadImg'}, ' [ File Upload Service ] File is not exist in req : ' + req.file);
     res.send('Image dose not exist');
-  }
-  else {
+  } else {
     imageUpload(data, UUID, params, userID, source, context, function (imageUploadResponse) {
       res.send(imageUploadResponse);
     });
   }
 });
-
-const getUpload = require('./core/validation/getDocUploadEx.js');
-
 app.get('/getUploadedFile/:action/:id', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" }
+    let resperr = {'error': "illeagal character found in request"}
     res.send(resperr);
     return;
   }
   console.log('Taking it from local');
   const UUID = req.params.id;
   console.log('==============UUID of downloaded file============' + UUID);
-  logger.debug({ fs: 'app.js', func: 'getUploadedFile' }, ' [ getUploadedFile ]   : ' + UUID);
+  logger.debug({fs: 'app.js', func: 'getUploadedFile'}, ' [ getUploadedFile ]   : ' + UUID);
   getUpload(UUID, res, function (data) {
     console.log('==============Sending file in return========================' + UUID);
     res.send(data, 'binary');
   });
 });
-
-const getDocUpload = require('./core/validation/getDocUpload.js');
-
 app.post('/upload/:action', permissions, function (req, res) {
   let id = req.params.id;
   const JWToken = req.get("token");
@@ -312,10 +287,9 @@ app.post('/upload/:action', permissions, function (req, res) {
     });
 
 });
-
 app.post('/APII/:channel/:action', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" };
+    let resperr = {'error': "illeagal character found in request"};
     res.send(resperr);
     return;
   }
@@ -323,26 +297,53 @@ app.post('/APII/:channel/:action', permissions, function (req, res) {
   const JWToken = req.get('token');
   const action = req.params.action;
   const channel = req.params.channel;
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
+  logger.info({fs: 'app.js', func: 'APPI'}, 'Handle Transaction on Cipher ' + action + ' ' + channel);
   if (channel === 'Cipher') {
-    logger.trace({ payload: payload }, 'Cipher APII call Payload');
+    logger.trace({payload: payload}, 'Cipher APII call Payload');
   }
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'calling handleExternalRequest ');
+  logger.info({fs: 'app.js', func: 'APPI'}, 'calling handleExternalRequest ');
   const UUID = uuid();
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'UUID:  ' + UUID);
-  logger.info({ fs: 'app.js', func: 'APPI' }, 'JWToken :  ' + JWToken);
+  logger.info({fs: 'app.js', func: 'APPI'}, 'UUID:  ' + UUID);
+  logger.info({fs: 'app.js', func: 'APPI'}, 'JWToken :  ' + JWToken);
 
   RestController.handleExternalRequest(payload, channel, action, UUID, res, '');
 
 });
-
 app.get('/API/:channel/:action', permissions, apiCallsHandler);
-
 app.post('/API/:channel/:action', permissions, apiCallsHandler);
+app.get('/export/:channel', permissions, function (req, res) {
+  if (checkbadinput(req)) {
+    let resperr = {'error': "illeagal character found in request"}
+    res.send(resperr);
+    return;
+  }
+  const url_parts = url.parse(req.url, true);
+  const type = url_parts.query.type;
+  let gridType = url_parts.query.gridType;
+  const JWToken = url_parts.query.JWT;
+  let decoded;
+  try {
+    decoded = crypto.decrypt(JWToken);
+  } catch (err) {
+    return sendError(res, req);
+  }
+  if (!decoded || !JWToken) {
+    return sendError(req, res);
+  }
+  let query = url_parts.query.searchCriteria || '';
+  try {
+    query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
+  } catch (e) {
+    res.send(e);
+    res.end();
+  }
+  renderExport(type, gridType, query, jsReport, decoded, res);
+
+});
 
 function apiCallsHandler(req, res) {
   if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" };
+    let resperr = {'error': "illeagal character found in request"};
     res.send(resperr);
     return;
   }
@@ -350,16 +351,15 @@ function apiCallsHandler(req, res) {
   let JWToken = '';
   if (payload.JWToken) {
     JWToken = payload.JWToken;
-  }
-  else {
+  } else {
     JWToken = req.get('token');
   }
   if (req.query) {
-    Object.assign(payload, { queryParams: req.query });
+    Object.assign(payload, {queryParams: req.query});
   }
 
   if (req.headers) {
-    Object.assign(payload, { headersParams: req.headers });
+    Object.assign(payload, {headersParams: req.headers});
   }
 
   if (req.files && Object.keys(req.files).length > 0) {
@@ -372,18 +372,17 @@ function apiCallsHandler(req, res) {
 
   const url_parts = url.parse(req.url, true);
   const query = url_parts.query;
-  logger.info({ fs: 'app.js', func: 'API' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
-  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: "::1", query });
+  logger.info({fs: 'app.js', func: 'API'}, 'Handle Transaction on Cipher ' + action + ' ' + channel);
+  payload = Object.assign(payload, {action: action, channel: channel, ipAddress: "::1", query});
   logger.info('calling handleExternalRequest ');
   const UUID = uuid();
-  logger.info({ fs: 'app.js', func: 'API' }, 'UUID:  ' + UUID);
-  logger.info({ fs: 'app.js', func: 'API' }, 'JWToken :  ' + JWToken);
+  logger.info({fs: 'app.js', func: 'API'}, 'UUID:  ' + UUID);
+  logger.info({fs: 'app.js', func: 'API'}, 'JWToken :  ' + JWToken);
 
   const decoded = crypto.decrypt(JWToken);
-  logger.info({ fs: 'app.js', func: 'API' }, decoded, 'decoded.userID:');
+  logger.info({fs: 'app.js', func: 'API'}, decoded, 'decoded.userID:');
   RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
 }
-
 
 function sendError(req, res) {
   const errMsg = {
@@ -404,35 +403,3 @@ function sendError(req, res) {
   res.json(errMsg);
   res.end();
 }
-
-app.get('/export/:channel', permissions, function (req, res) {
-  if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" }
-    res.send(resperr);
-    return;
-  }
-  const url_parts = url.parse(req.url, true);
-  const type = url_parts.query.type;
-  let gridType = url_parts.query.gridType;
-  const JWToken = url_parts.query.JWT;
-  let decoded;
-  try {
-    decoded = crypto.decrypt(JWToken);
-  }
-  catch (err) {
-    return sendError(res, req);
-  }
-  if (!decoded || !JWToken) {
-    return sendError(req, res);
-  }
-  let query = url_parts.query.searchCriteria || '';
-  try {
-    query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
-  }
-  catch (e) {
-    res.send(e);
-    res.end();
-  }
-  renderExport(type, gridType, query, jsReport, decoded, res);
-
-});

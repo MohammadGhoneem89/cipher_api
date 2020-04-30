@@ -11,7 +11,7 @@ function decrypt() {
 
 function _decrypt(str) {
   console.log(str, 'STR');
-  const decipher = crypto.createDecipher('aes-256-ctr', 'abcdefg1234567890!@#$%^&*()');
+  const decipher = crypto.createDecipher('aes-256-ctr', '4b32a690-8949-11ea-89db-777c257036644b32a691-8949-11ea-89db-777c257036644b32a692-8949-11ea-89db-777c257036644b32a693-8949-11ea-89db-777c25703664');
   console.log("decipher ?????? ", decipher)
   const crypt = decipher.update(str, 'hex', 'utf8');
   try {

@@ -6,9 +6,9 @@ const rp = require('request-promise');
 const path = require('path');
 const fs = require('fs');
 const amq = require('../../core/api/connectors/queue');
-
-
-
+const PROTO_PATH = __dirname + '/rest.proto';
+const grpc = require('grpc');
+const relayProto = grpc.load(PROTO_PATH).RELAY;
 
 module.exports = class Dispatcher {
   constructor(OriginalRequest, MappeedRequest, configData, UUID, typeList, JWTtoken) {
@@ -46,23 +46,19 @@ module.exports = class Dispatcher {
               if (!extValue) {
                 throw new Error(`blockchain routing error | ${element.field} must be defined`);
               }
-            }
-            else {
+            } else {
               console.log("Final Matching Value Picked from Request " + extValue);
             }
             let litmus = false;
             if (element.value == '*') {
               litmus = true;
-            }
-            else if (extValue == element.value) {
+            } else if (extValue == element.value) {
               litmus = true;
-            }
-            else {
+            } else {
               litmus = false;
             }
             flags.push(litmus);
-          }
-          else {
+          } else {
             flags.push(true);
           }
 
@@ -77,8 +73,7 @@ module.exports = class Dispatcher {
 
           if (elem.channel.type == "Quorrum" || elem.channel.type == "Quorum") {
             userID = JWTtoken && JWTtoken.quorrumUser ? JWTtoken.quorrumUser : "admindefault";
-          }
-          else {
+          } else {
             userID = JWTtoken && JWTtoken.hypUser ? JWTtoken.hypUser : "admindefault";
           }
 
@@ -97,8 +92,7 @@ module.exports = class Dispatcher {
       });
       if (isMatched === false) {
         throw new Error(`blockchain routing error | matching rule not found!!!`);
-      }
-      else {
+      } else {
 
         _.set(MappeedRequest, 'Header.tranCode', tranCode || "0002");
         _.set(MappeedRequest, 'Header.userID', userID);
@@ -119,6 +113,7 @@ module.exports = class Dispatcher {
     }
     this.request = MappeedRequest;
   }
+
   SendGetRequest(_res = undefined, _rej = undefined) {
     return new Promise((resolve, reject) => {
       let getResponse;
@@ -126,7 +121,12 @@ module.exports = class Dispatcher {
       if (this.configdata.isSimulated && this.configdata.isSimulated === true && bypassSimu === false) {
         let simu = new Simulator(this.oRequest, this.simucases);
         simu.getResponse().then((data) => {
-          resolve(data);
+          let generalResponse = {
+            "error": false,
+            "message": "Processed OK!",
+            ...data
+          };
+          resolve(generalResponse);
         }).catch((ex) => {
           reject(ex);
         });
@@ -135,6 +135,25 @@ module.exports = class Dispatcher {
           resolve(data);
         }).catch((ex) => {
           reject(ex);
+        });
+      } else if (this.configdata.communicationMode === 'GRPC Relay') {
+
+        let relNet = global.relayNetConfig;
+        let orgCode = _.get(this.request, '__RELAY', '');
+
+        let netSelected = _.get(this.configdata, 'RelayNet', '')
+        let invokeNet = _.get(relNet, `${netSelected}.CLIENT.${orgCode}`, undefined);
+
+        if (!invokeNet) {
+          return reject(new Error("Relay network not found!!"));
+        }
+        let keyList = Object.keys(invokeNet);
+        let peerExt = _.get(invokeNet, keyList[0], undefined);
+        if (!peerExt) {
+          return reject(new Error("Relay network not found!!"));
+        }
+        return this.connectGRPCService(this.configdata, peerExt).then((data) => {
+          return resolve(data);
         });
       } else if (this.configdata.communicationMode === 'REST') {
         let isBLK = _.get(this.configdata, 'isBlockchain', false);
@@ -166,8 +185,7 @@ module.exports = class Dispatcher {
         }
 
 
-      }
-      else if (this.configdata.communicationMode === 'QUEUE') {
+      } else if (this.configdata.communicationMode === 'QUEUE') {
         this.connectQueueService().then((data) => {
           console.log(data);
           resolve(data);
@@ -237,8 +255,64 @@ module.exports = class Dispatcher {
     });
   }
 
+  connectGRPCService(configdata, endpoint) {
 
+    let isRelay = _.get(configdata, 'isRelay', false);
+    let remoteAPI = _.get(configdata, 'RemoteAPI', '');
+    let network = _.get(configdata, 'RelayNet', '');
+    let relayReq = {};
+    let today = new Date();
+    let req = _.cloneDeep(this.request);
 
+    _.set(relayReq, 'Header.UUID', this.UUID);
+    _.set(relayReq, 'Header.timeStamp', today.toISOString());
+    _.set(relayReq, 'Header.network', network);
+    _.set(relayReq, 'Header.remoteAPI', remoteAPI);
+    _.set(relayReq, 'Body.payload', JSON.stringify(req));
+
+    const credentials = grpc.credentials.createSsl(
+      Buffer.from(endpoint.cacertificate),
+      Buffer.from(endpoint.privatekey),
+      Buffer.from(endpoint.chaincertificate)
+    );
+
+    let client = new relayProto.Communicator(
+      endpoint.requests,
+      credentials
+    );
+    console.log(`Request for GRPC processing dialng ${endpoint.requests} >> `, JSON.stringify(relayReq, null, 2))
+    return new Promise((res, rej) => {
+      client.Query(relayReq, (err, response) => {
+        if (err !== null) {
+          console.log("***************>>>  ",err)
+          return res({
+            "error": true,
+            "message": err.message
+          });
+        } else {
+          if (response.Body.success === true) {
+            let result;
+
+            try {
+              result = JSON.parse(response.Body.payload);
+            } catch (e) {
+              console.log(e);
+            }
+            return res({
+              "error": false,
+              "message": "Processed OK!",
+              result
+            });
+          } else {
+            return res({
+              "error": false,
+              "message": response.Body.errorMessage
+            });
+          }
+        }
+      });
+    })
+  }
 
   connectQueueService(responseQueue) {
     return amq.start()

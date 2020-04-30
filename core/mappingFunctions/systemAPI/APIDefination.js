@@ -12,6 +12,7 @@ const APIDefinitation = require('../../../lib/repositories/apiDefination');
 const complexType = require('../../../lib/repositories/complexTypes');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
+const relayConfig = require('./relayConfig');
 const fs = require('fs');
 
 String.prototype.capitalize = function () {
@@ -33,6 +34,10 @@ function LoadConfig() {
   let Projection = {
     "data": 1
   };
+  relayConfig.getRelayNetworkConfigList({}, "", "", (data) => {
+    console.log("Relay Config loaded Successfully!!");
+    global.relayNetConfig = data;
+  }, {})
   return Promise.all([
     typeData.selectProjected({}, Projection),
     APIDefinitation.getAPIConfig()

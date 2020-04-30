@@ -2,14 +2,15 @@
 
 const logger = require('../api/connectors/logger').app;
 const _ = require('lodash');
-const config = require('../../AppConfig');
+const config = require('../../config');
 const apiPayloadRepo = require('../../lib/repositories/apiPayload');
 const GeneralRequestProcessor = require('./requestProcessor');
 const constants = require('../Common/constants_en.js');
 const ObjectMapper = require('./objectMapper');
 const OldRestController = require('./_RestController');
 const APIDefination = require('../mappingFunctions/systemAPI/APIDefination');
-const apiFilter = ['RenewContract'];
+const apiFilter = config.get('apiFilters') || [];
+const pg = require('../api/connectors/postgress');
 
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
 
@@ -17,24 +18,28 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     fs: 'RestController.js',
     func: 'handleExternalRequest'
   }, "===========Got Message [" + UUIDKey + "]!!!============");
-  logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, JSON.stringify(payload, null, 2));
-  logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, incommingRoute);
+  logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, JSON.stringify(payload, null, 2));
+  logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, incommingRoute);
 
   if (apiFilter.indexOf(incommingRoute) >= 0) {
-    if (payload.body.password || payload.JWToken || payload.JWT) {
-      delete payload.body.password;
-      delete payload.JWToken;
-      delete payload.JWT;
-    }
-
+    _.set(payload, 'body.password', undefined);
+    _.set(payload, 'JWToken', undefined)
+    _.set(payload, 'JWT', undefined)
     let requestData = {
       uuid: UUIDKey,
       channel: channel,
       action: incommingRoute,
-      payload: payload
+      payload: payload,
+      createdat: Date.now()
     };
 
-    apiPayloadRepo.create(requestData);
+    let apiplquery = `INSERT into "apipayload" ("uuid", "channel", "action", "payload", "createdat") VALUES($1, $2, $3, $4, now())`;
+    let params = [requestData.uuid, requestData.channel, requestData.action, requestData.payload];
+    pg.connection().then(async (conn) => {
+      let res = await conn.query(apiplquery, params);
+      logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, apiplquery);
+      console.log("Query response: ", res);
+    });
   }
 
   let ResponseCaller = function (data) {
@@ -55,7 +60,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       return responseCallback.end();
     }
     //logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, JSON.stringify(data, null, 2));
-    logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, "=========== [" + UUIDKey + "]!!! ============");
+    logger.debug({fs: 'RestController.js', func: 'ResponseCaller'}, "=========== [" + UUIDKey + "]!!! ============");
     let apiSample = _.cloneDeep(payload);
     if (_.get(apiSample, '_apiRecorder', false) === true) {
       apiSample = _.omit(apiSample, 'token', 'action', 'channel', 'ipAddress', '_apiRecorder', 'JWToken', 'header', 'CipherJWT');
@@ -93,7 +98,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         _.set(response, '__cipherMessage', constants.cipherGeneralSuccess);
         _.set(response, '__cipherUIErrorStatus', constants.cipherUISuccess);
         _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
-      };
+      }
+      ;
       let objMapper = new ObjectMapper(response, configdata.ResponseMapping, global.enumInfo, UUIDKey, JWToken, 'Response', configdata.ResponseTransformations);
       return objMapper.start().then((mappedData) => {
         return mappedData;
@@ -109,7 +115,10 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   }).then((data) => {
     ResponseCaller(data);
     let millisecondsend = (new Date()).getTime();
-    logger.error({ fs: 'RestController.js', func: 'handleExternalRequest' }, `Message Processed In:  ${(millisecondsend - millisecondsstart)} ms`);
+    logger.error({
+      fs: 'RestController.js',
+      func: 'handleExternalRequest'
+    }, `Message Processed In:  ${(millisecondsend - millisecondsstart)} ms`);
     //  logger.error({ fs: 'RestController.js', func: 'handleExternalRequest' }, "Response Recieved: " + JSON.stringify(data));
   });
 };

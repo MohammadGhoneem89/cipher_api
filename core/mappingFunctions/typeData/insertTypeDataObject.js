@@ -1,9 +1,10 @@
 'use strict';
-
+console.log(" ------- PAYLOAD")
 const typeData = require('../../../lib/services/typeData');
-
+console.log(" ------- PAYLOAD")
 
 function insertTypeDataObject(payload, UUIDKey, route, callback, JWToken) {
+    console.log(payload," ------- PAYLOAD")
     payload.userId = JWToken._id;
     get(payload, callback);
 }
