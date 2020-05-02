@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const config = global.config;
 
-function get(path,defaultVal='') {
+function get(path,defaultVal= undefined) {
   return _.get(config, path, defaultVal);
 }
 
