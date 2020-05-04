@@ -24,7 +24,7 @@ function orgList(body, entityList_CB, JWToken) {
   if (JWToken.orgType === 'Entity') {
     if (JWToken.orgType === 'Entity') {
       isEntity = true;
-      body.searchCriteria = { spCode: JWToken.orgCode };
+      body.searchCriteria = {spCode: JWToken.orgCode};
     }
   }
 
@@ -48,22 +48,22 @@ function orgList(body, entityList_CB, JWToken) {
   let criteria = [];
   if (searchCriteria && searchCriteria.entityName) {
     let entityName = searchCriteria["entityName"];
-    criteria.push({ "entityName": { '$regex': entityName, '$options': 'i' } });
+    criteria.push({"entityName": {'$regex': entityName, '$options': 'i'}});
   }
 
   if (searchCriteria && searchCriteria.arabicName) {
     let arabicName = searchCriteria.arabicName;
-    criteria.push({ "arabicName": { '$regex': arabicName, '$options': 'i' } });
+    criteria.push({"arabicName": {'$regex': arabicName, '$options': 'i'}});
   }
   if (searchCriteria && searchCriteria.spCode) {
     let spCode = searchCriteria.spCode;
-    criteria.push({ "spCode": spCode });
+    criteria.push({"spCode": spCode});
   }
   if (searchCriteria && searchCriteria.isActive) {
-    criteria.push({ isActive: true });
+    criteria.push({isActive: true});
   }
 
-  where = criteria.length > 0 ? { "$and": criteria } : {};
+  where = criteria.length > 0 ? {"$and": criteria} : {};
 
   let options = {};
 
@@ -78,8 +78,7 @@ function orgList(body, entityList_CB, JWToken) {
     if (err) {
       logger.debug(" [ Entity List ] Count ERROR : " + err);
       entityList_CB(response);
-    }
-    else {
+    } else {
       pointer.set(response, "/entityList/pageData/totalRecords", countData);
 
       global.db.selectWithSort("Entity", where, {
@@ -90,6 +89,7 @@ function orgList(body, entityList_CB, JWToken) {
         "isActive": 1,
         "services": 1,
         "actions": 1,
+        "orgType": 1,
         "status": 1,
         "dateCreated": 1,
         "dateUpdated": 1
@@ -97,8 +97,7 @@ function orgList(body, entityList_CB, JWToken) {
         if (err) {
           logger.debug(" [ Entity List ] ERROR : " + err);
           entityList_CB(response);
-        }
-        else {
+        } else {
           entityTypeData(function (nameData) {
             let embedField = {};
             for (let j = 0; j < entityData.length; j++) {

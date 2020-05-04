@@ -18,7 +18,7 @@ function _set(payload, callback) {
               status: 'OK',
               errorDescription: 'User password updated successfully',
               displayToUser: true,
-              newPageURL: '/userList'
+              newPageURL: payload.firstScreen || undefined
             }
           }
         }

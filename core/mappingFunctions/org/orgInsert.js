@@ -64,20 +64,17 @@ function orgInsert(payload, userID, entityInsertCB) {
     if (err) {
       logger.debug(" [ Org Insert] Error : " + err);
       entityInsertCB(response);
-    }
-    else if (duplicate.length > 0) {
+    } else if (duplicate.length > 0) {
       let msg = "duplicate records";
       pointer.set(response, "/responseMessage/data/error/spCode", msg);
       entityInsertCB(response);
-    }
-    else {
+    } else {
       Validate.formValidate(data, validType.entityValidation, function (err) {
         if (Object.keys(err).length > 0) {
           logger.debug(" [ Entity Insert] Error in Validation : " + JSON.stringify(err));
           pointer.set(response, "/responseMessage/data/error", err);
           entityInsertCB(response);
-        }
-        else {
+        } else {
 
           let date = Date.newDate();
           format.entityName = data.entityName ? data.entityName : "";
@@ -90,6 +87,11 @@ function orgInsert(payload, userID, entityInsertCB) {
           format.entityLogo.sizeMedium = data.entityLogo ? data.entityLogo.sizeMedium : "";
           format.parentEntity = data.parentEntity ? data.parentEntity : "";
           format.commissionTemplate = data.commissionTemplate ? data.commissionTemplate : "";
+          if (!format.entityName && !format.arabicName && !format.orgType && !format.spCode) {
+            pointer.set(response, "/responseMessage/data/error", "Entity Name, Arabic Name , Org Type And org code are required Fields!!");
+            return entityInsertCB(response);
+          };
+
           for (let i = 0; i < data.contacts.length; i++) {
             format.contacts.push({
               "contactName": data.contacts[i]["contactName"],
@@ -119,8 +121,7 @@ function orgInsert(payload, userID, entityInsertCB) {
             if (err) {
               logger.debug("[ Entity Insert] ERROR : " + err);
               entityInsertCB(response);
-            }
-            else {
+            } else {
               const params = {
                 event: commonConst.auditLog.eventKeys.insert,
                 collectionName: 'Entity',

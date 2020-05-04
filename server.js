@@ -30,6 +30,7 @@ const getUpload = require('./core/validation/getDocUploadEx.js');
 const getDocUpload = require('./core/validation/getDocUpload.js');
 const tokenLookup = require('./lib/repositories/tokenLookup');
 const commonConst = require('./lib/constants/common');
+
 global.appDir = __dirname;
 mongoDB.connection(config.get('mongodb.url'));
 console.log(config.get('mongodb.url'))
@@ -152,7 +153,11 @@ app.post('/login', async (req, res) => {
             userId: user._id,
             createdAt: dates.newDate()
           });
-          response.loginResponse.data.firstScreen = user.firstScreen;
+
+          if (user.isNewUser)
+            response.loginResponse.data.firstScreen = '/changePasswordInternal';
+          else
+            response.loginResponse.data.firstScreen = user.firstScreen;
           res.send(response);
         }
       })
@@ -441,8 +446,9 @@ function apiCallsHandler(req, res) {
 
 
     tokenValid(decoded._id, JWToken).then(async valid => {
-      console.log(valid)
-      if (valid || _.get(payload, "header", null) != null) {
+
+      let byPassValidation = commonConst.permissionExcludeList.includes(action);
+      if (valid || _.get(payload, "header", null) != null || byPassValidation) {
         logger.info({
           fs: 'app.js',
           func: 'API'

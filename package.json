@@ -16,6 +16,7 @@
     "amqplib": "~0.5.1",
     "amqplib-auto-recovery": "^0.1.0",
     "atob": "^2.1.2",
+    "auth-header": "^1.0.0",
     "body-parser": "^1.18.3",
     "body-parser-xml": "^1.1.0",
     "bunyan": "^1.8.12",
