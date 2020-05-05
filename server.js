@@ -182,7 +182,7 @@ app.post('/login', async (req, res) => {
 
 app.post('/uploadFile/:action', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"}
+    let resperr = {'error': "illegal character found in request"}
     res.send(resperr);
     return;
   }
