@@ -31,6 +31,8 @@ const getDocUpload = require('./core/validation/getDocUpload.js');
 const tokenLookup = require('./lib/repositories/tokenLookup');
 const commonConst = require('./lib/constants/common');
 
+
+
 global.appDir = __dirname;
 mongoDB.connection(config.get('mongodb.url'));
 console.log(config.get('mongodb.url'))
@@ -116,11 +118,12 @@ app.post('/login', async (req, res) => {
     };
 
     const apiResponse = {
+      cipherMessageId : uuid(),
       messageStatus: 'OK',
       errorCode: 200,
       errorDescription: "logged in successfully !!!",
       token: "",
-      timestamp: ""
+      timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
     };
 
     if (checkbadinput(req)) {
@@ -134,13 +137,14 @@ app.post('/login', async (req, res) => {
       return;
     }
 
+
     authUser(payload)
       .then(async (user) => {
         if (user.userType == "API") {
           apiResponse.token = user.token;
           res.send(apiResponse);
         } else {
-          // response.loginResponse.data.token = user.token;
+          response.loginResponse.data.token = user.token;
           let cookieAttributes = {};
           if (config.get("disableSameSiteCookie")) {
             delete cookieAttributes.sameSite;
@@ -167,10 +171,26 @@ app.post('/login', async (req, res) => {
           func: 'login',
           error: err.stack || err
         }, 'login failed');
-        response.loginResponse.data.message.status = 'ERROR';
-        response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
-        response.loginResponse.data.success = false;
-        res.status(401).send(response);
+
+        if (err.userType) {
+          if (err.userType == "API") {
+            apiResponse.messageStatus = "ERROR";
+            apiResponse.errorDescription = err.desc || err.stack || err;
+            apiResponse.errorCode = 201;
+            res.status(401).send(apiResponse);
+          } else {
+            response.loginResponse.data.message.status = 'ERROR';
+            response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
+            response.loginResponse.data.success = false;
+            res.status(401).send(response);
+          }
+        } else {
+          apiResponse.messageStatus = "ERROR";
+          apiResponse.errorDescription = err.desc || err.stack || err;
+          apiResponse.errorCode = 201;
+          res.status(401).send(apiResponse);
+        }
+
       });
 
   } catch (err) {
@@ -566,18 +586,24 @@ function sendError(req, res) {
 
 
 const timeoutResponse = {
-  sessionExpiredResponse: {
-    action: 'sessionExpired',
-    data: {
-      message: {
-        status: 'ERROR',
-        errorCode: 403,
-        errorDescription: 'Session has expired. Please login again',
-        routeTo: '',
-        displayToUser: true,
-      },
-      success: false,
-      firstScreen: ''
-    }
-  }
+  // sessionExpiredResponse: {
+  //   action: 'sessionExpired',
+  //   data: {
+  //     message: {
+  //       status: 'ERROR',
+  //       errorCode: 403,
+  //       errorDescription: 'Session has expired. Please login again',
+  //       routeTo: '',
+  //       displayToUser: true,
+  //     },
+  //     success: false,
+  //     firstScreen: ''
+  //   }
+  // }
+
+  "cipherMessageId": uuid(),
+  "messageStatus": "ERROR",
+  "errorCode": 201,
+  "errorDescription": "Token Expired",
+  "timestamp" : dates.DDMMYYYYHHmmssSSS(new Date)
 };
