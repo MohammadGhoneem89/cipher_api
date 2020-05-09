@@ -30,6 +30,7 @@ const getUpload = require('./core/validation/getDocUploadEx.js');
 const getDocUpload = require('./core/validation/getDocUpload.js');
 const tokenLookup = require('./lib/repositories/tokenLookup');
 const commonConst = require('./lib/constants/common');
+const xssFilter = require('x-xss-protection');
 
 
 
@@ -37,7 +38,7 @@ global.appDir = __dirname;
 mongoDB.connection(config.get('mongodb.url'));
 console.log(config.get('mongodb.url'))
 app = expressWs.app;
-
+app.use(xssFilter());
 app.use(fileUpload());
 app.use(express.static('public'));
 app.use(express.static('exports'));
