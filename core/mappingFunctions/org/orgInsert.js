@@ -86,8 +86,9 @@ function orgInsert(payload, userID, entityInsertCB) {
           format.entityLogo.sizeSmall = data.entityLogo ? data.entityLogo.sizeSmall : "";
           format.entityLogo.sizeMedium = data.entityLogo ? data.entityLogo.sizeMedium : "";
           format.parentEntity = data.parentEntity ? data.parentEntity : "";
+          format.clientKey = date.clientKey;
           format.commissionTemplate = data.commissionTemplate ? data.commissionTemplate : "";
-          if (!format.entityName && !format.arabicName && !format.orgType && !format.spCode) {
+          if (!format.entityName && !format.arabicName && !format.orgType && !format.spCode ) {
             pointer.set(response, "/responseMessage/data/error", "Entity Name, Arabic Name , Org Type And org code are required Fields!!");
             return entityInsertCB(response);
           };

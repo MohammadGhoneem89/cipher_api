@@ -42,7 +42,7 @@ function _userUpdate(payload, callback) {
           data: {
             message: {
               status: 'ERROR',
-              errorDescription: 'User not updated',
+              errorDescription: err.password || 'User not updated',
               displayToUser: true
             },
             error: err

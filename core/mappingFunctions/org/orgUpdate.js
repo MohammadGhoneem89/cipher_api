@@ -80,6 +80,7 @@ function orgUpdate(payload, userID, entityUpdateCB) {
           format.isActive = data.isActive ? data.isActive : "";
           format.entityLogo.sizeSmall = data.entityLogo.sizeSmall ? data.entityLogo.sizeSmall : "";
           format.entityLogo.sizeMedium = data.entityLogo.sizeMedium ? data.entityLogo.sizeMedium : "";
+          format.clientKey = data.clientKey ? data.clientKey : "";
           format.parentEntity = data.parentEntity ? data.parentEntity : "";
           format.commissionTemplate = data.commissionTemplate ? data.commissionTemplate : "";
           for (let i = 0; i < data.contacts.length; i++) {
