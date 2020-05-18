@@ -34,7 +34,6 @@ var orgDetail = function (payload, entityGetCB, JWToken) {
   if (payload.spCode == 'SELF')
     out.spCode = JWToken.orgCode;
 
-
   console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>.", JSON.stringify(out))
 
   global.db.select("Entity", out, "", function (err, data) {

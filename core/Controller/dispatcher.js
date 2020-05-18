@@ -9,6 +9,7 @@ const amq = require('../../core/api/connectors/queue');
 const PROTO_PATH = __dirname + '/rest.proto';
 const grpc = require('grpc');
 const relayProto = grpc.load(PROTO_PATH).RELAY;
+const crypto = require("crypto");
 
 module.exports = class Dispatcher {
   constructor(OriginalRequest, MappeedRequest, configData, UUID, typeList, JWTtoken) {
@@ -19,6 +20,24 @@ module.exports = class Dispatcher {
     this.typeList = typeList;
     this.count = 0;
     this.JWT = JWTtoken;
+
+
+    if (configData.isHMAC === true) {
+      let retrievedSignature = _.get(OriginalRequest, "headersParams.x-signature", undefined);
+      if (!retrievedSignature) {
+        throw new Error("signature required!")
+      }
+      console.log(OriginalRequest.query)
+      if (OriginalRequest.query) {
+        let computedSignature = crypto.createHmac("sha256", '123').update(OriginalRequest.query).digest("hex");
+        if (computedSignature !== retrievedSignature) {
+          throw new Error("invalid signature!")
+        }
+      } else {
+        throw new Error("At least 1 param is required for signature verification!")
+      }
+    }
+
     if (configData.isBlockchain === true) {
       let isMatched = false;
       let rules = _.get(configData, 'rules', []);
@@ -284,7 +303,7 @@ module.exports = class Dispatcher {
     return new Promise((res, rej) => {
       client.Query(relayReq, (err, response) => {
         if (err !== null) {
-          console.log("***************>>>  ",err)
+          console.log("***************>>>  ", err)
           return res({
             "error": true,
             "message": err.message

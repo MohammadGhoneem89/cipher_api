@@ -31,7 +31,7 @@ const getDocUpload = require('./core/validation/getDocUpload.js');
 const tokenLookup = require('./lib/repositories/tokenLookup');
 const commonConst = require('./lib/constants/common');
 const xssFilter = require('x-xss-protection');
-
+const baseExclusion = ['setPassword', 'permission', 'user', 'notificationList']
 
 
 global.appDir = __dirname;
@@ -119,7 +119,7 @@ app.post('/login', async (req, res) => {
     };
 
     const apiResponse = {
-      cipherMessageId : uuid(),
+      cipherMessageId: uuid(),
       messageStatus: 'OK',
       errorCode: 200,
       errorDescription: "logged in successfully !!!",
@@ -132,7 +132,7 @@ app.post('/login', async (req, res) => {
         desc: 'The username or password contains illegal characters.'
       };
       response.loginResponse.data.message.status = 'ERROR';
-      response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
+      // response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
       response.loginResponse.data.success = false;
       res.status(400).send(response);
       return;
@@ -197,7 +197,13 @@ app.post('/login', async (req, res) => {
   } catch (err) {
 
     console.log("error while login" + err);
-    res.status(500).send({error: "Error while login"})
+    res.status(500).send({
+      "messageStatus": "ERROR",
+      "cipherMessageId": uuid(),
+      "errorDescription": 'some error occurred while processing',
+      "errorCode": 201,
+      "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
+    });
   }
 });
 
@@ -438,7 +444,7 @@ function apiCallsHandler(req, res) {
     const channel = req.params.channel;
 
 
-    const url_parts = url.parse(req.url, true);
+    const url_parts = url.parse(req.url);
     const query = url_parts.query;
     logger.info({
       fs: 'app.js',
@@ -464,7 +470,9 @@ function apiCallsHandler(req, res) {
     const decoded = crypto.decrypt(JWToken);
 
     console.log(JWToken + "token>>" + JSON.stringify(decoded));
-
+    if (decoded.isNewUser && baseExclusion.indexOf(action) == -1) {
+      return res.status(403).send(timeoutResponse);
+    }
 
     tokenValid(decoded._id, JWToken).then(async valid => {
 
@@ -605,6 +613,29 @@ const timeoutResponse = {
   "cipherMessageId": uuid(),
   "messageStatus": "ERROR",
   "errorCode": 201,
-  "errorDescription": "Token Expired",
-  "timestamp" : dates.DDMMYYYYHHmmssSSS(new Date)
+  "errorDescription": "Token Not Valid!",
+  "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
 };
+
+app.use(function (req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  res.status(404).send({
+    "messageStatus": "ERROR",
+    "cipherMessageId": uuid(),
+    "errorDescription": 'not found!',
+    "errorCode": 201,
+    "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
+  });
+});
+
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500);
+  res.status(500).send({
+    "messageStatus": "ERROR",
+    "cipherMessageId": uuid(),
+    "errorDescription": 'some error occured!!!!',
+    "errorCode": 201,
+    "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
+  });
+});
