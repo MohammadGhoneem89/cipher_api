@@ -22,8 +22,14 @@ function orgInsert(payload, userID, entityInsertCB) {
 
   logger.debug(" [ Org Insert] Org Inserted data : " + JSON.stringify(payload));
 
+  console.log("InsertOrg--------------------->>>>>>>>>>>>>>>>>>>>>", JSON.stringify(payload, null, 2))
+
   let data = payload.data;
   let format = {
+    "taxNO1": "",
+    "taxNO2": "",
+    "address": "",
+    "publicKey": "",
     "entityName": "",
     "arabicName": "",
     "spCode": "",
@@ -37,6 +43,8 @@ function orgInsert(payload, userID, entityInsertCB) {
     "parentEntity": "",
     "commissionTemplate": "",
     "contacts": [],
+    "mappedCodes":[],
+    "additionalProps":[],
     "documents": [],
     "dateCreated": "",
     "createdBy": "",
@@ -77,6 +85,10 @@ function orgInsert(payload, userID, entityInsertCB) {
         } else {
 
           let date = Date.newDate();
+          format.taxNO1 = data.taxNO1 ? data.taxNO1 : "";
+          format.taxNO2 = data.taxNO2 ? data.taxNO2 : "";
+          format.address = data.address ? data.address : "";
+          format.publicKey = data.publicKey ? data.publicKey : "";
           format.entityName = data.entityName ? data.entityName : "";
           format.arabicName = data.arabicName ? data.arabicName : "";
           format.spCode = data.spCode ? data.spCode : "";
@@ -100,6 +112,20 @@ function orgInsert(payload, userID, entityInsertCB) {
               "mobile": data.contacts[i]["mobile"]
             });
           }
+          for (let i = 0; i < data.mappedCodes.length; i++) {
+            format.mappedCodes.push({
+              "mappingType": data.mappedCodes[i]["mappingType"],
+              "mappingCode": data.mappedCodes[i]["mappingCode"]
+            });
+          }
+
+          for (let i = 0; i < data.additionalProps.length; i++) {
+            format.additionalProps.push({
+              "propertyName": data.additionalProps[i]["propertyName"],
+              "value": data.additionalProps[i]["value"]
+            });
+          }
+
           for (let i = 0; i < data.documents.length; i++) {
             format.documents.push({
               "documentName": data.documents[i]["documentName"],
