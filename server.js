@@ -450,11 +450,13 @@ function apiCallsHandler(req, res) {
       fs: 'app.js',
       func: 'API'
     }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
+
     payload = Object.assign(payload, {
       action: action,
       channel: channel,
       ipAddress: "::1",
-      query
+      query,
+
     });
     logger.info('calling handleExternalRequest ');
     const UUID = uuid();

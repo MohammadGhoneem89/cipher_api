@@ -109,12 +109,7 @@ module.exports = {
   getAPIPayloadDetailQuery: function(uuid = null) {
     let query = `SELECT 
     uuid as "_id",
-    uuid,
-    channel,
-    action,
-    createdat as "createdAt",
-    payload,
-    0 as "__v"      
+    *
     FROM apipayload      
      WHERE UUID = '${uuid}'`;
 

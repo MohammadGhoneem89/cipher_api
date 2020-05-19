@@ -6,11 +6,14 @@ const rp = require('request-promise');
 const path = require('path');
 const fs = require('fs');
 const amq = require('../../core/api/connectors/queue');
+const eventLog = require('../../core/api/eventLog');
+const billing = require('../../lib/models/billing');
+const dates = require('../../lib/helpers/dates');
 const PROTO_PATH = __dirname + '/rest.proto';
 const grpc = require('grpc');
 const relayProto = grpc.load(PROTO_PATH).RELAY;
 const crypto = require("crypto");
-
+const Stopwatch = require('statman-stopwatch');
 module.exports = class Dispatcher {
   constructor(OriginalRequest, MappeedRequest, configData, UUID, typeList, JWTtoken) {
     this.oRequest = OriginalRequest;
@@ -20,7 +23,36 @@ module.exports = class Dispatcher {
     this.typeList = typeList;
     this.count = 0;
     this.JWT = JWTtoken;
+    this.sw = new Stopwatch();
+    this.sw.reset();
+    if (configData.isBilled === true) {
 
+      if (configData.BillingPolicy && configData.BillingPolicy.length == 0) {
+        throw new Error("At least 1 billing policy must be defined!")
+      }
+      billing
+        .update({
+          action: OriginalRequest.action,
+          username: JWTtoken.userID,
+          orgCode: JWTtoken.orgCode,
+          date: dates.nowEpochDate()
+        }, {
+          $set: {
+            action: OriginalRequest.action,
+            username: JWTtoken.userID,
+            orgCode: JWTtoken.orgCode,
+            date: dates.nowEpochDate()
+          },
+          $inc: {
+            hits: 1
+          }
+        }, {
+          upsert: true
+        }, function (err, data) {
+          console.log(err);
+        });
+
+    }
 
     if (configData.isHMAC === true) {
       let retrievedSignature = _.get(OriginalRequest, "headersParams.x-signature", undefined);
@@ -29,7 +61,7 @@ module.exports = class Dispatcher {
       }
       console.log(OriginalRequest.query)
       if (OriginalRequest.query) {
-        let computedSignature = crypto.createHmac("sha256", '123').update(OriginalRequest.query).digest("hex");
+        let computedSignature = crypto.createHmac("sha512", '123').update(OriginalRequest.rawBody).digest("hex");
         if (computedSignature !== retrievedSignature) {
           throw new Error("invalid signature!")
         }
@@ -222,6 +254,7 @@ module.exports = class Dispatcher {
   }
 
   executeCustomFunction() {
+    this.sw.start();
     return new Promise((resolve, reject) => {
       let generalResponse = {
         "error": false,
@@ -239,7 +272,7 @@ module.exports = class Dispatcher {
           console.log("<<<<<<FILE Found>>>>>>");
           let mappingFunctions = require(fileLoc);
           console.log("<<<<<<Calling>>>>>> " + functionName);
-          mappingFunctions[functionName](Orequest, UUID, route, resolve, JWT, null, null);
+          mappingFunctions[functionName](Orequest, UUID, route, resolve, JWT, null, null, this.sw);
         } else {
           generalResponse.error = true;
           generalResponse.message = `mapping file does not exist ${fileLoc}`;
@@ -250,6 +283,7 @@ module.exports = class Dispatcher {
   }
 
   connectRestService(configdata) {
+    this.sw.start();
     let isBLK = _.get(configdata, 'isBlockchain', false);
     let today = new Date();
     if (isBLK === true) {
@@ -265,17 +299,23 @@ module.exports = class Dispatcher {
         // if (resp.success === false || resp.error === true) {
         //   throw new Error(resp.message);
         // }
+        let delta = this.sw.read();
+        this.sw.reset();
+        eventLog(this.UUID, `connectRestService[${this.configdata.endpointName.address}${ServiceURL}}]`, req, resp.data, delta);
         return resp.data;
       }
       return resp;
     }).catch((ex) => {
       console.log(ex);
+      let delta = this.sw.read();
+      this.sw.reset();
+      eventLog(this.UUID, `connectRestService[${this.configdata.endpointName.address}${ServiceURL}}]`, req, {}, delta, ex);
       throw new Error(ex.message);
     });
   }
 
   connectGRPCService(configdata, endpoint) {
-
+    this.sw.start();
     let isRelay = _.get(configdata, 'isRelay', false);
     let remoteAPI = _.get(configdata, 'RemoteAPI', '');
     let network = _.get(configdata, 'RelayNet', '');
@@ -308,12 +348,18 @@ module.exports = class Dispatcher {
             "error": true,
             "message": err.message
           });
+          let delta = this.sw.read();
+          this.sw.reset();
+          eventLog(this.UUID, `connectRestService[${this.configdata.endpointName.address}${ServiceURL}}]`, req, {}, delta, err.message);
         } else {
           if (response.Body.success === true) {
             let result;
 
             try {
               result = JSON.parse(response.Body.payload);
+              let delta = this.sw.read();
+              this.sw.reset();
+              eventLog(this.UUID, `connectGRPCService[${endpoint.requests}]`, relayReq, result, delta);
             } catch (e) {
               console.log(e);
             }
@@ -334,6 +380,7 @@ module.exports = class Dispatcher {
   }
 
   connectQueueService(responseQueue) {
+    this.sw.start();
     return amq.start()
       .then((ch) => {
         return ch.assertQueue(this.configdata.requestServiceQueue, {
@@ -352,9 +399,15 @@ module.exports = class Dispatcher {
             _.set(this.request, 'Header.ResponseMQ', responseQueue);
             _.set(this.request, 'Header.timeStamp', today.toISOString());
             console.log(JSON.stringify(this.request, null, 2))
-            ch.sendToQueue(this.configdata.requestServiceQueue, new Buffer(JSON.stringify(this.request)));
+
+            ch.sendToQueue(this.configdata.requestServiceQueue, new Buffer(JSON.stringify(this.request))).then(() => {
+              let delta = this.sw.read();
+              this.sw.reset();
+              eventLog(this.UUID, 'connectQueueService', this.request, generalResponse, delta);
+            });
             return generalResponse;
           });
       });
+
   };
 };
