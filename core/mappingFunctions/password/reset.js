@@ -34,7 +34,7 @@ function _reset(payload, callback) {
           data: {
             message: {
               status: 'ERROR',
-              errorDescription: 'Invalid User ID or Email',
+              errorDescription: err.message,
               displayToUser: true
             },
             error: error
