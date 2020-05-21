@@ -2,7 +2,7 @@
 {
   
   "keyVault": {
-    "env": "master_dev",
+    "env": "bekyc_dev",
     "header":{
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
