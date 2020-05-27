@@ -1,4 +1,13 @@
 {
+  "ekyc": {
+    "CustomFunctionsLocation": "../../applications/EKYC/mappingFunctions/",
+    "getResolutionForGroup":{
+      "customMapping": true,
+      "MappingfunctionName": "getResolutionForGroup",
+      "CustomMappingFile": "EKYC/ResolutionGroup/resolutionGroup.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
   "etisalat": {
     "getFileList": {
       "customMapping": true,
@@ -12,7 +21,14 @@
       "CustomMappingFile": "general/getFileData.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getResolutionForGroup":{
+      "customMapping": true,
+      "MappingfunctionName": "getResolutionForGroup",
+      "CustomMappingFile": "EKYC/ResolutionGroup/resolutionGroup.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "CustomFunctionsLocation": "../../applications/etisalat_smiles/mappingFunctions/",
+    
     "getEidList": {
       "customMapping": true,
       "MappingfunctionName": "getEidList",
