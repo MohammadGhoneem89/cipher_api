@@ -13,7 +13,6 @@ let handleExternalRequest = function (payload, channel, route, UUIDKey, Response
       return;
     }
     ResponseCaller(errorResponse("custom mapping must be true", UUIDKey));
-    return ResponseCaller.end();
   } catch (exp) {
     logger.error(exp);
     return ResponseCaller(errorResponse(" Route Configuration invalid", UUIDKey));
