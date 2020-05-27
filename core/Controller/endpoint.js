@@ -4,6 +4,7 @@ const rp = require('request-promise');
 const moment = require('moment');
 const format = require('xml-formatter');
 const Base64 = require('js-base64').Base64;
+//const fetch = require('node-fetch');
 let generalResponse = {
   "error": true,
   "message": "Failed to get response"
@@ -16,7 +17,7 @@ module.exports = class Endpoint {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> endpoint --------- ", JSON.stringify(endpoint, null, 2))
     let ServiceURL = "";
     let postfix = ServiceURI == '/' ? "" : ServiceURI;
-    ServiceURL = `${endpoint.address}${postfix}`;
+    ServiceURL = `${endpoint.address}`;
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", ServiceURL);
     switch (endpoint.authType) {
       case "bearer":
@@ -211,6 +212,27 @@ module.exports = class Endpoint {
 
     return data;
   }
+  // callWebService(options) {
+  //   global.Headers = fetch.Headers;
+  //   console.log("----------------------------------------------")
+  //   var myHeaders = new Headers();
+  //   console.log("----------------------------------------------1111")
+  //   myHeaders.append("Date", "Tue, 26 May 2020 16:40:12 GMT");
+  //   myHeaders.append("Authorization", "Signature keyId=\"730be32a-69d7-4593-b48c-33c400e10312\",algorithm=\"hmac-sha256\",headers=\"(request-target) host date\",signature=\"yTKd1W7HXrWXqHA59MBnbm51ZSJzYoDSXsXeX35WVH0=\"");
+
+  //   var requestOptions = {
+  //     method: 'GET',
+  //     headers: myHeaders,
+  //     redirect: 'follow'
+  //   };
+
+    
+
+  //   fetch("https://rms-world-check-one-api-pilot.thomsonreuters.com/v2/groups/0a3687cf-6a26-1690-9a94-0d58000006da/resolutionToolkit", requestOptions)
+  //     .then(response => response.text())
+  //     .then(result => console.log(result))
+  //     .catch(error => console.log('error', error));
+  // }
   callWebService(options) {
     let generalResponse = {
       "error": true,
