@@ -227,13 +227,13 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
                 "children": [
                   {
                     "children": [],
-                    "value": elem.route + "01AGC",
+                    "value": elem.route.toUpperCase() + "01AGC",
                     "type": "pageAction",
                     "label": "execute",
                     "labelName": "",
                   }
                 ],
-                "value": elem.route + "01AGP",
+                "value": elem.route.toUpperCase() + "01AGP",
                 "type": "page",
                 "pageURI": "/",
                 "label": elem.route.toUpperCase(),
@@ -248,9 +248,9 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
 
             for (let usecase in usecaseList) {
               let moduleDoc = {
-                "value": `${usecase}MAG`,
+                "value": `${usecase.toUpperCase()}MAG`,
                 "type": "module",
-                "label": "APIPermissions-" + `${usecase}`,
+                "label": "APIPermissions-" + `${usecase.toUpperCase()}`,
                 "iconName": "fa fa-gears",
                 "displayMenu": false,
                 "useCase": `${usecase}`,
