@@ -40,6 +40,9 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
 
   //==============Screen API Request===================
 
+  var epochDate = moment(payload.body.WCOscreeningFields.DOB).unix();
+
+  
   const request = {
     "groupId": Endpoint[0].groupId,
     "entityType": "INDIVIDUAL",
@@ -56,7 +59,7 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
           "dateTimeValue": {
               "timelinePrecision": "ON",
               "pointInTimePrecision": "DAY",
-              "utcDateTime": 316310400000,
+              "utcDateTime": epochDate,
               "timeZone": null
           }
       },
@@ -106,12 +109,16 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
     "host: " + Endpoint[0].gatewayHost + "\n" +
     "date: " + date + "\n" +
     "content-type: " + "application/json" + "\n" +
-    "content-length: 815" + "\n" +
+    "content-length: "+contentLength + "\n" +
     request;
 
   var hmac = generateAuthHeader(dataToSign);
-  var authorisation = "Signature keyId=\"" + Endpoint[0].apiKey + "\",algorithm=\"hmac-sha256\",headers=\"(request-target) host date content-type content-length\",signature=\"" + hmac + "\"";
+  //var authorisation = "Signature keyId=\"" + Endpoint[0].apiKey + "\",algorithm=\"hmac-sha256\",headers=\"(request-target) host date content-type content-length\",signature=\"" + hmac + "\"";
 
+
+  //var authorisation = "Signature keyId=\"730be32a-69d7-4593-b48c-33c400e10312\",algorithm=\"hmac-sha256\",headers=\"(request-target) host date content-type content-length\",signature=\""+hmac+"\"";
+
+  var authorisation = "Signature keyId=\"" + Endpoint[0].apiKey + "\",algorithm=\"hmac-sha256\",headers=\"(request-target) host date content-type content-length\",signature=\"" + hmac + "\"";
 
   console.log("---------->>>>> date: ", date);
   console.log("---------->>>>> hmac: ", hmac);
@@ -128,9 +135,11 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
     headers: {
       'Date': date,
       'Authorization': authorisation,
-      
       'Content-Type': 'application/json',
-     
+      'Content-Length': contentLength,
+      'Accept':'*/*',
+      'Accept-Encoding':'gzip, deflate, br',
+      'Connection':'keep-alive'
     },
     body:request,
     redirect: 'follow',
