@@ -14,6 +14,9 @@ module.exports = {
     let format = 'YYYY/MM/DD HH:mm:ss ZZ';
     return moment().format(format);
   },
+  resolveErrorCode: (data, payload, jwt) => {
+    return _.get(global.codelist, data, '');
+  },
   translateDateToEpoch: (data, payload, jwt) => {
     return dates.ddMMyyyyslash(data);
   },
@@ -21,10 +24,10 @@ module.exports = {
     return dates.ddMMyyyyMS(data);
   },
   ddMMyyyyformat: (data, payload, jwt) => {
-    let e=parseInt(data)/1000
+    let e = parseInt(data) / 1000
     return dates.waslDateformat(e);
   },
-  
+
   MSddMMyyyyHHmmS: (data, payload, jwt) => {
     return dates.MSddMMyyyyHHmmS(data);
   },

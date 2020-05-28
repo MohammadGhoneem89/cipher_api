@@ -23,6 +23,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, JSON.stringify(payload, null, 2));
   logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, incommingRoute);
 
+  let configdata = _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
+
   if (apiFilter.indexOf(incommingRoute) >= 0) {
     _.set(payload, 'body.password', undefined);
     _.set(payload, 'JWToken', undefined)
@@ -53,7 +55,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         "errorCode": 201,
         "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
       };
-      txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack);
+
+      txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack, configdata.estimatedRtt);
 
       responseCallback.status(500);
       responseCallback.json(error);
@@ -66,17 +69,16 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       APIDefination.updateRequestStub(apiSample, incommingRoute, channel);
     }
     if (apiFilter.indexOf(incommingRoute) >= 0) {
-      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta);
+      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, configdata.estimatedRtt);
     }
 
     logger.error({
       fs: 'RestController.js',
       func: 'handleExternalRequest'
     }, `Message Processed In:  ${delta} ms`);
-    responseCallback.json(data);
-    return responseCallback.end();
+    return responseCallback.json(data);
+     // responseCallback.end();
   };
-  let configdata = _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
   if (!configdata) {
     console.log(`Route ${channel}.${incommingRoute}`);
     return OldRestController.handleExternalRequest(payload, channel, incommingRoute, UUIDKey, ResponseCaller, JWToken, ConnMQ, responseCallback);
@@ -106,6 +108,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         return errResponse;
       });
     }
+    _.set(response, 'error', undefined);
+    _.set(response, 'message', undefined);
     return response;
   }).then((data) => {
     ResponseCaller(data);

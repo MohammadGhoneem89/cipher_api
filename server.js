@@ -141,6 +141,7 @@ app.post('/login', async (req, res) => {
 
     authUser(payload)
       .then(async (user) => {
+        console.log(JSON.stringify(user));
         if (user.userType == "API") {
           apiResponse.token = user.token;
           res.send(apiResponse);

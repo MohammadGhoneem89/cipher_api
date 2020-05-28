@@ -15,7 +15,7 @@ var fileTemplateListOut = function (payload, UUIDKey, route, callback, JWToken) 
 	payload.userId = JWToken._id;
     fileTemplateList(payload, callback);
 
-}
+};
 
 
 function fileTemplateList(payload, fileTemplateList_CB) {
@@ -34,13 +34,13 @@ function fileTemplateList(payload, fileTemplateList_CB) {
                 }
             }
         }
-    }
+    };
 
     let where = {};
 
     let searchCriteria = payload.searchCriteria;
 
-    if (searchCriteria) {
+    if (searchCriteria && searchCriteria["templateName"] && searchCriteria["templateName"] !== "") {
         where = {"$and": []};
         if (searchCriteria["templateName"]) {
             var templateName = searchCriteria["templateName"];
@@ -80,8 +80,8 @@ function fileTemplateList(payload, fileTemplateList_CB) {
                 }
                 else {
                     typeData(function (nameData) {
-						
-                       const params = {
+
+                        const params = {
                             userId: payload.userId,
                             documents: fileTemplateData,
                             docType: 'actions',
@@ -89,21 +89,20 @@ function fileTemplateList(payload, fileTemplateList_CB) {
                             component: permissionConst.fileTemplateList.component.searchGrid
                         };
                         permissionsHelper.embed(params)
-                            .then((res) => {
-								response["fileTemplateList"]["data"]["actions"] = res.pageActions;
-                                response["fileTemplateList"]["data"]["searchResult"] = res.documents;
-                                response["fileTemplateList"]["data"]["typeData"]["fileTemplateNames"] = nameData;
-                                fileTemplateList_CB(response);
-                            })
-							.catch((err) => {
-								logger.error("ERROR > > > > >  " + err);
-							})
+                          .then((res) => {
+                              response["fileTemplateList"]["data"]["actions"] = res.pageActions;
+                              response["fileTemplateList"]["data"]["searchResult"] = res.documents;
+                              response["fileTemplateList"]["data"]["typeData"]["fileTemplateNames"] = nameData;
+                              fileTemplateList_CB(response);
+                          })
+                          .catch((err) => {
+                              logger.error("ERROR > > > > >  " + err);
+                          })
 
                     });
                 }
             })
         }
-        ;
     })
 
 }

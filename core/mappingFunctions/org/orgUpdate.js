@@ -72,16 +72,20 @@ function orgUpdate(payload, userID, entityUpdateCB) {
           let date = Date.newDate();
           let id = data["_id"];
           delete data["_id"];
+          format.taxNO1 = data.taxNO1 ? data.taxNO1 : "";
+          format.taxNO2 = data.taxNO2 ? data.taxNO2 : "";
+          format.address = data.address ? data.address : "";
+          format.publicKey = data.publicKey ? data.publicKey : "";
           format.entityName = data.entityName ? data.entityName : "";
           format.arabicName = data.arabicName ? data.arabicName : "";
           format.spCode = data.spCode ? data.spCode : "";
           format.shortCode = data.shortCode ? data.shortCode : "";
           format.orgType = data.orgType;
           format.isActive = data.isActive ? data.isActive : "";
-          format.entityLogo.sizeSmall = data.entityLogo.sizeSmall ? data.entityLogo.sizeSmall : "";
-          format.entityLogo.sizeMedium = data.entityLogo.sizeMedium ? data.entityLogo.sizeMedium : "";
-          format.clientKey = data.clientKey ? data.clientKey : "";
+          format.entityLogo.sizeSmall = data.entityLogo ? data.entityLogo.sizeSmall : "";
+          format.entityLogo.sizeMedium = data.entityLogo ? data.entityLogo.sizeMedium : "";
           format.parentEntity = data.parentEntity ? data.parentEntity : "";
+          format.clientKey = data.clientKey;
           format.commissionTemplate = data.commissionTemplate ? data.commissionTemplate : "";
           for (let i = 0; i < data.contacts.length; i++) {
             format.contacts.push({
