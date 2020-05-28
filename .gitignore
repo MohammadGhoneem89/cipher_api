@@ -11,3 +11,4 @@ core/mappingFunctions/generated/*
 *.zip
 
 *.csv
+.DS_Store

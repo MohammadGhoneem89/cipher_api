@@ -6,6 +6,12 @@
       "MappingfunctionName": "getResolutionForGroup",
       "CustomMappingFile": "EKYC/ResolutionGroup/resolutionGroup.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "screenCase":{
+      "customMapping": true,
+      "MappingfunctionName": "screenCase",
+      "CustomMappingFile": "EKYC/screenCase/screenCase.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "etisalat": {
