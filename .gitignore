@@ -9,3 +9,5 @@ epayqnfs
 !core/mappingFunctions/generated/.gitkeep
 core/mappingFunctions/generated/*
 *.zip
+
+*.csv

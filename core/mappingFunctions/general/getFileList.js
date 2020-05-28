@@ -53,7 +53,7 @@ exports.getFileList = function (payload, UUIDKey, route, callback, JWToken) {
           "label": "View",
           "params": "",
           "iconName": "icon-docs",
-          "URI": ["/etisalat/fileData/"]
+          "URI": ["/fileData/"]
         }]
         outVal.push(element);
       })
