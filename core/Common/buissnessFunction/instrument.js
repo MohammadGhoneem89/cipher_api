@@ -199,6 +199,53 @@ module.exports = {
         return contract;
 
     },
+    identityType: (data,payload,jwt)=>{
+        console.log("-----------------------------------------------")
+     //   console.log("--------------------------------data",data)
+       // console.log("--------------------------------data ------------",data[0].identityType)
+       // console.log("--------------------------------payload",payload)
+        if(data[0].identityType==='NonIGA'){
+            console.log("SET-----------")
+           // throw new Error("Irrelevent identity Type");
+        }
+        else if(data[0].identityType==='GCC'){
+            console.log("SET-----------")
+        }
+        else{
+            console.log("ERROR-----------")
+            throw new Error("Irrelevent identity Type");
+        }
+           
+    },
+    WCOscreeningFields : (data,payload,jwt)=>{
+        console.log("-----------------------data",data[0].gender)
+        if(data[0].gender==='M'){
+            console.log("SET-----------")
+        }
+        else if(data[0].gender ==='F'){
+            console.log("SET-----------")
+        }
+        else{
+            throw new Error("Wrong Gender Added");
+        }
+        // if(data[0].gender!="M" || data[0].gender !="F"){
+        //     throw new Error("Wrong Gender Added");
+        // }
+    },
+    nonIGAFeilds:(data,payload,jwt)=>{
+        console.log("-----------------------data",data)
+       // console.log("-----------------------payload 1",payload.body.nonIGAFeilds.primary)
+        console.log("-----------------------payload",payload.body.nonIGAFeilds.primary.gender)
+        if(payload.body.nonIGAFeilds.primary.gender==='M'){
+            console.log("SET-----------")
+        }
+        else if(payload.body.nonIGAFeilds.primary.gender ==='F'){
+            console.log("SET-----------")
+        }
+        else{
+            throw new Error("Wrong Gender Added");
+        }
+    },
 
     ParseKYCDetailGDRFA: (data, payload, jwt) => {
         console.log("THIS IS MY VALUE---------->", data);
