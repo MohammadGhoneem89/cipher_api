@@ -108,6 +108,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         return errResponse;
       });
     }
+    _.set(response, 'error', undefined);
+    _.set(response, 'message', undefined);
     return response;
   }).then((data) => {
     ResponseCaller(data);
