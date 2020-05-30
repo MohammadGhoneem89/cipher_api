@@ -390,7 +390,7 @@ function getActiveAPIListForDocumentation(payload, UUIDKey, route, callback, JWT
     return callback(resp);
   }
   APIDefinitation.getActiveAPIListForDocumentation(payload).then(async (data) => {
-    console.log('dididididi', JSON.stringify(data));
+
     let resp = {};
     for (const useCaseObj of data) {
       let dest = useCaseObj.useCase + "." + useCaseObj.route;
@@ -438,6 +438,100 @@ function getActiveAPIListForDocumentation(payload, UUIDKey, route, callback, JWT
     callback(err);
   });
 }
+
+
+
+
+function getActiveAPIListForDocumentationNew() {
+
+  return APIDefinitation.getActiveAPIListForDocumentation({}).then(async (data) => {
+      let resp = {};
+      for (const useCaseObj of data) {
+        let dest = useCaseObj.useCase + "." + useCaseObj.route;
+        let reqMap = [];
+        let complexTypeList = [];
+        useCaseObj.RequestMapping.fields.forEach((field) => {
+          if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData" || field.IN_FIELDTYPE === "OrgIdentifier") {
+            reqMap.push(field);
+            if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA !== "")
+              complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
+
+            if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA !== "")
+              complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
+          }
+        });
+        let resMap = [];
+        useCaseObj.ResponseMapping.fields.forEach((field) => {
+          if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA != "")
+            complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
+
+          if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA != "")
+            complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
+          resMap.push(field);
+        });
+        useCaseObj.ResponseMapping = resMap;
+        useCaseObj.RequestMapping = reqMap;
+        let groupedRoute = _.omit(useCaseObj, 'route', 'useCase');
+        _.set(resp, dest, groupedRoute);
+        const detailList = await complexType.findByComplexTypeIds(Array.from(new Set(complexTypeList)));
+        if (detailList) {
+          _.set(resp, `${useCaseObj.useCase}.${useCaseObj.route}.complexList`, detailList)
+        }
+      }
+      let routemap = resp;
+      let reqSample = undefined;
+      for (let useCase in routemap) {
+        for (let route in routemap[useCase]) {
+          let request = {}
+          let response = {}
+
+          if (routemap[useCase][route].isValBypass === false) {
+            routemap[useCase][route].RequestMapping.forEach(element => {
+              let id = element.IN_FIELDCOMPLEXTYPEDATA
+              let dt = element.IN_FIELDDT
+              if (id) {
+                routemap[useCase][route].complexList.forEach((data) => {
+                  if (data._id == id)
+                    dt = `${dt}-${data.typeName}`
+                })
+              }
+              element.IN_FIELDDT = dt;
+              _.set(request, element.IN_FIELD, `${dt}`);
+            });
+            routemap[useCase][route].ResponseMapping.forEach(element => {
+              let id = element.MAP_FIELDCOMPLEXTYPEDATA
+              let dt = element.MAP_FIELDDT
+              if (id) {
+                routemap[useCase][route].complexList.forEach((data) => {
+                  if (data._id == id)
+                    dt = `${dt}-${data.typeName}`
+                })
+              }
+              element.MAP_FIELDDT = dt;
+              _.set(response, element.MAP_FIELD, `${dt}`);
+            });
+          } else {
+            routemap[useCase][route].ResponseMapping = [];
+            routemap[useCase][route].RequestMapping = []
+          }
+
+          if (routemap[useCase][route].isSimulated === true) {
+            response = JSON.parse(routemap[useCase][route].simulatorResponse);
+          }
+          reqSample = routemap[useCase][route].sampleRequest
+          _.set(routemap, `${useCase}.${route}.requestSchema`, request)
+          _.set(routemap, `${useCase}.${route}.responseSchema`, response)
+
+        }
+      }
+      return routemap;
+    }
+  ).catch((err) => {
+    callback(err);
+  });
+}
+
+
 
 function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
   let resp = {
@@ -924,5 +1018,6 @@ exports.getActiveAPIs = getActiveAPIs;
 exports.diffPermissionsRoutes = diffPermissionsRoutes;
 exports.updateErrorCodeList = updateErrorCodeList;
 exports.getErrorCodeList = getErrorCodeList;
+exports.getActiveAPIListForDocumentationNew = getActiveAPIListForDocumentationNew;
 
 

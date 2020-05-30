@@ -524,6 +524,12 @@
       "CustomMappingFile": "user/create.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "createOnDemandWelCome": {
+      "customMapping": true,
+      "MappingfunctionName": "createOnDemandWelCome",
+      "CustomMappingFile": "user/create.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "userUpdate": {
       "customMapping": true,
       "MappingfunctionName": "userUpdate",
@@ -641,6 +647,12 @@
     "groupList": {
       "customMapping": true,
       "MappingfunctionName": "list",
+      "CustomMappingFile": "group/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "groupTypeList": {
+      "customMapping": true,
+      "MappingfunctionName": "groupTypeList",
       "CustomMappingFile": "group/list.js",
       "mappingConfigFile": "ePayMapping"
     },

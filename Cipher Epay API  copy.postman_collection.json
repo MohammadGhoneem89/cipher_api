@@ -1,0 +1,36 @@
+{
+	"info": {
+		"_postman_id": "500bc7d0-091d-48ab-8103-a49b61fbbc24",
+		"name": "Cipher Epay API  copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Entity - initiateTransaction",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "c71d32c49f38afe2547cfef7eb78801ee7b8f95abc80abba207509fdd7cd5f59d11688235df3c97ceef5652b5ac8d8980cb5bc621a32c906cbdd8f5a94858cc9",
+						"username": "Internal_API"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"header\": {\r\n        \"username\": \"khda\",\r\n        \"password\": \"0bd94bdb5fdd684d07164727607de1029e15391df7b54bd5357056d5eb1eb7198db0b156a85a624aa442b19df098103b1e58645fa3b11139ba02ad774e7c3458\"\r\n    },\r\n    \"body\": {\r\n        \"tranxID\": \"f34622a436f2852525011327b5939eed24f32dadd544c29df4d25beee5439068\"\r\n    }\r\n}\r\n"
+				},
+				"url": "https://admin.qa.dubaipay.gov.ae/CCI/ePay/getTranxByHash",
+				"description": "Initiate Transaction"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

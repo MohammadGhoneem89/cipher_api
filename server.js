@@ -62,7 +62,8 @@ routeData.LoadConfig().then(() => {
 app.use(cookieParser('secretToken'));
 app.use(cors({
   "origin": true,
-  credentials: true
+  credentials: true,
+  methods: "GET,POST"
 }));
 apiTemplate.find().then((templates) => {
   let templatesg = {}

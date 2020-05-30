@@ -1,10 +1,42 @@
 'use strict';
 
 const group = require('../../../lib/services/group');
+const _ = require('lodash');
 
 function list(payload, UUIDKey, route, callback, JWToken) {
   payload.userId = JWToken._id;
   groupList(payload, callback);
+}
+
+function groupTypeList(payload, UUIDKey, route, callback, JWToken) {
+  group.find({})
+    .then((data) => {
+      let groupMap = {}
+      data.forEach((elem) => {
+        let glist = _.get(groupMap, elem.type, []);
+        glist.push({
+          "label": elem.name,
+          "values": elem._id
+        });
+        _.set(groupMap, elem.type, glist);
+      });
+      const response = {
+        groupTypeList: {
+          action: payload.action,
+          data: groupMap
+        }
+      };
+      callback(response);
+    })
+    .catch((err) => {
+      const response = {
+        groupTypeList: {
+          action: payload.action,
+          data: err
+        }
+      };
+      callback(response);
+    });
 }
 
 function groupList(payload, callback) {
@@ -38,4 +70,5 @@ function groupList(payload, callback) {
 }
 
 exports.list = list;
+exports.groupTypeList = groupTypeList;
 
