@@ -403,7 +403,8 @@ module.exports = class Dispatcher {
         let generalResponse = {
           "success": true,
           "error": false,
-          "message": "Processed OK!"
+          "message": "Processed OK!",
+          // "result":{errorCode:202}
         };
         let responseQueue = [];
 
