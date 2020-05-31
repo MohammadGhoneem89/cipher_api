@@ -1,10 +1,10 @@
 {
   "ekyc": {
     "CustomFunctionsLocation": "../../applications/EKYC/mappingFunctions/",
-    "getResolutionForGroup":{
+    "resolveCase":{
       "customMapping": true,
-      "MappingfunctionName": "getResolutionForGroup",
-      "CustomMappingFile": "EKYC/ResolutionGroup/resolutionGroup.js",
+      "MappingfunctionName": "resolveCase",
+      "CustomMappingFile": "EKYC/resolveCase/resolveCase.js",
       "mappingConfigFile": "ePayMapping"
 <<<<<<< HEAD
 <<<<<<< HEAD

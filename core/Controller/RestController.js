@@ -24,6 +24,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, incommingRoute);
 
   let configdata = _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
+  //console.log("----------+==========>>>Cconfigdata", JSON.stringify(configdata,null,2))
 
   if (apiFilter.indexOf(incommingRoute) >= 0) {
     _.set(payload, 'body.password', undefined);
@@ -69,7 +70,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       APIDefination.updateRequestStub(apiSample, incommingRoute, channel);
     }
     if (apiFilter.indexOf(incommingRoute) >= 0) {
-      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, configdata.estimatedRtt);
+      let eRRT=_.get(configdata,'estimatedRtt',10000)
+      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, eRRT);
     }
 
     logger.error({
