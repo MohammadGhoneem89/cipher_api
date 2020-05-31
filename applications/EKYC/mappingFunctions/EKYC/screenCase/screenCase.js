@@ -6,6 +6,8 @@ const rp = require('request-promise');
 const fetch = require('node-fetch');
 var CryptoJS = require('crypto-js');
 const EndpointDefination = require('../../../../../lib/models/EndpointDefination');
+const eventLog = require('../../../../../core/api/eventLog');
+const Stopwatch = require('statman-stopwatch');
 
 
 
@@ -13,6 +15,8 @@ const EndpointDefination = require('../../../../../lib/models/EndpointDefination
 
 
 let Endpoint;
+let sw = new Stopwatch();
+let delta;
 
 const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
 
@@ -73,7 +77,7 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
       },
       {
           "typeId": "SFCT_5",
-          "value": "ABW"
+          "value": payload.body.WCOscreeningFields.nationality
       }
   ]
   };
@@ -148,35 +152,45 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
   };
 
   console.log("------------------------------------------------>>>>>>>>> externalApi:  ", JSON.stringify(externalApi, null, 2));
-
+  
+  sw.reset();
   try {
+
+    
+    sw.start();
     let response = await rp(externalApi)
+    delta = sw.read();
+    sw.reset();
     console.log("------------------------------------------------>>>>>>>>> respons :   ", JSON.stringify(response, null, 2))
 
     
     const finalResponse = {
       "messageStatus": "OK",
-      "messageId": uuid,
+      "messageId": UUIDKey,
       "errorDescription": "Processed OK!",
       "errorCode": 200,
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
       "caseId": response.caseId,
-      "WCOCaseId":"!!!!!!!!!!!!!!!!",
+      "WCOCaseId":response.caseSystemId,
       "creationDate":response.creationDate,
       "outStandingActions":response.outStandingActions,
       "result":response.results
+      //"result":{errorCode:20100}
     };
+    eventLog(UUIDKey, 'screenCase', request, response, delta);
     return callback(finalResponse)
 
   } catch (err) {
     console.log('errorrrrrrrrrrrrrrr ------->>>>>>', err)
     const finalResponse = {
       "messageStatus": "Error",
-      "messageId": uuid,
+      "messageId": UUIDKey,
       "errorDescription": err,
       "errorCode": 201,
+      "result":{errorCode:20100},
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
     };
+    eventLog(UUIDKey, 'screenCase', request, finalResponse, delta, err);
     return callback(finalResponse)
   }
   //==============End===================
