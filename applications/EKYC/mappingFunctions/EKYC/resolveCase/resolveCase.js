@@ -355,9 +355,12 @@ const review = async (payload, UUIDKey, route, callback, JWToken) => {
   };
 
   console.log("------------------------------------------------>>>>>>>>> externalApi:  ", JSON.stringify(externalApi, null, 2));
-
+  sw.reset();
   try {
+    sw.start();
     let response = await rp(externalApi)
+    delta = sw.read();
+    sw.reset();
     console.log("------------------------------------------------>>>>>>>>> respons :   ", JSON.stringify(response, null, 2))
 
 
@@ -374,6 +377,7 @@ const review = async (payload, UUIDKey, route, callback, JWToken) => {
       // "result": response.results
       ...response
     };
+    eventLog(UUIDKey, 'REVIEW', {}, response, delta);
     return callback(finalResponse)
 
   } catch (err) {
@@ -385,6 +389,7 @@ const review = async (payload, UUIDKey, route, callback, JWToken) => {
       "errorCode": 201,
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
     };
+    eventLog(UUIDKey, 'REVIEW', {}, finalResponse, delta, err);
     return callback(finalResponse)
   }
   //==============End===================
