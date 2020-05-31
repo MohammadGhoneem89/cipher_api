@@ -16,7 +16,7 @@ function groupTypeList(payload, UUIDKey, route, callback, JWToken) {
         let glist = _.get(groupMap, elem.type, []);
         glist.push({
           "label": elem.name,
-          "values": elem._id
+          "value": elem._id
         });
         _.set(groupMap, elem.type, glist);
       });
