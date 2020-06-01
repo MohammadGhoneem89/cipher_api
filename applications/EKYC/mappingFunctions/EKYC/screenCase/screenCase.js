@@ -202,11 +202,7 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
     const finalResponse = {
       "messageStatus": "Error",
       "messageId": UUIDKey,
-<<<<<<< HEAD
       "errorDescription": err.message,
-=======
-      "errorDescription": err,
->>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a
       "errorCode": 201,
       "result":{errorCode:20100},
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
