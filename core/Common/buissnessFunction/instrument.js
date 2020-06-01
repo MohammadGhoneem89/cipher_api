@@ -201,10 +201,17 @@ module.exports = {
     },
     identityType: (data,payload,jwt)=>{
         console.log("-----------------------------------------------")
-       //  console.log("--------------------------------data",data[0].nonIGA.gender)//.nonIGA.gender
-        // console.log("--------------------------------data",data[0].GCC.nationalID.length)
-       // console.log("--------------------------------data ------------",data[0].identityType)
+        // let dateOfBirth = _.get(result, "dateOfBirth", undefined);
+            // _.get(result, "dateOfBirth", dateOfBirth >= 0 ? dates.MSddMMyyyy(dateOfBirth) : undefined);
+           //, true
+       // console.log("--------------------------------data 1",data[0].nonIGA.DOB)//.nonIGA.gender
+     //   console.log("--------------------------------data 2",dates.MSddMMyyyy(data[0].nonIGA.DOB) )
+       
+        
        // console.log("--------------------------------payload",payload)
+
+    //    if(dates.MSddMMyyyy(data[0].nonIGA.DOB)===data[0].nonIGA.DOB){
+       
         if(data[0].identityType==='NonIGA'){
             if(data[0].nonIGA.gender==='M'){
                 console.log("SET-----------")
@@ -224,6 +231,31 @@ module.exports = {
             else{
                 throw new Error("national should be of 3 digits");
             }
+            let date=moment(data[0].nonIGA.DOB, 'DD/MM/YYYY').isValid()
+            console.log("--------------------------------data ------------",date)
+            let date1=data[0].nonIGA.DOB.split('/')
+    
+            if(date1[0]<32){
+                console.log("--------------------------------true ------------",date1)
+                 }
+            else{
+                console.log("--------------------------------not true------------",date1)
+                throw new Error("Date format is not  correct");
+            }
+            if(date1[1]<13){
+                console.log("--------------------------------true ------------",date1)
+            }
+            else{
+                console.log("--------------------------------not true------------",date1)
+                throw new Error("Date format is not  correct");
+            }
+
+            if(date){
+                console.log("true-----------")
+               }
+               else{
+                throw new Error("Date format is not  correct");
+               }
 
            
            // throw new Error("Irrelevent identity Type");
@@ -238,7 +270,7 @@ module.exports = {
                         }
 
 
-                        if(data[0].GCC.cardCountry==="BAH"){
+                        if(data[0].GCC.cardCountry==="BHR"){      //BHR  BAH
                             if(data[0].GCC.nationalID.length===9){
                                 console.log("SET-----------")
                             }
@@ -305,6 +337,139 @@ module.exports = {
        
            
     },
+    reviewResult:(data,payload,jwt)=>{
+       // console.log("data------   payload------",payload.body.resultGroup[0].reviewResults)
+       if(payload.body.resultGroup){
+            if(payload.body.mode==="REVIEW" && JSON.stringify(payload.body.resultGroup[0].reviewResults)==='{}'){
+                throw new Error("when mode is REVIEW then reviewResults  is mandatory");
+            }
+        }
+    },
+    resultGroup:(data,payload,jwt)=>{
+        console.log("------payload",payload.body.mode)
+       // console.log("------------resultId",payload.body.resultGroup[0].resultId)
+        if(payload.body.resultGroup){
+            if(payload.body.resultGroup[0].resultId){
+                    if(payload.body.mode==="RESOLVE" && payload.body.resultGroup[0].resultId.length===0){
+                        throw new Error("resultId  is required if mode is RESOLVE");
+                    }
+                    else if(payload.body.mode==="REVIEW" && payload.body.resultGroup[0].resultId.length===0){
+                        throw new Error("resultId  is required if mode is REVIEW");
+                    }
+                }
+            }
+            
+       // if(payload.body.mode==="RESOLUTION_MATRIX"){
+            if(payload.body.resultGroup){
+                console.log("------true---------",payload.body.mode)
+                if(payload.body.resultGroup[0].riskId==="" && payload.body.mode==="RESOLUTION_MATRIX"){
+                    throw new Error("riskId  is required if mode is RESOLUTION_MATRIX");
+                }
+                else  if(payload.body.resultGroup[0].statusId==="" && payload.body.mode==="RESOLUTION_MATRIX"){
+                    throw new Error("statusId  is required if mode is RESOLUTION_MATRIX");
+                }
+                else  if(payload.body.resultGroup[0].reasonId==="" && payload.body.mode==="RESOLUTION_MATRIX"){
+                    throw new Error("reasonId  is required if mode is RESOLUTION_MATRIX");
+                }
+            }
+            
+       // }
+        // else if(payload.body.mode==="RESOLUTION_MATRIX"){
+        //     if(payload.body.resultGroup[0].riskId===""){
+        //         throw new Error("riskId  is required if mode is RESOLUTION_MATRIX");
+        //     }
+        //     else  if(payload.body.resultGroup[0].statusId===""){
+        //         throw new Error("statusId  is required if mode is RESOLUTION_MATRIX");
+        //     }
+        //     else  if(payload.body.resultGroup[0].reasonId===""){
+        //         throw new Error("reasonId  is required if mode is RESOLUTION_MATRIX");
+        //     }
+            
+        // }
+    },
+    documents:(data,payload,jwt)=>{
+         console.log("------documents", payload.body.documents[0].current)
+        // console.log("------documents", payload.body.documents[0].expirationDate)
+        // console.log("------documents", payload.body.documents[0].dateOfIssue)
+        let effectiveDate=moment(payload.body.documents[0].effectiveDate, 'DD/MM/YYYY').isValid()
+        let expirationDate=moment(payload.body.documents[0].expirationDate, 'DD/MM/YYYY').isValid()
+        let dateOfIssue=moment(payload.body.documents[0].dateOfIssue, 'DD/MM/YYYY').isValid()
+
+        if(payload.body.documents[0].current==='Y' || payload.body.documents[0].current==="Yes" || payload.body.documents[0].current==='N' || payload.body.documents[0].current==='No' ){
+            console.log("true-----------")
+        }
+        else{
+            throw new Error("current  should be Yes or No ");
+           }
+        if(payload.body.documents[0].legible==='Y' || payload.body.documents[0].legible==="Yes" || payload.body.documents[0].legible==='N' || payload.body.documents[0].legible==='No' ){
+            console.log("true-----------")
+        }
+        else{
+            throw new Error("legible  should be Yes or No ");
+           }
+        if(payload.body.documents[0].fileLessDocument==='Y' || payload.body.documents[0].fileLessDocument==="Yes" || payload.body.documents[0].fileLessDocument==='N' || payload.body.documents[0].fileLessDocument==='No' ){
+            console.log("true-----------")
+        }
+        else{
+            throw new Error("fileLessDocument  should be Yes or No ");
+           }
+        if(payload.body.documents[0].annotatedOtherThenEnglish==='Y' || payload.body.documents[0].annotatedOtherThenEnglish==="Yes" || payload.body.documents[0].annotatedOtherThenEnglish==='N' || payload.body.documents[0].annotatedOtherThenEnglish==='No' ){
+            console.log("true-----------")
+        }
+        else{
+            throw new Error("annotatedOtherThenEnglish  should be Yes or No ");
+           }    
+        
+        
+        // console.log("--------------------------------data ------------",effectiveDate)
+        // console.log("--------------------------------data ------------",expirationDate)
+        // console.log("--------------------------------data ------------",dateOfIssue)
+       // let spliceDate1=data[0].DOB.split('/')
+
+        let effectiveDate1=payload.body.documents[0].effectiveDate.split('/')
+        let expirationDate2=payload.body.documents[0].expirationDate.split('/')
+        let dateOfIssue3=payload.body.documents[0].dateOfIssue.split('/')
+
+        if(effectiveDate1[0]<32  && expirationDate2[0]<32  && dateOfIssue3[0]<32){
+            console.log("--------------------------------true ------------",effectiveDate1)
+            console.log("--------------------------------true ------------",expirationDate2)
+            console.log("--------------------------------true ------------",dateOfIssue3)
+        }
+        else{
+            console.log("--------------------------------not true------------",effectiveDate1)
+            throw new Error("Date format is not  correct");
+        }
+        if(effectiveDate1[1]<13 && expirationDate2[1]<13 && dateOfIssue3[1]<13){
+            console.log("--------------------------------true ------------",effectiveDate1)
+            console.log("--------------------------------true ------------",expirationDate2)
+            console.log("--------------------------------true ------------",dateOfIssue3)
+        }
+        else{
+            console.log("--------------------------------not true------------",effectiveDate)
+            throw new Error("Date format is not  correct");
+        }
+
+            if(effectiveDate){
+                console.log("true-----------")
+            }
+            else{
+                throw new Error("Date format is not  correct");
+               }
+            if(expirationDate){
+            console.log("true-----------")
+           }
+           else{
+            throw new Error("Date format is not  correct");
+           }
+            if(dateOfIssue){
+            console.log("true-----------")
+           }
+           else{
+            throw new Error("Date format is not  correct");
+           }
+
+
+    },
     consentMode :(data,payload,jwt)=>{
         console.log("DET-----------",payload.body.consentMode)
         if(payload.body.consentMode===""){
@@ -323,7 +488,7 @@ module.exports = {
         }
     },
     WCOscreeningFields : (data,payload,jwt)=>{
-        console.log("-----------------------data",data[0].gender)
+        console.log("-----------------------data",data[0].nationality)
         if(data[0].gender==='M'){
             console.log("SET-----------")
         }
@@ -333,17 +498,58 @@ module.exports = {
         else{
             throw new Error("Wrong Gender Added");
         }
+        
+        let date=moment(data[0].DOB, 'DD/MM/YYYY').isValid()
+        let spliceDate1=data[0].DOB.split('/')
+        if(spliceDate1[0]<32){
+            console.log("--------------------------------true ------------",spliceDate1)
+        }
+        else{
+            console.log("--------------------------------not true------------",spliceDate1)
+            throw new Error("Date format is not  correct");
+        }
+        if(spliceDate1[1]<13){
+            console.log("--------------------------------true ------------",spliceDate1)
+        }
+        else{
+            console.log("--------------------------------not true------------",spliceDate1)
+            throw new Error("Date format is not  correct");
+        }
+        // if(spliceDate1[1]<13){
+        //     console.log("--------------------------------true ------------",spliceDate1)
+        // }
+        // else{
+        //     console.log("--------------------------------not true------------",spliceDate1)
+        //     throw new Error("Date format is not  correct");
+        // }
+        
+
+       
+        console.log("--------------------------------spliceDate ------------",spliceDate1)
+        if(date){
+            console.log("true-----------")
+           }
+           else{
+            throw new Error("Date format is not  correct");
+           }
+        if(data[0].nationality.length===3){
+            console.log("SET-----------")
+        }
+        else{
+            throw new Error("national should be of 3 digits");
+        }
         // if(data[0].gender!="M" || data[0].gender !="F"){
         //     throw new Error("Wrong Gender Added");
         // }
     },
     nonIGAFeilds:(data,payload,jwt)=>{
         // console.log("-----------------------data",data)
-         console.log("-----------------------identityType",payload.body.Id.identityType)
-         console.log("-----------------------gender",payload.body.nonIGAFeilds.primary.gender)
-         if(payload.body.Id.identityType==="GCC" && payload.body.nonIGAFeilds.primary!=""){
-            throw new Error("if identityType id GCC then primary Object is not required");
-         }
+        //  console.log("-----------------------identityType",payload.body.Id.identityType)
+        //  console.log("-----------------------gender",payload.body.nonIGAFeilds.primary.gender)
+
+        //  if(payload.body.Id.identityType==="GCC" && payload.body.nonIGAFeilds.primary!=""){
+        //     throw new Error("if identityType is GCC then primary Object is not required");
+        //  }
         
         if(payload.body.nonIGAFeilds.primary){
             if(payload.body.nonIGAFeilds.primary.gender==='M'){
