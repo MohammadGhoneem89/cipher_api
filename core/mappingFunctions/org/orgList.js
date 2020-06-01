@@ -136,7 +136,18 @@ function orgList(body, entityList_CB, JWToken) {
       });
     }
   });
+};
+
+
+function orgCodeList() {
+  return new Promise((resolve, reject) => {
+    global.db.selectWithSort("Entity", {isActive: true}, {
+      "spCode": 1
+    }, {}, function (err, entityData) {
+    });
+  });
 }
+;
 
 exports.entityListOut = entityListOut;
 

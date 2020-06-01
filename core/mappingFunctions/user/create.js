@@ -14,22 +14,33 @@ function createOnDemandWelCome(payload, UUIDKey, route, callback, JWToken) {
 
 function onDemandWelCome(payload, callback) {
   user.createOnDemandWelCome(payload)
-    .then(() => {
-      const response = {
-        responseMessage: {
-          action: payload.action,
-          data: {
-            message: {
-              status: 'OK',
-              errorDescription: 'User inserted successfully',
-              displayToUser: true,
-              newPageURL: '/userList'
-            }
+    .then((data) => {
+        payload.welcome.forEach((elem) => {
+          switch (elem.id) {
+            case 'C-ONBD-01':
+              elem.status = data.isUserAPI ? 'Done' : 'User Already Exist!';
+              break;
+            case 'C-ONBD-02':
+              elem.status = data.isUserUI ? 'Done' : 'User Already Exist!';
+              break;
+            case 'C-ONBD-03':
+              elem.status = data.isCollection ? 'Done' : 'Failed creating Collection';
+              break;
+            case 'C-ONBD-04':
+              elem.status = data.isEmail ? 'Done' : 'Failed sending email';
+              break;
           }
-        }
-      };
-      callback(response);
-    })
+        });
+        const response = {
+          createOnDemandWelCome: {
+            action: payload.action,
+            data: payload.welcome
+
+          }
+        };
+        callback(response);
+      }
+    )
     .catch((err) => {
       console.log(err);
       const response = {

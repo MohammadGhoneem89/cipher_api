@@ -11,7 +11,7 @@ const OldRestController = require('./_RestController');
 const APIDefination = require('../mappingFunctions/systemAPI/APIDefination');
 const dates = require('../../lib/helpers/dates');
 const apiFilter = config.get('apiFilters') || [];
-const pg = require('../api/connectors/postgress');
+
 const txTracking = require('../api/txTracking');
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
   let sw = new Stopwatch();
@@ -24,8 +24,12 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, incommingRoute);
 
   let configdata = _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
-  //console.log("----------+==========>>>Cconfigdata", JSON.stringify(configdata,null,2))
 
+  let username = _.get(JWToken, `userID`, 'No User');
+  let orgcode = _.get(JWToken, `orgCode`, 'No Org');
+
+
+  _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
   if (apiFilter.indexOf(incommingRoute) >= 0) {
     _.set(payload, 'body.password', undefined);
     _.set(payload, 'JWToken', undefined)
@@ -39,7 +43,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     };
 
   }
-
+  let eRRTBasic = _.get(configdata, 'estimatedRtt', 10000)
   let ResponseCaller = function (data) {
     let delta = sw.read();
     sw.reset();
@@ -56,9 +60,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         "errorCode": 201,
         "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
       };
-
-      txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack, configdata.estimatedRtt);
-
+      txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack, eRRTBasic, username, orgcode);
       responseCallback.status(500);
       responseCallback.json(error);
       return responseCallback.end();
@@ -69,11 +71,13 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       apiSample = _.omit(apiSample, 'token', 'action', 'channel', 'ipAddress', '_apiRecorder', 'JWToken', 'header', 'CipherJWT');
       APIDefination.updateRequestStub(apiSample, incommingRoute, channel);
     }
-    if (apiFilter.indexOf(incommingRoute) >= 0) {
-      let eRRT=_.get(configdata,'estimatedRtt',10000)
-      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, eRRT);
-    }
 
+    if (apiFilter.indexOf(incommingRoute) >= 0) {
+
+      let eRRT = _.get(configdata, 'estimatedRtt', 10000)
+      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, eRRTBasic, username, orgcode);
+
+    }
     logger.error({
       fs: 'RestController.js',
       func: 'handleExternalRequest'
@@ -95,6 +99,9 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       if (!response.__cipherMessage) {
         _.set(response, '__cipherSuccessStatus', successStatus);
         let errCode = _.get(response, 'result.errorCode', undefined);
+        if (!errCode) {
+          errCode = _.get(response, 'errorCode', undefined);
+        }
         let errMsg = _.get(global.codelist, errCode, '');
 
         if (errCode) {
@@ -114,9 +121,19 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         return mappedData;
       }).catch((ex) => {
         let errResponse = {};
-        _.set(errResponse, '__cipherSuccessStatus', successStatus);
-        _.set(errResponse, '__cipherMessage', ex);
-        _.set(errResponse, '__cipherMetaData', constants.errResponseParsing);
+
+        if (simuStatus) {
+          _.set(errResponse, 'messageStatus', constants.cipherUIFailure);
+          _.set(errResponse, 'errorDescription', ex.message || ex);
+          _.set(errResponse, 'cipherMessageId', this.UUID);
+          _.set(errResponse, 'errorCode', constants.cipherExternalSuccess);
+          _.set(errResponse, 'timestamp', new Date().toISOString());
+          _.set(errResponse, 'parsingError', constants.errResponseParsing);
+        } else {
+          _.set(errResponse, '__cipherSuccessStatus', successStatus);
+          _.set(errResponse, '__cipherMessage', ex);
+          _.set(errResponse, '__cipherMetaData', constants.errResponseParsing);
+        }
         return errResponse;
       });
     }
