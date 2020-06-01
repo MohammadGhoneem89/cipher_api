@@ -88,7 +88,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   Cipher.processIncommingMessage().then((response) => {
     let bypassSimu = _.get(payload, 'bypassSimu', false);
     let simuStatus = configdata.isSimulated === true && bypassSimu === false;
-    if (configdata.isResValBypass === false && simuStatus === false) {
+    if (configdata.isResValBypass === false) {
       let successStatus = true;
       if (!response.__cipherMessage) {
         _.set(response, '__cipherSuccessStatus', successStatus);
@@ -107,7 +107,6 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
           _.set(response, '__cipherUIErrorStatus', constants.cipherUISuccess);
           _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
         }
-
       }
       ;
       let objMapper = new ObjectMapper(response, configdata.ResponseMapping, global.enumInfo, UUIDKey, JWToken, 'Response', configdata.ResponseTransformations);
@@ -123,6 +122,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     }
     _.set(response, 'error', undefined);
     _.set(response, 'message', undefined);
+
+
     return response;
   }).then((data) => {
     ResponseCaller(data);
