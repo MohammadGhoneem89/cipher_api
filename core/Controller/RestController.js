@@ -14,7 +14,6 @@ const apiFilter = config.get('apiFilters') || [];
 const pg = require('../api/connectors/postgress');
 const txTracking = require('../api/txTracking');
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
-  console.log(JWToken)
   let sw = new Stopwatch();
   sw.start();
   logger.debug({

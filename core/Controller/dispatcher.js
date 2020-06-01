@@ -26,34 +26,6 @@ module.exports = class Dispatcher {
     this.JWT = JWTtoken;
     this.sw = new Stopwatch();
     this.sw.reset();
-    if (configData.isBilled === true) {
-
-      if (configData.BillingPolicy && configData.BillingPolicy.length == 0) {
-        throw new Error("At least 1 billing policy must be defined!")
-      }
-      billing
-        .update({
-          action: OriginalRequest.action,
-          username: JWTtoken.userID,
-          orgCode: JWTtoken.orgCode,
-          date: dates.nowEpochDate()
-        }, {
-          $set: {
-            action: OriginalRequest.action,
-            username: JWTtoken.userID,
-            orgCode: JWTtoken.orgCode,
-            date: dates.nowEpochDate()
-          },
-          $inc: {
-            hits: 1
-          }
-        }, {
-          upsert: true
-        }, function (err, data) {
-          console.log(err);
-        });
-
-    }
 
     if (configData.isHMAC === true) {
       let retrievedSignature = _.get(OriginalRequest, "headersParams.x-signature", undefined);
@@ -66,7 +38,6 @@ module.exports = class Dispatcher {
       console.log(OriginalRequest.rawBody);
       let computedSignature = crypto.createHmac("sha512", JWTtoken.clientKey).update(OriginalRequest.rawBody).digest("hex");
       let verified = this.getSignatureVerifyResult(computedSignature, JWTtoken.HmacPvtKey, retrievedSignature);
-
       if (!verified) {
         throw new Error("invalid signature!")
       }
