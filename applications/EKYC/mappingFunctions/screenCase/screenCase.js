@@ -5,8 +5,8 @@ const moment = require("moment");
 const rp = require('request-promise');
 const fetch = require('node-fetch');
 var CryptoJS = require('crypto-js');
-const EndpointDefination = require('../../../../../lib/models/EndpointDefination');
-const eventLog = require('../../../../../core/api/eventLog');
+const EndpointDefination = require('../../../../lib/models/EndpointDefination');
+const eventLog = require('../../../../core/api/eventLog');
 const Stopwatch = require('statman-stopwatch');
 
 
