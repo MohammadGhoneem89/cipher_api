@@ -142,12 +142,16 @@ function orgList(body, entityList_CB, JWToken) {
 function orgCodeList() {
   return new Promise((resolve, reject) => {
     global.db.selectWithSort("Entity", {isActive: true}, {
-      "spCode": 1
+      "spCode": 1,
+      "currency": 1,
+      "cycle": 1
     }, {}, function (err, entityData) {
+      resolve(entityData);
     });
   });
 }
 ;
 
 exports.entityListOut = entityListOut;
+exports.orgCodeList = orgCodeList;
 

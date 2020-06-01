@@ -1,7 +1,6 @@
 'use strict';
 
 const logger = require('../api/connectors/logger').app;
-let config = require('../../AppConfig');
 let routeConfiguration = Object.assign(require('../routeConfig/routeConfiguration.json'), require('../../applications/routeConfig/routeConfiguration.json'));
 const _ = require('lodash');
 

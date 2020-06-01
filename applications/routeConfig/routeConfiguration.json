@@ -17,9 +17,9 @@
   "etisalat": {
     "getFileList": {
       "customMapping": true,
-      "MappingfunctionName": "getFileList",
-      "CustomMappingFile": "general/getFileList.js",
-      "mappingConfigFile": "ePayMapping"
+      "MappingfunctionName": "buisness",
+      "CustomMappingFile": "general/buisness.js",
+      "mappingConfigFile": "buisness"
     },
     "getFileData": {
       "customMapping": true,
