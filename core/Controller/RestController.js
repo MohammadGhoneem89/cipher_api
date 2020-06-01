@@ -24,7 +24,6 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, incommingRoute);
 
   let configdata = _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
-
   let username = _.get(JWToken, `userID`, 'No User');
   let orgcode = _.get(JWToken, `orgCode`, 'No Org');
 
@@ -73,10 +72,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     }
 
     if (apiFilter.indexOf(incommingRoute) >= 0) {
-
-      let eRRT = _.get(configdata, 'estimatedRtt', 10000)
       txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, eRRTBasic, username, orgcode);
-
     }
     logger.error({
       fs: 'RestController.js',
@@ -114,14 +110,12 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
           _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
         }
 
-      }
-      ;
+      };
       let objMapper = new ObjectMapper(response, configdata.ResponseMapping, global.enumInfo, UUIDKey, JWToken, 'Response', configdata.ResponseTransformations);
       return objMapper.start().then((mappedData) => {
         return mappedData;
       }).catch((ex) => {
         let errResponse = {};
-
         if (simuStatus) {
           _.set(errResponse, 'messageStatus', constants.cipherUIFailure);
           _.set(errResponse, 'errorDescription', ex.message || ex);
