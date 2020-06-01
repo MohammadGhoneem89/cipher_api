@@ -38,7 +38,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     };
 
   }
-
+  let eRRTBasic = _.get(configdata, 'estimatedRtt', 10000)
   let ResponseCaller = function (data) {
     let delta = sw.read();
     sw.reset();
@@ -55,9 +55,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         "errorCode": 201,
         "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
       };
-
-      txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack, configdata.estimatedRtt);
-
+      txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack, eRRTBasic);
       responseCallback.status(500);
       responseCallback.json(error);
       return responseCallback.end();
@@ -68,10 +66,11 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       apiSample = _.omit(apiSample, 'token', 'action', 'channel', 'ipAddress', '_apiRecorder', 'JWToken', 'header', 'CipherJWT');
       APIDefination.updateRequestStub(apiSample, incommingRoute, channel);
     }
-    if (apiFilter.indexOf(incommingRoute) >= 0) {
-      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, configdata.estimatedRtt);
-    }
 
+    if (apiFilter.indexOf(incommingRoute) >= 0) {
+      let eRRT = _.get(configdata, 'estimatedRtt', 10000)
+      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, eRRTBasic);
+    }
     logger.error({
       fs: 'RestController.js',
       func: 'handleExternalRequest'
@@ -108,25 +107,20 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
           _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
         }
 
-      }
-      ;
+      };
       let objMapper = new ObjectMapper(response, configdata.ResponseMapping, global.enumInfo, UUIDKey, JWToken, 'Response', configdata.ResponseTransformations);
       return objMapper.start().then((mappedData) => {
         return mappedData;
       }).catch((ex) => {
         let errResponse = {};
-        _.set(errResponse, 'messageStatus', constants.cipherUIFailure);
-        _.set(errResponse, 'errorDescription', ex);
-        _.set(errResponse, 'cipherMessageId', UUIDKey);
-        _.set(response, 'errorCode', constants.cipherExternalSuccess);
-        _.set(errResponse, 'timestamp', new Date().toISOString());
+        _.set(errResponse, '__cipherSuccessStatus', successStatus);
+        _.set(errResponse, '__cipherMessage', ex);
+        _.set(errResponse, '__cipherMetaData', constants.errResponseParsing);
         return errResponse;
       });
     }
     _.set(response, 'error', undefined);
     _.set(response, 'message', undefined);
-
-
     return response;
   }).then((data) => {
     ResponseCaller(data);
