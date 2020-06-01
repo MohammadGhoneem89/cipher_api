@@ -115,7 +115,7 @@ const  resolutionMatrix = async (payload, UUIDKey, route, callback, JWToken) => 
     const finalResponse = {
       "messageStatus": "Error",
       "messageId": uuid,
-      "errorDescription": err,
+      "errorDescription": err.message,
       "errorCode": 201,
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
     };
@@ -251,7 +251,7 @@ const resolve = async (payload, UUIDKey, route, callback, JWToken) => {
     const finalResponse = {
       "messageStatus": "Error",
       "messageId": uuid,
-      "errorDescription": err,
+      "errorDescription": err.message,
       "errorCode": 201,
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
     };
@@ -385,7 +385,7 @@ const review = async (payload, UUIDKey, route, callback, JWToken) => {
     const finalResponse = {
       "messageStatus": "Error",
       "messageId": uuid,
-      "errorDescription": err,
+      "errorDescription": err.message,
       "errorCode": 201,
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
     };

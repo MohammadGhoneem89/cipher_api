@@ -6,21 +6,14 @@
       "MappingfunctionName": "resolveCase",
       "CustomMappingFile": "EKYC/resolveCase/resolveCase.js",
       "mappingConfigFile": "ePayMapping"
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Befor Rebasing with master
+
     },
     "screenCase":{
       "customMapping": true,
       "MappingfunctionName": "screenCase",
       "CustomMappingFile": "EKYC/screenCase/screenCase.js",
       "mappingConfigFile": "ePayMapping"
-<<<<<<< HEAD
-=======
->>>>>>> getResolutionForGroup
-=======
->>>>>>> Befor Rebasing with master
+
     }
   },
   "etisalat": {

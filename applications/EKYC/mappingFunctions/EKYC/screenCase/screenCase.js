@@ -46,6 +46,16 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
 
   var epochDate = moment(payload.body.WCOscreeningFields.DOB).unix();
   console.log("---------->>>>> epochDate: ", epochDate);
+  let gender;
+  if(payload.body.WCOscreeningFields.gender == "M"){
+    gender = "MALE"
+  }else if(payload.body.WCOscreeningFields.gender == "F"){
+    gender = "FEMALE"
+  }else if(payload.body.WCOscreeningFields.gender == "O"){
+    gender = "UNSPECIFIED"
+  }else {
+    return callback("Gender field values must be one of: M, F, O")
+  }
   
   const request = {
     "groupId": Endpoint[0].groupId,
@@ -56,7 +66,7 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
     "secondaryFields": [
       {
           "typeId": "SFCT_1",
-          "value": payload.body.WCOscreeningFields.gender
+          "value": gender
       },
       {
           "typeId": "SFCT_2",
@@ -185,7 +195,7 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
     const finalResponse = {
       "messageStatus": "Error",
       "messageId": UUIDKey,
-      "errorDescription": err,
+      "errorDescription": err.message,
       "errorCode": 201,
       "result":{errorCode:20100},
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
