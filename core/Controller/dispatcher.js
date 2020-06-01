@@ -131,7 +131,6 @@ module.exports = class Dispatcher {
         _.set(MappeedRequest, 'BCData.privateFor', endorsementPolicy);
         _.set(MappeedRequest, 'BCData.abi', abi);
         _.set(MappeedRequest, 'BCData.contractAddress', contractAddress);
-
       }
     }
     this.request = MappeedRequest;

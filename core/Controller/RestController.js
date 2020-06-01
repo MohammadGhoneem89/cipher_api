@@ -11,7 +11,7 @@ const OldRestController = require('./_RestController');
 const APIDefination = require('../mappingFunctions/systemAPI/APIDefination');
 const dates = require('../../lib/helpers/dates');
 const apiFilter = config.get('apiFilters') || [];
-const pg = require('../api/connectors/postgress');
+
 const txTracking = require('../api/txTracking');
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
   let sw = new Stopwatch();
