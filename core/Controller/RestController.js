@@ -93,6 +93,9 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       if (!response.__cipherMessage) {
         _.set(response, '__cipherSuccessStatus', successStatus);
         let errCode = _.get(response, 'result.errorCode', undefined);
+        if (!errCode) {
+          errCode = _.get(response, 'errorCode', undefined);
+        }
         let errMsg = _.get(global.codelist, errCode, '');
 
         if (errCode) {
