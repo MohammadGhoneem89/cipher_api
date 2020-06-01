@@ -14,8 +14,11 @@ core/mappingFunctions/generated/*
 *.csv
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> Befor Rebasing with master
+=======
+>>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a
 
 # Compiled source #
 ###################
@@ -47,7 +50,10 @@ core/mappingFunctions/generated/*
 
 # OS generated files #
 ######################
+<<<<<<< HEAD
 
+=======
+>>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a
 .DS_Store
 .DS_Store?
 ._*
@@ -55,6 +61,9 @@ core/mappingFunctions/generated/*
 .Trashes
 ehthumbs.db
 Thumbs.db
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a
