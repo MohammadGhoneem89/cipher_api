@@ -12,6 +12,7 @@ const dates = require('../../lib/helpers/dates');
 const PROTO_PATH = __dirname + '/rest.proto';
 const grpc = require('grpc');
 const relayProto = grpc.load(PROTO_PATH).RELAY;
+const config = require('../../config');
 const crypto = require("crypto");
 const Stopwatch = require('statman-stopwatch');
 module.exports = class Dispatcher {
@@ -60,13 +61,14 @@ module.exports = class Dispatcher {
         throw new Error("signature required!")
       }
       console.log(OriginalRequest.query)
-      if (OriginalRequest.query) {
-        let computedSignature = crypto.createHmac("sha512", '123').update(OriginalRequest.rawBody).digest("hex");
-        if (computedSignature !== retrievedSignature) {
-          throw new Error("invalid signature!")
-        }
-      } else {
-        throw new Error("At least 1 param is required for signature verification!")
+      console.log(">>>>>>>>>>>>>>", JWTtoken);
+
+      console.log(OriginalRequest.rawBody);
+      let computedSignature = crypto.createHmac("sha512", JWTtoken.clientKey).update(OriginalRequest.rawBody).digest("hex");
+      let verified = this.getSignatureVerifyResult(computedSignature, JWTtoken.HmacPvtKey, retrievedSignature);
+
+      if (!verified) {
+        throw new Error("invalid signature!")
       }
     }
 
@@ -112,7 +114,6 @@ module.exports = class Dispatcher {
           } else {
             flags.push(true);
           }
-
         });
         let flagRuleApproved = true;
         flags.forEach((e) => {
@@ -253,6 +254,17 @@ module.exports = class Dispatcher {
     });
   }
 
+  getSignatureVerifyResult(hmac, publix, signatureSignedByPrivateKey) {
+    let pem = Buffer.from(publix)
+    let publicKey = pem.toString('ascii');
+    const verifier = crypto.createVerify('RSA-SHA512');
+    verifier.update(hmac, 'ascii');
+    const publicKeyBuf = new Buffer(publicKey, 'ascii')
+    const signatureBuf = new Buffer(signatureSignedByPrivateKey, 'hex')
+    const result = verifier.verify(publicKeyBuf, signatureBuf)
+    return result;
+  };
+
   executeCustomFunction() {
     this.sw.start();
     return new Promise((resolve, reject) => {
@@ -380,33 +392,37 @@ module.exports = class Dispatcher {
   }
 
   connectQueueService(responseQueue) {
+
     this.sw.start();
     return amq.start()
       .then((ch) => {
-        return ch.assertQueue(this.configdata.requestServiceQueue, {
+        ch.assertQueue(this.configdata.requestServiceQueue, {
           durable: false
         })
-          .then(() => {
-            let generalResponse = {
-              "error": false,
-              "message": "Processed OK!"
-            };
-            let responseQueue = [];
-            let today = new Date();
-            responseQueue.push(this.configdata.responseQueue);
-            _.set(this.request, 'Header.tranType', "0200");
-            _.set(this.request, 'Header.UUID', this.UUID);
-            _.set(this.request, 'Header.ResponseMQ', responseQueue);
-            _.set(this.request, 'Header.timeStamp', today.toISOString());
-            console.log(JSON.stringify(this.request, null, 2))
 
-            ch.sendToQueue(this.configdata.requestServiceQueue, new Buffer(JSON.stringify(this.request))).then(() => {
-              let delta = this.sw.read();
-              this.sw.reset();
-              eventLog(this.UUID, 'connectQueueService', this.request, generalResponse, delta);
-            });
-            return generalResponse;
-          });
+        let generalResponse = {
+          "success": true,
+          "error": false,
+          "message": "Processed OK!",
+          // "result":{errorCode:202}
+        };
+        let responseQueue = [];
+
+        let today = new Date();
+        responseQueue.push(this.configdata.responseQueue);
+        _.set(this.request, 'Header.tranType', "0200");
+        _.set(this.request, 'Header.UUID', this.UUID);
+        _.set(this.request, 'Header.ResponseMQ', responseQueue);
+        _.set(this.request, 'Header.timeStamp', today.toISOString());
+        console.log(JSON.stringify(this.request, null, 2))
+
+        ch.sendToQueue(this.configdata.requestServiceQueue, new Buffer(JSON.stringify(this.request)))
+        let delta = this.sw.read();
+        this.sw.reset();
+        eventLog(this.UUID, 'connectQueueService', this.request, generalResponse, delta);
+
+        return generalResponse;
+
       });
 
   };

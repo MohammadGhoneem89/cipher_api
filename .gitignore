@@ -1,6 +1,7 @@
 .idea
 .vscode
 node_modules
+_node_modules
 logs
 _lib
 package-lock.json
@@ -9,3 +10,60 @@ epayqnfs
 !core/mappingFunctions/generated/.gitkeep
 core/mappingFunctions/generated/*
 *.zip
+
+*.csv
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Befor Rebasing with master
+=======
+>>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+
+# OS generated files #
+######################
+<<<<<<< HEAD
+
+=======
+>>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+<<<<<<< HEAD
+
+
+
+=======
+>>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a

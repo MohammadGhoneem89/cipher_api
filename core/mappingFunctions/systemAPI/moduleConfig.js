@@ -5,6 +5,7 @@ let customFunctions = require('../../Common/customFunctions.js');
 let validationFunctions = require('../../Common/_validationFunctions.js');
 const groupPermission = require('../../../lib/services/group');
 const _ = require('lodash');
+
 function getModuleConfig(payload, UUIDKey, route, callback, JWToken) {
   permission.findPageAndCount(payload).then((data) => {
     let actions = [
@@ -56,6 +57,7 @@ function getModuleConfig(payload, UUIDKey, route, callback, JWToken) {
     callback(response);
   });
 }
+
 function getModuleConfigByID(payload, UUIDKey, route, callback, JWToken) {
   Promise.all([
     permission.findById(payload)
@@ -93,20 +95,57 @@ function updateModuleConfig(payload, UUIDKey, route, callback, JWToken) {
   };
 
   if (payload._id) {
-    permission.update({ _id: payload._id }, payload).then((data) => {
+    permission.update({_id: payload._id}, payload).then((data) => {
       resp.responseMessage.data.message.status = "OK";
       resp.responseMessage.data.message.errorDescription = "Record Updated Success!!";
       resp.responseMessage.data.message.newPageURL = "/moduleList";
       callback(resp);
     });
-  }
-  else {
+  } else {
     resp.responseMessage.data.message.status = "ERROR";
     resp.responseMessage.data.message.errorDescription = "id is required!";
     resp.responseMessage.data.message.newPageURL = "";
     return callback(resp);
   }
 }
+
+
+function getModuleConfigAll(payload, UUIDKey, route, callback, JWToken) {
+  permission.find({}).then((data) => {
+    let ddlModules = [];
+    let modulePageMap = {}
+    let modulePageMapList = {}
+    data.forEach((module, indexmod) => {
+      ddlModules.push({
+        "value": `${module.value}_${indexmod}`,
+        "label": module.label
+      });
+      let ddlPage = [];
+      module.children.forEach((perm, index) => {
+        ddlPage.push({
+          "value": index,
+          "label": perm.label
+        });
+      });
+      _.set(modulePageMap, `${module.value}_${indexmod}`, ddlPage);
+      _.set(modulePageMapList, `${module.value}_${indexmod}`, module);
+    });
+
+    let response = {
+      "ModuleListAll": {
+        "action": "ModuleList",
+        "data": {
+          ddlModules,
+          modulePageMap,
+          moduleList: modulePageMapList
+        }
+      }
+    };
+    callback(response);
+  });
+};
+
+exports.getModuleConfigAll = getModuleConfigAll;
 exports.updateModuleConfig = updateModuleConfig;
 exports.getModuleConfig = getModuleConfig;
 exports.getModuleConfigByID = getModuleConfigByID;

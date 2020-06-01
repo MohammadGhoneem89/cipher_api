@@ -62,7 +62,8 @@ routeData.LoadConfig().then(() => {
 app.use(cookieParser('secretToken'));
 app.use(cors({
   "origin": true,
-  credentials: true
+  credentials: true,
+  methods: "GET,POST"
 }));
 apiTemplate.find().then((templates) => {
   let templatesg = {}
@@ -141,6 +142,7 @@ app.post('/login', async (req, res) => {
 
     authUser(payload)
       .then(async (user) => {
+        console.log(JSON.stringify(user));
         if (user.userType == "API") {
           apiResponse.token = user.token;
           res.send(apiResponse);

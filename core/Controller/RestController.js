@@ -23,6 +23,9 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, JSON.stringify(payload, null, 2));
   logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, incommingRoute);
 
+  let configdata = _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
+  //console.log("----------+==========>>>Cconfigdata", JSON.stringify(configdata,null,2))
+
   if (apiFilter.indexOf(incommingRoute) >= 0) {
     _.set(payload, 'body.password', undefined);
     _.set(payload, 'JWToken', undefined)
@@ -53,7 +56,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         "errorCode": 201,
         "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
       };
-      txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack);
+
+      txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack, configdata.estimatedRtt);
 
       responseCallback.status(500);
       responseCallback.json(error);
@@ -66,17 +70,17 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       APIDefination.updateRequestStub(apiSample, incommingRoute, channel);
     }
     if (apiFilter.indexOf(incommingRoute) >= 0) {
-      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta);
+      let eRRT=_.get(configdata,'estimatedRtt',10000)
+      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, eRRT);
     }
 
     logger.error({
       fs: 'RestController.js',
       func: 'handleExternalRequest'
     }, `Message Processed In:  ${delta} ms`);
-    responseCallback.json(data);
-    return responseCallback.end();
+    return responseCallback.json(data);
+    // responseCallback.end();
   };
-  let configdata = _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
   if (!configdata) {
     console.log(`Route ${channel}.${incommingRoute}`);
     return OldRestController.handleExternalRequest(payload, channel, incommingRoute, UUIDKey, ResponseCaller, JWToken, ConnMQ, responseCallback);
@@ -90,9 +94,19 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       let successStatus = true;
       if (!response.__cipherMessage) {
         _.set(response, '__cipherSuccessStatus', successStatus);
-        _.set(response, '__cipherMessage', constants.cipherGeneralSuccess);
-        _.set(response, '__cipherUIErrorStatus', constants.cipherUISuccess);
-        _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
+        let errCode = _.get(response, 'result.errorCode', undefined);
+        let errMsg = _.get(global.codelist, errCode, '');
+
+        if (errCode) {
+          _.set(response, '__cipherMessage', errMsg);
+          _.set(response, '__cipherExternalErrorStatus', parseInt(errCode, 10));
+          _.set(response, '__cipherUIErrorStatus', constants.cipherUISuccess);
+        } else {
+          _.set(response, '__cipherMessage', constants.cipherGeneralSuccess);
+          _.set(response, '__cipherUIErrorStatus', constants.cipherUISuccess);
+          _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
+        }
+
       }
       ;
       let objMapper = new ObjectMapper(response, configdata.ResponseMapping, global.enumInfo, UUIDKey, JWToken, 'Response', configdata.ResponseTransformations);
@@ -106,6 +120,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         return errResponse;
       });
     }
+    _.set(response, 'error', undefined);
+    _.set(response, 'message', undefined);
     return response;
   }).then((data) => {
     ResponseCaller(data);

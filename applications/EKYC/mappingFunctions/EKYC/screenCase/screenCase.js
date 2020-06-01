@@ -6,6 +6,8 @@ const rp = require('request-promise');
 const fetch = require('node-fetch');
 var CryptoJS = require('crypto-js');
 const EndpointDefination = require('../../../../../lib/models/EndpointDefination');
+const eventLog = require('../../../../../core/api/eventLog');
+const Stopwatch = require('statman-stopwatch');
 
 
 
@@ -13,6 +15,8 @@ const EndpointDefination = require('../../../../../lib/models/EndpointDefination
 
 
 let Endpoint;
+let sw = new Stopwatch();
+let delta;
 
 const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
 
@@ -40,6 +44,22 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
 
   //==============Screen API Request===================
 
+  var epochDate = moment(payload.body.WCOscreeningFields.DOB).unix();
+  console.log("---------->>>>> epochDate: ", epochDate);
+<<<<<<< HEAD
+  let gender;
+  if(payload.body.WCOscreeningFields.gender == "M"){
+    gender = "MALE"
+  }else if(payload.body.WCOscreeningFields.gender == "F"){
+    gender = "FEMALE"
+  }else if(payload.body.WCOscreeningFields.gender == "O"){
+    gender = "UNSPECIFIED"
+  }else {
+    return callback("Gender field values must be one of: M, F, O")
+  }
+=======
+>>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a
+  
   const request = {
     "groupId": Endpoint[0].groupId,
     "entityType": "INDIVIDUAL",
@@ -49,14 +69,18 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
     "secondaryFields": [
       {
           "typeId": "SFCT_1",
+<<<<<<< HEAD
+          "value": gender
+=======
           "value": payload.body.WCOscreeningFields.gender
+>>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a
       },
       {
           "typeId": "SFCT_2",
           "dateTimeValue": {
               "timelinePrecision": "ON",
               "pointInTimePrecision": "DAY",
-              "utcDateTime": 316310400000,
+              "utcDateTime": epochDate,
               "timeZone": null
           }
       },
@@ -70,7 +94,7 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
       },
       {
           "typeId": "SFCT_5",
-          "value": "ABW"
+          "value": payload.body.WCOscreeningFields.nationality
       }
   ]
   };
@@ -87,12 +111,12 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
   }
 
   var groupId = Endpoint[0].groupId;
-  var customField1 = "--REQUIRED-VALUE-MISSING--";
-  var customField2 = "--REQUIRED-VALUE-MISSING--";
-  var customField3 = "--REQUIRED-VALUE-MISSING--";
+  // var customField1 = "--REQUIRED-VALUE-MISSING--";
+  // var customField2 = "--REQUIRED-VALUE-MISSING--";
+  // var customField3 = "--REQUIRED-VALUE-MISSING--";
 
   var date = new Date().toGMTString();
-  var content = request;
+  //var content = request;
   // content = content.replace("{{group-id}}", groupId);
   // content = content.replace("{{custom-field-1}}", customField1);
   // content = content.replace("{{custom-field-2}}", customField2);
@@ -100,19 +124,25 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
 
   
 
-  var contentLength = unescape(encodeURIComponent(request)).length;
+  var contentLength = unescape(encodeURIComponent(JSON.stringify(request))).length;
+ 
 
-  var dataToSign = "(request-target): post " + Endpoint[0].gatewayUrl + "cases/screeningRequest\n" +
+  var dataToSign = "(request-target): post " + Endpoint[0].gatewayUrl + 
+  "cases/screeningRequest\n" +
     "host: " + Endpoint[0].gatewayHost + "\n" +
     "date: " + date + "\n" +
     "content-type: " + "application/json" + "\n" +
-    "content-length: 815" + "\n" +
-    request;
+    "content-length: "+contentLength + "\n" +
+    JSON.stringify(request);
+
+    console.log("---------->>>>> dataToSign: ", dataToSign);
 
   var hmac = generateAuthHeader(dataToSign);
   var authorisation = "Signature keyId=\"" + Endpoint[0].apiKey + "\",algorithm=\"hmac-sha256\",headers=\"(request-target) host date content-type content-length\",signature=\"" + hmac + "\"";
 
+  
 
+  
   console.log("---------->>>>> date: ", date);
   console.log("---------->>>>> hmac: ", hmac);
   console.log("---------->>>>> authorisation: ", authorisation);
@@ -125,12 +155,12 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
   let externalApi = {
     method: 'POST',
     uri: Endpoint[0].address,
+    
     headers: {
       'Date': date,
       'Authorization': authorisation,
-      
       'Content-Type': 'application/json',
-     
+      'Content-Length': contentLength,
     },
     body:request,
     redirect: 'follow',
@@ -139,26 +169,49 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
   };
 
   console.log("------------------------------------------------>>>>>>>>> externalApi:  ", JSON.stringify(externalApi, null, 2));
-
-  try {
-    let response = await rp(externalApi)
-    console.log("------------------------------------------------>>>>>>>>>11111111111 respons :   ", JSON.stringify(response, null, 2))
-
-    const finalResponse = {
   
-      ...response
+  sw.reset();
+  try {
+
+    
+    sw.start();
+    let response = await rp(externalApi)
+    delta = sw.read();
+    sw.reset();
+    console.log("------------------------------------------------>>>>>>>>> respons :   ", JSON.stringify(response, null, 2))
+
+    
+    const finalResponse = {
+      "messageStatus": "OK",
+      "messageId": UUIDKey,
+      "errorDescription": "Processed OK!",
+      "errorCode": 200,
+      "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
+      "caseId": response.caseId,
+      "WCOCaseId":response.caseSystemId,
+      "creationDate":response.creationDate,
+      "outStandingActions":response.outStandingActions,
+      "result":response.results
+      //"result":{errorCode:20100}
     };
+    eventLog(UUIDKey, 'screenCase', request, response, delta);
     return callback(finalResponse)
 
   } catch (err) {
     console.log('errorrrrrrrrrrrrrrr ------->>>>>>', err)
     const finalResponse = {
       "messageStatus": "Error",
-      "messageId": uuid,
+      "messageId": UUIDKey,
+<<<<<<< HEAD
+      "errorDescription": err.message,
+=======
       "errorDescription": err,
+>>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a
       "errorCode": 201,
+      "result":{errorCode:20100},
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
     };
+    eventLog(UUIDKey, 'screenCase', request, finalResponse, delta, err);
     return callback(finalResponse)
   }
   //==============End===================
