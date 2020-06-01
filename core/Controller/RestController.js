@@ -110,8 +110,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
           _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
         }
 
-      }
-      ;
+      };
       let objMapper = new ObjectMapper(response, configdata.ResponseMapping, global.enumInfo, UUIDKey, JWToken, 'Response', configdata.ResponseTransformations);
       return objMapper.start().then((mappedData) => {
         return mappedData;

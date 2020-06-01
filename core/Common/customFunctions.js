@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const moment = require('moment');
 const dates = require('../../lib/helpers/dates');
-const inst = require('./buissnessFunction/instrument.js');
+const inst = require('./buissnessFunction/sample.js');
 module.exports = {
   STUB: (data, payload, jwt) => {
     return data;
