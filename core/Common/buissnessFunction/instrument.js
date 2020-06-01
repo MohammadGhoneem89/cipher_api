@@ -201,21 +201,126 @@ module.exports = {
     },
     identityType: (data,payload,jwt)=>{
         console.log("-----------------------------------------------")
-     //   console.log("--------------------------------data",data)
+       //  console.log("--------------------------------data",data[0].nonIGA.gender)//.nonIGA.gender
+        // console.log("--------------------------------data",data[0].GCC.nationalID.length)
        // console.log("--------------------------------data ------------",data[0].identityType)
        // console.log("--------------------------------payload",payload)
         if(data[0].identityType==='NonIGA'){
-            console.log("SET-----------")
+            if(data[0].nonIGA.gender==='M'){
+                console.log("SET-----------")
+            }
+            else if(data[0].nonIGA.gender==='F'){
+                console.log("SET-----------")
+            }
+            else if(data[0].nonIGA.gender==='O'){
+                console.log("SET-----------")
+            }
+            else{
+                throw new Error("Invaliaid gender type");
+            }
+            if(data[0].nonIGA.nationality.length===3){
+                console.log("SET-----------")
+            }
+            else{
+                throw new Error("national should be of 3 digits");
+            }
+
+           
            // throw new Error("Irrelevent identity Type");
         }
         else if(data[0].identityType==='GCC'){
-            console.log("SET-----------")
+             
+                        if(data[0].GCC.cardCountry.length===3){
+                            console.log("SET-----------")
+                        }
+                        else{
+                            throw new Error("cardCountry  should be of 3 digits");
+                        }
+
+
+                        if(data[0].GCC.cardCountry==="BAH"){
+                            if(data[0].GCC.nationalID.length===9){
+                                console.log("SET-----------")
+                            }
+                            else{
+                                throw new Error("nationalID  should be of 9 digits");
+                            }
+                        }
+                        else if(data[0].GCC.cardCountry==="SAU"){
+                            if(data[0].GCC.nationalID.length===10){
+                                console.log("SET-----------")
+                            }
+                            else{
+                                throw new Error("nationalID  should be of 10 digits");
+                            }
+                            
+                        }
+                        else if(data[0].GCC.cardCountry==="ARE"){
+                            if(data[0].GCC.nationalID.length===15){
+                                console.log("SET-----------")
+                            }
+                            else{
+                                throw new Error("nationalID  should be of 15 digits");
+                            }
+                            
+                        }
+                        else if(data[0].GCC.cardCountry==="KWT"){
+                            if(data[0].GCC.nationalID.length===12){
+                                console.log("SET-----------")
+                            }
+                            else{
+                                throw new Error("nationalID  should be of 12 digits");
+                            }
+                        
+                        }
+                        else if(data[0].GCC.cardCountry==="OMN"){
+                            if(data[0].GCC.nationalID.length===8){
+                                console.log("SET-----------")
+                            }
+                            else{
+                                throw new Error("nationalID  should be of 8 digits");
+                            }
+                            
+                        }
+                        else if(data[0].GCC.cardCountry==="QAT"){
+                            if(data[0].GCC.nationalID.length===11){
+                                console.log("SET-----------")
+                            }
+                            else{
+                                throw new Error("nationalID  should be of 11 digits");
+                            }
+                        
+                        }
+                        else{
+                            throw new Error("Irrelevent country code");
+                        }
+            
         }
         else{
             console.log("ERROR-----------")
             throw new Error("Irrelevent identity Type");
         }
+
+       
+       
            
+    },
+    consentMode :(data,payload,jwt)=>{
+        console.log("DET-----------",payload.body.consentMode)
+        if(payload.body.consentMode===""){
+            throw new Error("ConsentMode should not be empty");
+        }
+        if(payload.body.consentMode==="BIOMETRIC"){
+            console.log("SET-----------")
+        }
+        else if(payload.body.consentMode==="E-KEY"){
+            console.log("SET-----------")
+        }
+        else if(payload.body.consentMode==="IDandV"){
+            console.log("SET-----------")
+        }else{
+            throw new Error("Irrelevent consentMode it could be BIOMETRIC E-KEY, IDandV");
+        }
     },
     WCOscreeningFields : (data,payload,jwt)=>{
         console.log("-----------------------data",data[0].gender)
@@ -233,17 +338,26 @@ module.exports = {
         // }
     },
     nonIGAFeilds:(data,payload,jwt)=>{
-        console.log("-----------------------data",data)
-       // console.log("-----------------------payload 1",payload.body.nonIGAFeilds.primary)
-        console.log("-----------------------payload",payload.body.nonIGAFeilds.primary.gender)
-        if(payload.body.nonIGAFeilds.primary.gender==='M'){
-            console.log("SET-----------")
-        }
-        else if(payload.body.nonIGAFeilds.primary.gender ==='F'){
-            console.log("SET-----------")
-        }
-        else{
-            throw new Error("Wrong Gender Added");
+        // console.log("-----------------------data",data)
+         console.log("-----------------------identityType",payload.body.Id.identityType)
+         console.log("-----------------------gender",payload.body.nonIGAFeilds.primary.gender)
+         if(payload.body.Id.identityType==="GCC" && payload.body.nonIGAFeilds.primary!=""){
+            throw new Error("if identityType id GCC then primary Object is not required");
+         }
+        
+        if(payload.body.nonIGAFeilds.primary){
+            if(payload.body.nonIGAFeilds.primary.gender==='M'){
+                console.log("SET-----------")
+            }
+            else if(payload.body.nonIGAFeilds.primary.gender ==='F'){
+                console.log("SET-----------")
+            }
+            else if(payload.body.nonIGAFeilds.primary.gender==='O'){
+                console.log("SET-----------")
+            }
+            else{
+                throw new Error("Invaliaid gender type");
+            }
         }
     },
 
