@@ -440,8 +440,6 @@ function getActiveAPIListForDocumentation(payload, UUIDKey, route, callback, JWT
 }
 
 
-
-
 function getActiveAPIListForDocumentationNew() {
 
   return APIDefinitation.getActiveAPIListForDocumentation({}).then(async (data) => {
@@ -516,7 +514,13 @@ function getActiveAPIListForDocumentationNew() {
           }
 
           if (routemap[useCase][route].isSimulated === true) {
-            response = JSON.parse(routemap[useCase][route].simulatorResponse);
+            try {
+              response = JSON.parse(routemap[useCase][route].simulatorResponse);
+            } catch (e) {
+              console.log(e, routemap[useCase][route].simulatorResponse);
+              response = {}
+            }
+
           }
           reqSample = routemap[useCase][route].sampleRequest
           _.set(routemap, `${useCase}.${route}.requestSchema`, request)
@@ -527,10 +531,9 @@ function getActiveAPIListForDocumentationNew() {
       return routemap;
     }
   ).catch((err) => {
-    callback(err);
+    console.log(err);
   });
 }
-
 
 
 function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
