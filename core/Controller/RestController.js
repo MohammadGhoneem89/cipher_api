@@ -94,23 +94,11 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       let successStatus = true;
       if (!response.__cipherMessage) {
         _.set(response, '__cipherSuccessStatus', successStatus);
-        let errCode = _.get(response, 'result.errorCode', undefined);
-        if (!errCode) {
-          errCode = _.get(response, 'errorCode', undefined);
-        }
-        let errMsg = _.get(global.codelist, errCode, '');
-
-        if (errCode) {
-          _.set(response, '__cipherMessage', errMsg);
-          _.set(response, '__cipherExternalErrorStatus', parseInt(errCode, 10));
-          _.set(response, '__cipherUIErrorStatus', constants.cipherUISuccess);
-        } else {
-          _.set(response, '__cipherMessage', constants.cipherGeneralSuccess);
-          _.set(response, '__cipherUIErrorStatus', constants.cipherUISuccess);
-          _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
-        }
-
-      };
+        _.set(response, '__cipherMessage', constants.cipherGeneralSuccess);
+        _.set(response, '__cipherUIErrorStatus', constants.cipherUISuccess);
+        _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
+      }
+      response = enrichError(response, successStatus);
       let objMapper = new ObjectMapper(response, configdata.ResponseMapping, global.enumInfo, UUIDKey, JWToken, 'Response', configdata.ResponseTransformations);
       return objMapper.start().then((mappedData) => {
         return mappedData;
@@ -132,11 +120,26 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       });
     }
     _.set(response, 'error', undefined);
+    _.set(response, 'success', undefined);
     _.set(response, 'message', undefined);
+    response = enrichError(response);
     return response;
   }).then((data) => {
     ResponseCaller(data);
   });
+}
+
+function enrichError(response, successStatus = true) {
+  let errCode = _.get(response, 'result.errorCode', undefined);
+  if (!errCode) {
+    errCode = _.get(response, 'errorCode', undefined);
+  }
+  let errMsg = _.get(global.codelist, errCode, '');
+  if (errCode) {
+    _.set(response, 'errorCode', parseInt(errCode, 10));
+    _.set(response, 'errorDescription', errMsg);
+  }
+  return response;
 }
 
 exports.handleExternalRequest = handleExternalRequest;

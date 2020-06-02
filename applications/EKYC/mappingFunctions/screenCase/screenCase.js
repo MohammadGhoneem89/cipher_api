@@ -3,15 +3,10 @@ const _ = require("lodash");
 const uuid = require("uuid").v4();
 const moment = require("moment");
 const rp = require('request-promise');
-const fetch = require('node-fetch');
-var CryptoJS = require('crypto-js');
+const CryptoJS = require('crypto-js');
 const EndpointDefination = require('../../../../lib/models/EndpointDefination');
 const eventLog = require('../../../../core/api/eventLog');
 const Stopwatch = require('statman-stopwatch');
-
-
-
-
 
 
 let Endpoint;
@@ -20,7 +15,7 @@ let delta;
 
 const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
 
-  console.log("------------------------------------------------>>>>> Payload: \n", JSON.stringify(payload,null,2));
+  console.log("------------------------------------------------>>>>> Payload: \n", JSON.stringify(payload, null, 2));
 
   //==============Fetch EndPoint===================
   let query = {};
@@ -40,26 +35,23 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
   //==============End===================
 
 
-
-
   //==============Screen API Request===================
 
   var epochDate = moment(payload.body.WCOscreeningFields.DOB).unix();
   console.log("---------->>>>> epochDate: ", epochDate);
-<<<<<<< HEAD
+
   let gender;
-  if(payload.body.WCOscreeningFields.gender == "M"){
+  if (payload.body.WCOscreeningFields.gender == "M") {
     gender = "MALE"
-  }else if(payload.body.WCOscreeningFields.gender == "F"){
+  } else if (payload.body.WCOscreeningFields.gender == "F") {
     gender = "FEMALE"
-  }else if(payload.body.WCOscreeningFields.gender == "O"){
+  } else if (payload.body.WCOscreeningFields.gender == "O") {
     gender = "UNSPECIFIED"
-  }else {
+  } else {
     return callback("Gender field values must be one of: M, F, O")
   }
-=======
->>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a
-  
+
+
   const request = {
     "groupId": Endpoint[0].groupId,
     "entityType": "INDIVIDUAL",
@@ -68,39 +60,32 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
     "nameTransposition": false,
     "secondaryFields": [
       {
-          "typeId": "SFCT_1",
-<<<<<<< HEAD
-          "value": gender
-=======
-          "value": payload.body.WCOscreeningFields.gender
->>>>>>> c35dcc01ce248aef90c281608d27ddc98424009a
+        "typeId": "SFCT_1",
+        "value": gender
       },
       {
-          "typeId": "SFCT_2",
-          "dateTimeValue": {
-              "timelinePrecision": "ON",
-              "pointInTimePrecision": "DAY",
-              "utcDateTime": epochDate,
-              "timeZone": null
-          }
+        "typeId": "SFCT_2",
+        "dateTimeValue": {
+          "timelinePrecision": "ON",
+          "pointInTimePrecision": "DAY",
+          "utcDateTime": epochDate,
+          "timeZone": null
+        }
       },
       {
-          "typeId": "SFCT_3",
-          "value": payload.body.Id.GCC.cardCountry
+        "typeId": "SFCT_3",
+        "value": payload.body.Id.GCC.cardCountry
       },
       {
-          "typeId": "SFCT_4",
-          "value": payload.body.WCOscreeningFields.placeOfBirth
+        "typeId": "SFCT_4",
+        "value": payload.body.WCOscreeningFields.placeOfBirth
       },
       {
-          "typeId": "SFCT_5",
-          "value": payload.body.WCOscreeningFields.nationality
+        "typeId": "SFCT_5",
+        "value": payload.body.WCOscreeningFields.nationality
       }
-  ]
+    ]
   };
-
-
-
 
 
   //==============Pre Request Script===================
@@ -122,27 +107,24 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
   // content = content.replace("{{custom-field-2}}", customField2);
   // content = content.replace("{{custom-field-3}}", customField3);
 
-  
 
   var contentLength = unescape(encodeURIComponent(JSON.stringify(request))).length;
- 
 
-  var dataToSign = "(request-target): post " + Endpoint[0].gatewayUrl + 
-  "cases/screeningRequest\n" +
+
+  var dataToSign = "(request-target): post " + Endpoint[0].gatewayUrl +
+    "cases/screeningRequest\n" +
     "host: " + Endpoint[0].gatewayHost + "\n" +
     "date: " + date + "\n" +
     "content-type: " + "application/json" + "\n" +
-    "content-length: "+contentLength + "\n" +
+    "content-length: " + contentLength + "\n" +
     JSON.stringify(request);
 
-    console.log("---------->>>>> dataToSign: ", dataToSign);
+  console.log("---------->>>>> dataToSign: ", dataToSign);
 
   var hmac = generateAuthHeader(dataToSign);
   var authorisation = "Signature keyId=\"" + Endpoint[0].apiKey + "\",algorithm=\"hmac-sha256\",headers=\"(request-target) host date content-type content-length\",signature=\"" + hmac + "\"";
 
-  
 
-  
   console.log("---------->>>>> date: ", date);
   console.log("---------->>>>> hmac: ", hmac);
   console.log("---------->>>>> authorisation: ", authorisation);
@@ -155,43 +137,44 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
   let externalApi = {
     method: 'POST',
     uri: Endpoint[0].address,
-    
+
     headers: {
       'Date': date,
       'Authorization': authorisation,
       'Content-Type': 'application/json',
       'Content-Length': contentLength,
     },
-    body:request,
+    body: request,
     redirect: 'follow',
 
     json: true
   };
 
   console.log("------------------------------------------------>>>>>>>>> externalApi:  ", JSON.stringify(externalApi, null, 2));
-  
+
   sw.reset();
   try {
 
-    
+
     sw.start();
     let response = await rp(externalApi)
     delta = sw.read();
     sw.reset();
     console.log("------------------------------------------------>>>>>>>>> respons :   ", JSON.stringify(response, null, 2))
 
-    
+
     const finalResponse = {
+      success: true,
       "messageStatus": "OK",
       "messageId": UUIDKey,
       "errorDescription": "Processed OK!",
-      "errorCode": 200,
+      "errorCode": 20100,
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
       "caseId": response.caseId,
-      "WCOCaseId":response.caseSystemId,
-      "creationDate":response.creationDate,
-      "outStandingActions":response.outStandingActions,
-      "result":response.results
+      "WCOCaseId": response.caseSystemId,
+      "creationDate": response.creationDate,
+      "outStandingActions": response.outStandingActions,
+      "result": response.results
       //"result":{errorCode:20100}
     };
     eventLog(UUIDKey, 'screenCase', request, response, delta);
@@ -200,11 +183,12 @@ const screenCase = async (payload, UUIDKey, route, callback, JWToken) => {
   } catch (err) {
     console.log('errorrrrrrrrrrrrrrr ------->>>>>>', err)
     const finalResponse = {
+      success: true,
       "messageStatus": "Error",
       "messageId": UUIDKey,
       "errorDescription": err.message,
       "errorCode": 201,
-      "result":{errorCode:20100},
+      "result": {errorCode: 20100},
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
     };
     eventLog(UUIDKey, 'screenCase', request, finalResponse, delta, err);
