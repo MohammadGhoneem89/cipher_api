@@ -236,7 +236,7 @@ module.exports = class Dispatcher {
   };
 
   executeCustomFunction() {
-    this.sw.start();
+
     return new Promise((resolve, reject) => {
       let generalResponse = {
         "error": false,
@@ -247,6 +247,7 @@ module.exports = class Dispatcher {
       let route = this.configdata.route;
       let JWT = this.JWT;
       let UUID = this.UUID;
+
       let functionName = this.configdata.MappingfunctionName;
       console.log("SEARCHING FILE>>>>>>>>>" + fileLoc)
       fs.exists(fileLoc, function (exists) {
@@ -254,7 +255,7 @@ module.exports = class Dispatcher {
           console.log("<<<<<<FILE Found>>>>>>");
           let mappingFunctions = require(fileLoc);
           console.log("<<<<<<Calling>>>>>> " + functionName);
-          mappingFunctions[functionName](Orequest, UUID, route, resolve, JWT, null, null, this.sw);
+          mappingFunctions[functionName](Orequest, UUID, route, resolve, JWT, null, null);
         } else {
           generalResponse.error = true;
           generalResponse.message = `mapping file does not exist ${fileLoc}`;
