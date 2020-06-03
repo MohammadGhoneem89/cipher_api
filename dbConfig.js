@@ -10,7 +10,7 @@ function get(callback) {
     const options = {
       method: 'POST',
       url: config.keyVault.url,
-      body: { env: config.keyVault.env, header: config.keyVault.header, svc: "cipher-replicator", pid: process.pid, hostname: os.hostname(), discoveryStatus: process.env.DISCOVERY },
+      body: { env: config.keyVault.env, header: config.keyVault.header, svc: "cipher-api", pid: process.pid, hostname: os.hostname(), discoveryStatus: process.env.DISCOVERY },
       json: true
     };
     request(options, callback);

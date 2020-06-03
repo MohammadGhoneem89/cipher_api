@@ -8,7 +8,6 @@ tryConnection();
 const crypto = require('crypto');
 const _ = require('lodash');
 
-
 function encrypt(str, secret) {
   const cipher = crypto.createCipher('aes-256-ctr', secret);
   let crypt = cipher.update(str, 'utf8', 'hex');
