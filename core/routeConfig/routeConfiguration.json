@@ -48,6 +48,12 @@
       "CustomMappingFile": "systemAPI/relayConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "calculate": {
+      "customMapping": true,
+      "MappingfunctionName": "calculate",
+      "CustomMappingFile": "systemAPI/billing.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "updateRelayNetworkConfig": {
       "customMapping": true,
       "MappingfunctionName": "updateRelayNetworkConfig",

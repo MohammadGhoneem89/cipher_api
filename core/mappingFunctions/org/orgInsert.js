@@ -99,6 +99,8 @@ function orgInsert(payload, userID, entityInsertCB) {
           format.entityLogo.sizeMedium = data.entityLogo ? data.entityLogo.sizeMedium : "";
           format.parentEntity = data.parentEntity ? data.parentEntity : "";
           format.clientKey = data.clientKey;
+          format.cycle = data.cycle ? data.cycle : "";
+          format.currency = data.currency ? data.currency : "";
           format.commissionTemplate = data.commissionTemplate ? data.commissionTemplate : "";
           if (!format.entityName && !format.arabicName && !format.orgType && !format.spCode ) {
             pointer.set(response, "/responseMessage/data/error", "Entity Name, Arabic Name , Org Type And org code are required Fields!!");
