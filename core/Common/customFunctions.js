@@ -4,12 +4,15 @@ const _ = require('lodash');
 const moment = require('moment');
 const dates = require('../../lib/helpers/dates');
 const inst = require('./buissnessFunction/sample.js');
+const business = require('../../applications/custom');
+
 module.exports = {
   STUB: (data, payload, jwt) => {
     return data;
   },
   ...inst
   ,
+  ...business,
   getDate: (data, payload, jwt) => {
     let format = 'YYYY/MM/DD HH:mm:ss ZZ';
     return moment().format(format);
