@@ -11,7 +11,8 @@ const OldRestController = require('./_RestController');
 const APIDefination = require('../mappingFunctions/systemAPI/APIDefination');
 const dates = require('../../lib/helpers/dates');
 const apiFilter = config.get('apiFilters') || [];
-
+const sprintf = require('sprintf-js').sprintf,
+  vsprintf = require('sprintf-js').vsprintf
 const txTracking = require('../api/txTracking');
 let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey, responseCallback, JWToken, ConnMQ) {
   let sw = new Stopwatch();
@@ -44,6 +45,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   }
   let eRRTBasic = _.get(configdata, 'estimatedRtt', 10000)
   let ResponseCaller = function (data) {
+    data = enrichError(data);
     let delta = sw.read();
     sw.reset();
     logger.debug({
@@ -74,7 +76,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     if (apiFilter.indexOf(incommingRoute) >= 0) {
       txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, eRRTBasic, username, orgcode);
     }
-    logger.error({
+    logger.info({
       fs: 'RestController.js',
       func: 'handleExternalRequest'
     }, `Message Processed In:  ${delta} ms`);
@@ -98,7 +100,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         _.set(response, '__cipherUIErrorStatus', constants.cipherUISuccess);
         _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
       }
-      response = enrichError(response, successStatus);
+
       let objMapper = new ObjectMapper(response, configdata.ResponseMapping, global.enumInfo, UUIDKey, JWToken, 'Response', configdata.ResponseTransformations);
       return objMapper.start().then((mappedData) => {
         return mappedData;
@@ -122,7 +124,6 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     _.set(response, 'error', undefined);
     _.set(response, 'success', undefined);
     _.set(response, 'message', undefined);
-    response = enrichError(response);
     return response;
   }).then((data) => {
     ResponseCaller(data);
@@ -134,10 +135,15 @@ function enrichError(response, successStatus = true) {
   if (!errCode) {
     errCode = _.get(response, 'errorCode', undefined);
   }
+
+  let options = _.get(response, 'result.options', undefined);
+  if (!options) {
+    options = _.get(response, 'options', undefined);
+  }
   let errMsg = _.get(global.codelist, errCode, '');
   if (errCode) {
     _.set(response, 'errorCode', parseInt(errCode, 10));
-    _.set(response, 'errorDescription', errMsg);
+    _.set(response, 'errorDescription', vsprintf(errMsg, options));
   }
   return response;
 }

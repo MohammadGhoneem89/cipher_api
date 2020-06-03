@@ -36,12 +36,19 @@ function getErrorCodeList(payload, UUIDKey, route, callback, JWToken) {
 
 function updateErrorCodeList(payload, UUIDKey, route, callback, JWToken) {
   ErrorCodes.update({code: payload.code}, {$set: payload}, {upsert: true}).then((data) => {
+    let newRec = {
+      code: payload.code, description: payload.description, actions: [
+        {"label": "edit", "iconName": "fa fa-pen", "actionType": "COMPONENT_FUNCTION"}
+      ]
+    };
+    let bounce = _.get(payload, 'bounce', []);
+    bounce.push(newRec);
     let response = {
       "updateErrorCodeList": {
         "action": "ErrorCodeList",
         "data": {
           "status": true,
-          "bounce": {code: payload.code, description: payload.description}
+          "bounce": bounce
         }
       }
     };
