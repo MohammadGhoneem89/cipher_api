@@ -152,6 +152,21 @@ function orgCodeList() {
 }
 ;
 
+function updateLastBilling(lastbilldate, spCode) {
+  return new Promise((resolve, reject) => {
+    global.db.update("Entity", {
+      "spCode": spCode
+    }, {lastbilldate: lastbilldate}, function (err) {
+      if (err) {
+        logger.error(" [ Entity Update ] Entity is not updated : " + err);
+        return reject(err);
+      }
+      return resolve();
+    });
+  });
+}
+
 exports.entityListOut = entityListOut;
 exports.orgCodeList = orgCodeList;
+exports.updateLastBilling = updateLastBilling;
 

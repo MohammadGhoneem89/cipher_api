@@ -3,7 +3,7 @@ const pointer = require("json-pointer");
 const permissionsHelper = require('../../../lib/helpers/permissions');
 const permissionConst = require('../../../lib/constants/permissions');
 const _ = require('lodash');
-
+const pg = require('../../api/connectors/postgress');
 var entityDetailOut = function (payload, UUIDKey, route, callback, JWToken) {
 
   logger.debug(" [ Entity Detail ] PAYLOAD : " + JSON.stringify(payload, null, 2));
@@ -82,9 +82,14 @@ var orgDetail = function (payload, entityGetCB, JWToken) {
       component: ''
     };
     permissionsHelper.embed(params)
-      .then((res) => {
+      .then(async (res) => {
         pointer.set(data, '/actions', res.pageActions);
+
+
+        let conn = await pg.connection();
+        let reslt = await conn.query(`select * from billingreport where orgcode='${data.spCode}'`);
         response["entityDetail"]["data"] = data;
+        _.set(response, 'entityDetail.data.billing', reslt.rows);
         entityGetCB(response);
       });
   });
