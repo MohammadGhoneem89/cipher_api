@@ -13,5 +13,26 @@
       "CustomMappingFile": "screenCase/screenCase.js",
       "mappingConfigFile": "ePayMapping"
     }
+  },
+  "Task": {
+    "CustomFunctionsLocation": "../../applications/Task/mappingFunctions/",
+    "getTask":{
+      "customMapping": true,
+      "MappingfunctionName": "getTask",
+      "CustomMappingFile": "getTask.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "searchTask":{
+      "customMapping": true,
+      "MappingfunctionName": "searchTask",
+      "CustomMappingFile": "searchTask.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
+  "addTask":{
+    "customMapping": true,
+    "MappingfunctionName": "addTask",
+    "CustomMappingFile": "addTask.js",
+    "mappingConfigFile": "ePayMapping"
   }
 }
