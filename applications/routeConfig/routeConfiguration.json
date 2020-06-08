@@ -27,12 +27,19 @@
       "MappingfunctionName": "searchTask",
       "CustomMappingFile": "searchTask.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "searchTaskDetails":{
+      "customMapping": true,
+      "MappingfunctionName": "searchTaskDetails",
+      "CustomMappingFile": "searchTaskDetails.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "search":{
+      "customMapping": true,
+      "MappingfunctionName": "search",
+      "CustomMappingFile": "search.js",
+      "mappingConfigFile": "ePayMapping"
     }
-  },
-  "addTask":{
-    "customMapping": true,
-    "MappingfunctionName": "addTask",
-    "CustomMappingFile": "addTask.js",
-    "mappingConfigFile": "ePayMapping"
   }
+ 
 }

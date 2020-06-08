@@ -14,6 +14,8 @@ const crypto = require('./lib/helpers/crypto');
 const apiTemplate = require('./lib/repositories/apiTemplate');
 const RestController = require('./core/Controller/RestController.js');
 const mongoDB = require('./core/api/connectors/mongoDB');
+const postgres = require('./core/api/connectors/postgress.js');
+
 const fileUpload = require('express-fileupload');
 const imageUpload = require('./core/validation/imageUpload');
 const fileUploadValid = require('./core/validation/fileUpload');
@@ -37,6 +39,8 @@ const baseExclusion = ['setPassword', 'permission', 'user', 'notificationList']
 global.appDir = __dirname;
 mongoDB.connection(config.get('mongodb.url'));
 console.log(config.get('mongodb.url'))
+//console.log("postgress t-------------------------")
+//console.log(config.get('taskPostgres.url'))
 app = expressWs.app;
 app.use(xssFilter());
 app.use(fileUpload());
