@@ -6,6 +6,12 @@
       "CustomMappingFile": "general/getFileList.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "generateHMAC": {
+      "customMapping": true,
+      "MappingfunctionName": "generateHMAC",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getFileData": {
       "customMapping": true,
       "MappingfunctionName": "getFileData",

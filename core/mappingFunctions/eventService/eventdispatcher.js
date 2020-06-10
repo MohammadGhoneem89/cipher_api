@@ -130,7 +130,7 @@ function upsertEventDispatcher(payload, UUIDKey, route, callback, JWToken) {
     }
   };
   if (payload.dispatcherName) {
-    eventDispatcher.update({ dispatcherName: payload.dispatcherName }, payload).then((data) => {
+    eventDispatcher.update({dispatcherName: payload.dispatcherName}, payload).then((data) => {
       resp.responseMessage.data.message.status = "OK";
       data.nModified > 0 ?
         resp.responseMessage.data.message.errorDescription = "Record Updated Success!!" :
@@ -141,8 +141,7 @@ function upsertEventDispatcher(payload, UUIDKey, route, callback, JWToken) {
       console.log(err);
       callback(resp);
     });
-  }
-  else {
+  } else {
     resp.responseMessage.data.message.errorDescription = "dispatcherName is required";
     return callback(resp);
   }
@@ -175,7 +174,9 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
 
   let queryCriteria = queryCnt + query;
   let queryCriteriaFull = queryData + query;
-  if (payload.page) { queryCriteriaFull += ` order by createdon desc limit ${payload.page.pageSize} OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)}`; }
+  if (payload.page) {
+    queryCriteriaFull += ` order by createdon desc limit ${payload.page.pageSize} OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)}`;
+  }
   console.log(queryCriteriaFull);
   pg.connection().then((conn) => {
     return Promise.all([
@@ -189,7 +190,11 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
         elemt.createdon = elemt.createdon;
         elemt.updatedon = elemt.updatedon;
         elemt.status = Status(elemt.status);
-        elemt.actions = [{ label: "ReQueue", iconName: "fa fa-recycle", actionType: "COMPONENT_FUNCTION" }, { label: "viewData", iconName: "fa fa-eye", actionType: "COMPONENT_FUNCTION" }];
+        elemt.actions = [{
+          label: "ReQueue",
+          iconName: "fa fa-recycle",
+          actionType: "COMPONENT_FUNCTION"
+        }, {label: "viewData", iconName: "fa fa-eye", actionType: "COMPONENT_FUNCTION"}];
       });
       console.log(JSON.stringify(data[0].rows, null, 5))
       let response = {
@@ -246,22 +251,17 @@ function Status(tranStatus) {
   let vs = {
     "value": "",
     "type": "INFO"
-  };
-  if (tranStatus == 0) {
-    vs.value = 'Pending',
-      vs.type = 'WARNING';
   }
-  
-  if (tranStatus == 4) {
-     vs.value = 'Waiting',
-      vs.type = 'WARNING';
-  }
-  else if (tranStatus == 1) {
+  if (tranStatus === 0) {
+    vs.value = 'Pending';
+    vs.type = 'WARNING';
+  } else if (tranStatus === 4) {
+    vs.value = 'Waiting';
+    vs.type = 'WARNING';
+  } else if (tranStatus === 1) {
     vs.value = 'Dispatched';
     vs.type = "SUCCESS";
-
-  }
-  else if (tranStatus == 3) {
+  } else if (tranStatus === 3) {
     vs.value = "Fail";
     vs.type = "ERROR";
   }

@@ -16,6 +16,7 @@ const ErrorCodes = require('../../../lib/models/ErrorCodes');
 const relayConfig = require('./relayConfig');
 const fs = require('fs');
 const permission = require('../../../lib/repositories/permission');
+let crypto = require('crypto');
 String.prototype.capitalize = function () {
   return this.charAt(0).toUpperCase() + this.slice(1);
 }
@@ -1014,6 +1015,52 @@ async function main() {
   await zipafolder.zip('./core/mappingFunctions/systemAPI/Chaincode', './core/mappingFunctions/systemAPI/Chaincode.zip');
 }
 
+function generateHMAC(payload, UUIDKey, route, callback, JWToken) {
+  let privatekey = payload.privatekey;
+  let sharedSec = payload.sharedSec;
+
+  const getSignatureByInput = (input) => {
+    try {
+      let privatePem = new Buffer(privatekey, 'ascii');
+      let key = privatePem.toString('ascii');
+      let sign = crypto.createSign('RSA-SHA512');
+      sign.update(input);
+      let signature = sign.sign(key, 'hex')
+      return signature;
+    } catch (ex) {
+      return callback({
+        loginResponse: {
+          data: {
+            message: {
+              status: 'ERROR',
+              errorDescription: 'invalid privatekey',
+              routeTo: '',
+              displayToUser: true
+            },
+            success: false
+          }
+        },
+        error: true
+      })
+    }
+
+  }
+
+  // Usage
+  let hamc = crypto.createHmac("sha512", sharedSec).update(payload.body).digest("hex");
+  let signatureSignedByPrivateKey = getSignatureByInput(hamc);
+  let response = {
+    "generateHMAC": {
+      "action": "ErrorCodeList",
+      "data": {
+        "generatedHMAC": signatureSignedByPrivateKey
+      }
+    }
+  };
+  callback(response);
+
+}
+
 
 exports.downloadChainCode = downloadChainCode;
 exports.getAPIDefinition = getAPIDefinition;
@@ -1029,5 +1076,6 @@ exports.diffPermissionsRoutes = diffPermissionsRoutes;
 exports.updateErrorCodeList = updateErrorCodeList;
 exports.getErrorCodeList = getErrorCodeList;
 exports.getActiveAPIListForDocumentationNew = getActiveAPIListForDocumentationNew;
+exports.generateHMAC = generateHMAC;
 
 
