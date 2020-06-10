@@ -191,8 +191,8 @@ exports.health = async function (payload, UUIDKey, route, callback, JWToken) {
     }
   }
 
-  let rabbitURL = url.parse(crypto.decrypt(configGlobal.get('amqp.health')))
-  let rabbitMQ = []
+  let rabbitURL = url.parse(crypto.decrypt(configGlobal.get('amqp.health')));
+  let rabbitMQ = [];
   try {
     let parsedBody = await rp({
       method: 'GET',
@@ -211,14 +211,14 @@ exports.health = async function (payload, UUIDKey, route, callback, JWToken) {
     rabbitMQ.push(finalObj);
   } catch (ex) {
     let finalObj = {};
-    _.set(finalObj, 'cluster_name', rabbitURL.host)
-    _.set(finalObj, 'publish', 0.0)
-    _.set(finalObj, 'publish_details_rate', 0.0)
-    _.set(finalObj, 'publish', 0.0)
-    _.set(finalObj, 'publish', 0.0)
-    _.set(finalObj, 'lastUpdateTime', Date.now())
-    _.set(finalObj, 'status', 'Dead')
-    _.set(finalObj, 'message', ex.message)
+    _.set(finalObj, 'cluster_name', rabbitURL.host);
+    _.set(finalObj, 'publish', 0.0);
+    _.set(finalObj, 'publish_details_rate', 0.0);
+    _.set(finalObj, 'publish', 0.0);
+    _.set(finalObj, 'publish', 0.0);
+    _.set(finalObj, 'lastUpdateTime', Date.now());
+    _.set(finalObj, 'status', 'Dead');
+    _.set(finalObj, 'message', ex.message);
     rabbitMQ.push(finalObj);
     console.log(JSON.stringify(rabbitMQ))
     console.log(ex.message)
@@ -236,6 +236,8 @@ exports.health = async function (payload, UUIDKey, route, callback, JWToken) {
       health: {
         action: "health",
         data: {
+          prometheusURL: configGlobal.get('prometheusURL'),
+          gui_monitoring: configGlobal.get('gui_monitoring'),
           cipherSvc: parsedBody,
           clientList: clientList,
           rabbitMQ: rabbitMQ,
