@@ -27,22 +27,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   let configdata = _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
   let username = _.get(JWToken, `userID`, 'No User');
   let orgcode = _.get(JWToken, `orgCode`, 'No Org');
-
-
   _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
-  if (apiFilter.indexOf(incommingRoute) >= 0) {
-    _.set(payload, 'body.password', undefined);
-    _.set(payload, 'JWToken', undefined)
-    _.set(payload, 'JWT', undefined)
-    let requestData = {
-      uuid: UUIDKey,
-      channel: channel,
-      action: incommingRoute,
-      payload: payload,
-      createdat: Date.now()
-    };
-
-  }
   let eRRTBasic = _.get(configdata, 'estimatedRtt', 10000)
   let ResponseCaller = function (data) {
     data = enrichError(data);
@@ -73,7 +58,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       APIDefination.updateRequestStub(apiSample, incommingRoute, channel);
     }
 
-    if (apiFilter.indexOf(incommingRoute) >= 0) {
+    if ((apiFilter.indexOf(incommingRoute) >= 0) || (configdata && configdata.isTracked)) {
       txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, eRRTBasic, username, orgcode);
     }
     logger.info({
