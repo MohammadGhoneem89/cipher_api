@@ -33,14 +33,19 @@ module.exports = class Dispatcher {
         throw new Error("signature required!")
       }
       console.log(OriginalRequest.query)
-      console.log(">>>>>>>>>>>>>>", JWTtoken);
 
       console.log(OriginalRequest.rawBody);
-      let computedSignature = crypto.createHmac("sha512", JWTtoken.clientKey).update(OriginalRequest.rawBody).digest("hex");
-      let verified = this.getSignatureVerifyResult(computedSignature, JWTtoken.HmacPvtKey, retrievedSignature);
-      if (!verified) {
+      try {
+        let computedSignature = crypto.createHmac("sha512", JWTtoken.clientKey).update(OriginalRequest.rawBody).digest("hex");
+        let verified = this.getSignatureVerifyResult(computedSignature, JWTtoken.HmacPvtKey, retrievedSignature);
+        if (!verified) {
+          throw new Error("invalid signature!")
+        }
+      } catch (e) {
+        console.log(e)
         throw new Error("invalid signature!")
       }
+
     }
 
     if (configData.isBlockchain === true) {
