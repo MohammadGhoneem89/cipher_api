@@ -243,7 +243,12 @@ module.exports = class Dispatcher {
         "message": "Processed OK!"
       };
       let fileLoc = path.resolve(__dirname, `../mappingFunctions/${this.configdata.CustomMappingFile}`);
-      let Orequest = this.request;
+      let Orequest = {};
+      if (this.configdata.isBlockchain) {
+        Orequest = this.request;
+      } else {
+        Orequest = this.oRequest
+      }
       let route = this.configdata.route;
       let JWT = this.JWT;
       let UUID = this.UUID;

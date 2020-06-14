@@ -65,6 +65,18 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       fs: 'RestController.js',
       func: 'handleExternalRequest'
     }, `Message Processed In:  ${delta} ms`);
+
+    // let ss = _.get(data, '__cipherUIErrorStatus', undefined);
+    // if (ss && ss == 'ERROR') {
+    //   let error = _.get(data, '__cipherMessage', undefined);
+    //   data = {
+    //     "messageStatus": ss,
+    //     "cipherMessageId": UUIDKey,
+    //     "errorDescription": error,
+    //     "errorCode": 201,
+    //     "timestamp": new Date().toISOString()
+    //   };
+    // }
     return responseCallback.json(data);
     // responseCallback.end();
   };
