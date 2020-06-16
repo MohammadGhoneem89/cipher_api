@@ -58,14 +58,6 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       APIDefination.updateRequestStub(apiSample, incommingRoute, channel);
     }
 
-    if ((apiFilter.indexOf(incommingRoute) >= 0) || (configdata && configdata.isTracked)) {
-      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, eRRTBasic, username, orgcode);
-    }
-    logger.info({
-      fs: 'RestController.js',
-      func: 'handleExternalRequest'
-    }, `Message Processed In:  ${delta} ms`);
-
     let ss = _.get(data, '__cipherUIErrorStatus', undefined);
     if (ss && ss == 'ERROR') {
       let error = _.get(data, '__cipherMessage', undefined);
@@ -77,6 +69,17 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         "timestamp": new Date().toISOString()
       };
     }
+    let errCode = _.get(data, 'errorCode', 200);
+    console.log('????>>>>', errCode)
+    if ((apiFilter.indexOf(incommingRoute) >= 0) || (configdata && configdata.isTracked) || errCode != 200) {
+      txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, eRRTBasic, username, orgcode, errCode);
+    }
+    logger.info({
+      fs: 'RestController.js',
+      func: 'handleExternalRequest'
+    }, `Message Processed In:  ${delta} ms`);
+
+
     return responseCallback.json(data);
     // responseCallback.end();
   };

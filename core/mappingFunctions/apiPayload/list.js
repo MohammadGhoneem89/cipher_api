@@ -2,8 +2,8 @@
 
 const apiPayload = require('../../../lib/services/apiPayload');
 const pg = require('../../api/connectors/postgress');
-const { getAPIPayloadListQuery } = require('../../utils/apiPayloadqueries');
-const { calculateOffset, getRecordsCount } = require('../../utils/commonUtils');
+const {getAPIPayloadListQuery} = require('../../utils/apiPayloadqueries');
+const {calculateOffset, getRecordsCount} = require('../../utils/commonUtils');
 
 function list(payload, UUIDKey, route, callback, JWToken) {
   payload.userId = JWToken._id;
@@ -23,7 +23,8 @@ function _listPG(payload, callback) {
     payload.searchCriteria.fromDate,
     payload.searchCriteria.toDate,
     payload.searchCriteria.payloadField,
-    payload.searchCriteria.payloadFieldValue
+    payload.searchCriteria.payloadFieldValue,
+    payload.searchCriteria.errCode
   );
   pg.connection().then(async conn => {
     let queryResult = await conn.query(query, []);
@@ -35,7 +36,7 @@ function _listPG(payload, callback) {
     console.log('getRecordCount' + numberOfRecords);
 
     console.log('queryResult: ', JSON.stringify(queryResult));
-    let { rows } = queryResult;
+    let {rows} = queryResult;
 
     let response = {};
     response[payload.action] = {
@@ -55,6 +56,7 @@ function _listPG(payload, callback) {
     callback(response);
   });
 }
+
 function _list(payload, callback) {
   apiPayload
     .getList(payload)
@@ -103,4 +105,5 @@ function appendAction(response) {
     }
   }
 }
+
 exports.list = list;

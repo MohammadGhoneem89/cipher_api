@@ -1,6 +1,6 @@
-const { formateWhereClause } = require('./commonUtils');
+const {formateWhereClause} = require('./commonUtils');
 module.exports = {
-  getAPIPayloadListQuery: function(pageSize, offset, channel = null, action = null, msgId = null, fromDate = null, toDate = null, payloadField = null, payloadFieldValue = null) {
+  getAPIPayloadListQuery: function (pageSize, offset, channel = null, action = null, msgId = null, fromDate = null, toDate = null, payloadField = null, payloadFieldValue = null, errCode) {
     let filtersToApply = [];
     if (channel) {
       filtersToApply.push(`channel LIKE '${channel}'`);
@@ -82,7 +82,9 @@ module.exports = {
             )`);
       }
     }
-
+    if (errCode) {
+      filtersToApply.push(`errcode  LIKE '%${errCode}%'`);
+    }
     const whereFilter = formateWhereClause(filtersToApply) || '';
     const query = `
             SELECT
@@ -91,7 +93,8 @@ module.exports = {
             channel,
             action,
             createdat as "createdAt",
-            payload            
+            payload,
+            *            
             FROM apipayload
             ${whereFilter}
             ORDER BY createdat DESC LIMIT ${pageSize} OFFSET ${offset}
@@ -106,7 +109,7 @@ module.exports = {
     return [query, countQuery];
   },
 
-  getAPIPayloadDetailQuery: function(uuid = null) {
+  getAPIPayloadDetailQuery: function (uuid = null) {
     let query = `SELECT 
     uuid as "_id",
     *
