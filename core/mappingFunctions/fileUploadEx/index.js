@@ -6,7 +6,7 @@ const { create, findDocument } = require('../../../lib/services/documents');
 
 const Ipfs = require('./ipfs');
 const ServerFS = require('./server-fs');
-const Database = require('./database');
+// const Database = require('./database');
 
 let Readable = require('stream').Readable;
 
@@ -93,8 +93,8 @@ let upload = async function(payload, UUIDKey, route, callback, JWToken) {
     case 'IPFS':
       fsObject = new Ipfs();
       break;
-    case 'DB': 
-      fsObject = new Database();
+    // case 'DB':
+    //   fsObject = new Database();
     break;
     default:
         const resp = {

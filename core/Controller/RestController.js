@@ -142,7 +142,7 @@ function enrichError(response, successStatus = true) {
     options = _.get(response, 'options', undefined);
   }
   let errMsg = _.get(global.codelist, errCode, '');
-  if (errCode) {
+  if (errCode && errMsg) {
     _.set(response, 'errorCode', parseInt(errCode, 10));
     _.set(response, 'errorDescription', vsprintf(errMsg, options));
   }
