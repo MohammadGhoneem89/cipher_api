@@ -5,15 +5,15 @@ const user = require('../../../lib/services/user');
 
 function userListOut(payload, UUIDKey, route, callback, JWToken) {
   payload.userId = JWToken._id;
-  if (!(JWToken.orgType==='MASTER') && JWToken.userID != 'admin' && JWToken.userID != 'Admin') {
+  if (!(JWToken.orgType === 'MASTER') && JWToken.userID != 'admin' && JWToken.userID != 'Admin') {
     payload.searchCriteria.orgCode = JWToken.orgCode;
   }
-    
-  userList(payload, callback);
+
+  userList(payload, callback, JWToken);
 }
 
-function userList(payload, callback) {
-  user.getList(payload)
+function userList(payload, callback, JWToken) {
+  user.getList(payload, JWToken)
     .then((usersDetails) => {
       let response = {
         userList: {
@@ -31,15 +31,15 @@ function userList(payload, callback) {
       };
 
       response.userList.data.actions = [{
-        "value" : "4043",
-        "type" : "pageAction",
-        "label" : "ADD",
-        "labelName" : "COM_AB_Add",
-        "actionType" : "PORTLET_LINK",
-        "iconName" : "fa fa-plus",
-        "URI" : "/userSetup"
-    }]
-      for (let rowCount=0; rowCount < response.userList.data.searchResult.length; rowCount++) {
+        "value": "4043",
+        "type": "pageAction",
+        "label": "ADD",
+        "labelName": "COM_AB_Add",
+        "actionType": "PORTLET_LINK",
+        "iconName": "fa fa-plus",
+        "URI": "/userSetup"
+      }]
+      for (let rowCount = 0; rowCount < response.userList.data.searchResult.length; rowCount++) {
         response.userList.data.searchResult[rowCount].actions = [
           {
             "URI": [

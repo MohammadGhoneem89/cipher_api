@@ -1,6 +1,7 @@
 const {formateWhereClause} = require('./commonUtils');
+const config = require('../../config');
 module.exports = {
-  getAPIPayloadListQuery: function (pageSize, offset, channel = null, action = null, msgId = null, fromDate = null, toDate = null, payloadField = null, payloadFieldValue = null, errCode) {
+  getAPIPayloadListQuery: function (pageSize, offset, channel = null, action = null, msgId = null, fromDate = null, toDate = null, payloadField = null, payloadFieldValue = null, errCode, JWToken) {
     let filtersToApply = [];
     if (channel) {
       filtersToApply.push(`channel LIKE '${channel}'`);
@@ -10,6 +11,10 @@ module.exports = {
     }
     if (msgId) {
       filtersToApply.push(`uuid LIKE '%${msgId}%'`);
+    }
+    let ownOrg = config.get('ownerOrgs', [])
+    if (JWToken && ownOrg.indexOf(JWToken.orgCode) == -1) {
+      filtersToApply.push(`orgcode='${JWToken.orgCode}'`);
     }
     if (payloadField && payloadFieldValue) {
       let payloadFields = [];

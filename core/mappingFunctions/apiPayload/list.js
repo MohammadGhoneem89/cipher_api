@@ -8,10 +8,10 @@ const {calculateOffset, getRecordsCount} = require('../../utils/commonUtils');
 function list(payload, UUIDKey, route, callback, JWToken) {
   payload.userId = JWToken._id;
   //_list(payload, callback);
-  _listPG(payload, callback);
+  _listPG(payload, callback, JWToken);
 }
 
-function _listPG(payload, callback) {
+function _listPG(payload, callback, JWToken) {
   let offset = calculateOffset(payload.page.currentPageNo, payload.page.pageSize);
 
   let [query, countQuery] = getAPIPayloadListQuery(
@@ -24,7 +24,8 @@ function _listPG(payload, callback) {
     payload.searchCriteria.toDate,
     payload.searchCriteria.payloadField,
     payload.searchCriteria.payloadFieldValue,
-    payload.searchCriteria.errCode
+    payload.searchCriteria.errCode,
+    JWToken
   );
   pg.connection().then(async conn => {
     let queryResult = await conn.query(query, []);

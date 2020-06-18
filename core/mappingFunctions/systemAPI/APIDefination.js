@@ -14,6 +14,7 @@ const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
 const ErrorCodes = require('../../../lib/models/ErrorCodes');
 const relayConfig = require('./relayConfig');
+const config = require('../../../config');
 const fs = require('fs');
 const permission = require('../../../lib/repositories/permission');
 let crypto = require('crypto');
@@ -22,12 +23,18 @@ String.prototype.capitalize = function () {
 }
 
 function getErrorCodeList(payload, UUIDKey, route, callback, JWToken) {
+  let isOwner = false;
+  let ownOrg = config.get('ownerOrgs', [])
+  if (ownOrg.indexOf(JWToken.orgCode) > -1) {
+    isOwner = true;
+  }
   ErrorCodes.find({}).then((data) => {
     let response = {
       "ErrorCodeList": {
         "action": "ErrorCodeList",
         "data": {
-          "searchResult": data
+          "searchResult": data,
+          isOwner
         }
       }
     };
@@ -133,12 +140,22 @@ function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
         "/APIDefScreen/"
       ]
     }];
+    let isOwner = false;
+    let ownOrg = config.get('ownerOrgs', [])
+    if (ownOrg.indexOf(JWToken.orgCode) > -1) {
+      isOwner = true;
+      data[0].forEach((element) => {
+        element.actions = actions;
+        element.hiddenID = element.useCase + "/" + element.route;
+        element.createdBy = element.createdBy ? element.createdBy.userID : '';
+      });
+    } else {
+      data[0].forEach((element) => {
+        element.hiddenID = element.useCase + "/" + element.route;
+        element.createdBy = element.createdBy ? element.createdBy.userID : '';
+      });
+    }
 
-    data[0].forEach((element) => {
-      element.actions = actions;
-      element.hiddenID = element.useCase + "/" + element.route;
-      element.createdBy = element.createdBy ? element.createdBy.userID : '';
-    });
 
     let response = {
       "ApiListData": {
@@ -149,7 +166,8 @@ function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
           "totalRecords": data[1]
         },
         "data": {
-          "searchResult": data[0]
+          "searchResult": data[0],
+          isOwner
         }
       }
     };

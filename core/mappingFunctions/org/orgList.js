@@ -5,6 +5,7 @@ const permissionsHelper = require('../../../lib/helpers/permissions');
 const permissionConst = require('../../../lib/constants/permissions');
 const _ = require('lodash');
 const dateFormat = require('../../../lib/helpers/dates');
+const config = require('../../../config');
 
 let entityListOut = function (payload, UUIDKey, route, callback, JWToken) {
   logger.debug(" [ Entity List ] PAYLOAD : " + JSON.stringify(payload, null, 2));
@@ -58,6 +59,11 @@ function orgList(body, entityList_CB, JWToken) {
   if (searchCriteria && searchCriteria.spCode) {
     let spCode = searchCriteria.spCode;
     criteria.push({"spCode": spCode});
+  }
+
+  let ownOrg = config.get('ownerOrgs', [])
+  if (ownOrg && ownOrg.indexOf(JWToken.orgCode) == -1) {
+    criteria.push({"spCode": {'$regex': JWToken.orgCode, '$options': 'i'}});
   }
   if (searchCriteria && searchCriteria.isActive) {
     criteria.push({isActive: true});
