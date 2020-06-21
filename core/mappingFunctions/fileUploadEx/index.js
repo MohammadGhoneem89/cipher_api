@@ -302,9 +302,6 @@ let download = async function(payload, UUIDKey, route, callback, JWToken, res) {
     }
 
 
-
-
-
     const document = await findDocument({
       hash: payload.queryParams.path || payload.headersParams.path
     });

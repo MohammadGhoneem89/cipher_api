@@ -17,6 +17,7 @@ const relayConfig = require('./relayConfig');
 const config = require('../../../config');
 const fs = require('fs');
 const permission = require('../../../lib/repositories/permission');
+const permissions = require('../../../lib/services/permission');
 let crypto = require('crypto');
 String.prototype.capitalize = function () {
   return this.charAt(0).toUpperCase() + this.slice(1);
@@ -129,7 +130,7 @@ function LoadConfig() {
 }
 
 function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
-  APIDefinitation.findPageAndCount(payload).then((data) => {
+  APIDefinitation.findPageAndCount(payload).then(async (data) => {
     let actions = [{
       "value": "1003",
       "type": "componentAction",
@@ -140,6 +141,7 @@ function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
         "/APIDefScreen/"
       ]
     }];
+    let finalList = []
     let isOwner = false;
     let ownOrg = config.get('ownerOrgs', [])
     if (ownOrg.indexOf(JWToken.orgCode) > -1) {
@@ -149,13 +151,21 @@ function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
         element.hiddenID = element.useCase + "/" + element.route;
         element.createdBy = element.createdBy ? element.createdBy.userID : '';
       });
+      finalList = data[0];
     } else {
-      data[0].forEach((element) => {
+
+      let URIs = await permissions.uriPermissionsByOrgCode({orgCode: JWToken.orgCode});
+
+      data[0].forEach((element, index) => {
         element.hiddenID = element.useCase + "/" + element.route;
         element.createdBy = element.createdBy ? element.createdBy.userID : '';
-      });
+        if (_.indexOf(URIs, '/' + element.route) >= 0) {
+          finalList.push(element)
+        }
+      })
+      console.log('>>>>>>>>>', JSON.stringify(URIs));
+      console.log('>>>>>finalList>>>>', JSON.stringify(finalList));
     }
-
 
     let response = {
       "ApiListData": {
@@ -166,7 +176,7 @@ function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
           "totalRecords": data[1]
         },
         "data": {
-          "searchResult": data[0],
+          "searchResult": finalList,
           isOwner
         }
       }

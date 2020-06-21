@@ -8,7 +8,7 @@ let handleExternalRequest = function (payload, channel, route, UUIDKey, Response
   try {
     let routeConfig = routeConfiguration[channel][route];
     if (routeConfig.customMapping === true) {
-      handleCustomMappingFunction(routeConfig.MappingfunctionName, routeConfig.CustomMappingFile, payload, UUIDKey, route, ResponseCaller, JWToken, ResponseCaller, routeConfiguration, channel, res);
+      handleCustomMappingFunction(routeConfig.MappingfunctionName, routeConfig.CustomMappingFile, payload, UUIDKey, route, ResponseCaller, JWToken, res, routeConfiguration, channel, res);
       return;
     }
     ResponseCaller(errorResponse("custom mapping must be true", UUIDKey));

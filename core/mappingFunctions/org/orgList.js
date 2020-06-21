@@ -130,7 +130,18 @@ function orgList(body, entityList_CB, JWToken) {
 
             permissionsHelper.embed(params)
               .then((res) => {
-                response["entityList"]["data"]["actions"] = res.pageActions;
+                if (res.pageActions.length > 0) {
+                  response["entityList"]["data"]["actions"] = [{
+                    "value": "1002",
+                    "type": "pageAction",
+                    "label": "ADD",
+                    "labelName": "COM_AB_Add",
+                    "actionType": "PORTLET_LINK",
+                    "iconName": "fa fa-plus",
+                    "URI": "/orgSetup",
+                    "children": []
+                  }];
+                }
                 response["entityList"]["data"]["searchResult"] = res.documents;
                 nameData = _.sortBy(nameData, (d) => d.label.toLowerCase());
                 response["entityList"]["data"]["typeData"]["entityNames"] = !isEntity ? nameData : [];
