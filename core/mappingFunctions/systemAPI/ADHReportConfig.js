@@ -82,7 +82,8 @@ function getADHReportListProtected(payload, UUIDKey, route, callback, JWToken, r
 
       element.actions = actions;
       element.createdBy = element.createdBy ? element.createdBy.userID : '';
-      outVal.push(element);
+      if (isFound)
+        outVal.push(element);
     });
     let response = {
       "ADHReportList": {
