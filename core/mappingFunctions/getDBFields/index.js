@@ -16,8 +16,8 @@ const getDBFields = async function (payload, UUIDKey, route, callback, JWToken) 
       name: payload.object,
       type: payload.objectType
     }).lean();
-    // console.log(payload,"---payload")
-     response.getDBFields.data = data.fields;
+
+     response.getDBFields.data = {};
     if (payload.objectType === 'storedProcedure') {
       response.getDBFields.outputFields = data.outputs;
     } else {

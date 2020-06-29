@@ -411,10 +411,6 @@ app.get('/export/:channel', permissions, function (req, res) {
 });
 
 function apiCallsHandler(req, res) {
-  console.log('Cookies: ', req.cookies)
-
-  // Cookies that have been signed
-  console.log('Signed Cookies: ', req.signedCookies)
   try {
     if (checkbadinput(req)) {
       let resperr = {'error': "illegal character found in request"};
@@ -452,10 +448,6 @@ function apiCallsHandler(req, res) {
 
     const url_parts = url.parse(req.url);
     const query = url_parts.query;
-    logger.info({
-      fs: 'app.js',
-      func: 'API'
-    }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
 
     payload = Object.assign(payload, {
       action: action,
@@ -476,29 +468,20 @@ function apiCallsHandler(req, res) {
     }, 'JWToken :  ' + JWToken);
 
     const decoded = crypto.decrypt(JWToken);
-
-    console.log(JWToken + "token>>" + JSON.stringify(decoded));
     if (decoded.isNewUser && baseExclusion.indexOf(action) == -1) {
       return res.status(403).send(timeoutResponse);
     }
 
     tokenValid(decoded._id, JWToken).then(async valid => {
-
       let byPassValidation = commonConst.permissionExcludeList.includes(action);
       if (valid || _.get(payload, "header", null) != null || byPassValidation) {
-        logger.info({
-          fs: 'app.js',
-          func: 'API'
-        }, decoded, 'decoded.userID:');
         RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
-
         await tokenLookup.update({
           token: JWToken,
           userId: decoded._id
         }, {
           createdAt: dates.newDate()
         });
-
       } else {
         console.log("sending response 403");
         res.clearCookie("token");

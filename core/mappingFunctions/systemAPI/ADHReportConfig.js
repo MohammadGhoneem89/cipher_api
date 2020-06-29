@@ -1,9 +1,14 @@
 'use strict';
-const networkConfig = require('../../../lib/repositories/networkConfig');
-const orgTypeData = require('../org/orgTypeData');
+const adhReport = require('../../../lib/repositories/adhReport');
+const sequalize = require('../../api/client/sequelize');
+const {QueryTypes} = require('sequelize');
 const _ = require('lodash');
-function getNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
-  networkConfig.findPageAndCount(payload).then((data) => {
+const SqlString = require('sqlstring');
+const Handlebars = require("handlebars");
+const jsonexport = require('jsonexport');
+
+function getADHReportList(payload, UUIDKey, route, callback, JWToken, res) {
+  adhReport.findPageAndCount(payload, JWToken).then((data) => {
     let actions = [
       {
         "value": "1003",
@@ -12,23 +17,23 @@ function getNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
         "params": "",
         "iconName": "icon-docs",
         "URI": [
-          "/editNetwork/"
+          "/ReportAddUpdate/"
         ]
       }];
-    data[0].forEach((element) => {
+    data[1].forEach((element) => {
       element.actions = actions;
       element.createdBy = element.createdBy ? element.createdBy.userID : '';
     });
     let response = {
-      "NetworkList": {
-        "action": "NetworkList",
+      "ADHReportList": {
+        "action": "getADHReportList",
         "pageData": {
           "pageSize": payload.page.pageSize,
           "currentPageNo": payload.page.currentPageNo,
-          "totalRecords": data[1]
+          "totalRecords": data[2]
         },
         "data": {
-          "searchResult": data[0]
+          "searchResult": data[1]
         }
       }
     };
@@ -36,8 +41,8 @@ function getNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
   }).catch((err) => {
     console.log(JSON.stringify(err));
     let response = {
-      "NetworkList": {
-        "action": "NetworkList",
+      "ADHReportList": {
+        "action": "ADHReportList",
         "pageData": {
           "pageSize": payload.page.pageSize,
           "currentPageNo": payload.page.currentPageNo,
@@ -51,16 +56,75 @@ function getNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
     callback(response);
   });
 }
-function getNetworkConfigByID(payload, UUIDKey, route, callback, JWToken) {
+
+function getADHReportListProtected(payload, UUIDKey, route, callback, JWToken, res) {
+  adhReport.findPageAndCount(payload, JWToken).then((data) => {
+    let actions = [
+      {
+        "value": "1003",
+        "type": "componentAction",
+        "label": "View",
+        "params": "",
+        "iconName": "icon-docs",
+        "URI": [
+          "/ReportRender/"
+        ]
+      }];
+    console.log(">>>>>>>>>}}}}", JSON.stringify(data[0]))
+    let outVal = []
+    data[1].forEach((element) => {
+      let isFound = false;
+      element.group.forEach((gp) => {
+        if (data[0].groups.indexOf(gp) > -1) {
+          isFound = true;
+        }
+      });
+
+      element.actions = actions;
+      element.createdBy = element.createdBy ? element.createdBy.userID : '';
+      outVal.push(element);
+    });
+    let response = {
+      "ADHReportList": {
+        "action": "getADHReportList",
+        "pageData": {
+          "pageSize": payload.page.pageSize,
+          "currentPageNo": payload.page.currentPageNo,
+          "totalRecords": data[2]
+        },
+        "data": {
+          "searchResult": outVal
+        }
+      }
+    };
+    callback(response);
+  }).catch((err) => {
+    console.log(JSON.stringify(err));
+    let response = {
+      "ADHReportList": {
+        "action": "ADHReportList",
+        "pageData": {
+          "pageSize": payload.page.pageSize,
+          "currentPageNo": payload.page.currentPageNo,
+          "totalRecords": 0
+        },
+        "data": {
+          "searchResult": []
+        }
+      }
+    };
+    callback(response);
+  });
+}
+
+function getADHReportByID(payload, UUIDKey, route, callback, JWToken) {
   Promise.all([
-    networkConfig.findById(payload)
+    adhReport.findById(payload)
   ]).then((data) => {
     let response = {
-      "AddUpdateNetwork": {
-        "action": "AddUpdateNetwork",
-        "data": {
-          "NetworkConfig": data[0]
-        }
+      "reportContainer": {
+        "action": "reportContainer",
+        "data": data[0]
       }
     };
     callback(response);
@@ -68,11 +132,12 @@ function getNetworkConfigByID(payload, UUIDKey, route, callback, JWToken) {
     callback(err);
   });
 }
-function updateNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
+
+function updateADHReport(payload, UUIDKey, route, callback, JWToken) {
   payload.createdBy = JWToken._id;
   let resp = {
     "responseMessage": {
-      "action": "updateNetworkConfig",
+      "action": "updateADHReport",
       "data": {
         "message": {
           "status": "ERROR",
@@ -85,14 +150,13 @@ function updateNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
   };
 
   if (true) {
-    networkConfig.update(payload).then((data) => {
+    adhReport.update(payload).then((data) => {
       resp.responseMessage.data.message.status = "OK";
       resp.responseMessage.data.message.errorDescription = "Record Updated Success!!";
-      resp.responseMessage.data.message.newPageURL = "/NetworkList";
+      resp.responseMessage.data.message.newPageURL = "/ReportList";
       callback(resp);
     });
-  }
-  else {
+  } else {
     resp.responseMessage.data.message.status = "ERROR";
     resp.responseMessage.data.message.errorDescription = "id is required!";
     resp.responseMessage.data.message.newPageURL = "";
@@ -100,164 +164,97 @@ function updateNetworkConfig(payload, UUIDKey, route, callback, JWToken) {
   }
 }
 
-function getServiceList(payload, UUIDKey, route, callback, JWToken) {
-  orgTypeData((data) => {
-    let resp = {
-      "NetworkTypeData": {
-        "action": "NetworkTypeData",
-        "data": {
-          networks: [],
-          orgList: data || []
-        }
-      }
-    };
-    Promise.all([
-      networkConfig.getList(payload)
-    ]).then((data) => {
-      data[0].forEach((key) => {
-        let obj = {
-          "label": key.networkName,
-          "value": key._id
-        };
-        resp.NetworkTypeData.data.networks.push(obj);
-      });
-      callback(resp);
-    }).catch((err) => {
-      callback(err);
-    });
-  });
-}
+async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
 
-function getPeerList(payload, UUIDKey, route, callback, JWToken) {
   let resp = {
-    "NetworkPeerList": {
-      "action": "NetworkPeerList",
+    "responseMessage": {
+      "action": "updateADHReport",
       "data": {
-        peers: []
+        "message": {
+          "status": "ERROR",
+          "errorDescription": "Some Error Occured during operation!!, Please Contact Support",
+          "displayToUser": true,
+          "newPageURL": ""
+        }
       }
     }
   };
-  Promise.all([
-    networkConfig.findById(payload)
-  ]).then((data) => {
-    data[0].peerList.forEach((elem) => {
-      elem.actions = [{
-        "label": "Join Channel",
-        "iconName": "fa fa-chain",
-        "actionType": "COMPONENT_FUNCTION"
-      }];
-    });
-    resp.NetworkPeerList.data.peers = data[0].peerList;
-    callback(resp);
-  }).catch((err) => {
-    callback(err);
-  });
-}
+  payload.createdBy = JWToken._id;
+  let connection = undefined;
+  try {
+    connection = await sequalize(payload.connectionString);
+  } catch (e) {
+    console.log(e)
+    resp.responseMessage.data.message.status = "ERROR";
+    resp.responseMessage.data.message.errorDescription = e.message;
+    resp.responseMessage.data.message.newPageURL = "";
 
-function getNetworkConfigList(payload, UUIDKey, route, callback, JWToken) {
+    return callback(resp)
+  }
+  if (connection) {
+    console.log("ADHOC Dock Connected Successfully!!")
+    try {
+      let finalObj = {};
 
-  networkConfig.find({ type: payload.type })
-    .then((arrayList) => {
-      let result = {};
-      arrayList.forEach((data) => {
-        console.log(JSON.stringify(data, null, 2));
-        let response = {
-          "users": [{
-            "username": data.username,
-            "secret": data.secret
-          }],
-          "GOPATH": "../chaincode",
-          "request-timeout": 12000000,
-          "orderer": {
-            "url": data.orderer.url,
-            "server-hostname": data.orderer.serverHostname,
-            "isFile": false,
-            "tls_cacerts": data.orderer.tlsCacerts
-          },
-          "org": {
-            "name": data.mspid,
-            "mspid": data.mspid,
-            "ca": data.ca
-          }
-        };
-        data.peerUser.forEach((dataPeerUser) => {
-          let blockchainUsers = {
-            "isFile": false,
-            "key": dataPeerUser.key,
-            "cert": dataPeerUser.cert
-          };
-          _.set(response, `org.${dataPeerUser.userName}`, blockchainUsers)
-        });
-        data.peerList.forEach((dataPeerList, index) => {
-          let peer = {
-            "isFile": false,
-            "peerName": dataPeerList.peerName,
-            "requests": dataPeerList.requests,
-            "events": dataPeerList.events,
-            "server-hostname": dataPeerList.server_hostname,
-            "tls_cacerts": dataPeerList.tls_cacerts
-          };
-          _.set(response, `org.peer${index + 1}`, peer);
-        });
-        _.set(result, `${data.networkName}`, response);
-      });
-      callback(result);
-    })
-    .catch((err) => {
-      console.log(err);
-      // response[payload.action] = {
-      //   action: payload.action,
-      //   data: {},
-      //   error: err
-      // };
-      // callback(response);
-    });
-}
 
-function getUserList(payload, UUIDKey, route, callback, JWToken) {
-  networkConfig.find({})
-    .then((arrayList) => {
-      let result = {
-        hyperledger: [],
-        quorrum: []
-      };
-      arrayList.forEach((data) => {
-        let tuppleList = [];
-        data.peerUser.forEach((elem) => {
-          let tupple = { label: "", value: "", orgType: "" }
-          tupple.orgType = data.orginizationAlias
-          tupple.label = `${data.networkName}-${elem.userName}`
-          tupple.value = `${data.networkName}-${elem.userName}`
-          tuppleList.push(tupple);
-          
-        });
-        if (data.type == "Quorum") {
-          tuppleList.forEach((elem) => {
-            result.quorrum.push(elem);
-          });
+      if (payload.exptype == 'CSV') {
+        finalObj = payload.finalForm;
+      }
+
+      payload.filters.forEach((elem) => {
+        if (payload.exptype != 'CSV') {
+          let sanitized = elem.testVal;
+          _.set(finalObj, elem.fieldName, sanitized)
         }
-        else {
-          tuppleList.forEach((elem) => {
-            result.hyperledger.push(elem);
-          });
+
+        if (elem.dataType == 'userid') {
+          _.set(finalObj, elem.fieldName, JWToken.userID)
+        } else if (elem.dataType == 'orgcode') {
+          _.set(finalObj, elem.fieldName, JWToken.orgCode)
+        } else if (elem.dataType == 'orgtype') {
+          _.set(finalObj, elem.fieldName, JWToken.orgType)
         }
+      })
+      let source = payload.queryStr;
+      let template = Handlebars.compile(source);
+      console.log(finalObj)
+      let qry = template(finalObj);
+      const resultSet = await connection.query(qry, {
+        logging: console.log,
+        plain: false,
+        raw: false,
+        type: QueryTypes.SELECT
       });
-      let resp = {
-        "NetworkUserTypeData": {
-          "action": "NetworkTypeData",
-          "data": result
+      if (resultSet.length == 0) {
+        resp.responseMessage.data.message.status = "ERROR";
+        resp.responseMessage.data.message.errorDescription = 'no records found matching criteria';
+        resp.responseMessage.data.message.newPageURL = "";
+        return callback(resp)
+      }
+      let action = payload.action || 'resultSet'
+      let response = {
+        [action]: {
+          "action": action,
+          "data": resultSet
         }
       };
-      callback(resp);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+
+      callback(response)
+
+    } catch (e) {
+      console.log(e)
+      resp.responseMessage.data.message.status = "ERROR";
+      resp.responseMessage.data.message.errorDescription = e.message;
+      resp.responseMessage.data.message.newPageURL = "";
+      return callback(resp)
+    }
+  }
+
 }
-exports.getUserList = getUserList;
-exports.updateNetworkConfig = updateNetworkConfig;
-exports.getNetworkConfig = getNetworkConfig;
-exports.getNetworkConfigByID = getNetworkConfigByID;
-exports.getServiceList = getServiceList;
-exports.getPeerList = getPeerList;
-exports.getNetworkConfigList = getNetworkConfigList;
+
+exports.testADHReport = testADHReport;
+exports.getADHReportList = getADHReportList;
+exports.getADHReportByID = getADHReportByID;
+exports.updateADHReport = updateADHReport;
+exports.getADHReportListProtected = getADHReportListProtected;
+
