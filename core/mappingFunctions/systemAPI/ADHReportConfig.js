@@ -1,9 +1,10 @@
 'use strict';
 const adhReport = require('../../../lib/repositories/adhReport');
+const endpointDefination = require('../../../lib/repositories/endpointDefination');
 const sequalize = require('../../api/client/sequelize');
 const {QueryTypes} = require('sequelize');
 const _ = require('lodash');
-const SqlString = require('sqlstring');
+const escapeString = require('sql-string-escape');
 const Handlebars = require("handlebars");
 const jsonexport = require('jsonexport');
 
@@ -183,7 +184,10 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
   payload.createdBy = JWToken._id;
   let connection = undefined;
   try {
-    connection = await sequalize(payload.connectionString);
+
+
+    let endpoint = await endpointDefination.findOne({id: payload.connectionString});
+    connection = await sequalize(endpoint.address);
   } catch (e) {
     console.log(e)
     resp.responseMessage.data.message.status = "ERROR";
@@ -201,10 +205,14 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
       if (payload.exptype == 'CSV') {
         finalObj = payload.finalForm;
       }
+      for(let id in finalObj){
+        let sanitized = (finalObj[id]);
+        _.set(finalObj, id, sanitized)
+      }
 
       payload.filters.forEach((elem) => {
         if (payload.exptype != 'CSV') {
-          let sanitized = elem.testVal;
+          let sanitized = (elem.testVal);
           _.set(finalObj, elem.fieldName, sanitized)
         }
 
