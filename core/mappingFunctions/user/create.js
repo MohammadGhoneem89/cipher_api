@@ -70,7 +70,7 @@ function create(payload, callback) {
           data: {
             message: {
               status: 'OK',
-              errorDescription: 'Welcome Package sent successfully',
+              errorDescription: 'user created successfully!',
               displayToUser: true,
               newPageURL: '/userList'
             }
