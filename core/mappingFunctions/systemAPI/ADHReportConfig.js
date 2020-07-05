@@ -1,5 +1,6 @@
 'use strict';
 const adhReport = require('../../../lib/repositories/adhReport');
+const emailTemplateRepo = require('../../../lib/repositories/emailTemplate');
 const endpointDefination = require('../../../lib/repositories/endpointDefination');
 const sequalize = require('../../api/client/sequelize');
 const {QueryTypes} = require('sequelize');
@@ -7,6 +8,9 @@ const _ = require('lodash');
 const escapeString = require('sql-string-escape');
 const Handlebars = require("handlebars");
 const jsonexport = require('jsonexport');
+const config = require('../../../config');
+const nodemailer = require('nodemailer');
+const rp = require("request-promise");
 
 function getADHReportList(payload, UUIDKey, route, callback, JWToken, res) {
   adhReport.findPageAndCount(payload, JWToken).then((data) => {
@@ -173,8 +177,8 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
       "action": "updateADHReport",
       "data": {
         "message": {
-          "status": "ERROR",
-          "errorDescription": "Some Error Occured during operation!!, Please Contact Support",
+          "status": "OK",
+          "errorDescription": "Processed Ok!",
           "displayToUser": true,
           "newPageURL": ""
         }
@@ -205,7 +209,7 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
       if (payload.exptype == 'CSV') {
         finalObj = payload.finalForm;
       }
-      for(let id in finalObj){
+      for (let id in finalObj) {
         let sanitized = (finalObj[id]);
         _.set(finalObj, id, sanitized)
       }
@@ -248,9 +252,99 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
         }
       };
 
-      callback(response)
+      if (payload.createSchedule) {
+        _.set(payload, 'rawBody', undefined);
+        _.set(payload, 'queryParams', undefined);
+        _.set(payload, 'headersParams', undefined);
+        _.set(payload, 'token', undefined);
+        _.set(payload, 'action', undefined);
+        _.set(payload, 'channel', undefined);
+        _.set(payload, 'ipAddress', undefined);
+        _.set(payload, 'query', undefined);
+        _.set(payload, 'createSchedule', undefined);
+        var options = {
+          method: 'POST',
+          uri: config.get('taskExec.url'),
+          body: {
+            "username": config.get('taskExec.username'),
+            "password": config.get('taskExec.password'),
+            "schedule_time": parseInt(payload.scheduleTime) / 1000,
+            "json_payload": JSON.stringify(payload),
+            "task_type": "API",
+            "retry_count": 0,
+            "api_url": config.get('taskExec.api_url'),
+          },
+          json: true // Automatically stringifies the body to JSON
+        };
 
-    } catch (e) {
+        rp(options)
+          .then(function (parsedBody) {
+            resp.responseMessage.data.message.errorDescription = "Schedule Created Successfully!!";
+            callback(resp);
+          })
+          .catch(function (err) {
+            console.log(err);
+            resp.responseMessage.data.message.status = "ERROR";
+            resp.responseMessage.data.message.errorDescription = err.message;
+            resp.responseMessage.data.message.newPageURL = "";
+            callback(resp);
+          });
+
+      } else if (payload.isScheduled && !payload.test) {
+        emailTemplateRepo.findOne({templateType: 'Report'}).then(async (template) => {
+          const [templateObject] = template;
+          let transporter = nodemailer.createTransport({
+            host: config.get('email.host'),
+            port: config.get('email.port'),
+            secure: config.get('email.ssl'), // use TLS
+            auth: {
+              user: config.get('email.address'),
+              pass: config.get('email.authPassword')//
+            },
+            tls: {
+              rejectUnauthorized: false
+            }
+          });
+
+          let dataForTemplate = payload
+          let columnList = [];
+          let fileCSV = "";
+          let singleRecord = _.get(resultSet, '[0]', {})
+          for (let key in singleRecord) {
+            columnList.push(key);
+          }
+          fileCSV = columnList.join(',');
+          fileCSV += '\r\n'
+          resultSet.forEach((elem) => {
+            let values = []
+            columnList.forEach((col) => {
+              let val = _.get(elem, col, '')
+              values.push(val);
+            })
+            fileCSV += values.join(',');
+            fileCSV += '\r\n'
+          });
+          await transporter.sendMail({
+            from: config.get('email.address'), // sender address
+            to: payload.email,  // list of receivers
+            subject: templateObject.subjectEng,    // Subject line
+            html: `${replaceEmailText(templateObject.templateTextEng, dataForTemplate)}`,
+            attachments: [
+              {
+                filename: 'report.csv',
+                content: fileCSV
+              }]
+          });
+          callback(resp);
+
+        })
+      } else {
+        callback(response)
+      }
+
+
+    } catch
+      (e) {
       console.log(e)
       resp.responseMessage.data.message.status = "ERROR";
       resp.responseMessage.data.message.errorDescription = e.message;
@@ -259,6 +353,16 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
     }
   }
 
+}
+
+function replaceEmailText(msg, obj) {
+  let result = msg.slice(0)
+  for (let key in obj) {
+    let value = obj[key]
+    result = result.replace('{{' + key + '}}', value)
+  }
+
+  return result
 }
 
 exports.testADHReport = testADHReport;

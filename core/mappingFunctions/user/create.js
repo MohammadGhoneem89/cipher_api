@@ -1,6 +1,7 @@
 'use strict';
 
 const user = require('../../../lib/services/user');
+const _ = require('lodash');
 
 function userCreate(payload, UUIDKey, route, callback, JWToken) {
   payload.createdBy = JWToken._id;
@@ -79,13 +80,17 @@ function create(payload, callback) {
       callback(response);
     })
     .catch((err) => {
+      let firstKey, firstValue;
+      firstKey = _.get(Object.keys(err), '[0]', undefined);
+      if (firstKey)
+        firstValue = _.get(err, firstKey, undefined);
       const response = {
         responseMessage: {
           action: payload.action,
           data: {
             message: {
               status: 'ERROR',
-              errorDescription: 'User not inserted',
+              errorDescription: firstValue || 'User not updated',
               displayToUser: true
             },
             error: err
