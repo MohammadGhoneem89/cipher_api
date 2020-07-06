@@ -1,8 +1,10 @@
 'use strict';
-import networkList from "../../../../../cipher_ui/core/components/BLAConfiguration/networkList";
 
 const dates = require('../../../lib/helpers/dates');
 const pg = require('../../api/connectors/postgress');
+const config = require('../../../config');
+const _ = require('lodash');
+const moment = require('moment');
 
 function getSafLogs(payload, UUIDKey, route, callback, JWToken) {
   let queryData = 'SELECT * FROM saflogs WHERE 1=1 ';
@@ -17,9 +19,9 @@ function getSafLogs(payload, UUIDKey, route, callback, JWToken) {
     let functionName = payload.searchCriteria.functionName;
     query += ` AND functionName = '${functionName}' `;
   }
-  if (payload.searchCriteria && payload.searchCriteria.errormsg) {
-    let errormsg = payload.searchCriteria.errormsg;
-    query += ` AND errormsg like '%${errormsg}%'`;
+  if (payload.searchCriteria && payload.searchCriteria.network) {
+    let network = payload.searchCriteria.network;
+    query += ` AND network like '%${network}%'`;
   }
   let queryCriteria = queryCnt + query;
   let queryCriteriaFull = queryData + query;
@@ -60,13 +62,92 @@ function getSafLogs(payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
-function updateSafLogs() {
+async function updateSafLogs(payload, UUIDKey, route, callback, JWToken) {
+  let queryData = `update saflogs set status=2 WHERE id=${payload.id}`;
+  let resp = {
+    "responseMessage": {
+      "data": {
+        "message": {
+          "status": "ERROR",
+          "errorDescription": "",
+          "displayToUser": true,
+          "newPageURL": ""
+        }
+      }
+    }
+  };
+  const amq = require('../../api/connectors/queue');
+  let channelSender = await amq.start();
+  let queueName = config.get('queues.SAFQueue', 'BLA_Input_Queue');
+  console.log(">>++++__", JSON.stringify(payload))
+  return channelSender.sendToQueue(queueName, payload.payload).then(function () {
+    return pg.connection().then((conn) => {
+      return conn.query(queryData, []).then((data) => {
+        resp.responseMessage.data.message.status = "OK";
+        resp.responseMessage.data.message.errorDescription = `Message ReQueued to [${queueName}] !!`;
+        return callback(resp);
+      }).catch((ex) => {
+        console.log(ex)
+        resp.responseMessage.data.message.status = "ERROR";
+        resp.responseMessage.data.message.errorDescription = ex.message;
+        return callback(resp);
+      });
+    }).catch((ex) => {
+      console.log(ex);
+      resp.responseMessage.data.message.status = "ERROR";
+      resp.responseMessage.data.message.errorDescription = ex.message;
+      return callback(resp);
+    });
+  }).catch(function (err) {
+    console.log(err);
+    resp.responseMessage.data.message.status = "ERROR";
+    resp.responseMessage.data.message.errorDescription = "Message was rejected!";
+    return console.log("Message was rejected!");
+  });
 }
 
-function consumeSaflogs() {
+async function consumeSaflogs() {
   const amq = require('../../api/connectors/queue');
-  let connection = amq.start();
+  let connection = await amq.start();
+  console.log("system ")
+  connection.addSetup(function (channel) {
+    return Promise.all([
+      channel.assertQueue(config.get('queues.unprocessed', 'UN_PROCESSED'), config.get('queueGeneralConfig', {})),
+      channel.consume(config.get('queues.unprocessed', 'UN_PROCESSED'), async function handleMessage(msg) {
+        try {
+          let message = Buffer.from(msg.content).toString();
+          console.log('SAF Record Found>', message)
+          console.log(message)
+          let data = JSON.parse(message);
+          let error = _.get(data, 'Error', {});
+          let fcnName = _.get(data, 'Body.fcnName', 'N/A');
+          let status = '1';
+          let payload = data;
+          let uuid = _.get(data, 'Header.UUID', 'N/A');
+          let messagedate = _.get(data, 'Header.timeStamp', 'N/A');
+          if (messagedate) {
+            let dateEp = new Date(messagedate);
+            messagedate = moment.unix(dateEp.valueOf() / 1000).format('YYYY-MM-DD HH:mm:ss');
+          }
+          let network = _.get(data, 'Header.network', 'Exhausted');
+          let smartcontract = `${_.get(data, 'BCData.channelName', 'N/A')}/${_.get(data, 'BCData.smartContractName', 'N/A')}`
+          let query = `INSERT INTO public.saflogs (createdon, functionname, errormsg, status, payload, uuid, messagedate, network, smartcontract)
+                 VALUES(now(), $1::varchar, $2::json, $3::json, $4::json, $5::varchar,$6::timestamptz, $7::varchar, $8::varchar)`;
 
+          console.log(query)
+          return pg.connection().then((conn) => {
+            return conn.query(query, [fcnName, error, status, payload, uuid, messagedate, network, smartcontract]).then(() => {
+              console.log('SAF Record Found archived successfully!');
+            })
+          });
+        } catch (e) {
+          console.log(e)
+        } finally {
+          connection.ack(msg);
+        }
+      })
+    ])
+  });
 }
 
 
@@ -75,18 +156,13 @@ function Status(tranStatus) {
     "value": "",
     "type": "INFO"
   }
-  if (tranStatus === 0) {
-    vs.value = 'Pending';
-    vs.type = 'WARNING';
-  } else if (tranStatus === 4) {
-    vs.value = 'Waiting';
-    vs.type = 'WARNING';
-  } else if (tranStatus === 1) {
+  if (tranStatus === '1') {
+    vs.value = "Rejected";
+    vs.type = "ERROR";
+
+  } else if (tranStatus === '2') {
     vs.value = 'Dispatched';
     vs.type = "SUCCESS";
-  } else if (tranStatus === 3) {
-    vs.value = "Fail";
-    vs.type = "ERROR";
   }
   return vs;
 
@@ -94,3 +170,4 @@ function Status(tranStatus) {
 
 exports.getSafLogs = getSafLogs;
 exports.updateSafLogs = updateSafLogs;
+exports.consumeSaflogs = consumeSaflogs;

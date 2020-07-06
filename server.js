@@ -15,7 +15,8 @@ const apiTemplate = require('./lib/repositories/apiTemplate');
 const RestController = require('./core/Controller/RestController.js');
 const mongoDB = require('./core/api/connectors/mongoDB');
 const postgres = require('./core/api/connectors/postgress.js');
-
+const saf = require('./core/mappingFunctions/safLogs/saf');
+saf.consumeSaflogs();
 const fileUpload = require('express-fileupload');
 const imageUpload = require('./core/validation/imageUpload');
 const fileUploadValid = require('./core/validation/fileUpload');
@@ -28,6 +29,7 @@ const cookieParser = require('cookie-parser');
 const _ = require('lodash');
 let HealthCheckHelper = require('./core/utils/health.js');
 const routeData = require('./core/mappingFunctions/systemAPI/APIDefination');
+const health = require('./core/mappingFunctions/healthService/health');
 const getUpload = require('./core/validation/getDocUploadEx.js');
 const getDocUpload = require('./core/validation/getDocUpload.js');
 const tokenLookup = require('./lib/repositories/tokenLookup');
@@ -59,6 +61,7 @@ routeData.LoadConfig().then(() => {
       func: 'index'
     }, 'server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
     console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
+    setTimeout(health.checkRules, configGlobal.get('healthCheckInterval', 300000));
   });
 });
 
