@@ -61,7 +61,7 @@ routeData.LoadConfig().then(() => {
       func: 'index'
     }, 'server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
     console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
-    setTimeout(health.checkRules, configGlobal.get('healthCheckInterval', 300000));
+    setTimeout(health.checkRules, config.get('healthCheckInterval', 300000));
   });
 });
 
