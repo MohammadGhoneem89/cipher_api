@@ -23,10 +23,15 @@ function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
       emailTemplateRepo.findAndFormat(payload.data.templateId, payload.data.templateParams).then((format) => {
         let senderEmail = config.get('email.address');
         let transporter = nodemailer.createTransport({
-          service: 'gmail',
+          host: config.get('email.host'),
+          port: config.get('email.port'),
+          secure: config.get('email.ssl'), // use TLS
           auth: {
-            user: config.get('email.address'),
-            pass: config.get('email.authPassword')
+            user: config.get('email.username'),
+            pass: config.get('email.authPassword')//
+          },
+          tls: {
+            rejectUnauthorized: false
           }
         });
         let mailList = [];
@@ -35,7 +40,7 @@ function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
         });
         let flag = true;
         let mailOptions = {
-          from: senderEmail, // sender address
+          from: config.get('email.address'), // sender address
           to: mailList.toString(), // list of receivers
           subject: format.subjectEng, // Subject line
           html: `<p>${format.templateTextEng}</p>`// plain text body

@@ -298,7 +298,7 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
             port: config.get('email.port'),
             secure: config.get('email.ssl'), // use TLS
             auth: {
-              user: config.get('email.address'),
+              user: config.get('email.username'),
               pass: config.get('email.authPassword')//
             },
             tls: {
