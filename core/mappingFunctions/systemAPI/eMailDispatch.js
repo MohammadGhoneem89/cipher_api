@@ -6,6 +6,7 @@ const typeData = require('../../../lib/repositories/typeData');
 const emailTemplateRepo = require('../../../lib/repositories/emailTemplate');
 const nodemailer = require('nodemailer');
 const config = require('../../../config/index');
+
 function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
 
   let grp = _.get(payload, 'data.groupName', null);
@@ -20,12 +21,17 @@ function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
       });
     }).then((userList) => {
       emailTemplateRepo.findAndFormat(payload.data.templateId, payload.data.templateParams).then((format) => {
-        let senderEmail = 'lostpassportservice.dp@gmail.com';
+        let senderEmail = config.get('email.address');
         let transporter = nodemailer.createTransport({
-          service: 'gmail',
+          host: config.get('email.host'),
+          port: config.get('email.port'),
+          secure: config.get('email.ssl'), // use TLS
           auth: {
-            user: senderEmail,
-            pass: 'Aisitaisi4696'
+            user: config.get('email.username'),
+            pass: config.get('email.authPassword')//
+          },
+          tls: {
+            rejectUnauthorized: false
           }
         });
         let mailList = [];
@@ -34,27 +40,26 @@ function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
         });
         let flag = true;
         let mailOptions = {
-          from: senderEmail, // sender address
+          from: config.get('email.address'), // sender address
           to: mailList.toString(), // list of receivers
           subject: format.subjectEng, // Subject line
           html: `<p>${format.templateTextEng}</p>`// plain text body
         };
         transporter.sendMail(mailOptions, function (err, info) {
           if (err) {
-            return callback({ success: false, message: err.response });
+            return callback({success: false, message: err.response});
           }
           console.log(info);
-          return callback({ success: true });
+          return callback({success: true});
 
         });
       });
     }).catch((err) => {
       console.log(err)
-      callback({ success: false, message: err.message });
+      callback({success: false, message: err.message});
     });
-  }
-  else {
-    return callback({ success: false, message: 'Invalid Group for Email' });
+  } else {
+    return callback({success: false, message: 'Invalid Group for Email'});
   }
 }
 

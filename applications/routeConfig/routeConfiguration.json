@@ -18,14 +18,14 @@
     "CustomFunctionsLocation": "../../applications/Task/mappingFunctions/",
     "getTask":{
       "customMapping": true,
-      "MappingfunctionName": "getTask",
-      "CustomMappingFile": "getTask.js",
+      "MappingfunctionName": "searchTaskDetails",
+      "CustomMappingFile": "searchTaskDetails.js",
       "mappingConfigFile": "ePayMapping"
     },
     "searchTask":{
       "customMapping": true,
-      "MappingfunctionName": "searchTask",
-      "CustomMappingFile": "searchTask.js",
+      "MappingfunctionName": "search",
+      "CustomMappingFile": "search.js",
       "mappingConfigFile": "ePayMapping"
     },
     "searchTaskDetails":{

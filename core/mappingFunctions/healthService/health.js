@@ -8,6 +8,8 @@ const configGlobal = require('../../../config/index');
 const logger = require('../../../lib/helpers/logger')().app;
 const networkConfig = require('../../../lib/repositories/networkConfig');
 const endpoint = require('../../../lib/repositories/endpointDefination');
+const Health = require('../../../lib/models/HealthNotifications');
+const eMailDispatch = require('../systemAPI/eMailDispatch');
 const url = require('url');
 const isReachable = require('is-reachable');
 const vaultURL = url.parse(config.keyVault.url);
@@ -91,13 +93,66 @@ exports.configUpdate = async function (payload, UUIDKey, route, callback, JWToke
 }
 
 
-exports.health = async function (payload, UUIDKey, route, callback, JWToken) {
+// create map for rules
+
+function checkRules() {
+
+  health({}, '', '', function (dataHealth) {
+
+    Health.findOne({name: 'general'}).then((data) => {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>', JSON.stringify(data, null, 2));
+      if (data && data.ruleList) {
+        data.ruleList.forEach((elem) => {
+            console.log(JSON.stringify(elem));
+            let wildcardLoc = elem.field.indexOf('*')
+            if (elem.field.indexOf('*') > 0) {
+              let rawArr = _.get(dataHealth, elem.field.substring(0, wildcardLoc - 1), [])
+              rawArr.forEach((element) => {
+                let val = _.get(element, elem.field.substring(wildcardLoc + 2, elem.field.length), '');
+                if (elem.option == '==' && val == elem.value) {
+                  dispatch(elem, element)
+                } else if (elem.option == '!=' && val != elem.value) {
+                  dispatch(elem, element)
+                }
+              })
+            } else {
+              let val = _.get(dataHealth, elem.field, '')
+              if (elem.option == '==' && val == elem.value) {
+                dispatch(elem, dataHealth)
+              } else if (elem.option == '!=' && val != elem.value) {
+                dispatch(elem, dataHealth)
+              }
+            }
+          }
+        )
+      }
+    })
+  }, {});
+  setTimeout(checkRules, configGlobal.get('healthCheckInterval', 300000));
+}
+
+function dispatch(elem, data) {
+  eMailDispatch.dispatchEmail({
+    data: {
+      text: `Health svc EMAIL`,
+      type: "ERROR",
+      params: "?params",
+      labelClass: "label label-sm label-primary",
+      createdBy: "System",
+      groupName: elem.group,
+      isEmail: true,
+      templateParams: data,
+      templateId: elem.emailTemplate
+    }
+  })
+}
+
+async function health(payload, UUIDKey, route, callback, JWToken) {
   // networkConfig
   let networks = await networkConfig.getList({type: 'Hyperledger'})
   let peerList = [];
   let epList = await endpoint.findAll();
   let endpointList = [];
-
   for (let epnt of epList) {
     let ep = _.get(epnt, 'address', undefined);
     let epURL = url.parse(ep);
@@ -231,6 +286,20 @@ exports.health = async function (payload, UUIDKey, route, callback, JWToken) {
     json: true // Automatically stringifies the body to JSON
   }).then(function (parsedBody) {
     logger.debug(JSON.stringify(parsedBody));
+    parsedBody.forEach((elem) => {
+      elem.actions = [
+        {
+          label: "ConfigUpdate",
+          iconName: "fa fa-edit",
+          actionType: "COMPONENT_FUNCTION"
+        },
+        {
+          label: "Restart",
+          iconName: "fa fa-trash",
+          actionType: "COMPONENT_FUNCTION"
+        }
+      ];
+    })
     logger.debug('==================== Sent Successfully==================');
     const response = {
       health: {
@@ -319,3 +388,5 @@ let parser = (data) => {
   }
   return result;
 }
+exports.health = health;
+exports.checkRules = checkRules;

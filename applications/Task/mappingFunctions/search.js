@@ -1,11 +1,8 @@
 'use strict'
-// const connector = require('../../../../core/api/client');
-// const pg = require('../../../../core/api/connectors/postgress');
-// const appConfig = global.config;
+
 const connector = require('../../../core/api/client');
- //const pg = require('../../../core/api/connectors/postgress');
- const pg = require('../../../core/api/connectors/taskPostgres');
-//let rp = require('request-promise');
+const pg = require('../../../core/api/connectors/postgress');
+
 
 async function search(payload, UUIDKey, route, callback, JWToken) {
    console.log("-----------------response")

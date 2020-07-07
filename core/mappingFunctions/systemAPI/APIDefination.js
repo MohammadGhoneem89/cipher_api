@@ -13,6 +13,7 @@ const complexType = require('../../../lib/repositories/complexTypes');
 const _ = require('lodash');
 const typeData = require('../../../lib/repositories/typeData');
 const ErrorCodes = require('../../../lib/models/ErrorCodes');
+const HealthNotifications = require('../../../lib/models/HealthNotifications');
 const relayConfig = require('./relayConfig');
 const config = require('../../../config');
 const fs = require('fs');
@@ -1090,6 +1091,46 @@ function generateHMAC(payload, UUIDKey, route, callback, JWToken) {
 }
 
 
+function getHealthRuleList(payload, UUIDKey, route, callback, JWToken) {
+  let isOwner = false;
+  let ownOrg = config.get('ownerOrgs', [])
+  if (ownOrg.indexOf(JWToken.orgCode) > -1) {
+    isOwner = true;
+  }
+  HealthNotifications.find({name: 'general'}).then((data) => {
+    console.log(JSON.stringify(data))
+    let rules = _.get(data, '[0].ruleList', [])
+    let response = {
+      "getHealthRuleList": {
+        "action": "getHealthRuleList",
+        "data": {
+          "searchResult": rules,
+          isOwner
+        }
+      }
+    };
+    callback(response);
+  });
+}
+
+function updateHealthRuleList(payload, UUIDKey, route, callback, JWToken) {
+  _.set(payload, 'name', 'general');
+  HealthNotifications.update({name: 'general'}, {$set: {ruleList: payload.ruleList}}, {upsert: true}).then((data) => {
+    let response = {
+      "updateHealthRuleList": {
+        "action": "ErrorCodeList",
+        "data": {
+          "status": true,
+          "bounce": payload.ruleList
+        }
+      }
+    };
+    callback(response);
+  });
+}
+
+exports.getHealthRuleList = getHealthRuleList;
+exports.updateHealthRuleList = updateHealthRuleList;
 exports.downloadChainCode = downloadChainCode;
 exports.getAPIDefinition = getAPIDefinition;
 exports.getAPIDefinitionID = getAPIDefinitionID;

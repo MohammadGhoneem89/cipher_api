@@ -46,7 +46,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         "errorCode": 201,
         "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
       };
-      console.log(data.stack)
+      // console.log(data.stack)
       txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack, eRRTBasic, username, orgcode);
       responseCallback.status(500);
       responseCallback.json(error);
@@ -71,7 +71,6 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       };
     }
     let errCode = _.get(data, 'errorCode', 200);
-    console.log('????>>>>', errCode)
     if ((apiFilter.indexOf(incommingRoute) >= 0) || (configdata && configdata.isTracked) || errCode != 200) {
       txTracking.create(UUIDKey, channel, incommingRoute, payload, data, delta, undefined, eRRTBasic, username, orgcode, errCode);
     }

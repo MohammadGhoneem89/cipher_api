@@ -1,5 +1,59 @@
 {
   "core": {
+    "testADHReport": {
+      "customMapping": true,
+      "MappingfunctionName": "testADHReport",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getSafLogs": {
+      "customMapping": true,
+      "MappingfunctionName": "getSafLogs",
+      "CustomMappingFile": "safLogs/saf.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateSafLogs": {
+      "customMapping": true,
+      "MappingfunctionName": "updateSafLogs",
+      "CustomMappingFile": "safLogs/saf.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getHealthRuleList": {
+      "customMapping": true,
+      "MappingfunctionName": "getHealthRuleList",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateHealthRuleList": {
+      "customMapping": true,
+      "MappingfunctionName": "updateHealthRuleList",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getADHReportListProtected": {
+      "customMapping": true,
+      "MappingfunctionName": "getADHReportListProtected",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getADHReportList": {
+      "customMapping": true,
+      "MappingfunctionName": "getADHReportList",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getADHReportByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getADHReportByID",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateADHReport": {
+      "customMapping": true,
+      "MappingfunctionName": "updateADHReport",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getFileList": {
       "customMapping": true,
       "MappingfunctionName": "getFileList",
