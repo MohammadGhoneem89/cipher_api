@@ -9,7 +9,7 @@ const cors = require('cors');
 const rp = require('request-promise');
 const dates = require('./lib/helpers/dates');
 let app = express();
-const expressWs = require('express-ws')(app);
+
 const crypto = require('./lib/helpers/crypto');
 const apiTemplate = require('./lib/repositories/apiTemplate');
 const RestController = require('./core/Controller/RestController.js');
@@ -43,16 +43,36 @@ mongoDB.connection(config.get('mongodb.url'));
 console.log(config.get('mongodb.url'))
 //console.log("postgress t-------------------------")
 //console.log(config.get('taskPostgres.url'))
-app = expressWs.app;
 app.use(xssFilter());
 app.use(fileUpload());
 app.use(express.static('public'));
 app.use(express.static('exports'));
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(requestLog);
-app.use(frameguard({action: 'sameorigin'}));
+app.use(frameguard({ action: 'sameorigin' }));
 let appServer;
+
+const enableWs = require('express-ws')
+enableWs(app);
+global.WSRegistery = {}
+app.ws('/Socket', (ws, req) => {
+  ws.on('message', msg => {
+    ws.send(msg)
+    console.log('Web socket Handshake Recieved');
+    const msg2 = JSON.parse(msg);
+    console.log({ fs: 'app.js', func: 'Socket' }, msg2, 'this is request');
+    const decoded = crypto.decrypt(msg2.token);
+    if (decoded.userID) {
+      console.log(decoded._id, 'Registered')
+      global.WSRegistery[decoded._id] = ws;
+    }
+  })
+
+  ws.on('close', () => {
+    console.log('WebSocket was closed')
+  })
+})
 routeData.LoadConfig().then(() => {
   console.log('Configurations Loaded For Request Processing!!');
   appServer = app.listen(config.get('port'), function () {
@@ -88,18 +108,18 @@ function checkbadinput(req) {
   const payload = req.body;
   const requestString = JSON.stringify(payload);
   if (contains(requestString, "$")) {
-    logger.error({fs: 'app.js', func: 'login', error: err.stack || err}, 'illeagal characters Found Sending Error!!');
+    logger.error({ fs: 'app.js', func: 'login', error: err.stack || err }, 'illeagal characters Found Sending Error!!');
     return true;
   }
   return false;
 }
 
 process.on('uncaughtException', (err) => {
-  logger.error({fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack}, 'uncaught exception');
+  logger.error({ fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack }, 'uncaught exception');
 });
 
 process.on('unhandledRejection', function (err) {
-  logger.error({fs: 'app.js', func: 'unhandledRejection', error: err, stack: err.stack}, 'unhandled Rejection');
+  logger.error({ fs: 'app.js', func: 'unhandledRejection', error: err, stack: err.stack }, 'unhandled Rejection');
 });
 
 app.use('/health', HealthCheckHelper.router);
@@ -218,7 +238,7 @@ app.post('/login', async (req, res) => {
 
 app.post('/uploadFile/:action', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illegal character found in request"}
+    let resperr = { 'error': "illegal character found in request" }
     res.send(resperr);
     return;
   }
@@ -293,7 +313,7 @@ app.post('/uploadFile/:action', permissions, function (req, res) {
 });
 app.post('/uploadImg', function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"}
+    let resperr = { 'error': "illeagal character found in request" }
     res.send(resperr);
     return;
   }
@@ -308,7 +328,7 @@ app.post('/uploadImg', function (req, res) {
   const context = req.body.context;
 
   if (!data) {
-    logger.debug({fs: 'app.js', func: 'uploadImg'}, ' [ File Upload Service ] File is not exist in req : ' + req.file);
+    logger.debug({ fs: 'app.js', func: 'uploadImg' }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
     res.send('Image dose not exist');
   } else {
     imageUpload(data, UUID, params, userID, source, context, function (imageUploadResponse) {
@@ -318,14 +338,14 @@ app.post('/uploadImg', function (req, res) {
 });
 app.get('/getUploadedFile/:action/:id', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"}
+    let resperr = { 'error': "illeagal character found in request" }
     res.send(resperr);
     return;
   }
   console.log('Taking it from local');
   const UUID = req.params.id;
   console.log('==============UUID of downloaded file============' + UUID);
-  logger.debug({fs: 'app.js', func: 'getUploadedFile'}, ' [ getUploadedFile ]   : ' + UUID);
+  logger.debug({ fs: 'app.js', func: 'getUploadedFile' }, ' [ getUploadedFile ]   : ' + UUID);
   getUpload(UUID, res, function (data) {
     console.log('==============Sending file in return========================' + UUID);
     res.send(data, 'binary');
@@ -361,7 +381,7 @@ app.post('/upload/:action', permissions, function (req, res) {
 });
 app.post('/APII/:channel/:action', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"};
+    let resperr = { 'error': "illeagal character found in request" };
     res.send(resperr);
     return;
   }
@@ -369,14 +389,14 @@ app.post('/APII/:channel/:action', permissions, function (req, res) {
   const JWToken = req.get('token');
   const action = req.params.action;
   const channel = req.params.channel;
-  logger.info({fs: 'app.js', func: 'APPI'}, 'Handle Transaction on Cipher ' + action + ' ' + channel);
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
   if (channel === 'Cipher') {
-    logger.trace({payload: payload}, 'Cipher APII call Payload');
+    logger.trace({ payload: payload }, 'Cipher APII call Payload');
   }
-  logger.info({fs: 'app.js', func: 'APPI'}, 'calling handleExternalRequest ');
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'calling handleExternalRequest ');
   const UUID = uuid();
-  logger.info({fs: 'app.js', func: 'APPI'}, 'UUID:  ' + UUID);
-  logger.info({fs: 'app.js', func: 'APPI'}, 'JWToken :  ' + JWToken);
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'UUID:  ' + UUID);
+  logger.info({ fs: 'app.js', func: 'APPI' }, 'JWToken :  ' + JWToken);
 
   RestController.handleExternalRequest(payload, channel, action, UUID, res, '');
 
@@ -385,7 +405,7 @@ app.get('/API/:channel/:action', permissions, apiCallsHandler);
 app.post('/API/:channel/:action', permissions, apiCallsHandler);
 app.get('/export/:channel', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = {'error': "illeagal character found in request"}
+    let resperr = { 'error': "illeagal character found in request" }
     res.send(resperr);
     return;
   }
@@ -416,7 +436,7 @@ app.get('/export/:channel', permissions, function (req, res) {
 function apiCallsHandler(req, res) {
   try {
     if (checkbadinput(req)) {
-      let resperr = {'error': "illegal character found in request"};
+      let resperr = { 'error': "illegal character found in request" };
       res.send(resperr);
       return;
     }
@@ -633,3 +653,72 @@ app.use(function (err, req, res, next) {
     "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
   });
 });
+
+
+const k = require('./core/api/pushNotifications')
+// const WebSocketServer = require('websocket').server;
+// const http = require('http');
+// let wsServer = http.createServer(function (request, response) {
+// });
+// wsServer.listen(1337, function () { });
+// wsServer = new WebSocketServer({
+//   httpServer: wsServer
+// });
+// wsServer.on('request', function (request) {
+
+  // let connection = request.accept(null, request.origin);
+  // connection.on('message', function (message) {
+  //   if (message.type === 'utf8') {
+  //     console.log('Web socket Handshake Recieved');
+
+  //     console.log(message.utf8Data)
+  //     const msg2 = JSON.parse(message.utf8Data);
+  //     // console.log({ fs: 'app.js', func: 'Socket' }, msg2, 'this is request');
+  //     const decoded = crypto.decrypt(msg2.token);
+  //     if (decoded.userID) {
+  //       _.set(global.WSRegistery, decoded.userID, connection);
+  //     }
+  //     else {
+  //       logger.error({ fs: 'app.js', func: 'Socket' }, "Token doesnt have user ID" + JSON.stringify(msg2));
+  //     }
+  //     logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'GOT Web socket END ');
+  //   }
+  // });
+
+  // connection.on('close', function (connection) {
+  //   console.log('connection closed');
+  // });
+// });
+
+
+// app.ws('/Socket', function(ws, req) {
+// 	console.log('Web socket Handshake Recieved');
+// 	console.log({fs: 'app.js', func: 'Socket'}, 'Web socket Handshake Recieved');
+// 	ws.on('message', function(msg) {
+// 		console.log('Web socket Handshake Recieved');
+// 		const msg2 = JSON.parse(msg);
+// 		console.log({fs: 'app.js', func: 'Socket'}, msg2, 'this is request');
+// 		const decoded = crypto.decrypt(msg2.token);
+
+// 		if (decoded.userID) {
+// 			socketKey[decoded.userID] = ws;
+
+// 			pagesKey[decoded.userID] = msg2.pageName;
+// 			msg2.userID = decoded.userID;
+// 			if (msg2.action) {
+// 				if (msg2.action === 'subscribe') {
+// 					if (lastSubscription[decoded.userID]) {
+// 						unsubscribe(lastSubscription[decoded.userID].page, decoded.userID, '');
+// 					}
+// 					lastSubscription[decoded.userID] = { 'page': msg2.pageName, 'params': msg2.data };
+// 					logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'The subscription parameters');
+// 					subscribe(msg2);
+// 				}
+// 			}
+// 		}
+// 		else {
+// 			logger.error({fs: 'app.js', func: 'Socket'}, "Token doesnt have user ID" + JSON.stringify(msg2));
+// 		}
+// 		logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'GOT Web socket END ');
+// 	});
+// });

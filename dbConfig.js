@@ -38,6 +38,8 @@ function getws(callback) {
   }
   global.discoveryws.on('message', function incoming(data) {
     // implement health methods app.js
+
+    // console.log(data)
     let incData = JSON.parse(data);
     if (incData.type == 1 || incData.type == 2) {
       callback(undefined, undefined, incData);
@@ -64,7 +66,7 @@ function getws(callback) {
           }
           break;
         default:
-          console.log("Invalid OPCode from descovery!!")
+          // console.log("Invalid OPCode from descovery!!")
           break;
       }
     }

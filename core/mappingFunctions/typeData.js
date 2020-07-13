@@ -10,15 +10,15 @@ let typeDataOut = function (payload, UUIDKey, route, callback, JWToken) {
   logger.debug(" [ Type Data ] Route : " + route);
   logger.debug(" [ Type Data ] JWToken : " + JSON.stringify(JWToken, null, 2));
   let TypeData = payload.typeData;
-  getTypeData(TypeData, callback);
+  getTypeData(TypeData, callback, payload);
 
 }
 
-async function getTypeData(TypeData, getTypeData_CB) {
+async function getTypeData(TypeData, getTypeData_CB, payload) {
   try {
     const response = {
-      typeData: {
-        "action": "TypeData",
+      [payload.actionType]: {
+        "action": payload.actionType,
         "data": {}
       }
     };
@@ -32,7 +32,22 @@ async function getTypeData(TypeData, getTypeData_CB) {
       for (let [i, td] of TypeData.entries()) {
         for (let extData of execTypeData) {
           if (extData['data'][td]) {
-            response.typeData.data[td] = extData['data'][td];
+            let array = []
+            if (payload && payload.lang == 'AR') {
+              console.log(JSON.stringify(extData['data'][td]))
+              extData['data'][td].forEach(element => {
+                if (element.labelAr) {
+                  element.label = element.labelAr
+                  delete element.labelAr
+                }
+                array.push(element)
+              });
+            } else {
+              array = extData['data'][td];
+            }
+            response[payload.actionType].data[td] = array;
+
+
           }
         }
       }

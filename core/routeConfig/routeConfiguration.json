@@ -1,5 +1,11 @@
 {
   "core": {
+    "pushByGroupName":{
+      "customMapping": true,
+      "MappingfunctionName": "pushByGroupName",
+      "CustomMappingFile": "notification/create.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "testADHReport": {
       "customMapping": true,
       "MappingfunctionName": "testADHReport",
