@@ -20,7 +20,7 @@ function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
         }
       });
     }).then((userList) => {
-      emailTemplateRepo.findAndFormat(payload.data.templateId, payload.data.templateParams).then((format) => {
+      emailTemplateRepo.findAndFormat(payload.data.templateId, payload.data.templateParams).then(async (format) => {
         let senderEmail = config.get('email.address');
         let transporter = nodemailer.createTransport({
           host: config.get('email.host'),
@@ -45,21 +45,16 @@ function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
           subject: format.subjectEng, // Subject line
           html: `<p>${format.templateTextEng}</p>`// plain text body
         };
-        transporter.sendMail(mailOptions, function (err, info) {
-          if (err) {
-            return callback({success: false, message: err.response});
-          }
-          console.log(info);
-          return callback({success: true});
 
-        });
+        await transporter.sendMail(mailOptions);
+        return callback({ success: true });
       });
     }).catch((err) => {
       console.log(err)
-      callback({success: false, message: err.message});
+      callback({ success: false, message: err.message });
     });
   } else {
-    return callback({success: false, message: 'Invalid Group for Email'});
+    return callback({ success: false, message: 'Invalid Group for Email' });
   }
 }
 
