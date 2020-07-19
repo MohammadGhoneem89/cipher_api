@@ -3,7 +3,7 @@ const adhReport = require('../../../lib/repositories/adhReport');
 const emailTemplateRepo = require('../../../lib/repositories/emailTemplate');
 const endpointDefination = require('../../../lib/repositories/endpointDefination');
 const sequalize = require('../../api/client/sequelize');
-const {QueryTypes} = require('sequelize');
+const { QueryTypes } = require('sequelize');
 const _ = require('lodash');
 const escapeString = require('sql-string-escape');
 const Handlebars = require("handlebars");
@@ -190,7 +190,7 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
   try {
 
 
-    let endpoint = await endpointDefination.findOne({id: payload.connectionString});
+    let endpoint = await endpointDefination.findOne({ id: payload.connectionString });
     connection = await sequalize(endpoint.address);
   } catch (e) {
     console.log(e)
@@ -228,22 +228,52 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
           _.set(finalObj, elem.fieldName, JWToken.orgType)
         }
       })
-      let source = payload.queryStr;
-      let template = Handlebars.compile(source);
-      console.log(finalObj)
-      let qry = template(finalObj);
-      const resultSet = await connection.query(qry, {
-        logging: console.log,
-        plain: false,
-        raw: false,
-        type: QueryTypes.SELECT
-      });
+
+      let resultSet = []
+      if (payload.type == 'MULTI') {
+        let querySet = [payload.queryStrLabel, ...payload.queryStrValues];
+        for (let qryElem of querySet) {
+          let source = qryElem;
+          let template = Handlebars.compile(source);
+          let qry = template(finalObj);
+          let resultSetTemp = await connection.query(qry, {
+            logging: console.log,
+            plain: false,
+            raw: false,
+            type: QueryTypes.SELECT
+          });
+          resultSet.push(resultSetTemp)
+        }
+      } else if (payload.type == 'PIE') {
+        let source = payload.queryStr;
+        let template = Handlebars.compile(source);
+        let qry = template(finalObj);
+        resultSet = await connection.query(qry, {
+          logging: console.log,
+          plain: false,
+          raw: false,
+          type: QueryTypes.SELECT
+        });
+      } else {
+        let source = payload.queryStr;
+        let template = Handlebars.compile(source);
+        let qry = template(finalObj);
+        resultSet = await connection.query(qry, {
+          logging: console.log,
+          plain: false,
+          raw: false,
+          type: QueryTypes.SELECT
+        });
+      }
+
       if (resultSet.length == 0) {
         resp.responseMessage.data.message.status = "ERROR";
         resp.responseMessage.data.message.errorDescription = 'no records found matching criteria';
         resp.responseMessage.data.message.newPageURL = "";
         return callback(resp)
       }
+
+
       let action = payload.action || 'resultSet'
       let response = {
         [action]: {
@@ -291,7 +321,7 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
           });
 
       } else if (payload.isScheduled && !payload.test) {
-        emailTemplateRepo.findOne({templateType: 'Report'}).then(async (template) => {
+        emailTemplateRepo.findOne({ templateType: 'Report' }).then(async (template) => {
           const [templateObject] = template;
           let transporter = nodemailer.createTransport({
             host: config.get('email.host'),
@@ -344,7 +374,7 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
 
 
     } catch
-      (e) {
+    (e) {
       console.log(e)
       resp.responseMessage.data.message.status = "ERROR";
       resp.responseMessage.data.message.errorDescription = e.message;

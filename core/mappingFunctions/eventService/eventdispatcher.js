@@ -157,19 +157,14 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
     query += ` AND date_part('epoch'::text,createdon)::bigint between  ${fromdate / 1000} AND ${todate / 1000} `;
   }
 
-  if (payload.searchCriteria && payload.searchCriteria.reqType) {
-    let reqType = payload.searchCriteria.reqType;
-    query += ` AND reqtype = '${reqType}' `;
+  if (payload.searchCriteria && payload.searchCriteria.eventName) {
+    let eventName = payload.searchCriteria.eventName;
+    query += ` AND sourceevent = '${eventName}' `;
   }
 
-  if (payload.searchCriteria && payload.searchCriteria.shortCode) {
-    let shortCode = payload.searchCriteria.shortCode;
-    query += ` AND shortcode = '${shortCode}'`;
-  }
-
-  if (payload.searchCriteria && payload.searchCriteria.reconType) {
-    let reconType = payload.searchCriteria.reconType;
-    query += ` AND recontype ='${reconType}'`;
+  if (payload.searchCriteria && payload.searchCriteria.status) {
+    let status = payload.searchCriteria.status;
+    query += ` AND status = ${status}`;
   }
 
   let queryCriteria = queryCnt + query;

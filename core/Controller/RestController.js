@@ -132,11 +132,11 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
 }
 
 function enrichError(response, successStatus = true) {
-  let errCode = _.get(response, 'result.errorCode', undefined);
+  let errCode = _.get(response, '__result.errorCode', undefined);
   if (!errCode) {
     errCode = _.get(response, 'errorCode', undefined);
   }
-
+  
   let options = _.get(response, 'result.options', undefined);
   if (!options) {
     options = _.get(response, 'options', undefined);
@@ -145,8 +145,8 @@ function enrichError(response, successStatus = true) {
   if (errCode && errMsg) {
     _.set(response, 'errorCode', parseInt(errCode, 10));
     _.set(response, 'errorDescription', vsprintf(errMsg, options));
+    _.set(response, '__result', undefined);
   }
   return response;
 }
-
 exports.handleExternalRequest = handleExternalRequest;
