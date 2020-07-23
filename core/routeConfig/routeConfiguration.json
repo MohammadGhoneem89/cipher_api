@@ -1,9 +1,23 @@
 {
+  "meta": {
+    "getTypeSyncOut": {
+      "customMapping": true,
+      "MappingfunctionName": "getTypeSyncOut",
+      "CustomMappingFile": "typeData.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
   "core": {
-    "pushByGroupName":{
+    "pushByGroupName": {
       "customMapping": true,
       "MappingfunctionName": "pushByGroupName",
       "CustomMappingFile": "notification/create.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "testPagination": {
+      "customMapping": true,
+      "MappingfunctionName": "testPagination",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
     "testADHReport": {

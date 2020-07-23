@@ -123,10 +123,8 @@ function sendRequestBLA(srvcAddressNPort, Request, UUIDKey, responseCallback, sm
     rpOptions = {
       method: 'POST',
       url,
-      form: {
+      formData: {
         Request: JSON.stringify(Request),
-
-        name: 'files',
         file: {
           value: fs.createReadStream(smartContractPackPath),
           options: {

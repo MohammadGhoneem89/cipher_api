@@ -1,44 +1,8 @@
-let _ = require('lodash');
-let x = [[{ "label": "ORG1" }, { "label": "ETISALAT" }, { "label": "GEMS" }], [{ "RECONCILED": 3 }], [{ "EXCEPTION": 3 }], [{ "WARNING": 3 }]];
-
-console.log(x)
-let labelList = []
-let data = {}
-
-x.forEach((elem, index) => {
-  elem.forEach((label) => {
-    if (index == 0) {
-      for (let key in label) {
-        labelList.push(label[key])
-      }
-    } else {
-      for (let key in label) {
-        let temp = _.get(data, key, []);
-        temp.push(label[key]);
-        _.set(data, key, temp);
-      }
-    }
-  })
-
-});
-
-let dsList = []
-for (let elem in data) {
-  dsList.push({
-    label: elem,
-    fill: false,
-    lineTension: 0.1,
-    pointBorderWidth: 1,
-    pointHoverRadius: 5,
-    pointHoverBorderWidth: 2,
-    pointRadius: 1,
-    pointHitRadius: 10,
-    data: data[elem]
-  })
+let str = `select * from apipayload where 1=1  [AND nice='{{cook}}']  [AND nice2='{{cook2}}']  AND ([nice='{{cook}}'] OR [nice='{{cook}}']) `;
+while (str.match(/\[(.*?)\]/) && str.match(/\[(.*?)\]/).length > 0) {
+  let matches = str.match(/\[(.*?)\]/);
+  console.log(matches[0], 'replaced')
+  str = str.replace(/\[(.*?)\]/, matches[1]);
+  console.log(str)
 }
-const dataRender = {
-  labels: labelList,
-  datasets: dsList
-};
-console.log(dataRender);
-
+console.log(str);

@@ -14,6 +14,7 @@ let typeDataOut = function (payload, UUIDKey, route, callback, JWToken) {
 
 }
 
+
 async function getTypeData(TypeData, getTypeData_CB, payload) {
   try {
     const response = {
@@ -60,5 +61,29 @@ async function getTypeData(TypeData, getTypeData_CB, payload) {
 }
 
 
+async function getTypeAllDataForSync(TypeData, getTypeData_CB, payload) {
+  try {
+    const response = {
+      "typeListForSync": {
+        "data": {}
+      }
+    };
+    const execTypeData = await typeData.find({}).lean(true);
+    response.typeListForSync.data = execTypeData
+    getTypeData_CB(response)
+  } catch (error) {
+    console.log(" [ Type Data ] ERROR : " + error);
+    getTypeData_CB(error)
+  }
+}
 
+let getTypeSyncOut = function (payload, UUIDKey, route, callback, JWToken) {
+  logger.debug(" [ Type Data ] PAYLOAD : " + JSON.stringify(payload, null, 2));
+  logger.debug(" [ Type Data ] UUID : " + UUIDKey);
+  logger.debug(" [ Type Data ] Route : " + route);
+  logger.debug(" [ Type Data ] JWToken : " + JSON.stringify(JWToken, null, 2));
+  getTypeAllDataForSync({}, callback, payload);
+}
+
+exports.getTypeSyncOut = getTypeSyncOut;
 exports.typeDataOut = typeDataOut;

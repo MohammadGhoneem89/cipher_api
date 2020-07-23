@@ -97,6 +97,8 @@ function ListView(payload, UUIDKey, route, callback, JWToken) {
         let Elem = {};
         Elem.text = element.name;
         Elem.value = element._id;
+        Elem.requestType = element.requestType;
+        Elem.dbType = element.dbType;
         result.push(Elem);
       });
 
@@ -176,7 +178,7 @@ function findByName(payload) {
     });
 }
 
-//
+
 // findByName({name: 'name4', data: {hello: 'world !!!'}})
 //   .then((res) => {
 //     console.log(res);

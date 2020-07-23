@@ -17,7 +17,7 @@ module.exports = class Endpoint {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> endpoint --------- ", JSON.stringify(endpoint, null, 2))
     let ServiceURL = "";
     let postfix = ServiceURI == '/' ? "" : ServiceURI;
-    ServiceURL = `${endpoint.address}`;
+    ServiceURL = `${endpoint.address}/${postfix}`;
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", ServiceURL);
     switch (endpoint.authType) {
       case "bearer":
@@ -226,7 +226,7 @@ module.exports = class Endpoint {
   //     redirect: 'follow'
   //   };
 
-    
+
 
   //   fetch("https://rms-world-check-one-api-pilot.thomsonreuters.com/v2/groups/0a3687cf-6a26-1690-9a94-0d58000006da/resolutionToolkit", requestOptions)
   //     .then(response => response.text())
