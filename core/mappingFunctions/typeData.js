@@ -1,6 +1,7 @@
 'use strict';
 let logger = require('../../lib/helpers/logger')().app;
 let pointer = require("json-pointer");
+let _ = require("lodash");
 const typeData = require('../../lib/models/TypeData');
 
 let typeDataOut = function (payload, UUIDKey, route, callback, JWToken) {
@@ -69,6 +70,12 @@ async function getTypeAllDataForSync(TypeData, getTypeData_CB, payload) {
       }
     };
     const execTypeData = await typeData.find({}).lean(true);
+    execTypeData.forEach((element) => {
+      delete element._id
+      delete element.__v
+      delete element.type
+      console.log(element)
+    })
     response.typeListForSync.data = execTypeData
     getTypeData_CB(response)
   } catch (error) {

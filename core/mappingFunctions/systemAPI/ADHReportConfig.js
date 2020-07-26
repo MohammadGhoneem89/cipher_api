@@ -416,8 +416,6 @@ async function testPagination(payload, UUIDKey, route, callback, JWToken, res) {
   let connection = undefined;
   let endpoint;
   try {
-
-
     endpoint = await endpointDefination.findOne({ id: payload.connectionString });
     connection = await sequalize(endpoint.address);
   } catch (e) {

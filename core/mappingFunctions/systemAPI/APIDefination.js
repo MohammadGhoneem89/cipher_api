@@ -1,6 +1,6 @@
 'use strict';
 
-const {APIDefination, Permission} = require("../../../lib/models/index");
+const { APIDefination, Permission } = require("../../../lib/models/index");
 
 const path = require('path');
 const zipafolder = require('zip-a-folder');
@@ -45,10 +45,10 @@ function getErrorCodeList(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function updateErrorCodeList(payload, UUIDKey, route, callback, JWToken) {
-  ErrorCodes.update({code: payload.code}, {$set: payload}, {upsert: true}).then((data) => {
+  ErrorCodes.update({ code: payload.code }, { $set: payload }, { upsert: true }).then((data) => {
     let newRec = {
       code: payload.code, description: payload.description, actions: [
-        {"label": "edit", "iconName": "fa fa-pen", "actionType": "COMPONENT_FUNCTION"}
+        { "label": "edit", "iconName": "fa fa-pen", "actionType": "COMPONENT_FUNCTION" }
       ]
     };
     let bounce = _.get(payload, 'bounce', []);
@@ -155,7 +155,7 @@ function getAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
       finalList = data[0];
     } else {
 
-      let URIs = await permissions.uriPermissionsByOrgCode({orgCode: JWToken.orgCode});
+      let URIs = await permissions.uriPermissionsByOrgCode({ orgCode: JWToken.orgCode });
 
       data[0].forEach((element, index) => {
         element.hiddenID = element.useCase + "/" + element.route;
@@ -235,78 +235,78 @@ function upsertAPIDefinition(payload, UUIDKey, route, callback, JWToken) {
   };
   if (payload.route && payload.useCase) {
     APIDefinitation.findById(payload).then((data) => {
-        if (payload.operation === "insert" && data && data.length !== 0) {
-          resp.responseMessage.data.message.status = "ERROR";
-          resp.responseMessage.data.message.errorDescription = "route & useCase already exist!";
-          return callback(resp);
-        }
-        return APIDefinitation.update({
-          route: payload.route,
-          useCase: payload.useCase
-        }, payload).then((data) => {
-          resp.responseMessage.data.message.status = "OK";
-          console.log(data);
-          data.nModified > 0 ?
-            resp.responseMessage.data.message.errorDescription = "Record Updated Success!!" :
-            resp.responseMessage.data.message.errorDescription = "Record Inserted Successfully!!";
-          resp.responseMessage.data.message.newPageURL = "/ApiList";
-          LoadConfig().then(() => {
-            console.log('Configurations Loaded For Request Processing!!');
-          });
-
-          let usecaseList = {};
-          APIDefinitation.find({}).then((list) => {
-            list.forEach((elem) => {
-              let tupp = {
-                "URI": [
-                  "/" + elem.route
-                ],
-                "children": [
-                  {
-                    "children": [],
-                    "value": elem.route.toUpperCase() + "01AGC",
-                    "type": "pageAction",
-                    "label": "execute",
-                    "labelName": "",
-                  }
-                ],
-                "value": elem.route.toUpperCase() + "01AGP",
-                "type": "page",
-                "pageURI": "/",
-                "label": elem.route.toUpperCase(),
-                "labelName": "",
-                "displayMenu": false
-              };
-              let permissionList = _.get(usecaseList, elem.useCase, []);
-              permissionList.push(tupp);
-
-              _.set(usecaseList, elem.useCase, permissionList);
-            });
-
-            for (let usecase in usecaseList) {
-              let moduleDoc = {
-                "value": `${usecase.toUpperCase()}MAG`,
-                "type": "module",
-                "label": "APIPermissions-" + `${usecase.toUpperCase()}`,
-                "iconName": "fa fa-gears",
-                "displayMenu": false,
-                "useCase": `${usecase}`,
-                "order": 12,
-                "permissionType": "API",
-                "children": usecaseList[usecase]
-              }
-              permission.update({value: moduleDoc.value}, moduleDoc).then((data) => {
-                console.log("Module update success! ", `${usecase}MAG`, data);
-                console.log(JSON.stringify(moduleDoc))
-              }).catch((ex) => {
-                console.log(ex);
-                console.log("Module update failed! ", `${usecase}MAG`);
-              });
-            }
-          });
-          callback(resp);
-        });
+      if (payload.operation === "insert" && data && data.length !== 0) {
+        resp.responseMessage.data.message.status = "ERROR";
+        resp.responseMessage.data.message.errorDescription = "route & useCase already exist!";
+        return callback(resp);
       }
+      return APIDefinitation.update({
+        route: payload.route,
+        useCase: payload.useCase
+      }, payload).then((data) => {
+        resp.responseMessage.data.message.status = "OK";
+        console.log(data);
+        data.nModified > 0 ?
+          resp.responseMessage.data.message.errorDescription = "Record Updated Success!!" :
+          resp.responseMessage.data.message.errorDescription = "Record Inserted Successfully!!";
+        resp.responseMessage.data.message.newPageURL = "/ApiList";
+        LoadConfig().then(() => {
+          console.log('Configurations Loaded For Request Processing!!');
+        });
+
+        let usecaseList = {};
+        APIDefinitation.find({}).then((list) => {
+          list.forEach((elem) => {
+            let tupp = {
+              "URI": [
+                "/" + elem.route
+              ],
+              "children": [
+                {
+                  "children": [],
+                  "value": elem.route.toUpperCase() + "01AGC",
+                  "type": "pageAction",
+                  "label": "execute",
+                  "labelName": "",
+                }
+              ],
+              "value": elem.route.toUpperCase() + "01AGP",
+              "type": "page",
+              "pageURI": "/",
+              "label": elem.route.toUpperCase(),
+              "labelName": "",
+              "displayMenu": false
+            };
+            let permissionList = _.get(usecaseList, elem.useCase, []);
+            permissionList.push(tupp);
+
+            _.set(usecaseList, elem.useCase, permissionList);
+          });
+
+          for (let usecase in usecaseList) {
+            let moduleDoc = {
+              "value": `${usecase.toUpperCase()}MAG`,
+              "type": "module",
+              "label": "APIPermissions-" + `${usecase.toUpperCase()}`,
+              "iconName": "fa fa-gears",
+              "displayMenu": false,
+              "useCase": `${usecase}`,
+              "order": 12,
+              "permissionType": "API",
+              "children": usecaseList[usecase]
+            }
+            permission.update({ value: moduleDoc.value }, moduleDoc).then((data) => {
+              console.log("Module update success! ", `${usecase}MAG`, data);
+              console.log(JSON.stringify(moduleDoc))
+            }).catch((ex) => {
+              console.log(ex);
+              console.log("Module update failed! ", `${usecase}MAG`);
+            });
+          }
+        });
+        callback(resp);
+      });
+    }
     )
 
       .catch((err) => {
@@ -358,7 +358,7 @@ function getActiveAPIList(payload, UUIDKey, route, callback, JWToken) {
       }
     }
   };
-  if (!payload.route || !payload.useCase) {
+  if ((!payload.route && !payload.useCase) && !payload.smartcontract) {
     return callback(resp);
   }
   APIDefinitation.getActiveAPIList(payload).then((data) => {
@@ -480,93 +480,93 @@ function getActiveAPIListForDocumentation(payload, UUIDKey, route, callback, JWT
 function getActiveAPIListForDocumentationNew() {
 
   return APIDefinitation.getActiveAPIListForDocumentation({}).then(async (data) => {
-      let resp = {};
-      for (const useCaseObj of data) {
-        let dest = useCaseObj.useCase + "." + useCaseObj.route;
-        let reqMap = [];
-        let complexTypeList = [];
-        useCaseObj.RequestMapping.fields.forEach((field) => {
-          if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData" || field.IN_FIELDTYPE === "OrgIdentifier") {
-            reqMap.push(field);
-            if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA !== "")
-              complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
-
-            if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA !== "")
-              complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
-          }
-        });
-        let resMap = [];
-        useCaseObj.ResponseMapping.fields.forEach((field) => {
-          if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA != "")
+    let resp = {};
+    for (const useCaseObj of data) {
+      let dest = useCaseObj.useCase + "." + useCaseObj.route;
+      let reqMap = [];
+      let complexTypeList = [];
+      useCaseObj.RequestMapping.fields.forEach((field) => {
+        if (field.IN_FIELDTYPE === "data" || field.IN_FIELDTYPE === "execFunctionOnData" || field.IN_FIELDTYPE === "OrgIdentifier") {
+          reqMap.push(field);
+          if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA !== "")
             complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
 
-          if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA != "")
+          if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA !== "")
             complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
-          resMap.push(field);
-        });
-        useCaseObj.ResponseMapping = resMap;
-        useCaseObj.RequestMapping = reqMap;
-        let groupedRoute = _.omit(useCaseObj, 'route', 'useCase');
-        _.set(resp, dest, groupedRoute);
-        const detailList = await complexType.findByComplexTypeIds(Array.from(new Set(complexTypeList)));
-        if (detailList) {
-          _.set(resp, `${useCaseObj.useCase}.${useCaseObj.route}.complexList`, detailList)
         }
+      });
+      let resMap = [];
+      useCaseObj.ResponseMapping.fields.forEach((field) => {
+        if (field.IN_FIELDCOMPLEXTYPEDATA && field.IN_FIELDCOMPLEXTYPEDATA != "")
+          complexTypeList.push(field.IN_FIELDCOMPLEXTYPEDATA)
+
+        if (field.MAP_FIELDCOMPLEXTYPEDATA && field.MAP_FIELDCOMPLEXTYPEDATA != "")
+          complexTypeList.push(field.MAP_FIELDCOMPLEXTYPEDATA)
+        resMap.push(field);
+      });
+      useCaseObj.ResponseMapping = resMap;
+      useCaseObj.RequestMapping = reqMap;
+      let groupedRoute = _.omit(useCaseObj, 'route', 'useCase');
+      _.set(resp, dest, groupedRoute);
+      const detailList = await complexType.findByComplexTypeIds(Array.from(new Set(complexTypeList)));
+      if (detailList) {
+        _.set(resp, `${useCaseObj.useCase}.${useCaseObj.route}.complexList`, detailList)
       }
-      let routemap = resp;
-      let reqSample = undefined;
-      for (let useCase in routemap) {
-        for (let route in routemap[useCase]) {
-          let request = {}
-          let response = {}
-
-          if (routemap[useCase][route].isValBypass === false) {
-            routemap[useCase][route].RequestMapping.forEach(element => {
-              let id = element.IN_FIELDCOMPLEXTYPEDATA
-              let dt = element.IN_FIELDDT
-              if (id) {
-                routemap[useCase][route].complexList.forEach((data) => {
-                  if (data._id == id)
-                    dt = `${dt}-${data.typeName}`
-                })
-              }
-              element.IN_FIELDDT = dt;
-              _.set(request, element.IN_FIELD, `${dt}`);
-            });
-            routemap[useCase][route].ResponseMapping.forEach(element => {
-              let id = element.MAP_FIELDCOMPLEXTYPEDATA
-              let dt = element.MAP_FIELDDT
-              if (id) {
-                routemap[useCase][route].complexList.forEach((data) => {
-                  if (data._id == id)
-                    dt = `${dt}-${data.typeName}`
-                })
-              }
-              element.MAP_FIELDDT = dt;
-              _.set(response, element.MAP_FIELD, `${dt}`);
-            });
-          } else {
-            routemap[useCase][route].ResponseMapping = [];
-            routemap[useCase][route].RequestMapping = []
-          }
-
-          if (routemap[useCase][route].isSimulated === true) {
-            try {
-              response = JSON.parse(routemap[useCase][route].simulatorResponse);
-            } catch (e) {
-              console.log(e, routemap[useCase][route].simulatorResponse);
-              response = {}
-            }
-
-          }
-          reqSample = routemap[useCase][route].sampleRequest
-          _.set(routemap, `${useCase}.${route}.requestSchema`, request)
-          _.set(routemap, `${useCase}.${route}.responseSchema`, response)
-
-        }
-      }
-      return routemap;
     }
+    let routemap = resp;
+    let reqSample = undefined;
+    for (let useCase in routemap) {
+      for (let route in routemap[useCase]) {
+        let request = {}
+        let response = {}
+
+        if (routemap[useCase][route].isValBypass === false) {
+          routemap[useCase][route].RequestMapping.forEach(element => {
+            let id = element.IN_FIELDCOMPLEXTYPEDATA
+            let dt = element.IN_FIELDDT
+            if (id) {
+              routemap[useCase][route].complexList.forEach((data) => {
+                if (data._id == id)
+                  dt = `${dt}-${data.typeName}`
+              })
+            }
+            element.IN_FIELDDT = dt;
+            _.set(request, element.IN_FIELD, `${dt}`);
+          });
+          routemap[useCase][route].ResponseMapping.forEach(element => {
+            let id = element.MAP_FIELDCOMPLEXTYPEDATA
+            let dt = element.MAP_FIELDDT
+            if (id) {
+              routemap[useCase][route].complexList.forEach((data) => {
+                if (data._id == id)
+                  dt = `${dt}-${data.typeName}`
+              })
+            }
+            element.MAP_FIELDDT = dt;
+            _.set(response, element.MAP_FIELD, `${dt}`);
+          });
+        } else {
+          routemap[useCase][route].ResponseMapping = [];
+          routemap[useCase][route].RequestMapping = []
+        }
+
+        if (routemap[useCase][route].isSimulated === true) {
+          try {
+            response = JSON.parse(routemap[useCase][route].simulatorResponse);
+          } catch (e) {
+            console.log(e, routemap[useCase][route].simulatorResponse);
+            response = {}
+          }
+
+        }
+        reqSample = routemap[useCase][route].sampleRequest
+        _.set(routemap, `${useCase}.${route}.requestSchema`, request)
+        _.set(routemap, `${useCase}.${route}.responseSchema`, response)
+
+      }
+    }
+    return routemap;
+  }
   ).catch((err) => {
     console.log(err);
   });
@@ -921,35 +921,35 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
 
 
     }).catch((err) => {
-    console.log(err);
-    console.log(JSON.stringify(err));
-    for (let i = 0; i < chainCodeData.length; i++) {
-      let response = {
-        "ApiListData": {
-          "useCase": "",
-          "APIdata": [
-            {
-              "MSP": "",
-              "APIList": [
-                {
-                  "route": "",
-                  "purpose": ""
+      console.log(err);
+      console.log(JSON.stringify(err));
+      for (let i = 0; i < chainCodeData.length; i++) {
+        let response = {
+          "ApiListData": {
+            "useCase": "",
+            "APIdata": [
+              {
+                "MSP": "",
+                "APIList": [
+                  {
+                    "route": "",
+                    "purpose": ""
 
-                }
+                  }
 
-              ]
-            }
-          ]
-        }
-      };
-      // console.log(response)
-      // }).catch((err) => {
-      //   console.log(err, "errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
-      //   callback(err);
-      // });
+                ]
+              }
+            ]
+          }
+        };
+        // console.log(response)
+        // }).catch((err) => {
+        //   console.log(err, "errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+        //   callback(err);
+        // });
 
-    }
-  });
+      }
+    });
 }
 
 async function diffPermissionsRoutes(payload, UUIDKey, route, callback, JWToken) {
@@ -1097,7 +1097,7 @@ function getHealthRuleList(payload, UUIDKey, route, callback, JWToken) {
   if (ownOrg.indexOf(JWToken.orgCode) > -1) {
     isOwner = true;
   }
-  HealthNotifications.find({name: 'general'}).then((data) => {
+  HealthNotifications.find({ name: 'general' }).then((data) => {
     console.log(JSON.stringify(data))
     let rules = _.get(data, '[0].ruleList', [])
     let response = {
@@ -1115,7 +1115,7 @@ function getHealthRuleList(payload, UUIDKey, route, callback, JWToken) {
 
 function updateHealthRuleList(payload, UUIDKey, route, callback, JWToken) {
   _.set(payload, 'name', 'general');
-  HealthNotifications.update({name: 'general'}, {$set: {ruleList: payload.ruleList}}, {upsert: true}).then((data) => {
+  HealthNotifications.update({ name: 'general' }, { $set: { ruleList: payload.ruleList } }, { upsert: true }).then((data) => {
     let response = {
       "updateHealthRuleList": {
         "action": "ErrorCodeList",

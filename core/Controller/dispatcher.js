@@ -7,7 +7,9 @@ const path = require('path');
 const fs = require('fs');
 const amq = require('../../core/api/connectors/queue');
 const eventLog = require('../../core/api/eventLog');
+const ADHReportConfig = require('../../core/mappingFunctions/systemAPI/ADHReportConfig.js');
 const billing = require('../../lib/models/billing');
+
 const dates = require('../../lib/helpers/dates');
 const PROTO_PATH = __dirname + '/rest.proto';
 const grpc = require('grpc');
@@ -163,7 +165,23 @@ module.exports = class Dispatcher {
         }).catch((ex) => {
           reject(ex);
         });
-      } else if (this.configdata.communicationMode === 'GRPC Relay') {
+      } else if (this.configdata.communicationMode === 'Database') {
+        ADHReportConfig.testPagination({
+          "actionType": this.request.action,
+          "searchCriteria": this.request.searchCriteria,
+          "filters": [],
+          "connectionString": this.configdata.connectionStringRep,
+          "actionList": this.configdata.actionList,
+          "connectionString": this.configdata.connectionStringRep,
+          "queryStrCnt": this.configdata.queryStrCnt,
+          "queryStr": this.configdata.queryStr,
+          "page": this.request.page
+        }, this.UUID, '', (data) => {
+
+          return resolve({ ...data, error: false });
+        }, this.JWT);
+      }
+      else if (this.configdata.communicationMode === 'GRPC Relay') {
 
         let relNet = global.relayNetConfig;
         let orgCode = _.get(this.request, '__RELAY', '');
