@@ -7,7 +7,8 @@ module.exports = async function (connectionURL) {
         await mongoose.connect(connectionURL, { useNewUrlParser: true, reconnectTries: 10 });
         mongoose.connection.on('disconnected', () => {
             console.log('-> mongoose lost connection');
-            process.exit(0);
+            createConnection();
+            // process.exit(0);
         });
         mongoose.connection.on('reconnect', () => { console.log('-> mongoose reconnected'); });
         mongoose.connection.on('connected', () => { console.log('-> mongoose connected'); });
