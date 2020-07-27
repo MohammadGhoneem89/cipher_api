@@ -17,7 +17,7 @@ module.exports = class Endpoint {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> endpoint --------- ", JSON.stringify(endpoint, null, 2))
     let ServiceURL = "";
     let postfix = ServiceURI == '/' ? "" : ServiceURI;
-    ServiceURL = `${endpoint.address}/${postfix}`;
+    ServiceURL = `${endpoint.address}${postfix}`;
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", ServiceURL);
     switch (endpoint.authType) {
       case "bearer":
