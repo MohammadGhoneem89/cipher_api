@@ -79,7 +79,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       func: 'handleExternalRequest'
     }, `Message Processed In:  ${delta} ms`);
 
-
+    // responseCallback.status(500);
     return responseCallback.json(data);
     // responseCallback.end();
   };
