@@ -5,13 +5,12 @@ var SQExistingList = {};
 
 const cryptoDec = require('../../../lib/helpers/crypto');
 module.exports = async function (connection) {
-  let connectionURL = connection || cryptoDec.decrypt(config.get('postgres.url'));
+  let connectionURL = connection || cryptoDec.decrypt(config.get('postgres.url'))|| cryptoDec.decrypt(config.get('mssqlConfig'));
   console.log(">>>>>>>>>>>", connectionURL)
   const hash = crypto.createHash('md5').update(connectionURL).digest("hex");
   const createNewInstance = async () => {
     const sequelize = new Sequelize(connectionURL, {
       define: {
-        //prevent sequelize from pluralizing table names
         freezeTableName: true
       },
       pool: {
