@@ -28,6 +28,9 @@ const logger = require('./core/api/connectors/logger').app;
 const serverStats = require('./lib/services/serverStats');
 const notification = require('./core/mappingFunctions/notification/list');
 const _ = require('lodash');
+const tokenLookup = require('./lib/repositories/tokenLookup');
+const commonConst = require('./lib/constants/common');
+const dates = require('./lib/helpers/dates');
 
 process.on('uncaughtException', (err) => {
   logger.error({ fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack }, 'uncaught exception');
@@ -112,6 +115,62 @@ function SendLater(msg, newmsg) {
   }
 
 }
+
+
+const logout = async (req, res) => {
+  logger.debug({
+      fs: 'server.js',
+      func: 'logout'
+  }, ' logout request line number 400 ');
+  try {
+      let JWToken = _.get(req, "headers.token", _.get(req, "body.token", null));
+      JWToken = JWToken || req.cookies.token;
+
+      logger.debug({
+          fs: 'server.js',
+          func: 'logout'
+      }, ' logout request line number 403 Token', JWToken);
+      if (JWToken) {
+          const decoded = crypto.decrypt(JWToken);
+          console.log("decoded", decoded);
+          await tokenLookup.remove({
+              userId: decoded._id
+          });
+      }
+      res.send({})
+  } catch (error) {
+      console.error("error", error.stack);
+      logger.debug({
+          fs: 'server.js',
+          func: 'logout'
+      }, ' logout request line number 412 error', error.stack);
+      res.send({})
+  }
+};
+app.get('/logout', logout);
+app.post('/logout', logout);
+
+
+
+
+
+const timeoutResponse = {
+  sessionExpiredResponse: {
+      action: 'sessionExpired',
+      data: {
+          message: {
+              status: 'ERROR',
+              errorCode: 403,
+              errorDescription: 'Session has expired. Please login again',
+              routeTo: '',
+              displayToUser: true,
+          },
+          success: false,
+          firstScreen: ''
+      }
+  }
+};
+
 
 function handleRealTimeEvents(msg) {
 
@@ -458,19 +517,57 @@ app.post('/uploadFile/:action', permissions, function (req, res) {
     const params = req.headers.type || req.body.type;
     const context = req.headers.context || req.body.context;
 
-    if (!file) {
-      logger.error({
-        fs: 'app.js',
-        func: 'uploadFile'
-      }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
-      res.send('File does not exist');
-    }
-    else {
-      fileUploadValid(file, UUID, ext, params, userID, source, context, function (data) {
-        console.log(data)
-        res.send(data);
-      });
-    }
+    //if (!file) {
+      //logger.error({
+        //fs: 'app.js',
+        //func: 'uploadFile'
+      //}, ' [ File Upload Service ] File is not exist in req : ' + req.file);
+      //res.send('File does not exist');
+    //}
+    //else {
+      //fileUploadValid(file, UUID, ext, params, userID, source, context, function (data) {
+        //console.log(data)
+        //res.send(data);
+      //});
+    //}
+
+
+
+tokenValid(decoded._id, JWToken).then(async valid => {
+
+      if (valid) {
+          logger.info({
+              fs: 'app.js',
+              func: 'API'
+          }, decoded, 'decoded.userID:');
+
+          if (!file) {
+              logger.error({
+                  fs: 'app.js',
+                  func: 'uploadFile'
+              }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
+              res.send('File does not exist');
+          } else {
+              fileUploadValid(file, _.get(req, "body.policies", null), UUID, ext, params, userID, source, context, function (data) {
+                  console.log(data);
+                  res.send(data);
+              });
+          }
+          await tokenLookup.update({
+              token: JWToken,
+              userId: decoded._id
+          }, {
+              createdAt: dates.newDate()
+          });
+      } else {
+          console.log("sending response 403");
+          //res.clearCookie("token");
+          res.status(403).send(timeoutResponse);
+      }
+  })
+
+
+
 
   }
 });
@@ -576,19 +673,57 @@ app.post('/upload/:action', permissions, function (req, res) {
     JWToken: decoded
   };
 
-  getDocUpload(data)
-    .then((fileData) => {
-      res.download(fileData.path, fileData.name);
-    })
-    .catch((err) => {
-      let response = {
-        "status": "ERROR",
-        "message": "Failed to download",
-        err: err.stack || err
-      };
-      res.send(response);
-      res.end();
-    });
+  //getDocUpload(data)
+    //.then((fileData) => {
+      //res.download(fileData.path, fileData.name);
+    //})
+    //.catch((err) => {
+      //let response = {
+    //    "status": "ERROR",
+    //    "message": "Failed to download",
+  //      err: err.stack || err
+//      };
+      //res.send(response);
+    //  res.end();
+   // });
+
+
+tokenValid(decoded._id, JWToken).then(async valid => {
+
+    if (valid) {
+        logger.info({
+            fs: 'app.js',
+            func: 'API'
+        }, decoded, 'decoded.userID:');
+
+        getDocUpload(data)
+            .then((fileData) => {
+                res.download(fileData.path, fileData.name);
+            })
+            .catch((err) => {
+                let response = {
+                    "status": "ERROR",
+                    "message": "Failed to download",
+                    err: err.stack || err
+                };
+                res.send(response);
+                res.end();
+            });
+
+        await tokenLookup.update({
+            token: JWToken,
+            userId: decoded._id
+        }, {
+            createdAt: dates.newDate()
+        });
+    } else {
+        console.log("sending response 403");
+        res.status(403).send(timeoutResponse);
+    }
+})
+
+
+
 
 });
 
@@ -611,7 +746,35 @@ app.post('/APII/:channel/:action', permissions, function (req, res) {
   logger.info({ fs: 'app.js', func: 'APPI' }, 'UUID:  ' + UUID);
   logger.info({ fs: 'app.js', func: 'APPI' }, 'JWToken :  ' + JWToken);
 
-  RestController.handleExternalRequest(payload, channel, action, UUID, res, '');
+  //RestController.handleExternalRequest(payload, channel, action, UUID, res, '');
+
+
+const decoded = crypto.decrypt(JWToken);
+    console.log(JWToken + "token>>" + JSON.stringify(decoded));
+
+  tokenValid(decoded._id, JWToken).then(async valid => {
+
+    let byPassValidation = commonConst.permissionExcludeList.includes(action);
+    if (valid || _.get(payload, "header", null) != null || byPassValidation) {
+        logger.info({
+            fs: 'app.js',
+            func: 'API'
+        }, decoded, 'decoded.userID:');
+        RestController.handleExternalRequest(payload, channel, action, UUID, res, '');
+        if (!byPassValidation) {
+            await tokenLookup.update({
+                token: JWToken,
+                userId: decoded._id
+            }, {
+                createdAt: dates.newDate()
+            });
+        }
+    } else {
+        console.log("sending response 403");
+        res.status(403).send(timeoutResponse);
+    }
+})
+
 
 });
 
@@ -658,9 +821,41 @@ function apiCallsHandler(req, res) {
   logger.info({ fs: 'app.js', func: 'API' }, 'UUID:  ' + UUID);
   logger.info({ fs: 'app.js', func: 'API' }, 'JWToken :  ' + JWToken);
 
-  const decoded = crypto.decrypt(JWToken);
-  logger.info({ fs: 'app.js', func: 'API' }, decoded, 'decoded.userID:');
-  RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
+  //const decoded = crypto.decrypt(JWToken);
+  //logger.info({ fs: 'app.js', func: 'API' }, decoded, 'decoded.userID:');
+  //RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
+
+
+const decoded = crypto.decrypt(JWToken);
+        console.log(JWToken + "token>>" + JSON.stringify(decoded));
+
+
+        tokenValid(decoded._id, JWToken).then(async valid => {
+
+            let byPassValidation = commonConst.permissionExcludeList.includes(action);
+
+            if (valid || _.get(payload, "header", null) != null || byPassValidation) {
+                logger.info({
+                    fs: 'app.js',
+                    func: 'API'
+                }, decoded, 'decoded.userID:');
+                RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
+                if (!byPassValidation) {
+                    await tokenLookup.update({
+                        token: JWToken,
+                        userId: decoded._id
+                    }, {
+                        createdAt: dates.newDate()
+                    });
+                }
+            } else {
+                console.log("sending response 403");
+                // res.clearCookie("token");
+                res.status(403).send(timeoutResponse);
+            }
+        })
+
+
 }
 
 function getRandomInt(min, max) {
@@ -752,6 +947,46 @@ app.post('/passOn', function (req, res) {
   ReadIncomingMessage_Processing(req.body.msg);
   res.send(JSON.stringify({ "status": "Done" }));
 });
+
+
+
+async function tokenValid(userIdz, tkn) {
+  try {
+      let existingToken = await tokenLookup.findOne({
+          userId: userIdz,
+          token: tkn
+      });
+
+      console.log("--------->>>>>> Token: ", existingToken);
+
+      console.log("--------->>>>>> userIdz:", userIdz);
+      if (existingToken == null) {
+          console.log("existing token null>>");
+          // await tokenLookup.removeAndCreate({token: tkn, userId: userIdz});
+          return false;
+      }
+      let timestamp = dates.diffFromNow(existingToken.createdAt, "seconds");
+      console.log("existing token ", JSON.stringify(existingToken));
+      console.log("generated at ", config.get('tokenExp'));
+      console.log("timestamp at ", timestamp);
+      if (config.get('tokenExp') < timestamp) {
+      // if (20 < timestamp) {
+          console.log("removing>>>", userIdz);
+          await tokenLookup.remove({
+              token: tkn,
+              userId: userIdz
+          });
+          return false;
+      } else {
+          console.log("Updating token>>");
+          return true;
+      }
+  } catch (error) {
+      console.log(error.stack);
+      return false;
+  }
+}
+
 
 
 

@@ -1,17 +1,17 @@
 {
-    "keyVault": {
-        "env": "DC_dev",
-        "header": {
-            "username": "vaultKeeper",
-            "password": "DSGkeeper@321"
-        },
-        "url": "http://40.68.19.116:30001/keyVault"
+  "keyVault": {
+    "env": "DC",
+    "header":{
+      "username": "vaultKeeper",
+      "password": "DSGkeeper@321"
     },
-    "coreDB": {
-        "env": "core_database_list",
-        "header": {
-            "username": "vaultKeeper",
-            "password": "DSGkeeper@321"
-        }
+    "url": "http://172.30.83.80:9009/KeyVault"
+  },
+  "coreDB":{
+    "env": "core_db_dc",
+    "header":{
+      "username": "vaultKeeper",
+      "password": "DSGkeeper@321"
     }
+  }
 }
