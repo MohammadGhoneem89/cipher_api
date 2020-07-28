@@ -7,9 +7,7 @@ var PGExistingList = {};
 
 module.exports = async function (connectionURL) {
   const hash = crypto.createHash('md5').update(connectionURL).digest("hex");
-  const createNewInstance = async () => {
-
-  
+  const createNewInstance = async () => {  
     let pool =  new Pool({
       connectionString: connectionURL,
     });
@@ -19,7 +17,6 @@ module.exports = async function (connectionURL) {
       console.error('something bad has happened!', err.stack);
       await createNewInstance();
     })
-
   };
 
   if (PGExistingList[hash]) {

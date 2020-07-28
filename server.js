@@ -62,8 +62,6 @@ routeData.LoadConfig().then(() => {
     console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
   });
 });
-// let HealthCheckHelper = require('./core/utils/health.js');
-// let heathService = new HealthCheckHelper("REST", 10000, crypto.decrypt(config.get('amqp.url')));
 
 serverStats.upsert();
 // soapChannel.listen();
@@ -71,12 +69,18 @@ serverStats.upsert();
 app.options('*', cors());
 
 app.use(cors());
-app.use(bodyParser.json({ limit: 1048576 * 50}));
-app.use(bodyParser.urlencoded({ limit:  1048576 * 50, extended: true }));
+app.use(bodyParser.json({ limit: 1048576 * 50 }));
+app.use(bodyParser.urlencoded({ limit: 1048576 * 50, extended: true }));
 app.use(fileUpload());
 app.use(express.static('public'));
 app.use(express.static('exports'));
 app.use('/reporting', express());
+
+// health Check block
+let HealthCheckHelper = require('./core/utils/health.js');
+app.use('/health', HealthCheckHelper.router);
+//==================
+
 
 if (config.get('enableMQRead') == '1') {
   MQ.start(ReadIncomingMessage);
@@ -815,7 +819,7 @@ function apiCallsHandler(req, res) {
   const url_parts = url.parse(req.url, true);
   const query = url_parts.query;
   logger.info({ fs: 'app.js', func: 'API' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
-  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: "::1", query});
+  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: "::1", query });
   logger.info('calling handleExternalRequest ');
   const UUID = uuid();
   logger.info({ fs: 'app.js', func: 'API' }, 'UUID:  ' + UUID);

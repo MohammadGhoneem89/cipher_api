@@ -33,3 +33,7 @@ function getConfigs() {
     });
   });
 }
+
+module.exports={
+  getConfigs
+};

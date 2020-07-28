@@ -9,14 +9,14 @@ function decrypt() {
   console.log({ decrypt: decryptStr }); //eslint-disable-line
 }
 
-function _decrypt(str){
-   const decipher = crypto.createDecipher('aes-256-ctr', 'abcdefg1234567890!@#$%^&*()');
-   const crypt = decipher.update(str, 'hex', 'utf8');
-   try {
-   return JSON.parse(crypt);
-   }
-   catch (err) {
-   return crypt;
-   }
+function _decrypt(str) {
+  const decipher = crypto.createDecipher('aes-256-ctr', 'abcdefg1234567890!@#$%^&*()');
+  const crypt = decipher.update(str, 'hex', 'utf8');
+  try {
+    return JSON.parse(crypt);
+  }
+  catch (err) {
+    return crypt;
+  }
 }
 decrypt();

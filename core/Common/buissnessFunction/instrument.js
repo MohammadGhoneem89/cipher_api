@@ -12,22 +12,15 @@ module.exports = {
       return {}
     }
   },
-  validateInstrument: (data, payload, jwt) => {
+  validateOrderLineItems: (data, payload, jwt) => {
     if (!(data instanceof Array)) {
-      throw new Error("Instrumentation Field(s) missing");
+      throw new Error("LineItems Field(s) missing");
     }
     data.forEach((element, index) => {
-      if (!element.bankCode || !element.paymentMethod || !element.date || !element.amount) {
-        throw new Error(`Mandotary Field(s) missing from array on index ${index}`);
+      if (!element.countryOfOrigin) {
+        throw new Error(`Mandotary Field(s) COO is missing from array on index ${index}`);
       }
-      element.date = dates.ddMMyyyyslash(element.date);
-      element.amount = parseFloat(element.amount) || 0;
-      element.providerMetaData = element.providerMetaData ? JSON.stringify(element.providerMetaData) : undefined;
-      element.bankMetaData = element.bankMetaData ? JSON.stringify(element.bankMetaData) : undefined;
-      element.beneficiaryData = element.beneficiaryData ? JSON.stringify(element.beneficiaryData) : undefined;
     });
-
-    data = _.orderBy(data, ['date'], ['asc']);
     return data;
   },
   validateInstrumentObject: (data, payload, jwt) => {

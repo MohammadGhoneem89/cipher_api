@@ -1,0 +1,6 @@
+{
+    "interval": 5000,
+    "connectionString":"postgresql://Admin:avanza123@104.211.155.19:5432/wasl",
+    "tableName": "blockchain",
+    "url":"https://ptsv2.com/t/jw915-1545747688/post"
+}

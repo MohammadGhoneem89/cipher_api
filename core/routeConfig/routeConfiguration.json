@@ -1075,6 +1075,18 @@
     }
   },
   "Cipher": {
+    "restart": {
+      "customMapping": true,
+      "MappingfunctionName": "restart",
+      "CustomMappingFile": "healthService/health.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "configUpdate": {
+      "customMapping": true,
+      "MappingfunctionName": "configUpdate",
+      "CustomMappingFile": "healthService/health.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "health": {
       "customMapping": true,
       "MappingfunctionName": "health",
