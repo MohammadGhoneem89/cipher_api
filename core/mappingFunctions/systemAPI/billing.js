@@ -4,12 +4,15 @@ const entity = require('../../../core/mappingFunctions/org/orgList');
 const pg = require('../../api/connectors/postgress');
 const moment = require('moment');
 const _ = require('lodash');
+const sqlserver = require('../../api/connectors/mssql');
+const config = require('../../../config');
+
 
 async function calculate(payload, UUIDKey, route, callback, JWToken) {
   try {
     // input from date todate
 
-    let apiList = await APIDefinitation.find({isBilled: true})
+    let apiList = await APIDefinitation.find({ isBilled: true })
     let entityList = await entity.orgCodeList();
     console.log(JSON.stringify(apiList), '\n', JSON.stringify(entityList));
     for (const org of entityList) {
@@ -46,13 +49,28 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
         console.log(JSON.stringify(org), JSON.stringify(api));
         if (api.BillingPolicy) {
           // get total number of hits of this org
-          let conn = await pg.connection();
-          let data = await conn.query(`select id,"hits" as totalhits from billing where isbilled=false and apiaction='${api.route}' and orgcode='${org.spCode}' and txdate between '${start}' and '${end}' `);
+          let qry = `select id,"hits" as totalhits from billing where isbilled=false and apiaction='${api.route}' and orgcode='${org.spCode}' and txdate between '${start}' and '${end}' `;
+          let data;
+          if (config.get('database', 'postgres') == 'mssql') {
+            let conn = await sqlserver.connection()
+            data = await conn.request().query(qry);
+            conn.close();
+          } else {
+            let conn = await pg.connection(qry);
+            data = await conn.query();
+          }
           let hits = 0;
           for (let elem of data.rows) {
-            let connBill = await pg.connection();
-            hits += elem.totalhits;
-            await connBill.query(`update billing set isbilled=true where id='${elem.id}'`);
+            if (config.get('database', 'postgres') == 'mssql') {
+              let conn = await sqlserver.connection()
+              await conn.request().query(`update billing set isbilled=true where id='${elem.id}'`);
+              hits += elem.totalhits;
+              conn.close();
+            } else {
+              let connBill = await pg.connection();
+              hits += elem.totalhits;
+              await connBill.query(`update billing set isbilled=true where id='${elem.id}'`);
+            }
           }
           // let hits = _.get(data, 'rows[0].totalhits', 0)
           console.log('>>>>>>>>>', JSON.stringify(hits));
@@ -76,28 +94,46 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
         }
       }
       if (result > 0) {
-        let connUpdate = await pg.connection();
-        await connUpdate.query(`
-            insert
-            into
-            billingreport(startdate, enddate, amount, currency, status, billingcycle, orgcode)
-            values('${start}', '${end}',${result}, '${org.currency}', 'Pending', '${org.cycle}', '${org.spCode}')
-            on
-            conflict(startdate, enddate, status, billingcycle, orgcode)
-            do update set
-            amount = billingreport.amount +${result}`);
+
+        if (config.get('database', 'postgres') == 'mssql') {
+          let conn = await sqlserver.connection()
+          await conn.request().query(`
+          insert
+          into
+          billingreport(startdate, enddate, amount, currency, status, billingcycle, orgcode)
+          values('${start}', '${end}',${result}, '${org.currency}', 'Pending', '${org.cycle}', '${org.spCode}')
+          on
+          conflict(startdate, enddate, status, billingcycle, orgcode)
+          do update set
+          amount = billingreport.amount +${result}`);
+          conn.close();
+        } else {
+          let connUpdate = await pg.connection();
+          await connUpdate.query(`
+              insert
+              into
+              billingreport(startdate, enddate, amount, currency, status, billingcycle, orgcode)
+              values('${start}', '${end}',${result}, '${org.currency}', 'Pending', '${org.cycle}', '${org.spCode}')
+              on
+              conflict(startdate, enddate, status, billingcycle, orgcode)
+              do update set
+              amount = billingreport.amount +${result}`);
+        }
+
+
+
       }
       entity.updateLastBilling(endEpoch, org.spCode).then(() => {
-        callback({success: true});
+        callback({ success: true });
       }).catch((ex) => {
         console.log(ex);
-        callback({success: false});
+        callback({ success: false });
       })
 
     }
   } catch (error) {
     console.log(error.stack)
-    callback({success: false})
+    callback({ success: false })
   }
 }
 

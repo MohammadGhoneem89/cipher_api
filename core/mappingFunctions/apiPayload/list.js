@@ -2,9 +2,11 @@
 
 const apiPayload = require('../../../lib/services/apiPayload');
 const pg = require('../../api/connectors/postgress');
-const {getAPIPayloadListQuery} = require('../../utils/apiPayloadqueries');
-const {calculateOffset, getRecordsCount} = require('../../utils/commonUtils');
-
+const { getAPIPayloadListQuery } = require('../../utils/apiPayloadqueries');
+const { calculateOffset, getRecordsCount } = require('../../utils/commonUtils');
+const sqlserver = require('../../api/connectors/mssql');
+const config = require('../../../config');
+const _ = require('lodash');
 function list(payload, UUIDKey, route, callback, JWToken) {
   payload.userId = JWToken._id;
   //_list(payload, callback);
@@ -27,35 +29,67 @@ function _listPG(payload, callback, JWToken) {
     payload.searchCriteria.errCode,
     JWToken
   );
-  pg.connection().then(async conn => {
-    let queryResult = await conn.query(query, []);
 
-    let responseForRecordsLength = await conn.query(countQuery, []);
-    console.log('Response for Record Length: ' + responseForRecordsLength);
+  if (config.get('database', 'postgress') == 'mssql') {
+    sqlserver.connection('apipayload').then(async (conn) => {
+      let responseForRecordsLength = await conn.request().query(countQuery);
+      console.log('Response for Record Length: ' + JSON.stringify(responseForRecordsLength));
+      let numberOfRecords = _.get(responseForRecordsLength, 'recordset.[0].numberOfRecords', 0);
+      console.log('getRecordCount' + numberOfRecords);
+      let queryResult = await await conn.request().query(query);
+      console.log('queryResult: ', JSON.stringify(queryResult));
+      let { recordset } = queryResult;
+      let response = {};
+      response[payload.action] = {
+        action: payload.action,
+        pageData: {
+          pageSize: payload.page.pageSize,
+          currentPageNo: payload.page.currentPageNo,
+          totalRecords: numberOfRecords
+        },
+        data: {
+          searchResult: recordset
+        }
+      };
+      appendAction(response);
+      conn.close();
+      callback(response);
+    }).catch((ex) => {
+      console.log(ex)
+    })
+  } else {
+    pg.connection().then(async conn => {
 
-    let numberOfRecords = getRecordsCount(responseForRecordsLength);
-    console.log('getRecordCount' + numberOfRecords);
+      let queryResult = await conn.query(query, []);
+      let responseForRecordsLength = await conn.query(countQuery, []);
+      console.log('Response for Record Length: ' + responseForRecordsLength);
 
-    console.log('queryResult: ', JSON.stringify(queryResult));
-    let {rows} = queryResult;
+      let numberOfRecords = getRecordsCount(responseForRecordsLength);
+      console.log('getRecordCount' + numberOfRecords);
 
-    let response = {};
-    response[payload.action] = {
-      action: payload.action,
-      pageData: {
-        pageSize: payload.page.pageSize,
-        currentPageNo: payload.page.currentPageNo,
-        totalRecords: numberOfRecords
-      },
-      data: {
-        searchResult: rows
-      }
-    };
-    // response.push(apiPayloadAction);
+      console.log('queryResult: ', JSON.stringify(queryResult));
+      let { rows } = queryResult;
 
-    appendAction(response);
-    callback(response);
-  });
+      let response = {};
+      response[payload.action] = {
+        action: payload.action,
+        pageData: {
+          pageSize: payload.page.pageSize,
+          currentPageNo: payload.page.currentPageNo,
+          totalRecords: numberOfRecords
+        },
+        data: {
+          searchResult: rows || recordset
+        }
+      };
+      // response.push(apiPayloadAction);
+
+      appendAction(response);
+      callback(response);
+    });
+  }
+
+
 }
 
 function _list(payload, callback) {

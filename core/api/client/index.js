@@ -2,6 +2,7 @@ const mongo = require('./mongoose');
 const amqp = require('./amqp');
 const redis = require('./redis');
 const pg = require('./pg');
+const mssql = require('./mssql');
 const sequelize = require('./sequelize');
 
 module.exports = {
@@ -19,6 +20,9 @@ module.exports = {
         break;
       case 'postgres':
         client = await pg(connectionURL);
+        break;
+      case 'mssql':
+        client = await mssql.getPool(QUEUE_NAME, connectionURL);
         break;
       case 'pg':
         client = await pg(connectionURL);

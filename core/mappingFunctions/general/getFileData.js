@@ -1,6 +1,8 @@
 'use strict';
 const pg = require('../../../core/api/connectors/postgress');
 const _ = require('lodash');
+const sqlserver = require('../../api/connectors/mssql');
+const config = require('../../../config');
 
 exports.getFileData = function (payload, UUIDKey, route, callback, JWToken) {
 
@@ -53,7 +55,7 @@ exports.getFileData = function (payload, UUIDKey, route, callback, JWToken) {
       let outVal = [];
       data[1].rows.forEach((elemt) => {
         let element = _.clone(elemt)
-        element.action = [{"actionType": "COMPONENT_FUNCTION", iconName: "fa fa-eye", label: "view"}]
+        element.action = [{ "actionType": "COMPONENT_FUNCTION", iconName: "fa fa-eye", label: "view" }]
         outVal.push(element);
       })
 
@@ -80,3 +82,83 @@ exports.getFileData = function (payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
+
+
+exports.getFileDataMSSQL = function (payload, UUIDKey, route, callback, JWToken) {
+
+  let params = []
+
+  let queryFile = 'SELECT * FROM file_details WHERE id=@id';
+  let queryData = 'SELECT * FROM file_contents WHERE fileid=@id';
+  let queryCnt = 'SELECT COUNT(*) FROM file_contents WHERE fileid=@id ';
+
+  params.push(payload.id)
+
+  if (payload.searchCriteria) {
+    if (payload.searchCriteria.status) {
+      if (payload.searchCriteria.status.length == 1) {
+        queryData += ' AND status=@status '
+        queryCnt += ' AND status=@status '
+
+        params.push(payload.searchCriteria.status[0])
+      } else {
+        queryData += ' AND status In (@status1, @status2) '
+        queryCnt += ' AND status In (@status1, @status2) '
+
+        params.push(payload.searchCriteria.status[0])
+        params.push(payload.searchCriteria.status[1])
+      }
+    }
+    if (payload.searchCriteria.rulename) {
+      queryData += ` AND rulename=@rulename `
+      queryCnt += ` AND rulename=@rulename `
+      params.push(payload.searchCriteria.rulename)
+    }
+  }
+  queryData += ' ORDER BY datetime DESC';
+
+
+  if (payload.page) {
+    queryData += ` OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)} ROWS FETCH NEXT  ${payload.page.pageSize} ROWS ONLY `;
+  }
+
+  console.log("===", queryFile)
+  console.log("+++", queryData)
+  console.log("---", queryCnt)
+
+  sqlserver.connection().then((conn) => {
+    return Promise.all([
+      conn.query(queryFile, [payload.id]),
+      conn.query(queryData, params),
+      conn.query(queryCnt, params),
+    ]).then((data) => {
+      conn.close();
+      let outVal = [];
+      data[1].recordset.forEach((elemt) => {
+        let element = _.clone(elemt)
+        element.action = [{ "actionType": "COMPONENT_FUNCTION", iconName: "fa fa-eye", label: "view" }]
+        outVal.push(element);
+      })
+
+      let response = {
+        "getFileData": {
+          "action": "getFileData",
+          "pageData": {
+            "pageSize": payload.page.pageSize,
+            "currentPageNo": payload.page.currentPageNo,
+            "totalRecords": data[2].recordset[0].count
+          },
+          "data": {
+            "searchResult": {
+              fileDetails: data[0].recordset,
+              fileData: outVal
+            }
+          }
+        }
+      };
+      return callback(response);
+    });
+  }).catch((err) => {
+    console.log(err);
+  });
+}

@@ -4,6 +4,9 @@ const permissionsHelper = require('../../../lib/helpers/permissions');
 const permissionConst = require('../../../lib/constants/permissions');
 const _ = require('lodash');
 const pg = require('../../api/connectors/postgress');
+const sqlserver = require('../../api/connectors/mssql');
+const config = require('../../../config');
+
 var entityDetailOut = function (payload, UUIDKey, route, callback, JWToken) {
 
   logger.debug(" [ Entity Detail ] PAYLOAD : " + JSON.stringify(payload, null, 2));
@@ -85,12 +88,22 @@ var orgDetail = function (payload, entityGetCB, JWToken) {
       .then(async (res) => {
         pointer.set(data, '/actions', res.pageActions);
 
+        if (config.get('database', 'postgres') == 'mssql') {
+          let conn = await sqlserver.connection()
+          let { recordset } = await conn.request().query(`select * from billingreport where orgcode='${data.spCode}'`);
+          conn.close();
+          response["entityDetail"]["data"] = data;
+          _.set(response, 'entityDetail.data.billing', recordset);
+          entityGetCB(response);
+        } else {
+          let conn = await pg.connection();
+          let reslt = await conn.query(`select * from billingreport where orgcode='${data.spCode}'`);
+          response["entityDetail"]["data"] = data;
+          _.set(response, 'entityDetail.data.billing', reslt.rows);
+          entityGetCB(response);
+        }
 
-        let conn = await pg.connection();
-        let reslt = await conn.query(`select * from billingreport where orgcode='${data.spCode}'`);
-        response["entityDetail"]["data"] = data;
-        _.set(response, 'entityDetail.data.billing', reslt.rows);
-        entityGetCB(response);
+
       });
   });
 

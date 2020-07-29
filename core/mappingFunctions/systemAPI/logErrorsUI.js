@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; 
 const sequalize = require('../../api/client/sequelize');
 const { QueryTypes } = require('sequelize');
 async function logErrors(payload, UUIDKey, route, callback, JWToken, res) {

@@ -100,7 +100,6 @@ function checkRules() {
   health({}, '', '', function (dataHealth) {
 
     Health.findOne({name: 'general'}).then((data) => {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>', JSON.stringify(data, null, 2));
       if (data && data.ruleList) {
         data.ruleList.forEach((elem) => {
             console.log(JSON.stringify(elem));
@@ -128,6 +127,8 @@ function checkRules() {
       }
     })
   }, {});
+
+  
   setTimeout(checkRules, configGlobal.get('healthCheckInterval', 300000));
 }
 

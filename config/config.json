@@ -2,7 +2,7 @@
 {
   "discovery": true,
   "keyVault": {
-    "env": "master_dev",
+    "env": "rta_vehicle_newRelease_local",
     "header":{
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
