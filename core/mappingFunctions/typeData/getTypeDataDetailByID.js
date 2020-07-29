@@ -7,6 +7,7 @@ const typeData = require('../../../lib/services/typeData');
 
 function getTypeDataDetailById(payload, UUIDKey, route, callback, JWToken) {
   payload.userId = JWToken._id;
+
   get(payload, callback);
 }
 

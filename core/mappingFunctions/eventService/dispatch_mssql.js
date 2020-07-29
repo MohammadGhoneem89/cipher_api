@@ -4,6 +4,7 @@ const group = require('../../../lib/repositories/group');
 const emailTemplate = require('../../../lib/repositories/emailTemplate');
 const dates = require('../../../lib/helpers/dates');
 const sqlserver = require('../../api/connectors/mssql');
+const sql = require('mssql');
 
 function getEventDispatcher(payload, UUIDKey, route, callback, JWToken) {
   eventDispatcher.findPageAndCount(payload).then((data) => {
@@ -141,61 +142,57 @@ function upsertEventDispatcher(payload, UUIDKey, route, callback, JWToken) {
       console.log(err);
       callback(resp);
     });
-  }
-  else {
+  } else {
     resp.responseMessage.data.message.errorDescription = "dispatcherName is required";
     return callback(resp);
   }
 }
 
 function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
-
   let queryData = 'SELECT * FROM eventdispatchqueue WHERE 1=1 ';
-  let queryCnt = 'SELECT count(*) FROM eventdispatchqueue WHERE 1=1 ';
+  let queryCnt = 'SELECT count(*) as count FROM eventdispatchqueue WHERE 1=1 ';
   let query = '';
   if (payload.searchCriteria && payload.searchCriteria.toDate && payload.searchCriteria.fromDate) {
     let fromdate = dates.ddMMyyyyslash(payload.searchCriteria.fromDate);
     let todate = dates.ddMMyyyyslash(payload.searchCriteria.toDate);
-    query += ` AND date_part('epoch'::text,createdon)::bigint between  ${fromdate / 1000} AND ${todate / 1000} `;
+    query += ` AND DATEDIFF(SECOND,\'1970-01-01\', createdon) between  ${fromdate / 1000} AND ${todate / 1000} `;
   }
 
-  if (payload.searchCriteria && payload.searchCriteria.reqType) {
-    let reqType = payload.searchCriteria.reqType;
-    query += ` AND reqtype = '${reqType}' `;
+  if (payload.searchCriteria && payload.searchCriteria.eventName) {
+    let eventName = payload.searchCriteria.eventName;
+    query += ` AND sourceevent = '${eventName}' `;
   }
 
-  if (payload.searchCriteria && payload.searchCriteria.shortCode) {
-    let shortCode = payload.searchCriteria.shortCode;
-    query += ` AND shortcode = '${shortCode}'`;
-  }
-
-  if (payload.searchCriteria && payload.searchCriteria.reconType) {
-    let reconType = payload.searchCriteria.reconType;
-    query += ` AND recontype ='${reconType}'`;
+  if (payload.searchCriteria && payload.searchCriteria.status) {
+    let status = payload.searchCriteria.status;
+    query += ` AND status = ${status}`;
   }
 
   let queryCriteria = queryCnt + query;
   let queryCriteriaFull = queryData + query;
-  if (payload.page) { queryCriteriaFull += ` order by createdon desc OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)} ROWS FETCH NEXT ${payload.page.pageSize} ROWS ONLY `; }
-  // console.log(queryCriteriaFull);
-  sqlserver.connection('event').then((conn) => {
+  if (payload.page) {
+    queryCriteriaFull += ` order by createdon desc OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)} ROWS FETCH NEXT  ${payload.page.pageSize} ROWS ONLY`;
+  }
+  console.log(">>>>>>>>>>>>>>>>>>------>>>>",queryCriteriaFull);
+  sqlserver.connection().then((conn) => {
     return Promise.all([
       conn.query(queryCriteria, []),
       conn.query(queryCriteriaFull, [])
     ]).then((data) => {
-
-      console.log(JSON.stringify(data))
+      conn.close();
       data[1].recordset.forEach((elemt) => {
-
-        elemt.dispatcher = JSON.parse(elemt.dispatcher).dispatcherName;
-        elemt.datasource = JSON.parse(elemt.datasource).dataSourceName;
-        elemt.eventdata = JSON.parse(elemt.eventdata)
+        elemt.dispatcher = elemt.dispatcher.dispatcherName;
+        elemt.datasource = elemt.datasource.dataSourceName;
         elemt.createdon = elemt.createdon;
         elemt.updatedon = elemt.updatedon;
         elemt.status = Status(elemt.status);
-        elemt.actions = [{ label: "ReQueue", iconName: "fa fa-recycle", actionType: "COMPONENT_FUNCTION" }, { label: "viewData", iconName: "fa fa-eye", actionType: "COMPONENT_FUNCTION" }];
+        elemt.actions = [{
+          label: "ReQueue",
+          iconName: "fa fa-recycle",
+          actionType: "COMPONENT_FUNCTION"
+        }, { label: "viewData", iconName: "fa fa-eye", actionType: "COMPONENT_FUNCTION" }];
       });
-      // console.log(JSON.stringify(data[0].rows, null, 5))
+      console.log(JSON.stringify(data[0].recordset, null, 5))
       let response = {
         "EventDispatcherStatus": {
           "action": "EventDispatcherStatus",
@@ -211,7 +208,6 @@ function getEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken) {
       };
       return callback(response);
     });
-    conn.close();
   }).catch((err) => {
     console.log(err);
   });
@@ -234,15 +230,16 @@ function updateEventDispatcherStatus(payload, UUIDKey, route, callback, JWToken)
   };
   sqlserver.connection().then((conn) => {
     conn.query(queryData, []).then((data) => {
+      conn.close();
       resp.responseMessage.data.message.status = "OK";
       resp.responseMessage.data.message.errorDescription = "Event ReQueued!!";
       return callback(resp);
     }).catch((ex) => {
-      // console.log(ex);
+      console.log(ex);
       return callback(resp);
     });
   }).catch((ex) => {
-    // console.log(ex);
+    console.log(ex);
     return callback(resp);
   });
 }
@@ -251,22 +248,17 @@ function Status(tranStatus) {
   let vs = {
     "value": "",
     "type": "INFO"
-  };
-  if (tranStatus == 0) {
-    vs.value = 'Pending',
-      vs.type = 'WARNING';
   }
-
-  if (tranStatus == 4) {
-    vs.value = 'Waiting',
-      vs.type = 'WARNING';
-  }
-  else if (tranStatus == 1) {
+  if (tranStatus === 0) {
+    vs.value = 'Pending';
+    vs.type = 'WARNING';
+  } else if (tranStatus === 4) {
+    vs.value = 'Waiting';
+    vs.type = 'WARNING';
+  } else if (tranStatus === 1) {
     vs.value = 'Dispatched';
     vs.type = "SUCCESS";
-
-  }
-  else if (tranStatus == 3) {
+  } else if (tranStatus === 3) {
     vs.value = "Fail";
     vs.type = "ERROR";
   }

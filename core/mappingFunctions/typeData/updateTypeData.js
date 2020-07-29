@@ -22,6 +22,7 @@ function get(payload, callback) {
           data: {
             message: {
               status: 'OK',
+              newPageURL: "/pickupListSearch",
               errorDescription: 'typeData updated successfully',
               displayToUser: true
             }

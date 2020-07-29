@@ -3,8 +3,9 @@ const pg = require('../../../core/api/connectors/postgress');
 const _ = require('lodash');
 const sqlserver = require('../../api/connectors/mssql');
 const config = require('../../../config');
+const sql = require('mssql');
 
-exports.getFileData = function (payload, UUIDKey, route, callback, JWToken) {
+let getFileDataPG = function (payload, UUIDKey, route, callback, JWToken) {
 
   let params = []
 
@@ -84,7 +85,7 @@ exports.getFileData = function (payload, UUIDKey, route, callback, JWToken) {
 
 
 
-exports.getFileDataMSSQL = function (payload, UUIDKey, route, callback, JWToken) {
+let getFileDataMSSQL = function (payload, UUIDKey, route, callback, JWToken) {
 
   let params = []
 
@@ -92,45 +93,44 @@ exports.getFileDataMSSQL = function (payload, UUIDKey, route, callback, JWToken)
   let queryData = 'SELECT * FROM file_contents WHERE fileid=@id';
   let queryCnt = 'SELECT COUNT(*) FROM file_contents WHERE fileid=@id ';
 
-  params.push(payload.id)
-
-  if (payload.searchCriteria) {
-    if (payload.searchCriteria.status) {
-      if (payload.searchCriteria.status.length == 1) {
-        queryData += ' AND status=@status '
-        queryCnt += ' AND status=@status '
-
-        params.push(payload.searchCriteria.status[0])
-      } else {
-        queryData += ' AND status In (@status1, @status2) '
-        queryCnt += ' AND status In (@status1, @status2) '
-
-        params.push(payload.searchCriteria.status[0])
-        params.push(payload.searchCriteria.status[1])
-      }
-    }
-    if (payload.searchCriteria.rulename) {
-      queryData += ` AND rulename=@rulename `
-      queryCnt += ` AND rulename=@rulename `
-      params.push(payload.searchCriteria.rulename)
-    }
-  }
-  queryData += ' ORDER BY datetime DESC';
-
-
-  if (payload.page) {
-    queryData += ` OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)} ROWS FETCH NEXT  ${payload.page.pageSize} ROWS ONLY `;
-  }
-
   console.log("===", queryFile)
   console.log("+++", queryData)
   console.log("---", queryCnt)
 
   sqlserver.connection().then((conn) => {
+
+    let request = conn.request();
+    request.input('id', sql.VarChar, payload.id)
+    if (payload.searchCriteria) {
+      if (payload.searchCriteria.status) {
+        if (payload.searchCriteria.status.length == 1) {
+          queryData += ' AND status=@status '
+          queryCnt += ' AND status=@status '
+          params.push(payload.searchCriteria.status[0])
+        } else {
+          queryData += ' AND status In (@status1, @status2) '
+          queryCnt += ' AND status In (@status1, @status2) '
+          request.input('status1', sql.VarChar, payload.status[0])
+          request.input('status2', sql.VarChar, payload.status[1])
+        }
+      }
+      if (payload.searchCriteria.rulename) {
+        queryData += ` AND rulename=@rulename `
+        queryCnt += ` AND rulename=@rulename `
+        request.input('rulename', sql.VarChar, payload.searchCriteria.rulename)
+
+      }
+    }
+    queryData += ' ORDER BY datetime DESC';
+
+
+    if (payload.page) {
+      queryData += ` OFFSET ${payload.page.pageSize * (payload.page.currentPageNo - 1)} ROWS FETCH NEXT  ${payload.page.pageSize} ROWS ONLY `;
+    }
     return Promise.all([
-      conn.query(queryFile, [payload.id]),
-      conn.query(queryData, params),
-      conn.query(queryCnt, params),
+      request.query(queryFile),
+      request.query(queryData),
+      request.query(queryCnt),
     ]).then((data) => {
       conn.close();
       let outVal = [];
@@ -161,4 +161,11 @@ exports.getFileDataMSSQL = function (payload, UUIDKey, route, callback, JWToken)
   }).catch((err) => {
     console.log(err);
   });
+}
+
+
+if (config.get('database') == 'mssql') {
+  exports.getFileData = getFileDataPG;
+} else {
+  exports.getFileData = getFileDataMSSQL
 }
