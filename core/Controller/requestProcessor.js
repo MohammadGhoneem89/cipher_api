@@ -13,6 +13,7 @@ module.exports = class GeneralRequestProcessor {
     this.UUID = UUID;
     this.JWTokenData = JWTokenData;
   }
+
   processIncommingMessage() {
     return new Promise((resolve, reject) => {
       let promiseList = [];
@@ -24,24 +25,49 @@ module.exports = class GeneralRequestProcessor {
         let message;
         if (data.length > 0) {
           message = data[0];
-        }
-        else {
+        } else {
           message = this.request;
         }
 
         let controller = new Dispatcher(this.request, message, this.configdata, this.UUID, global.enumInfo, this.JWTokenData);
         return controller.SendGetRequest().then((response) => {
-          resolve(response);
+          if (response.success || response.error === false) {
+            resolve(response);
+          } else {
+            let responseObj = {
+              __cipherSuccessStatus: false,
+              __cipherMessage: response.message || "Some unknown error occured, please check logs",
+              __cipherUIErrorStatus: constants.cipherUIFailure,
+              __cipherExternalErrorStatus: constants.cipherExternalFailure,
+              __cipherMetaData: constants.errRequestParsing,
+              ...response
+            };
+            _.set(responseObj, 'success', undefined);
+            _.set(responseObj, 'message', undefined);
+            resolve(responseObj);
+          }
+
+
         });
       }).catch((ex) => {
         let successStatus = false;
-        let responseObj = {
-          __cipherSuccessStatus: successStatus,
-          __cipherMessage: ex.message || ex,
-          __cipherUIErrorStatus: constants.cipherUIFailure,
-          __cipherExternalErrorStatus: constants.cipherExternalFailure,
-          __cipherMetaData: constants.errRequestParsing
-        };
+        let simuStatus = this.configdata.isSimulated === true;
+        let responseObj = {};
+        if (simuStatus) {
+          _.set(responseObj, 'messageStatus', constants.cipherUIFailure);
+          _.set(responseObj, 'errorDescription', ex.message || ex);
+          _.set(responseObj, 'cipherMessageId', this.UUID);
+          _.set(responseObj, 'errorCode', constants.cipherExternalSuccess);
+          _.set(responseObj, 'timestamp', new Date().toISOString());
+        } else {
+          responseObj = {
+            __cipherSuccessStatus: successStatus,
+            __cipherMessage: ex.message || ex,
+            __cipherUIErrorStatus: constants.cipherUIFailure,
+            __cipherExternalErrorStatus: constants.cipherExternalFailure,
+            __cipherMetaData: constants.errRequestParsing
+          };
+        }
         resolve(responseObj);
       });
     });

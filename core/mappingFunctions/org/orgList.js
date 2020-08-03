@@ -5,9 +5,9 @@ const permissionsHelper = require('../../../lib/helpers/permissions');
 const permissionConst = require('../../../lib/constants/permissions');
 const _ = require('lodash');
 const dateFormat = require('../../../lib/helpers/dates');
+const config = require('../../../config');
 
 let entityListOut = function (payload, UUIDKey, route, callback, JWToken) {
-
   logger.debug(" [ Entity List ] PAYLOAD : " + JSON.stringify(payload, null, 2));
   logger.debug(" [ Entity List ] UUID : " + UUIDKey);
   logger.debug(" [ Entity List ] Route : " + route);
@@ -22,11 +22,10 @@ function orgList(body, entityList_CB, JWToken) {
   logger.debug(" [ Entity List ] Entity list Data : " + JSON.stringify(body));
 
   let isEntity = false;
-
   if (JWToken.orgType === 'Entity') {
     if (JWToken.orgType === 'Entity') {
       isEntity = true;
-      body.searchCriteria = { spCode: JWToken.orgCode };
+      body.searchCriteria = {spCode: JWToken.orgCode};
     }
   }
 
@@ -50,22 +49,27 @@ function orgList(body, entityList_CB, JWToken) {
   let criteria = [];
   if (searchCriteria && searchCriteria.entityName) {
     let entityName = searchCriteria["entityName"];
-    criteria.push({ "entityName": { '$regex': entityName, '$options': 'i' } });
+    criteria.push({"entityName": {'$regex': entityName, '$options': 'i'}});
   }
 
   if (searchCriteria && searchCriteria.arabicName) {
     let arabicName = searchCriteria.arabicName;
-    criteria.push({ "arabicName": { '$regex': arabicName, '$options': 'i' } });
+    criteria.push({"arabicName": {'$regex': arabicName, '$options': 'i'}});
   }
   if (searchCriteria && searchCriteria.spCode) {
     let spCode = searchCriteria.spCode;
-    criteria.push({ "spCode": spCode });
-  }
-  if (searchCriteria && searchCriteria.isActive) {
-    criteria.push({ isActive: true });
+    criteria.push({"spCode": spCode});
   }
 
-  where = criteria.length > 0 ? { "$and": criteria } : {};
+  let ownOrg = config.get('ownerOrgs', [])
+  if (ownOrg && ownOrg.indexOf(JWToken.orgCode) == -1) {
+    criteria.push({"spCode": {'$regex': JWToken.orgCode, '$options': 'i'}});
+  }
+  if (searchCriteria && searchCriteria.isActive) {
+    criteria.push({isActive: true});
+  }
+
+  where = criteria.length > 0 ? {"$and": criteria} : {};
 
   let options = {};
 
@@ -80,8 +84,7 @@ function orgList(body, entityList_CB, JWToken) {
     if (err) {
       logger.debug(" [ Entity List ] Count ERROR : " + err);
       entityList_CB(response);
-    }
-    else {
+    } else {
       pointer.set(response, "/entityList/pageData/totalRecords", countData);
 
       global.db.selectWithSort("Entity", where, {
@@ -92,6 +95,7 @@ function orgList(body, entityList_CB, JWToken) {
         "isActive": 1,
         "services": 1,
         "actions": 1,
+        "orgType": 1,
         "status": 1,
         "dateCreated": 1,
         "dateUpdated": 1,
@@ -100,8 +104,7 @@ function orgList(body, entityList_CB, JWToken) {
         if (err) {
           logger.debug(" [ Entity List ] ERROR : " + err);
           entityList_CB(response);
-        }
-        else {
+        } else {
           entityTypeData(function (nameData) {
             let embedField = {};
             for (let j = 0; j < entityData.length; j++) {
@@ -128,7 +131,18 @@ function orgList(body, entityList_CB, JWToken) {
 
             permissionsHelper.embed(params)
               .then((res) => {
-                response["entityList"]["data"]["actions"] = res.pageActions;
+                if (res.pageActions.length > 0) {
+                  response["entityList"]["data"]["actions"] = [{
+                    "value": "1002",
+                    "type": "pageAction",
+                    "label": "ADD",
+                    "labelName": "COM_AB_Add",
+                    "actionType": "PORTLET_LINK",
+                    "iconName": "fa fa-plus",
+                    "URI": "/orgSetup",
+                    "children": []
+                  }];
+                }
                 response["entityList"]["data"]["searchResult"] = res.documents;
                 nameData = _.sortBy(nameData, (d) => d.label.toLowerCase());
                 response["entityList"]["data"]["typeData"]["entityNames"] = !isEntity ? nameData : [];
@@ -140,7 +154,37 @@ function orgList(body, entityList_CB, JWToken) {
       });
     }
   });
+};
+
+
+function orgCodeList() {
+  return new Promise((resolve, reject) => {
+    global.db.selectWithSort("Entity", {isActive: true}, {
+      "spCode": 1,
+      "currency": 1,
+      "cycle": 1
+    }, {}, function (err, entityData) {
+      resolve(entityData);
+    });
+  });
+}
+;
+
+function updateLastBilling(lastbilldate, spCode) {
+  return new Promise((resolve, reject) => {
+    global.db.update("Entity", {
+      "spCode": spCode
+    }, {lastbilldate: lastbilldate}, function (err) {
+      if (err) {
+        logger.error(" [ Entity Update ] Entity is not updated : " + err);
+        return reject(err);
+      }
+      return resolve();
+    });
+  });
 }
 
 exports.entityListOut = entityListOut;
+exports.orgCodeList = orgCodeList;
+exports.updateLastBilling = updateLastBilling;
 

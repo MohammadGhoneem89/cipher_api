@@ -1,7 +1,8 @@
+  
 {
-<<<<<<< HEAD
+  "discovery": true,
   "keyVault": {
-    "env": "DC",
+    "env": "master_dev",
     "header":{
       "username": "vaultKeeper",
       "password": "DSGkeeper@321"
@@ -15,7 +16,7 @@
         "url": "http://23.97.138.116:9009/keyVault"
 >>>>>>> a9c8cfb28e02643c105d80563bcdfcfa3ecb3f74
     },
-    "url": "http://172.30.83.80:9009/KeyVault"
+    "url": "ws://127.0.0.1:9009/keyVault"
   },
   "coreDB":{
     "env": "core_db_dc",

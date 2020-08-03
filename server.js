@@ -1,36 +1,118 @@
 'use strict';
-
 const config = require('./config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const uuid = require('uuid/v1');
-const db = require('./core/database/db')(); // eslint-disable-line
-// const jsReport = require('jsreport');
+require('./core/database/db')(); // eslint-disable-line
 const url = require('url');
 const cors = require('cors');
 const rp = require('request-promise');
-const renderExport = require('./exports');
-//  const generateReports = require('./reports');
+const dates = require('./lib/helpers/dates');
 let app = express();
-const expressWs = require('express-ws')(app);
+
 const crypto = require('./lib/helpers/crypto');
+const apiTemplate = require('./lib/repositories/apiTemplate');
 const RestController = require('./core/Controller/RestController.js');
-const MQ = require('./MQListener.js');
 const mongoDB = require('./core/api/connectors/mongoDB');
+const postgres = require('./core/api/connectors/postgress.js');
+const saf = require('./core/mappingFunctions/safLogs/saf');
+saf.consumeSaflogs();
 const fileUpload = require('express-fileupload');
 const imageUpload = require('./core/validation/imageUpload');
 const fileUploadValid = require('./core/validation/fileUpload');
 const permissions = require('./lib/middleware/permissions');
-const docPermissions = require('./lib/middleware/docPermission');
 const requestLog = require('./lib/middleware/requesLog');
 const authUser = require('./lib/auth/user');
 const logger = require('./core/api/connectors/logger').app;
-const serverStats = require('./lib/services/serverStats');
-const notification = require('./core/mappingFunctions/notification/list');
+const frameguard = require('frameguard');
+const cookieParser = require('cookie-parser');
 const _ = require('lodash');
+let HealthCheckHelper = require('./core/utils/health.js');
+const routeData = require('./core/mappingFunctions/systemAPI/APIDefination');
+const health = require('./core/mappingFunctions/healthService/health');
+const getUpload = require('./core/validation/getDocUploadEx.js');
+const getDocUpload = require('./core/validation/getDocUpload.js');
 const tokenLookup = require('./lib/repositories/tokenLookup');
 const commonConst = require('./lib/constants/common');
-const dates = require('./lib/helpers/dates');
+const xssFilter = require('x-xss-protection');
+const baseExclusion = ['setPassword', 'permission', 'user', 'notificationList']
+
+
+global.appDir = __dirname;
+mongoDB.connection(config.get('mongodb.url'));
+console.log(config.get('mongodb.url'))
+//console.log("postgress t-------------------------")
+//console.log(config.get('taskPostgres.url'))
+app.use(xssFilter());
+app.use(fileUpload());
+app.use(express.static('public'));
+app.use(express.static('exports'));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(requestLog);
+app.use(frameguard({ action: 'sameorigin' }));
+let appServer;
+
+const enableWs = require('express-ws')
+enableWs(app);
+global.WSRegistery = {}
+app.ws('/Socket', (ws, req) => {
+  ws.on('message', msg => {
+    ws.send(msg)
+    console.log('Web socket Handshake Recieved');
+    const msg2 = JSON.parse(msg);
+    console.log({ fs: 'app.js', func: 'Socket' }, msg2, 'this is request');
+    const decoded = crypto.decrypt(msg2.token);
+    if (decoded.userID) {
+      console.log(decoded._id, 'Registered')
+      global.WSRegistery[decoded._id] = ws;
+    }
+  })
+
+  ws.on('close', () => {
+    console.log('WebSocket was closed')
+  })
+})
+routeData.LoadConfig().then(() => {
+  console.log('Configurations Loaded For Request Processing!!');
+  appServer = app.listen(config.get('port'), function () {
+    logger.info({
+      fs: 'app.js ',
+      func: 'index'
+    }, 'server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
+    console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
+    setTimeout(health.checkRules, config.get('healthCheckInterval', 300000));
+  });
+});
+
+
+app.use(cookieParser('secretToken'));
+app.use(cors({
+  "origin": true,
+  credentials: true,
+  methods: "GET,POST"
+}));
+apiTemplate.find().then((templates) => {
+  let templatesg = {}
+  templates.forEach(function (template) {
+    templatesg[template.name] = template;
+  });
+  global.apiTemplatesg = templatesg;
+});
+
+function contains(input, checkval) {
+  return (input.indexOf(checkval) !== -1);
+}
+
+function checkbadinput(req) {
+  const payload = req.body;
+  const requestString = JSON.stringify(payload);
+  if (contains(requestString, "$")) {
+    logger.error({ fs: 'app.js', func: 'login', error: err.stack || err }, 'illeagal characters Found Sending Error!!');
+    return true;
+  }
+  return false;
+}
 
 process.on('uncaughtException', (err) => {
   logger.error({ fs: 'app.js', func: 'uncaughtException', error: err, stack: err.stack }, 'uncaught exception');
@@ -40,429 +122,123 @@ process.on('unhandledRejection', function (err) {
   logger.error({ fs: 'app.js', func: 'unhandledRejection', error: err, stack: err.stack }, 'unhandled Rejection');
 });
 
-const pagesKey = {};
-const socketKey = [];
-const lastSubscription = [];
-
-global.appDir = __dirname;
-
-mongoDB.connection(config.get('mongodb.url'));
-console.log(config.get('mongodb.url'))
-app = expressWs.app;
-
-const routeData = require('./core/mappingFunctions/systemAPI/APIDefination');
-let appServer;
-routeData.LoadConfig().then(() => {
-  console.log('Configurations Loaded For Request Processing!!');
-  appServer = app.listen(config.get('port'), function () {
-    logger.info({
-      fs: 'app.js ',
-      func: 'index'
-    }, 'server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
-    console.log('server running at http://%s:%s\n', appServer.address().address, appServer.address().port);
-  });
-});
-
-serverStats.upsert();
-// soapChannel.listen();
-
-app.options('*', cors());
-
-app.use(cors());
-app.use(bodyParser.json({ limit: 1048576 * 50 }));
-app.use(bodyParser.urlencoded({ limit: 1048576 * 50, extended: true }));
-app.use(fileUpload());
-app.use(express.static('public'));
-app.use(express.static('exports'));
-app.use('/reporting', express());
-
-// health Check block
-let HealthCheckHelper = require('./core/utils/health.js');
 app.use('/health', HealthCheckHelper.router);
-//==================
 
-
-if (config.get('enableMQRead') == '1') {
-  MQ.start(ReadIncomingMessage);
-}
-
-// jsReport({
-//     express: { app: app, server: appServer },
-//     appPath: '/reporting'
-// }).init()
-//     .catch(function(e) {
-//         logger.error(e, 'JS report error');
-//     });
-
-
-
-app.use(requestLog);
-
-function unsubscribeOnClosedConnection(subscriberId) {
+app.post('/login', async (req, res) => {
   try {
-    if (lastSubscription[subscriberId].page) {
-      unsubscribe(lastSubscription[subscriberId].page, subscriberId, '');
-    }
-  }
-  catch (err) {
-    logger.error(err, 'some error in unsubscription');
-  }
-}
-
-function SendLater(msg, newmsg) {
-  try {
-    console.log("message came here in send later");
-    socketKey[msg.header.userID].send(JSON.stringify(newmsg));
-  }
-  catch (err) {
-    logger.error({ fs: 'app.js', func: 'SendLater' }, err, 'cannot send message to socket as socket is closed');
-  }
-
-}
-
-
-const logout = async (req, res) => {
-  logger.debug({
-      fs: 'server.js',
-      func: 'logout'
-  }, ' logout request line number 400 ');
-  try {
-      let JWToken = _.get(req, "headers.token", _.get(req, "body.token", null));
-      JWToken = JWToken || req.cookies.token;
-
-      logger.debug({
-          fs: 'server.js',
-          func: 'logout'
-      }, ' logout request line number 403 Token', JWToken);
-      if (JWToken) {
-          const decoded = crypto.decrypt(JWToken);
-          console.log("decoded", decoded);
-          await tokenLookup.remove({
-              userId: decoded._id
-          });
-      }
-      res.send({})
-  } catch (error) {
-      console.error("error", error.stack);
-      logger.debug({
-          fs: 'server.js',
-          func: 'logout'
-      }, ' logout request line number 412 error', error.stack);
-      res.send({})
-  }
-};
-app.get('/logout', logout);
-app.post('/logout', logout);
-
-
-
-
-
-const timeoutResponse = {
-  sessionExpiredResponse: {
-      action: 'sessionExpired',
-      data: {
+    const payload = req.body;
+    payload.action = '/login';
+    payload.remoteAddress = req.connection.remoteAddress;
+    const response = {
+      loginResponse: {
+        action: 'login',
+        data: {
           message: {
-              status: 'ERROR',
-              errorCode: 403,
-              errorDescription: 'Session has expired. Please login again',
-              routeTo: '',
-              displayToUser: true,
+            status: 'OK',
+            errorDescription: 'logged in successfully !!!',
+            routeTo: '',
+            displayToUser: true
           },
-          success: false,
+          success: true,
+          token: '',
           firstScreen: ''
-      }
-  }
-};
-
-
-function handleRealTimeEvents(msg) {
-
-  if (msg.header.subscriberId) {
-    try {
-      if (socketKey[msg.header.subscriberId]) {
-        if (lastSubscription[msg.header.subscriberId]) {
-          if (JSON.stringify(msg.header.params) === JSON.stringify(lastSubscription[msg.header.subscriberId].params) && msg.header.page === lastSubscription[msg.header.subscriberId].page) {
-            logger.info({ fs: 'app.js', func: 'handleRealTimeEvents' }, msg, 'Incoming Message Received');
-            socketKey[msg.header.subscriberId].send(JSON.stringify(msg.body));
-          }
-        }
-        else {
-          socketKey[msg.header.subscriberId].send(JSON.stringify(msg.body));
-        }
-      }
-
-    }
-    catch (err) {
-      logger.error({ fs: 'app.js', func: 'handleRealTimeEvents' }, err, 'connection is closed unsubscribing');
-      unsubscribeOnClosedConnection(msg.header.subscriberId);
-    }
-  }
-}
-
-function handleRealTimeNotification(msg) {
-
-  if (socketKey[msg.body.userID] && socketKey[msg.body.userID].readyState == 1) {
-    const messageJson = {
-      'responseMessage': {
-        'action': 'Notification',
-        'data': {
-          'message': {
-            'status': msg.body.MessageType,
-            'errorDescription': msg.body.MessageText,
-            'routeTo': 'success',
-            'displayToUser': true
-          }
         }
       }
     };
 
-    try {
-      socketKey[msg.body.userID].send(JSON.stringify(messageJson));
+    const apiResponse = {
+      cipherMessageId: uuid(),
+      messageStatus: 'OK',
+      errorCode: 200,
+      errorDescription: "logged in successfully !!!",
+      token: "",
+      timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+    };
 
-      const param = {
-        'page': { 'currentPageNo': 1, 'pageSize': 5 },
-        'sortBy': { 'createdAt': -1 },
-        'userID': msg.body.userID,
-        'action': 'notificationList'
+    if (checkbadinput(req)) {
+      let err = {
+        desc: 'The username or password contains illegal characters.'
       };
-      notification.listByUserID(param, '', '', function (response) {
-        socketKey[msg.body.userID].send(JSON.stringify(response));
+      response.loginResponse.data.message.status = 'ERROR';
+      // response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
+      response.loginResponse.data.success = false;
+      res.status(400).send(response);
+      return;
+    }
+
+
+    authUser(payload)
+      .then(async (user) => {
+        console.log(JSON.stringify(user));
+        if (user.userType == "API") {
+          apiResponse.token = user.token;
+          res.send(apiResponse);
+        } else {
+          response.loginResponse.data.token = user.token;
+          let cookieAttributes = {};
+          if (config.get("disableSameSiteCookie")) {
+            delete cookieAttributes.sameSite;
+          }
+          res.cookie('token', user.token, cookieAttributes);
+
+
+          await tokenLookup.removeAndCreate({
+            token: user.token,
+            userId: user._id,
+            createdAt: dates.newDate()
+          });
+
+          if (user.isNewUser)
+            response.loginResponse.data.firstScreen = '/changePasswordInternal';
+          else
+            response.loginResponse.data.firstScreen = user.firstScreen;
+          res.send(response);
+        }
+      })
+      .catch((err) => {
+        logger.error({
+          fs: 'app.js',
+          func: 'login',
+          error: err.stack || err
+        }, 'login failed');
+
+        if (err.userType) {
+          if (err.userType == "API") {
+            apiResponse.messageStatus = "ERROR";
+            apiResponse.errorDescription = err.desc || err.stack || err;
+            apiResponse.errorCode = 201;
+            res.status(401).send(apiResponse);
+          } else {
+            response.loginResponse.data.message.status = 'ERROR';
+            response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
+            response.loginResponse.data.success = false;
+            res.status(401).send(response);
+          }
+        } else {
+          apiResponse.messageStatus = "ERROR";
+          apiResponse.errorDescription = err.desc || err.stack || err;
+          apiResponse.errorCode = 201;
+          res.status(401).send(apiResponse);
+        }
+
       });
 
-    }
-    catch (err) {
-      logger.error({
-        fs: 'app.js',
-        func: 'handleRealTimeEvents'
-      }, err, 'Cannot send notifications as the socket is closed');
-    }
+  } catch (err) {
 
-  }
-
-}
-
-function passOnCall(msg, uri) {
-
-  const options = {
-    method: 'POST',
-    uri: uri + "passOn",
-    body: {
-      password: config.get('passOnPassword'),
-      msg: msg
-    },
-    json: true // Automatically stringifies the body to JSON
-  };
-
-  rp(options)
-    .then(function (parsedBody) {
-      logger.info({
-        fs: 'app.js',
-        func: 'passOnCall'
-      }, parsedBody, 'Broadcasted to other server from Server ' + config.get('URLRestInterface'));
-    })
-    .catch(function (err) {
-      // POST failed...
-      logger.error({ fs: 'app.js', func: 'passOnCall' }, err, 'Broadcasted to other server');
-
+    console.log("error while login" + err);
+    res.status(500).send({
+      "messageStatus": "ERROR",
+      "cipherMessageId": uuid(),
+      "errorDescription": 'some error occurred while processing',
+      "errorCode": 201,
+      "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
     });
-
-}
-
-function ReadIncomingMessage_Processing(msg) {
-
-  if (msg.header && (msg.header.action === 'FPS_VALIDATE' || msg.header.action === 'FPS_PROCESS_REQUEST_UPDATE' || msg.header.action === 'FPS_VALIDATE_ERROR')) {
-    console.log("Inside FPS_VALIDATE");
-    handleFileMessage(msg);
   }
-  else if (msg.header && msg.header.action === 'NOTIFICATION') {
-    handleRealTimeNotification(msg);
-  }
-  else if (msg.header && msg.header.subscriberId) {
-    handleRealTimeEvents(msg);
-  }
-  else {
-    logger.info({ fs: 'app.js', func: 'ReadIncomingMessage_Processing' }, msg, 'Ignoring Message');
-  }
-}
-
-function ReadIncomingMessage(msg) {
-
-  let userId = "";
-  if (msg.body) {
-    if (msg.body.userID) {
-      userId = msg.body.userID
-    }
-  }
-  if (msg.header) {
-    if (msg.header.userID) {
-      userId = msg.header.userID
-    }
-    if (msg.header.subscriberId) {
-      userId = msg.header.subscriberId
-    }
-  }
-
-  console.log("Message is read from the queue" + JSON.stringify(msg));
-  serverStats.find().then((data) => {
-    for (var i = 0; i < data.length; i++) {
-      if (data[i].ip.indexOf("127.0.0.1") == -1) {
-        if (data[i].ip != config.get('URLRestInterface')) {
-          passOnCall(msg, data[i].ip);
-        }
-      }
-    }
-  });
-  ReadIncomingMessage_Processing(msg);
-}
-
-// /////////////////////////////////////////////////////////////////////////////
-// /////////////////////// REST ENDPOINTS START HERE ///////////////////////////
-// //////////////////////////////////
-
-function subscribe(msg) {
-
-  const msg2 = MQ.getNewMessageForSubscription(msg.pageName, msg.userID, msg.data);
-  MQ.MQOut(null, '', msg2);
-  logger.info({ fs: 'app.js', func: 'subscribe' }, msg2, 'sent subscription message');
-}
-
-function unsubscribe(eventname, subscriptionId, params) {
-  const msg2 = MQ.getNewMessageForUnsubscription(eventname, subscriptionId, params);
-  MQ.MQOut(null, '', msg2);
-  logger.info({ fs: 'app.js', func: 'unsubscribe' }, msg2, 'sent unsubscription  message');
-}
-
-function sendMessage(msg) {
-  expressWs.getWss().clients.forEach(function (client) {
-    logger.info('Sending the message ');
-    try {
-      client.send(JSON.stringify(msg));
-    }
-    catch (err) {
-      logger.error({ fs: 'app.js', func: 'sendMessage' }, err, 'client socket not found');
-    }
-  });
-
-}
-
-app.ws('/Socket', function (ws, req) {
-  logger.info({ fs: 'app.js', func: 'Socket' }, 'Web socket Handshake Recieved');
-  ws.on('message', function (msg) {
-    logger.info('Web socket Handshake Recieved');
-    const msg2 = JSON.parse(msg);
-    logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'this is request');
-
-    const decoded = crypto.decrypt(msg2.token);
-
-    if (decoded.userID) {
-      socketKey[decoded.userID] = ws;
-
-      pagesKey[decoded.userID] = msg2.pageName;
-      msg2.userID = decoded.userID;
-      if (msg2.action) {
-        if (msg2.action === 'subscribe') {
-          if (lastSubscription[decoded.userID]) {
-            unsubscribe(lastSubscription[decoded.userID].page, decoded.userID, '');
-          }
-          lastSubscription[decoded.userID] = { 'page': msg2.pageName, 'params': msg2.data };
-          logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'The subscription parameters');
-          subscribe(msg2);
-        }
-      }
-    }
-    else {
-      logger.error({ fs: 'app.js', func: 'Socket' }, "Token doesnt have user ID" + JSON.stringify(msg2));
-    }
-    logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'GOT Web socket END ');
-  });
-
-});
-
-function contains(input, checkval) {
-  return (input.indexOf(checkval) !== -1);
-}
-
-function checkbadinput(req) {
-  const payload = req.body;
-  console.log("checking for illeagal characters.");
-  const requestString = JSON.stringify(payload);
-  if (contains(requestString, "$")) {
-    console.log("illeagal characters Found Sending Error!!");
-    logger.error({ fs: 'app.js', func: 'login', error: err.stack || err }, 'illeagal characters Found Sending Error!!');
-    return true;
-  }
-  console.log("request OK!.");
-  return false;
-}
-
-app.post('/login', function (req, res) {
-  const payload = req.body;
-  payload.action = '/login';
-  payload.remoteAddress = req.connection.remoteAddress;
-  const response = {
-    loginResponse: {
-      action: 'login',
-      data: {
-        message: {
-          status: 'OK',
-          errorDescription: 'logged in successfully !!!',
-          routeTo: '',
-          displayToUser: true
-        },
-        success: true,
-        token: '',
-        firstScreen: ''
-      }
-    }
-  };
-
-  const apiResponse = {
-    messageStatus: 'OK',
-    errorCode: 200,
-    errorDescription: "logged in successfully !!!",
-    token: "",
-    timestamp: ""
-  };
-
-  if (checkbadinput(req)) {
-    let err = {
-      desc: 'The username or password is incorrect'
-    };
-    response.loginResponse.data.message.status = 'ERROR';
-    response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
-    response.loginResponse.data.success = false;
-    res.send(response);
-    return;
-  }
-
-  authUser(payload)
-    .then((user) => {
-      if (user.userType == "API") {
-        apiResponse.token = user.token;
-        res.send(apiResponse);
-      } else {
-        response.loginResponse.data.token = user.token;
-        response.loginResponse.data.firstScreen = user.firstScreen;
-        res.send(response);
-      }
-    })
-    .catch((err) => {
-      logger.error({
-        fs: 'app.js',
-        func: 'login',
-        error: err.stack || err
-      }, 'login failed');
-      response.loginResponse.data.message.status = 'ERROR';
-      response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
-      response.loginResponse.data.success = false;
-      res.send(response);
-    });
 });
 
 app.post('/uploadFile/:action', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" }
+    let resperr = { 'error': "illegal character found in request" }
     res.send(resperr);
     return;
   }
@@ -505,8 +281,7 @@ app.post('/uploadFile/:action', permissions, function (req, res) {
         res.send(response);
         res.end();
       });
-  }
-  else {
+  } else {
     console.log('=============Organization is not entity==============');
     const JWToken = req.get('token');
     const decoded = crypto.decrypt(JWToken);
@@ -521,102 +296,21 @@ app.post('/uploadFile/:action', permissions, function (req, res) {
     const params = req.headers.type || req.body.type;
     const context = req.headers.context || req.body.context;
 
-    //if (!file) {
-      //logger.error({
-        //fs: 'app.js',
-        //func: 'uploadFile'
-      //}, ' [ File Upload Service ] File is not exist in req : ' + req.file);
-      //res.send('File does not exist');
-    //}
-    //else {
-      //fileUploadValid(file, UUID, ext, params, userID, source, context, function (data) {
-        //console.log(data)
-        //res.send(data);
-      //});
-    //}
-
-
-
-tokenValid(decoded._id, JWToken).then(async valid => {
-
-      if (valid) {
-          logger.info({
-              fs: 'app.js',
-              func: 'API'
-          }, decoded, 'decoded.userID:');
-
-          if (!file) {
-              logger.error({
-                  fs: 'app.js',
-                  func: 'uploadFile'
-              }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
-              res.send('File does not exist');
-          } else {
-              fileUploadValid(file, _.get(req, "body.policies", null), UUID, ext, params, userID, source, context, function (data) {
-                  console.log(data);
-                  res.send(data);
-              });
-          }
-          await tokenLookup.update({
-              token: JWToken,
-              userId: decoded._id
-          }, {
-              createdAt: dates.newDate()
-          });
-      } else {
-          console.log("sending response 403");
-          //res.clearCookie("token");
-          res.status(403).send(timeoutResponse);
-      }
-  })
-
-
-
+    if (!file) {
+      logger.error({
+        fs: 'app.js',
+        func: 'uploadFile'
+      }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
+      res.send('File does not exist');
+    } else {
+      fileUploadValid(file, UUID, ext, params, userID, source, context, function (data) {
+        console.log(data)
+        res.send(data);
+      });
+    }
 
   }
 });
-
-function handleTokenVerification(req, res, callback, action) {
-  if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" }
-    res.send(resperr);
-    return;
-  }
-  logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, 'Handle Transaction on Cipher ');
-  const payload = req.body;
-  let JWToken = '';
-  if (payload.JWToken) {
-    JWToken = payload.JWToken;
-  }
-  else {
-    JWToken = req.get('token');
-  }
-
-  logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, JWToken, 'JWToken : ');
-
-  const decoded = crypto.decrypt(JWToken);
-  if (decoded) {
-    logger.info({ fs: 'app.js', func: 'handleTokenVerification' }, decoded, 'decoded.userID:  ');
-    return callback(decoded, req.body, res, action, req);
-  }
-
-  const messageJson = {
-    'responseMessage': {
-      'action': 'Connection Error',
-      'data': {
-        'message': {
-          'status': 'ERROR',
-          'errorDescription': 'Access Denied',
-          'routeTo': 'success',
-          'displayToUser': true
-        }
-      }
-    }
-  };
-  res.send(messageJson);
-  return callback({}, {}, res, '', req);
-}
-
 app.post('/uploadImg', function (req, res) {
   if (checkbadinput(req)) {
     let resperr = { 'error': "illeagal character found in request" }
@@ -636,16 +330,12 @@ app.post('/uploadImg', function (req, res) {
   if (!data) {
     logger.debug({ fs: 'app.js', func: 'uploadImg' }, ' [ File Upload Service ] File is not exist in req : ' + req.file);
     res.send('Image dose not exist');
-  }
-  else {
+  } else {
     imageUpload(data, UUID, params, userID, source, context, function (imageUploadResponse) {
       res.send(imageUploadResponse);
     });
   }
 });
-
-const getUpload = require('./core/validation/getDocUploadEx.js');
-
 app.get('/getUploadedFile/:action/:id', permissions, function (req, res) {
   if (checkbadinput(req)) {
     let resperr = { 'error': "illeagal character found in request" }
@@ -661,9 +351,6 @@ app.get('/getUploadedFile/:action/:id', permissions, function (req, res) {
     res.send(data, 'binary');
   });
 });
-
-const getDocUpload = require('./core/validation/getDocUpload.js');
-
 app.post('/upload/:action', permissions, function (req, res) {
   let id = req.params.id;
   const JWToken = req.get("token");
@@ -730,7 +417,6 @@ tokenValid(decoded._id, JWToken).then(async valid => {
 
 
 });
-
 app.post('/APII/:channel/:action', permissions, function (req, res) {
   if (checkbadinput(req)) {
     let resperr = { 'error': "illeagal character found in request" };
@@ -781,108 +467,191 @@ const decoded = crypto.decrypt(JWToken);
 
 
 });
-
 app.get('/API/:channel/:action', permissions, apiCallsHandler);
-
 app.post('/API/:channel/:action', permissions, apiCallsHandler);
-
-function apiCallsHandler(req, res) {
+app.get('/export/:channel', permissions, function (req, res) {
   if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" };
+    let resperr = { 'error': "illeagal character found in request" }
     res.send(resperr);
     return;
   }
-  let payload = req.body;
-  let JWToken = '';
-  if (payload.JWToken) {
-    JWToken = payload.JWToken;
-  }
-  else {
-    JWToken = req.get('token');
-  }
-  if (req.query) {
-    Object.assign(payload, { queryParams: req.query });
-  }
-
-  if (req.headers) {
-    Object.assign(payload, { headersParams: req.headers });
-  }
-
-  if (req.files && Object.keys(req.files).length > 0) {
-    _.set(payload, 'files', req.files);
-  }
-
-  payload.token = JWToken;
-  const action = req.params.action;
-  const channel = req.params.channel;
-
   const url_parts = url.parse(req.url, true);
-  const query = url_parts.query;
-  logger.info({ fs: 'app.js', func: 'API' }, 'Handle Transaction on Cipher ' + action + ' ' + channel);
-  payload = Object.assign(payload, { action: action, channel: channel, ipAddress: "::1", query });
-  logger.info('calling handleExternalRequest ');
-  const UUID = uuid();
-  logger.info({ fs: 'app.js', func: 'API' }, 'UUID:  ' + UUID);
-  logger.info({ fs: 'app.js', func: 'API' }, 'JWToken :  ' + JWToken);
+  const type = url_parts.query.type;
+  let gridType = url_parts.query.gridType;
+  const JWToken = url_parts.query.JWT;
+  let decoded;
+  try {
+    decoded = crypto.decrypt(JWToken);
+  } catch (err) {
+    return sendError(res, req);
+  }
+  if (!decoded || !JWToken) {
+    return sendError(req, res);
+  }
+  let query = url_parts.query.searchCriteria || '';
+  try {
+    query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
+  } catch (e) {
+    res.send(e);
+    res.end();
+  }
+  renderExport(type, gridType, query, jsReport, decoded, res);
 
-  //const decoded = crypto.decrypt(JWToken);
-  //logger.info({ fs: 'app.js', func: 'API' }, decoded, 'decoded.userID:');
-  //RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
-
-
-const decoded = crypto.decrypt(JWToken);
-        console.log(JWToken + "token>>" + JSON.stringify(decoded));
-
-
-        tokenValid(decoded._id, JWToken).then(async valid => {
-
-            let byPassValidation = commonConst.permissionExcludeList.includes(action);
-
-            if (valid || _.get(payload, "header", null) != null || byPassValidation) {
-                logger.info({
-                    fs: 'app.js',
-                    func: 'API'
-                }, decoded, 'decoded.userID:');
-                RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
-                if (!byPassValidation) {
-                    await tokenLookup.update({
-                        token: JWToken,
-                        userId: decoded._id
-                    }, {
-                        createdAt: dates.newDate()
-                    });
-                }
-            } else {
-                console.log("sending response 403");
-                // res.clearCookie("token");
-                res.status(403).send(timeoutResponse);
-            }
-        })
-
-
-}
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min; // The maximum is exclusive and the minimum is inclusive
-}
-
-app.post('/SIMU/:action', function (req, res) {
-  logger.info('Handle Transaction on Cipher ');
-  const action = req.params.action;
-  logger.info(req.headers, 'Headers: ');
-  logger.info(req.headers, 'Headers: ');
-  logger.info(req.body, 'Data: ');
-  const resData = require('./responseJSON/' + action + '.json');
-  res.type('json');
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-
-  res.send(resData);
 });
 
-const searchCriteriaExport = require('./lib/helpers/searchCriteriaExport');
+function apiCallsHandler(req, res) {
+  try {
+    if (checkbadinput(req)) {
+      let resperr = { 'error': "illegal character found in request" };
+      res.send(resperr);
+      return;
+    }
+
+    let payload = req.body;
+    let JWToken = '';
+    if (payload.JWToken) {
+      JWToken = payload.JWToken;
+    } else {
+      JWToken = req.get('token') || req.cookies.token;
+    }
+    if (req.query) {
+      Object.assign(payload, {
+        queryParams: req.query
+      });
+    }
+
+    if (req.headers) {
+      Object.assign(payload, {
+        headersParams: req.headers
+      });
+    }
+
+    if (req.files && Object.keys(req.files).length > 0) {
+      _.set(payload, 'files', req.files);
+    }
+
+    payload.token = JWToken;
+    const action = req.params.action;
+    const channel = req.params.channel;
+
+
+    const url_parts = url.parse(req.url);
+    const query = url_parts.query;
+
+    payload = Object.assign(payload, {
+      action: action,
+      channel: channel,
+      ipAddress: "::1",
+      query,
+
+    });
+    logger.info('calling handleExternalRequest ');
+    const UUID = uuid();
+    logger.info({
+      fs: 'app.js',
+      func: 'API'
+    }, 'UUID:  ' + UUID);
+    logger.info({
+      fs: 'app.js',
+      func: 'API'
+    }, 'JWToken :  ' + JWToken);
+
+    const decoded = crypto.decrypt(JWToken);
+    if (decoded.isNewUser && baseExclusion.indexOf(action) == -1) {
+      return res.status(403).send(timeoutResponse);
+    }
+
+    tokenValid(decoded._id, JWToken).then(async valid => {
+      let byPassValidation = commonConst.permissionExcludeList.includes(action);
+      if (valid || _.get(payload, "header", null) != null || byPassValidation) {
+        RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
+        await tokenLookup.update({
+          token: JWToken,
+          userId: decoded._id
+        }, {
+          createdAt: dates.newDate()
+        });
+      } else {
+        console.log("sending response 403");
+        res.clearCookie("token");
+        res.status(403).send(timeoutResponse);
+      }
+    })
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).send({
+      error: "Error while processing request."
+    })
+  }
+}
+
+async function tokenValid(userIdz, tkn) {
+  try {
+    let existingToken = await tokenLookup.findOne({
+      userId: userIdz,
+      token: tkn
+    });
+    if (existingToken == null) {
+      return false;
+    }
+    let timestamp = dates.diffFromNow(existingToken.createdAt, "seconds");
+    console.log("existing token ", JSON.stringify(existingToken));
+    console.log("generated at ", config.get('tokenExp'));
+    console.log("timestamp at ", timestamp);
+    if (config.get('tokenExp') < timestamp) {
+      console.log("removing>>>", userIdz);
+      await tokenLookup.remove({
+        token: tkn,
+        userId: userIdz
+      });
+      return false;
+    } else {
+      console.log("Updating token>>");
+      return true;
+    }
+  } catch (error) {
+    console.log(error.stack);
+    return false;
+  }
+}
+
+const logout = async (req, res) => {
+  logger.debug({
+    fs: 'server.js',
+    func: 'logout'
+  }, ' logout request line number 400 ');
+  try {
+    let JWToken = _.get(req, "headers.token", _.get(req, "body.token", null));
+    JWToken = JWToken || req.cookies.token;
+
+    logger.debug({
+      fs: 'server.js',
+      func: 'logout'
+    }, ' logout request line number 403 Token', JWToken);
+    if (JWToken) {
+      const decoded = crypto.decrypt(JWToken);
+      console.log("decoded", decoded);
+      await tokenLookup.remove({
+        userId: decoded._id
+      });
+      // req.session.destroy(( err ) => {
+      //     console.error(err)
+      // })
+      res.clearCookie("token");
+    }
+    res.send({})
+  } catch (error) {
+    console.error("error", error.stack);
+    logger.debug({
+      fs: 'server.js',
+      func: 'logout'
+    }, ' logout request line number 412 error', error.stack);
+    res.send({})
+  }
+};
+app.get('/logout', logout);
+app.post('/logout', logout);
 
 function sendError(req, res) {
   const errMsg = {
@@ -904,135 +673,118 @@ function sendError(req, res) {
   res.end();
 }
 
-app.get('/export/:channel', permissions, function (req, res) {
-  if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" }
-    res.send(resperr);
-    return;
-  }
-  const url_parts = url.parse(req.url, true);
-  const type = url_parts.query.type;
-  let gridType = url_parts.query.gridType;
-  const JWToken = url_parts.query.JWT;
-  let decoded;
-  try {
-    decoded = crypto.decrypt(JWToken);
-  }
-  catch (err) {
-    return sendError(res, req);
-  }
-  if (!decoded || !JWToken) {
-    return sendError(req, res);
-  }
-  let query = url_parts.query.searchCriteria || '';
-  try {
-    query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
-  }
-  catch (e) {
-    res.send(e);
-    res.end();
-  }
-  renderExport(type, gridType, query, jsReport, decoded, res);
 
+const timeoutResponse = {
+  // sessionExpiredResponse: {
+  //   action: 'sessionExpired',
+  //   data: {
+  //     message: {
+  //       status: 'ERROR',
+  //       errorCode: 403,
+  //       errorDescription: 'Session has expired. Please login again',
+  //       routeTo: '',
+  //       displayToUser: true,
+  //     },
+  //     success: false,
+  //     firstScreen: ''
+  //   }
+  // }
+
+  "cipherMessageId": uuid(),
+  "messageStatus": "ERROR",
+  "errorCode": 201,
+  "errorDescription": "Token Not Valid!",
+  "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
+};
+
+app.use(function (req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  res.status(404).send({
+    "messageStatus": "ERROR",
+    "cipherMessageId": uuid(),
+    "errorDescription": 'not found!',
+    "errorCode": 201,
+    "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
+  });
 });
 
-app.post('/passOn', function (req, res) {
-  if (checkbadinput(req)) {
-    let resperr = { 'error': "illeagal character found in request" };
-    res.send(resperr);
-    return;
-  }
-  let passOnPassword = config.get('passOnPassword');
-
-  if (passOnPassword !== req.body.password) {
-    res.send(JSON.stringify({ "status": "Not Authorized to access the resource" }));
-    return;
-  }
-  ReadIncomingMessage_Processing(req.body.msg);
-  res.send(JSON.stringify({ "status": "Done" }));
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500);
+  res.status(500).send({
+    "messageStatus": "ERROR",
+    "cipherMessageId": uuid(),
+    "errorDescription": 'some error occured!!!!',
+    "errorCode": 201,
+    "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
+  });
 });
 
 
+const k = require('./core/api/pushNotifications')
+// const WebSocketServer = require('websocket').server;
+// const http = require('http');
+// let wsServer = http.createServer(function (request, response) {
+// });
+// wsServer.listen(1337, function () { });
+// wsServer = new WebSocketServer({
+//   httpServer: wsServer
+// });
+// wsServer.on('request', function (request) {
 
-async function tokenValid(userIdz, tkn) {
-  try {
-      let existingToken = await tokenLookup.findOne({
-          userId: userIdz,
-          token: tkn
-      });
+  // let connection = request.accept(null, request.origin);
+  // connection.on('message', function (message) {
+  //   if (message.type === 'utf8') {
+  //     console.log('Web socket Handshake Recieved');
 
-      console.log("--------->>>>>> Token: ", existingToken);
+  //     console.log(message.utf8Data)
+  //     const msg2 = JSON.parse(message.utf8Data);
+  //     // console.log({ fs: 'app.js', func: 'Socket' }, msg2, 'this is request');
+  //     const decoded = crypto.decrypt(msg2.token);
+  //     if (decoded.userID) {
+  //       _.set(global.WSRegistery, decoded.userID, connection);
+  //     }
+  //     else {
+  //       logger.error({ fs: 'app.js', func: 'Socket' }, "Token doesnt have user ID" + JSON.stringify(msg2));
+  //     }
+  //     logger.info({ fs: 'app.js', func: 'Socket' }, msg2, 'GOT Web socket END ');
+  //   }
+  // });
 
-      console.log("--------->>>>>> userIdz:", userIdz);
-      if (existingToken == null) {
-          console.log("existing token null>>");
-          // await tokenLookup.removeAndCreate({token: tkn, userId: userIdz});
-          return false;
-      }
-      let timestamp = dates.diffFromNow(existingToken.createdAt, "seconds");
-      console.log("existing token ", JSON.stringify(existingToken));
-      console.log("generated at ", config.get('tokenExp'));
-      console.log("timestamp at ", timestamp);
-      if (config.get('tokenExp') < timestamp) {
-      // if (20 < timestamp) {
-          console.log("removing>>>", userIdz);
-          await tokenLookup.remove({
-              token: tkn,
-              userId: userIdz
-          });
-          return false;
-      } else {
-          console.log("Updating token>>");
-          return true;
-      }
-  } catch (error) {
-      console.log(error.stack);
-      return false;
-  }
-}
-
-
-
-
-// const generateReports = require('./reports');
-// app.get('/reports/:channel/:action', function(req, res) {
-//     if(checkbadinput(req)){
-//         let resperr={'error':"illeagal character found in request"};
-//         res.send(resperr);
-//         return;
-//     }
-//     const url_parts = url.parse(req.url, true);
-//     let id = url_parts.query.id;
-//     const type = url_parts.query.reportFormat;
-//     const JWToken = url_parts.query.JWT;
-//     let language = url_parts.query.language;
-//     let query = url_parts.query.searchCriteria || '';
-//     query = query ? JSON.parse(new Buffer(query, 'base64')) : {};
-//     language = language ? JSON.parse(new Buffer(language, 'base64')) : {};
-
-//     let decoded ;
-//     try{
-//         decoded = crypto.decrypt(JWToken);
-//     }
-//     catch(err){
-//         return sendError(req, res);
-//     }
-//     if(!decoded || !JWToken){
-//         return sendError(req, res);
-//     }
-
-//     const payload = {
-//         filters: query,
-//         reportsCriteriaId: id,
-//         JWT: decoded,
-//         nationalization: language
-//     };
-//     try {
-//         generateReports(jsReport, payload, res, type);
-//     }
-//     catch (e) {
-//         res.send(e);
-//         return res.end();
-//     }
+  // connection.on('close', function (connection) {
+  //   console.log('connection closed');
+  // });
 // });
 
+
+// app.ws('/Socket', function(ws, req) {
+// 	console.log('Web socket Handshake Recieved');
+// 	console.log({fs: 'app.js', func: 'Socket'}, 'Web socket Handshake Recieved');
+// 	ws.on('message', function(msg) {
+// 		console.log('Web socket Handshake Recieved');
+// 		const msg2 = JSON.parse(msg);
+// 		console.log({fs: 'app.js', func: 'Socket'}, msg2, 'this is request');
+// 		const decoded = crypto.decrypt(msg2.token);
+
+// 		if (decoded.userID) {
+// 			socketKey[decoded.userID] = ws;
+
+// 			pagesKey[decoded.userID] = msg2.pageName;
+// 			msg2.userID = decoded.userID;
+// 			if (msg2.action) {
+// 				if (msg2.action === 'subscribe') {
+// 					if (lastSubscription[decoded.userID]) {
+// 						unsubscribe(lastSubscription[decoded.userID].page, decoded.userID, '');
+// 					}
+// 					lastSubscription[decoded.userID] = { 'page': msg2.pageName, 'params': msg2.data };
+// 					logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'The subscription parameters');
+// 					subscribe(msg2);
+// 				}
+// 			}
+// 		}
+// 		else {
+// 			logger.error({fs: 'app.js', func: 'Socket'}, "Token doesnt have user ID" + JSON.stringify(msg2));
+// 		}
+// 		logger.info({fs: 'app.js', func: 'Socket'}, msg2, 'GOT Web socket END ');
+// 	});
+// });

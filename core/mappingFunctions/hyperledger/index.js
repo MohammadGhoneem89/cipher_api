@@ -55,15 +55,15 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
     }
   }
 
-  if (payload.smartContractPackPath) {
-    try {
-      chainpack = fs.readFileSync(payload.smartContractPackPath);
-    }
-    catch (ex) {
-      console.log(ex);
-      return callback(errorResponse("Invalid Chain Pack File Path!!! ", UUIDKey));
-    }
-  }
+  // if (payload.smartContractPackPath) {
+  //   try {
+  //     chainpack = fs.readFileSync(payload.smartContractPackPath);
+  //   }
+  //   catch (ex) {
+  //     console.log(ex);
+  //     return callback(errorResponse("Invalid Chain Pack File Path!!! ", UUIDKey));
+  //   }
+  // }
   let RPCRequest = {
     Header: {
       tranType: "0200",
@@ -75,11 +75,21 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
       ResponseMQ: []
     },
     BCData: {
+      "orderer": payload.orderer,
+      "ordererDomain": payload.ordererDomain,
+      "ordererPort": payload.ordererPort,
+      "MSP": payload.MSP,
+      "peer": payload.peer,
+      "peerDomain": payload.peerDomain,
+      "peerPort": payload.peerPort,
+      "signaturePolicy": payload.signaturePolicy,
+      "sequence": payload.sequence,
+      "smartContractArgs": payload.smartContractArgs,
       "channelName": payload.channelName,
       "smartContractName": payload.smartContractName,
       "channelConfig": envelope,
-      "smartContractPackage": chainpack,
       'smartContractVersion': payload.smartContractVersion,
+      "chaincodeType": payload.chaincodeType,
       'actionType': payload.actionType,
       'channelConfigPath': payload.channelConfigPath
     },
@@ -88,6 +98,7 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
       arguments: payload.smartContractArgs
     }
   };
+
   sendRequestBLA(grpcConfig, RPCRequest, UUIDKey, (data) => {
     let response = {
       HyperledgerConnect: {
@@ -96,20 +107,51 @@ let generalNetworkOps = function (payload, UUIDKey, route, callback, JWToken) {
       }
     };
     callback(response);
-  });
+  }, payload.smartContractPackPath);
 };
 
-function sendRequestBLA(srvcAddressNPort, Request, UUIDKey, responseCallback) {
+function sendRequestBLA(srvcAddressNPort, Request, UUIDKey, responseCallback, smartContractPackPath) {
+
   logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, ' [sendGRPCRequest] srvc Address and Port: ' + srvcAddressNPort);
   logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, ' [sendGRPCRequest] Sending query to Micservice');
   let url = `http://${srvcAddressNPort}/process`;
-  let rpOptions = {
-    method: 'POST',
-    url,
-    body: Request,
-    json: true // Automatically stringifies the body to JSON
-  };
-  logger.debug({ fs: 'RestController.js', func: 'sendGRPCRequest' }, "[RP][SEND]", url, JSON.stringify(rpOptions.body || rpOptions));
+  console.log(JSON.stringify(smartContractPackPath))
+  console.log(JSON.stringify(Request))
+  // process.exit(1);
+  let rpOptions = {};
+  if (Request.Header.tranCode == '0007') {
+    rpOptions = {
+      method: 'POST',
+      url,
+      formData: {
+        Request: JSON.stringify(Request),
+        file: {
+          value: fs.createReadStream(smartContractPackPath),
+          options: {
+            filename: `${Request.BCData.smartContractName}${Request.BCData.smartContractVersion}.zip`,
+            contentType: 'application/zip'
+          }
+        }
+
+      },
+      json: true // Automatically stringifies the body to JSON
+    };
+  } else {
+    rpOptions = {
+      method: 'POST',
+      url,
+      body: Request,
+      json: true // Automatically stringifies the body to JSON
+    };
+  }
+  console.log("-------------------****--------------------------");
+  console.log("-------------------****--------------------------");
+  console.log("-------------------****--------------------------");
+  console.log("-------------------****--------------------------");
+  console.log("-------------------****--------------------------");
+  console.log("-------------------****--------------------------");
+  console.log("-------------------****--------------------------");
+
   return rp(rpOptions).then((msg) => {
     logger.debug(' [sendGRPCRequest] Response MSG: ' + JSON.stringify(msg, null, 2));
     responseCallback(msg);

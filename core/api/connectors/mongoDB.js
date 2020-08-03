@@ -17,4 +17,3 @@ module.exports.connection = function (dbConfig) {
     }
   });
 };
-

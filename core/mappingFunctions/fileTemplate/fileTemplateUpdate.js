@@ -40,6 +40,8 @@ var fileTemplateUpdate = function (payload, userID, fileTemplateUpdate_CB) {
         "skipLines": "",
         "separator": "",
         "XMLMainTag": "",
+        "endpoint": "",
+        "table": "",
         "fields": [],
         "dateCreated": "",
         "createdBy": "",
@@ -84,6 +86,8 @@ var fileTemplateUpdate = function (payload, userID, fileTemplateUpdate_CB) {
                             format.skipBottomLines = data.skipBottomLines ? data.skipBottomLines : "";
                             format.separator = data.separator ? data.separator : "";
                             format.XMLMainTag = data.XMLMainTag ? data.XMLMainTag : "";
+                            format.endpoint = data.endpoint ? data.endpoint : "";
+                            format.table = data.table ? data.table : "";
                             for (var i = 0; i < data.fields.length; i++) {
                                 let field = data.fields[i];
                                 let fieldType = field.type;

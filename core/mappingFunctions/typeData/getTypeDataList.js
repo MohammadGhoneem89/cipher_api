@@ -2,6 +2,7 @@
 
 const typeData = require('../../../lib/services/typeData');
 let pointer = require("json-pointer");
+const config = require('../../../config');
 
 
 function typeDataList(payload, UUIDKey, route, callback, JWToken) {
@@ -11,7 +12,12 @@ function typeDataList(payload, UUIDKey, route, callback, JWToken) {
 
 function typeDataListByType(payload, UUIDKey, route, callback, JWToken) {
   payload.userId = JWToken._id;
-  getDataByType(payload, callback);
+  let isOwner = false;
+  let ownOrg = config.get('ownerOrgs', [])
+  if (ownOrg.indexOf(JWToken.orgCode) > -1) {
+    isOwner = true;
+  }
+  getDataByType(payload, callback,isOwner);
 }
 
 function get(payload, callback) {
@@ -42,11 +48,11 @@ function get(payload, callback) {
     });
 }
 
-async function getDataByType(payload, callback) {
+async function getDataByType(payload, callback,isOwner) {
   try {
     const rows = await typeData.getTypeDataDetailByType(payload);
-    if (rows && rows.length) {
-      for (let elms of rows) {
+    if (rows[0] && rows[0].length) {
+      for (let elms of rows[0]) {
         elms.actions = [{
           "value": "1003",
           "type": "componentAction",
@@ -61,7 +67,13 @@ async function getDataByType(payload, callback) {
       [payload.action]: {
         action: payload.action,
         data: {
-          searchResult: rows
+          searchResult: rows[0],
+          isOwner,
+          pageData: {
+            pageSize: payload.page.pageSize,
+            currentPageNo: payload.page.currentPageNo,
+            totalRecords: rows[1]
+          }
         }
       }
     };

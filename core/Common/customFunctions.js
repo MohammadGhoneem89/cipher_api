@@ -3,17 +3,22 @@
 const _ = require('lodash');
 const moment = require('moment');
 const dates = require('../../lib/helpers/dates');
-const inst = require('./buissnessFunction/instrument.js');
-const ds = require('./buissnessFunction/datastructure');
+const inst = require('./buissnessFunction/sample.js');
+const business = require('../../applications/custom');
+
 module.exports = {
   STUB: (data, payload, jwt) => {
     return data;
   },
-  ...ds,
-  ...inst,
+  ...inst
+  ,
+  ...business,
   getDate: (data, payload, jwt) => {
     let format = 'YYYY/MM/DD HH:mm:ss ZZ';
     return moment().format(format);
+  },
+  resolveErrorCode: (data, payload, jwt) => {
+    return _.get(global.codelist, data, '');
   },
   translateDateToEpoch: (data, payload, jwt) => {
     return dates.ddMMyyyyslash(data);
@@ -41,7 +46,7 @@ module.exports = {
       return JSON.parse(data);
     } catch (ex) {
       console.log(ex);
-      throw new Error("Could not Parse incomming data!!!");
+      throw new Error("Could not Parse incoming data!!!");
     }
   }
 

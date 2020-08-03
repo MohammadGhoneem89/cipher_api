@@ -9,7 +9,7 @@ function password(payload, UUIDKey, route, callback, JWToken) {
 
 function _set(payload, callback) {
   user.setPassword(payload)
-    .then(() => {
+    .then((data) => {
       const response = {
         responseMessage: {
           action: payload.action,
@@ -17,7 +17,8 @@ function _set(payload, callback) {
             message: {
               status: 'OK',
               errorDescription: 'User password updated successfully',
-              displayToUser: true
+              displayToUser: true,
+              newPageURL: payload.firstScreen || undefined
             }
           }
         }

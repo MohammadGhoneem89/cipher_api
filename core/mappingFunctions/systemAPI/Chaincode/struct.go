@@ -8,97 +8,150 @@ type MSPList struct {
 type BLANK struct {
 	BLANK string `json:"BLANK"`
 }
-type  addAttribute struct{
-	Name string `json:"name"`
-DataProvider string `json:"dataProvider"`
-Type string `json:"type"`
-Occurrence string `json:"occurrence"`
-IsRequired bool `json:"isRequired"`
- }
+type addItemCatalogue struct {
+	ItemCode       string `json:"itemCode"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	Classification string `json:"classification"`
+	ItemStatus     string `json:"itemStatus"`
+	Image          string `json:"image"`
+	Material       string `json:"material"`
+	Price          string `json:"price"`
+	LeadTime       string `json:"leadTime"`
+	PrintTime      string `json:"printTime"`
+	PartNumber     string `json:"partNumber"`
+	ModelVolume    string `json:"modelVolume"`
+	SupportVolume  string `json:"supportVolume"`
+	ModelTip       string `json:"modelTip"`
+	SupportTip     string `json:"supportTip"`
+	Color          string `json:"color"`
+	CreatedBy      string `json:"createdBy"`
+}
 
+type addMasterContract struct {
+	ContractID     string `json:"contractID"`
+	DateCreated    string `json:"dateCreated"`
+	StartDate      string `json:"startDate"`
+	EndDate        string `json:"endDate"`
+	ApprovedBy     string `json:"approvedBy"`
+	ApprovedOn     string `json:"approvedOn"`
+	CustomerID     string `json:"customerID"`
+	AmountRealized string `json:"amountRealized"`
+	ShipmentType   string `json:"shipmentType"`
+	Status         string `json:"status"`
+	TotalPenalty   string `json:"totalPenalty"`
+	TotalRebate    string `json:"totalRebate"`
+}
 
-type  associateAlias struct{
-	UnifiedID string `json:"unifiedID"`
- }
+type createInvoice struct {
+	OrderID     string `json:"orderID"`
+	InvoiceDate string `json:"invoiceDate"`
+}
 
+type createOrder struct {
+	OrderType     string `json:"orderType"`
+	ContractID    string `json:"contractID"`
+	RaisedBy      string `json:"raisedBy"`
+	QuoteValidity string `json:"quoteValidity"`
+	IncoTerms     string `json:"incoTerms"`
+}
 
-type  getDataByAlias struct{
-	RegAuthCode string `json:"regAuthCode"`
- }
+type createSubOrder struct {
+	OrderID     string `json:"orderID"`
+	SubOrderID  string `json:"subOrderID"`
+	SupplierID  string `json:"supplierID"`
+	RaisedBy    string `json:"raisedBy"`
+	OrderDate   string `json:"orderDate"`
+	OrderAmount int64  `json:"orderAmount"`
+}
 
+type eventOnCreateOrder struct {
+	OrderID   string `json:"orderID"`
+	OldStatus string `json:"oldStatus"`
+	NewStatus string `json:"newStatus"`
+}
 
-type  getDataByUnifiedID struct{
-	UnifiedID string `json:"unifiedID"`
- }
+type eventOnInvoiceCreation struct {
+	OrderID        string `json:"orderID"`
+	ContractID     string `json:"contractID"`
+	CustomerID     string `json:"customerID"`
+	Status         string `json:"status"`
+	OrderAmount    string `json:"orderAmount"`
+	TotalQuantity  string `json:"totalQuantity"`
+	TotalLeadTime  string `json:"totalLeadTime"`
+	TotalPrintTime string `json:"totalPrintTime"`
+	Discount       string `json:"discount"`
+	Penalty        string `json:"penalty"`
+}
 
+type eventOnPaymentOrderCreation struct {
+	OrderID   string `json:"orderID"`
+	OldStatus string `json:"oldStatus"`
+	NewStatus string `json:"newStatus"`
+}
 
-type  postDataToBlockchainChamber struct{
-	UnifiedID string `json:"unifiedID"`
-MembershipExpiryDate string `json:"membershipExpiryDate"`
-MembershipStatus string `json:"membershipStatus"`
- }
+type eventOnPaymentOrderCreationCustomer struct {
+	OrderID   string `json:"orderID"`
+	OldStatus string `json:"oldStatus"`
+	NewStatus string `json:"newStatus"`
+}
 
+type eventOnPurchaseOrder struct {
+	OrderID   string `json:"orderID"`
+	OldStatus string `json:"oldStatus"`
+	NewStatus string `json:"newStatus"`
+}
 
-type  getAttributeList struct{
-	UnifiedID string `json:"unifiedID"`
- }
+type eventOnPurchaseOrderCustomer struct {
+	OrderID   string `json:"orderID"`
+	OldStatus string `json:"oldStatus"`
+	NewStatus string `json:"newStatus"`
+}
 
+type getMasterAgreementData struct {
+	ContractID string `json:"contractID"`
+}
 
-type  getDataByUnifiedID2 struct{
-	UnifiedID string `json:"unifiedID"`
- }
+type getOrderDetail struct {
+	OrderID string `json:"orderID"`
+}
 
+type getOrderDetailCustomer struct {
+	OrderID string `json:"orderID"`
+}
 
-type  postDataToBlockchainCustoms struct{
-	UnifiedID string `json:"unifiedID"`
-AccountName string `json:"accountName"`
-GroupBuisnessName string `json:"groupBuisnessName"`
- }
+type updateItemCatalogue struct {
+	ItemCode       string `json:"itemCode"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	Classification string `json:"classification"`
+	ItemStatus     string `json:"itemStatus"`
+	Image          string `json:"image"`
+	Material       string `json:"material"`
+	Price          string `json:"price"`
+	LeadTime       string `json:"leadTime"`
+	PrintTime      string `json:"printTime"`
+	PartNumber     string `json:"partNumber"`
+	ModelVolume    string `json:"modelVolume"`
+	SupportVolume  string `json:"supportVolume"`
+	ModelTip       string `json:"modelTip"`
+	SupportTip     string `json:"supportTip"`
+	Color          string `json:"color"`
+	UpdatedBy      string `json:"updatedBy"`
+}
 
+type updateOrderStatus struct {
+	OrderID string `json:"orderID"`
+	Status  string `json:"status"`
+}
 
-type  postDataToBlockchainDPW struct{
-	UnifiedID string `json:"unifiedID"`
-CompanyBrief string `json:"companyBrief"`
-NonVATCustomer bool `json:"nonVATCustomer"`
- }
+type updateOrderStatusCustomer struct {
+	OrderID string `json:"orderID"`
+	Status  string `json:"status"`
+}
 
-
-type  postDataToBlockchainDubaiTrade struct{
-	UnifiedID string `json:"unifiedID"`
-FacebookURL string `json:"facebookURL"`
-TwitterURL string `json:"twitterURL"`
-VATAccountNo string `json:"VATAccountNo"`
- }
-
-
-type  postDataToBlockchainRegAuth struct{
-	UnifiedID string `json:"unifiedID"`
-Issuedate string `json:"issuedate"`
-ExpiryDate string `json:"expiryDate"`
-Status string `json:"status"`
-TradeZone string `json:"tradeZone"`
-LicenseCategoryCodeDescEn string `json:"licenseCategoryCodeDescEn"`
-LicenseCategoryCodeDescAr string `json:"licenseCategoryCodeDescAr"`
-LicenseTerminatedDate string `json:"licenseTerminatedDate"`
-RenewalDate string `json:"renewalDate"`
-FormationNo string `json:"formationNo"`
-AccountNumber string `json:"accountNumber"`
-AccountNameAr string `json:"accountNameAr"`
-AccountNameEn string `json:"accountNameEn"`
-AccountStatus string `json:"accountStatus"`
-AccountFormationDate string `json:"accountFormationDate"`
-EstablishmentType string `json:"establishmentType"`
-LegalEntity string `json:"legalEntity"`
-CountryOfOrigin string `json:"countryOfOrigin"`
-City string `json:"city"`
-Address string `json:"address"`
-POBOX string `json:"POBOX"`
-Email string `json:"email"`
-Phone string `json:"phone"`
-MobileNumber string `json:"mobileNumber"`
-Website string `json:"website"`
-ZoneName string `json:"zoneName"`
-Fax string `json:"fax"`
- }
-
-
+type updateSubOrderStatus struct {
+	SubOrderID string `json:"subOrderID"`
+	OrderID    string `json:"orderID"`
+	Status     string `json:"status"`
+}

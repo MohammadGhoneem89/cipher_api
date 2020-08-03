@@ -7,16 +7,16 @@ const _ = require('lodash');
 
 
 var fileTemplateDetailOut = function(payload,UUIDKey,route,callback,JWToken){
-	
+
 	 logger.debug(" [ File Template Detail ] PAYLOAD : "+JSON.stringify(payload,null,2));
 	 logger.debug(" [ File Template Detail ] UUID : "+UUIDKey);
 	 logger.debug(" [ File Template Detail ] Route : "+route);
 	 logger.debug(" [ File Template Detail ] JWToken : "+JSON.stringify(JWToken,null,2));
-	 
+
 	 payload.userId = JWToken._id;
-	
+
     fileTemplateDetail(payload,callback);
-	 
+
 };
 
 
@@ -31,8 +31,8 @@ var fileTemplateDetail = function (payload,fileTemplateGet_CB) {
     };
 
 	payload.fileTemplateID = payload.fileTemplateID || "";
-	
-  
+
+
         global.db.select("FileTemplate",{
             "id" : payload.fileTemplateID
         },"",function (err, data) {
@@ -43,21 +43,24 @@ var fileTemplateDetail = function (payload,fileTemplateGet_CB) {
             else {
                 data = _.get(data, '[0]', {});
 				data.rulesList = data.rulesList || [];
-				data.fields = data.fields || [];
-				data["fields"].forEach(function(d){
+                data.fields = data.fields || [];
+                // if(data.fileType != 'Database') {
+                data["fields"].forEach(function(d){
                     pointer.set(d,"/actions",[
                         {
-							"label": "Edit",
-							"iconName": "fa fa-edit",
-							"actionType": "COMPONENT_FUNCTION"
-						},
-						{
-							"label": "Delete",
-							"iconName": "fa fa-trash",
-							"actionType": "COMPONENT_FUNCTION"
-						}
+                            "label": "Edit",
+                            "iconName": "fa fa-edit",
+                            "actionType": "COMPONENT_FUNCTION"
+                        },
+                        {
+                            "label": "Delete",
+                            "iconName": "fa fa-trash",
+                            "actionType": "COMPONENT_FUNCTION"
+                        }
                     ]);
                 });
+                // }
+
 				const params = {
                     userId: payload.userId,
                     documents: data,

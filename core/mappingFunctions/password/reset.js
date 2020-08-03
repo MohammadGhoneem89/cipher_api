@@ -9,7 +9,8 @@ function reset(payload, UUIDKey, route, callback, JWToken) {
 }
 
 function _reset(payload, callback) {
-  user.resetPassword(payload, msgConst.reset)
+  console.log("Called RESET!!!!")
+  user.resetPassword(payload, msgConst.reset,'ResetPassword')
     .then(() => {
       const response = {
         responseMessage: {
@@ -33,7 +34,7 @@ function _reset(payload, callback) {
           data: {
             message: {
               status: 'ERROR',
-              errorDescription: 'User password not updated',
+              errorDescription: err.message,
               displayToUser: true
             },
             error: error

@@ -1,5 +1,169 @@
 {
+  "meta": {
+    "getTypeSyncOut": {
+      "customMapping": true,
+      "MappingfunctionName": "getTypeSyncOut",
+      "CustomMappingFile": "typeData.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
   "core": {
+    "logErrors":{
+      "customMapping": true,
+      "MappingfunctionName": "logErrors",
+      "CustomMappingFile": "systemAPI/logErrorsUI.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "pushByGroupName": {
+      "customMapping": true,
+      "MappingfunctionName": "pushByGroupName",
+      "CustomMappingFile": "notification/create.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "testPagination": {
+      "customMapping": true,
+      "MappingfunctionName": "testPagination",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "testADHReport": {
+      "customMapping": true,
+      "MappingfunctionName": "testADHReport",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getSafLogs": {
+      "customMapping": true,
+      "MappingfunctionName": "getSafLogs",
+      "CustomMappingFile": "safLogs/saf.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateSafLogs": {
+      "customMapping": true,
+      "MappingfunctionName": "updateSafLogs",
+      "CustomMappingFile": "safLogs/saf.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getHealthRuleList": {
+      "customMapping": true,
+      "MappingfunctionName": "getHealthRuleList",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateHealthRuleList": {
+      "customMapping": true,
+      "MappingfunctionName": "updateHealthRuleList",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getADHReportListProtected": {
+      "customMapping": true,
+      "MappingfunctionName": "getADHReportListProtected",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getADHReportList": {
+      "customMapping": true,
+      "MappingfunctionName": "getADHReportList",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getADHReportByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getADHReportByID",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateADHReport": {
+      "customMapping": true,
+      "MappingfunctionName": "updateADHReport",
+      "CustomMappingFile": "systemAPI/ADHReportConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getFileList": {
+      "customMapping": true,
+      "MappingfunctionName": "getFileList",
+      "CustomMappingFile": "general/getFileList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "generateHMAC": {
+      "customMapping": true,
+      "MappingfunctionName": "generateHMAC",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getFileData": {
+      "customMapping": true,
+      "MappingfunctionName": "getFileData",
+      "CustomMappingFile": "general/getFileData.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getDBEndpointListView": {
+      "customMapping": true,
+      "MappingfunctionName": "DBListView",
+      "CustomMappingFile": "endpoint/endpointDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getTableNames": {
+      "customMapping": true,
+      "MappingfunctionName": "getTableNames",
+      "CustomMappingFile": "endpoint/getTableNames.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getFieldsList": {
+      "customMapping": true,
+      "MappingfunctionName": "getFieldsList",
+      "CustomMappingFile": "endpoint/getFieldsList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "uploadEx": {
+      "customMapping": true,
+      "MappingfunctionName": "upload",
+      "CustomMappingFile": "fileUploadEx/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "downloadEx": {
+      "customMapping": true,
+      "MappingfunctionName": "download",
+      "CustomMappingFile": "fileUploadEx/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getRelayNetworkConfigListTd": {
+      "customMapping": true,
+      "MappingfunctionName": "getServiceList",
+      "CustomMappingFile": "systemAPI/relayConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "calculate": {
+      "customMapping": true,
+      "MappingfunctionName": "calculate",
+      "CustomMappingFile": "systemAPI/billing.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateRelayNetworkConfig": {
+      "customMapping": true,
+      "MappingfunctionName": "updateRelayNetworkConfig",
+      "CustomMappingFile": "systemAPI/relayConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getRelayNetworkConfigList": {
+      "customMapping": true,
+      "MappingfunctionName": "getRelayNetworkConfigList",
+      "CustomMappingFile": "systemAPI/relayConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getRelayNetworkConfig": {
+      "customMapping": true,
+      "MappingfunctionName": "getRelayNetworkConfig",
+      "CustomMappingFile": "systemAPI/relayConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getRelayNetworkConfigByID": {
+      "customMapping": true,
+      "MappingfunctionName": "getRelayNetworkConfigByID",
+      "CustomMappingFile": "systemAPI/relayConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "upload": {
       "customMapping": true,
       "MappingfunctionName": "upload",
@@ -10,18 +174,6 @@
       "customMapping": true,
       "MappingfunctionName": "download",
       "CustomMappingFile": "fileUpload/index.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "upsertAPIImport": {
-      "customMapping": true,
-      "MappingfunctionName": "upsertAPIImport",
-      "CustomMappingFile": "systemAPI/apiImport.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getImport": {
-      "customMapping": true,
-      "MappingfunctionName": "getImport",
-      "CustomMappingFile": "systemAPI/apiImport.js",
       "mappingConfigFile": "ePayMapping"
     },
     
@@ -313,6 +465,12 @@
       "CustomMappingFile": "systemAPI/moduleConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getModuleConfigAll": {
+      "customMapping": true,
+      "MappingfunctionName": "getModuleConfigAll",
+      "CustomMappingFile": "systemAPI/moduleConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getModuleConfigByID": {
       "customMapping": true,
       "MappingfunctionName": "getModuleConfigByID",
@@ -340,6 +498,18 @@
     "getAPIDefinitionID": {
       "customMapping": true,
       "MappingfunctionName": "getAPIDefinitionID",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "updateErrorCodeList": {
+      "customMapping": true,
+      "MappingfunctionName": "updateErrorCodeList",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getErrorCodeList": {
+      "customMapping": true,
+      "MappingfunctionName": "getErrorCodeList",
       "CustomMappingFile": "systemAPI/APIDefination.js",
       "mappingConfigFile": "ePayMapping"
     },
@@ -456,6 +626,12 @@
     "userCreate": {
       "customMapping": true,
       "MappingfunctionName": "userCreate",
+      "CustomMappingFile": "user/create.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "createOnDemandWelCome": {
+      "customMapping": true,
+      "MappingfunctionName": "createOnDemandWelCome",
       "CustomMappingFile": "user/create.js",
       "mappingConfigFile": "ePayMapping"
     },
@@ -582,6 +758,12 @@
     "groupList": {
       "customMapping": true,
       "MappingfunctionName": "list",
+      "CustomMappingFile": "group/list.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "groupTypeList": {
+      "customMapping": true,
+      "MappingfunctionName": "groupTypeList",
       "CustomMappingFile": "group/list.js",
       "mappingConfigFile": "ePayMapping"
     },
@@ -801,7 +983,6 @@
       "CustomMappingFile": "typeData/getTypeDataList.js",
       "mappingConfigFile": "ePayMapping"
     },
-    
     "typeDataListByType": {
       "customMapping": true,
       "MappingfunctionName": "typeDataListByType",
@@ -814,7 +995,6 @@
       "CustomMappingFile": "typeData/getTypeDataList.js",
       "mappingConfigFile": "ePayMapping"
     },
-  
     "getTypeDataDetailByID": {
       "customMapping": true,
       "MappingfunctionName": "getTypeDataDetailById",
@@ -849,6 +1029,12 @@
       "customMapping": true,
       "MappingfunctionName": "fetchAllPasswordPolicy",
       "CustomMappingFile": "passwordPolicy/fetchAll.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "entityTypedata": {
+      "customMapping": true,
+      "MappingfunctionName": "entityTypedata",
+      "CustomMappingFile": "org/orgDetail.js",
       "mappingConfigFile": "ePayMapping"
     },
     "orgDetail": {
@@ -1265,6 +1451,36 @@
       "customMapping": true,
       "MappingfunctionName": "couchQuery",
       "CustomMappingFile": "couchQuery.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getAllLetters": {
+      "customMapping": true,
+      "MappingfunctionName": "getAllLetters",
+      "CustomMappingFile": "application/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getSampleLetters": {
+      "customMapping": true,
+      "MappingfunctionName": "getSampleLetters",
+      "CustomMappingFile": "application/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "addUpdateSampleLetter": {
+      "customMapping": true,
+      "MappingfunctionName": "addUpdateSampleLetter",
+      "CustomMappingFile": "application/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "addUpdateLetter": {
+      "customMapping": true,
+      "MappingfunctionName": "addUpdateLetter",
+      "CustomMappingFile": "application/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "testLetter": {
+      "customMapping": true,
+      "MappingfunctionName": "testLetter",
+      "CustomMappingFile": "application/index.js",
       "mappingConfigFile": "ePayMapping"
     }
   }

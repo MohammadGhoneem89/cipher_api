@@ -22,8 +22,14 @@ function orgInsert(payload, userID, entityInsertCB) {
 
   logger.debug(" [ Org Insert] Org Inserted data : " + JSON.stringify(payload));
 
+  console.log("InsertOrg--------------------->>>>>>>>>>>>>>>>>>>>>", JSON.stringify(payload, null, 2))
+
   let data = payload.data;
   let format = {
+    "taxNO1": "",
+    "taxNO2": "",
+    "address": "",
+    "publicKey": "",
     "entityName": "",
     "arabicName": "",
     "spCode": "",
@@ -37,6 +43,8 @@ function orgInsert(payload, userID, entityInsertCB) {
     "parentEntity": "",
     "commissionTemplate": "",
     "contacts": [],
+    "mappedCodes":[],
+    "additionalProps":[],
     "documents": [],
     "dateCreated": "",
     "createdBy": "",
@@ -64,32 +72,41 @@ function orgInsert(payload, userID, entityInsertCB) {
     if (err) {
       logger.debug(" [ Org Insert] Error : " + err);
       entityInsertCB(response);
-    }
-    else if (duplicate.length > 0) {
+    } else if (duplicate.length > 0) {
       let msg = "duplicate records";
       pointer.set(response, "/responseMessage/data/error/spCode", msg);
       entityInsertCB(response);
-    }
-    else {
+    } else {
       Validate.formValidate(data, validType.entityValidation, function (err) {
         if (Object.keys(err).length > 0) {
           logger.debug(" [ Entity Insert] Error in Validation : " + JSON.stringify(err));
           pointer.set(response, "/responseMessage/data/error", err);
           entityInsertCB(response);
-        }
-        else {
+        } else {
 
           let date = Date.newDate();
+          format.taxNO1 = data.taxNO1 ? data.taxNO1 : "";
+          format.taxNO2 = data.taxNO2 ? data.taxNO2 : "";
+          format.address = data.address ? data.address : "";
+          format.publicKey = data.publicKey ? data.publicKey : "";
           format.entityName = data.entityName ? data.entityName : "";
           format.arabicName = data.arabicName ? data.arabicName : "";
           format.spCode = data.spCode ? data.spCode : "";
           format.shortCode = data.shortCode ? data.shortCode : "";
-          format.orgType = date.orgType;
+          format.orgType = data.orgType;
           format.isActive = data.isActive ? data.isActive : "";
           format.entityLogo.sizeSmall = data.entityLogo ? data.entityLogo.sizeSmall : "";
           format.entityLogo.sizeMedium = data.entityLogo ? data.entityLogo.sizeMedium : "";
           format.parentEntity = data.parentEntity ? data.parentEntity : "";
+          format.clientKey = data.clientKey;
+          format.cycle = data.cycle ? data.cycle : "";
+          format.currency = data.currency ? data.currency : "";
           format.commissionTemplate = data.commissionTemplate ? data.commissionTemplate : "";
+          if (!format.entityName && !format.arabicName && !format.orgType && !format.spCode ) {
+            pointer.set(response, "/responseMessage/data/error", "Entity Name, Arabic Name , Org Type And org code are required Fields!!");
+            return entityInsertCB(response);
+          };
+
           for (let i = 0; i < data.contacts.length; i++) {
             format.contacts.push({
               "contactName": data.contacts[i]["contactName"],
@@ -97,6 +114,20 @@ function orgInsert(payload, userID, entityInsertCB) {
               "mobile": data.contacts[i]["mobile"]
             });
           }
+          for (let i = 0; i < data.mappedCodes.length; i++) {
+            format.mappedCodes.push({
+              "mappingType": data.mappedCodes[i]["mappingType"],
+              "mappingCode": data.mappedCodes[i]["mappingCode"]
+            });
+          }
+
+          for (let i = 0; i < data.additionalProps.length; i++) {
+            format.additionalProps.push({
+              "propertyName": data.additionalProps[i]["propertyName"],
+              "value": data.additionalProps[i]["value"]
+            });
+          }
+
           for (let i = 0; i < data.documents.length; i++) {
             format.documents.push({
               "documentName": data.documents[i]["documentName"],
@@ -119,8 +150,7 @@ function orgInsert(payload, userID, entityInsertCB) {
             if (err) {
               logger.debug("[ Entity Insert] ERROR : " + err);
               entityInsertCB(response);
-            }
-            else {
+            } else {
               const params = {
                 event: commonConst.auditLog.eventKeys.insert,
                 collectionName: 'Entity',

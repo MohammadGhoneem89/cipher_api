@@ -153,6 +153,7 @@ function getServiceList(payload, UUIDKey, route, callback, JWToken) {
   let promises = [];
 
   //if (payload.type === 'consortium') {
+    console.log(payload,"---payload")
   promises.push(consortiumConfig.getList(payload));
   // } 
   let channelID = payload.channelID;
@@ -176,6 +177,7 @@ function getServiceList(payload, UUIDKey, route, callback, JWToken) {
   Promise.all(
     promises
   ).then((data) => {
+    console.log(JSON.stringify(data[0]),"--data")
     data[0].forEach((key) => {
       let orgList = [];
       if (selectedConsortium == key._id) {

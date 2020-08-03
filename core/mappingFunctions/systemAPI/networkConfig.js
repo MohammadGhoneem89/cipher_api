@@ -223,13 +223,13 @@ function getUserList(payload, UUIDKey, route, callback, JWToken) {
       };
       arrayList.forEach((data) => {
         let tuppleList = [];
-
         data.peerUser.forEach((elem) => {
-          let tupple = {
-            label: `${data.networkName}-${elem.userName}`,
-            value: elem.userName
-          };
+          let tupple = { label: "", value: "", orgType: "" }
+          tupple.orgType = data.orginizationAlias
+          tupple.label = `${data.networkName}-${elem.userName}`
+          tupple.value = `${data.networkName}-${elem.userName}`
           tuppleList.push(tupple);
+          
         });
         if (data.type == "Quorum") {
           tuppleList.forEach((elem) => {
@@ -252,12 +252,6 @@ function getUserList(payload, UUIDKey, route, callback, JWToken) {
     })
     .catch((err) => {
       console.log(err);
-      // response[payload.action] = {
-      //   action: payload.action,
-      //   data: {},
-      //   error: err
-      // };
-      // callback(response);
     });
 }
 exports.getUserList = getUserList;

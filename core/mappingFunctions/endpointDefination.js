@@ -2,6 +2,7 @@
 
 const endpointDefination = require('../../lib/repositories/endpointDefination');
 const _ = require('lodash');
+
 function upsert(payload, UUIDKey, route, callback, JWToken) {
   _upsert(payload, callback);
 }
@@ -17,6 +18,10 @@ function list(payload, UUIDKey, route, callback, JWToken) {
 function _upsert(payload, callback) {
   if (!payload.auth.endpoint) {
     _.set(payload, 'auth.endpoint', undefined);
+  }
+  let addr = _.get(payload, 'address', '')
+  if (addr.indexOf('---masked---') > -1) {
+    delete payload.address;
   }
   console.log(JSON.stringify(payload))
   endpointDefination.upsert(payload)
@@ -64,6 +69,14 @@ function _upsert(payload, callback) {
 function _findOne(payload, callback) {
   endpointDefination.findOne(payload)
     .then((user) => {
+
+      if (user.address.indexOf('@') > -1) {
+        let startIndex = user.address.indexOf('//');
+        let endIndex = user.address.indexOf('@');
+        if (startIndex > -1 && endIndex > -1) {
+          user.address = `${user.address.substr(0, startIndex + 2)}---masked---${user.address.substr(endIndex, user.address.length)}`
+        }
+      }
       const response = {};
       response[payload.action] = {
         action: payload.action,
@@ -84,6 +97,8 @@ function ListView(payload, UUIDKey, route, callback, JWToken) {
         let Elem = {};
         Elem.text = element.name;
         Elem.value = element._id;
+        Elem.requestType = element.requestType;
+        Elem.dbType = element.dbType;
         result.push(Elem);
       });
 
@@ -127,6 +142,17 @@ function TemplatesListView(payload, UUIDKey, route, callback, JWToken) {
 function _list(payload, callback) {
   endpointDefination.findPageAndCount(payload)
     .then((res) => {
+
+      res[0].forEach((elem) => {
+        if (elem.address.indexOf('@') > -1) {
+          let startIndex = elem.address.indexOf('//');
+          let endIndex = elem.address.indexOf('@');
+          if (startIndex > -1 && endIndex > -1) {
+            elem.address = `${elem.address.substr(0, startIndex + 2)}---masked---${elem.address.substr(endIndex, elem.address.length)}`
+          }
+        }
+      });
+
       const response = {
         [payload.action]: {
           action: payload.action,
@@ -146,12 +172,13 @@ function _list(payload, callback) {
 }
 
 function findByName(payload) {
-  return endpointDefination.findByName({ name: payload.name })
+  return endpointDefination.findByName({name: payload.name})
     .then((res) => {
-      return { endpoint: res, data: payload.data };
+      return {endpoint: res, data: payload.data};
     });
 }
-//
+
+
 // findByName({name: 'name4', data: {hello: 'world !!!'}})
 //   .then((res) => {
 //     console.log(res);

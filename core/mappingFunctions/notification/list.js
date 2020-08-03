@@ -16,6 +16,7 @@ function _list(payload, callback) {
 
   notifications.find(payload)
     .then((noti) => {
+      console.log(JSON.stringify(noti))
       noti[0].map((item) => {
         item.actions = [
           {

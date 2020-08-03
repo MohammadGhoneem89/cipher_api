@@ -1,19 +1,8 @@
-var zip = new require('node-zip')();
-zip.file('test.file', 'hello there');
-var data = zip.generate({base64:false,compression:'DEFLATE'});
-console.log(data);
-
-var fs = require('fs'),
-    path = require('path'),    
-    filePath = path.join(__dirname, './Chaincode/ChaincodeTemplate.txt');
-
-fs.readFile(filePath, {encoding: 'utf-8'}, function(err,data){
-    if (!err) {
-        console.log('received data: ' + data);
-        response.writeHead(200, {'Content-Type': 'text/html'});
-        response.write(data);
-        response.end();
-    } else {
-        console.log(err);
-    }
-});
+let str = `select * from apipayload where 1=1  [AND nice='{{cook}}']  [AND nice2='{{cook2}}']  AND ([nice='{{cook}}'] OR [nice='{{cook}}']) `;
+while (str.match(/\[(.*?)\]/) && str.match(/\[(.*?)\]/).length > 0) {
+  let matches = str.match(/\[(.*?)\]/);
+  console.log(matches[0], 'replaced')
+  str = str.replace(/\[(.*?)\]/, matches[1]);
+  console.log(str)
+}
+console.log(str);

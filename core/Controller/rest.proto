@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package RELAY;
+
+service Communicator {
+  rpc Query (QueryRequest) returns (QueryResponse) {}
+}
+
+message Empty {}
+
+
+message QueryRequest {
+  RequestHeader Header = 1;
+  RequestBody Body = 2;
+}
+
+message RequestBody {
+  string payload = 1;
+}
+
+
+message RequestHeader {
+  string network = 5;
+  string timeStamp = 6;
+  string UUID = 7;
+  string remoteAPI = 8;
+}
+
+
+message QueryResponse {
+  RequestHeader Header  = 1;
+  ResponseBody  Body    = 2;
+}
+
+message ResponseBody {
+  bool success = 1;
+  string payload = 2;
+  string errorMessage = 3;
+}
+
+
