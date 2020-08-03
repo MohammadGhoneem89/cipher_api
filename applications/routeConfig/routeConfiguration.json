@@ -1,45 +1,35 @@
 {
-  "ekyc": {
-    "CustomFunctionsLocation": "../../applications/EKYC/mappingFunctions/",
-    "resolveCase":{
+  "customs-courier": {
+    "CustomFunctionsLocation": "../../applications/customs-courier/mappingFunctions/",
+    "getOrderList": {
       "customMapping": true,
-      "MappingfunctionName": "resolveCase",
-      "CustomMappingFile": "resolveCase/resolveCase.js",
+      "MappingfunctionName": "getOrderList",
+      "CustomMappingFile": "general/getOrderList.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "screenCase":{
+    "getEndToEndTrackingData": {
       "customMapping": true,
-      "MappingfunctionName": "screenCase",
-      "CustomMappingFile": "screenCase/screenCase.js",
-      "mappingConfigFile": "ePayMapping"
-    }
-  },
-  "Task": {
-    "CustomFunctionsLocation": "../../applications/Task/mappingFunctions/",
-    "getTask":{
-      "customMapping": true,
-      "MappingfunctionName": "searchTaskDetails",
-      "CustomMappingFile": "searchTaskDetails.js",
+      "MappingfunctionName": "getOrderDetails",
+      "CustomMappingFile": "general/getOrderDetails.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "searchTask":{
+    "getDashboardData": {
       "customMapping": true,
-      "MappingfunctionName": "search",
-      "CustomMappingFile": "search.js",
+      "MappingfunctionName": "getDashboardData",
+      "CustomMappingFile": "general/getDashboardData.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "searchTaskDetails":{
+    "getFileList": {
       "customMapping": true,
-      "MappingfunctionName": "searchTaskDetails",
-      "CustomMappingFile": "searchTaskDetails.js",
+      "MappingfunctionName": "getFileList",
+      "CustomMappingFile": "general/getFileList.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "search":{
+    "getFileData": {
       "customMapping": true,
-      "MappingfunctionName": "search",
-      "CustomMappingFile": "search.js",
+      "MappingfunctionName": "getFileData",
+      "CustomMappingFile": "general/getFileData.js",
       "mappingConfigFile": "ePayMapping"
     }
   }
- 
 }
