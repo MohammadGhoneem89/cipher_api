@@ -1,4 +1,4 @@
-const {Pool} = require('pg')
+const { Pool } = require('pg')
 
 const crypto = require('crypto');
 
@@ -13,6 +13,9 @@ module.exports = async function (connectionURL) {
     const createNewInstance = async () => {
       let pool = new Pool({
         connectionString: connectionURL,
+        ssl: {
+          rejectUnauthorized: false
+        }
       });
       await pool.connect();
       PGExistingList[hash] = pool;

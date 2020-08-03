@@ -191,7 +191,7 @@ async function testADHReport(payload, UUIDKey, route, callback, JWToken, res) {
 
 
     let endpoint = await endpointDefination.findOne({ id: payload.connectionString });
-    connection = await sequalize(endpoint.address);
+    connection = await sequalize(endpoint.address, endpoint.protocol.secure);
   } catch (e) {
     console.log(e)
     resp.responseMessage.data.message.status = "ERROR";
@@ -417,7 +417,7 @@ async function testPagination(payload, UUIDKey, route, callback, JWToken, res) {
   let endpoint;
   try {
     endpoint = await endpointDefination.findOne({ id: payload.connectionString });
-    connection = await sequalize(endpoint.address);
+    connection = await sequalize(endpoint.address, endpoint.protocol.secure);
   } catch (e) {
     console.log(e)
     resp.responseMessage.data.message.status = "ERROR";

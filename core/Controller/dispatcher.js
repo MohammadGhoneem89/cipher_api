@@ -415,7 +415,7 @@ module.exports = class Dispatcher {
         _.set(this.request, 'Header.timeStamp', today.toISOString());
         console.log(JSON.stringify(this.request, null, 2))
 
-        ch.sendToQueue(this.configdata.requestServiceQueue, new Buffer(JSON.stringify(this.request)))
+        ch.sendToQueue(this.configdata.requestServiceQueue, this.request);
         let delta = this.sw.read();
         this.sw.reset();
         eventLog(this.UUID, 'connectQueueService', this.request, generalResponse, delta);
