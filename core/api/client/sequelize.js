@@ -4,9 +4,9 @@ const config = require('../../../config')
 var SQExistingList = {};
 
 const cryptoDec = require('../../../lib/helpers/crypto');
-module.exports = async function (connection) {
-  let connectionURL = connection || cryptoDec.decrypt(config.get('postgres.url'))|| cryptoDec.decrypt(config.get('mssqlConfig'));
-  console.log(">>>>>>>>>>>", connectionURL)
+module.exports = async function (connection, issecure = false) {
+  let connectionURL = connection || cryptoDec.decrypt(config.get('postgres.url')) || cryptoDec.decrypt(config.get('mssqlConfig'));
+  let litmusSSL = connection ? issecure : config.get('sslForDatabase', issecure)
   const hash = crypto.createHash('md5').update(connectionURL).digest("hex");
   const createNewInstance = async () => {
     const sequelize = new Sequelize(connectionURL, {
@@ -20,8 +20,12 @@ module.exports = async function (connection) {
         idle: 10000
       },
       logging: true,
+      ssl: litmusSSL,
       dialectOptions: {
-        encrypt: true
+        encrypt: true,
+        ssl: litmusSSL ? {
+          rejectUnauthorized: false
+        } : undefined,
       }
     });
     await sequelize.authenticate();
@@ -81,4 +85,12 @@ function makeModel(tableName) {
         })
         .catch(err => {
             console.error('Unable to connect to the database:', err);
-        }); */
+        });
+
+
+
+        postgresql://Admin:avanza123@23.97.138.116:5432/smiles?idleTimeoutMillis=3000000&max=1&connectionTimeoutMillis=0
+
+
+
+        */

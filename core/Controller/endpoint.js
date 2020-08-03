@@ -3,6 +3,7 @@ const _ = require('lodash');
 const rp = require('request-promise');
 const moment = require('moment');
 const format = require('xml-formatter');
+const config = require('../../config');
 const Base64 = require('js-base64').Base64;
 //const fetch = require('node-fetch');
 let generalResponse = {
@@ -243,7 +244,7 @@ module.exports = class Endpoint {
       url: options.serviceURL,
       form: Object.keys(options.form).length > 0 ? options.form : undefined,
       headers: options.headers,
-      timeout: 10000,
+      timeout: config.get('restTimeout') || 120000,
       json: !options.ignoreBody
     };
     if (!options.ignoreBody) {
