@@ -12,10 +12,7 @@ module.exports = async function (connectionURL) {
   } else {
     const createNewInstance = async () => {
       let pool = new Pool({
-        connectionString: connectionURL,
-        ssl: {
-          rejectUnauthorized: false
-        }
+        connectionString: connectionURL
       });
       await pool.connect();
       PGExistingList[hash] = pool;
