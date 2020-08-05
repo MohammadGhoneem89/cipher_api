@@ -73,7 +73,6 @@ async function getTypeAllDataForSync(TypeData, getTypeData_CB, payload) {
     execTypeData.forEach((element) => {
       delete element._id
       delete element.__v
-      delete element.type
       console.log(element)
     })
     response.typeListForSync.data = execTypeData
