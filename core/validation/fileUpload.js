@@ -12,39 +12,11 @@ const fileUpload = function (file, UUID, ext, params, userID, source, context, f
   logger.debug({ fs: 'fileUpload.js', func: 'fileUpload' }, ">>>>>>>>>>>>>>>    " + ext);
   logger.debug({ fs: 'fileUpload.js', func: 'fileUpload' }, ">>>>>>>>>>>>>>>    " + params);
 
-  // let response = {
-  //   "message": "Error acquired in file upload",
-  //   "status": false,
-  //   "contextData": []
-  // }
-
-  let allowedFileTypes = global.config.allowedFileTypes;
-
-  let endName = file.name.endsWith();
-  let validInputType = allowedFileTypes.find((type) => ext == type);
-  console.log(validInputType, 'VALID INPUT TYPE');
-  console.log(allowedFileTypes);
   let response = {
-    fileUploadResponse: {
-        action: 'fileUploader',
-        data: {
-            message: {
-                status: 'ERROR',
-                errorDescription: 'Incorrect File Type',
-                routeTo: '',
-                displayToUser: true
-            },
-            success: true,
-            token: '',
-            firstScreen: ''
-        }
-    }
-};
-
-if (!validInputType) {
-  return fileUpload_CB(response);
-} else {
-
+    "message": "Error acquired in file upload",
+    "status": false,
+    "contextData": []
+  }
 
   let basePath = config.get('basePath');
   let fileName = file.name;
@@ -62,7 +34,7 @@ if (!validInputType) {
     path = basePath + "/public/images";
     destinationPath = basePath + "/public/images" + "/" + UUID + "." + ext;
   }
-}
+
   fsDirectory(path, destinationPath, function (msg) {
     if (msg) {
       logger.debug(" [ Image Upload ] Directory : " + msg);
