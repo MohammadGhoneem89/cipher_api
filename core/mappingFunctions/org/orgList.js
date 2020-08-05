@@ -25,7 +25,7 @@ function orgList(body, entityList_CB, JWToken) {
   if (JWToken.orgType === 'Entity') {
     if (JWToken.orgType === 'Entity') {
       isEntity = true;
-      body.searchCriteria = {spCode: JWToken.orgCode};
+      body.searchCriteria = { spCode: JWToken.orgCode };
     }
   }
 
@@ -49,27 +49,27 @@ function orgList(body, entityList_CB, JWToken) {
   let criteria = [];
   if (searchCriteria && searchCriteria.entityName) {
     let entityName = searchCriteria["entityName"];
-    criteria.push({"entityName": {'$regex': entityName, '$options': 'i'}});
+    criteria.push({ "entityName": { '$regex': entityName, '$options': 'i' } });
   }
 
   if (searchCriteria && searchCriteria.arabicName) {
     let arabicName = searchCriteria.arabicName;
-    criteria.push({"arabicName": {'$regex': arabicName, '$options': 'i'}});
+    criteria.push({ "arabicName": { '$regex': arabicName, '$options': 'i' } });
   }
   if (searchCriteria && searchCriteria.spCode) {
     let spCode = searchCriteria.spCode;
-    criteria.push({"spCode": spCode});
+    criteria.push({ "spCode": spCode });
   }
 
   let ownOrg = config.get('ownerOrgs', [])
   if (ownOrg && ownOrg.indexOf(JWToken.orgCode) == -1) {
-    criteria.push({"spCode": {'$regex': JWToken.orgCode, '$options': 'i'}});
+    criteria.push({ "spCode": { '$regex': JWToken.orgCode, '$options': 'i' } });
   }
   if (searchCriteria && searchCriteria.isActive) {
-    criteria.push({isActive: true});
+    criteria.push({ isActive: true });
   }
 
-  where = criteria.length > 0 ? {"$and": criteria} : {};
+  where = criteria.length > 0 ? { "$and": criteria } : {};
 
   let options = {};
 
@@ -105,6 +105,8 @@ function orgList(body, entityList_CB, JWToken) {
           logger.debug(" [ Entity List ] ERROR : " + err);
           entityList_CB(response);
         } else {
+          let ownOrg = config.get('ownerOrgs', [])
+          let ownerFlag = !(ownOrg.indexOf(JWToken.orgCode) == -1);
           entityTypeData(function (nameData) {
             let embedField = {};
             for (let j = 0; j < entityData.length; j++) {
@@ -149,7 +151,7 @@ function orgList(body, entityList_CB, JWToken) {
                 entityList_CB(response);
               });
 
-          });
+          }, entityData, ownerFlag);
         }
       });
     }
@@ -159,7 +161,7 @@ function orgList(body, entityList_CB, JWToken) {
 
 function orgCodeList() {
   return new Promise((resolve, reject) => {
-    global.db.selectWithSort("Entity", {isActive: true}, {
+    global.db.selectWithSort("Entity", { isActive: true }, {
       "spCode": 1,
       "currency": 1,
       "cycle": 1
@@ -174,7 +176,7 @@ function updateLastBilling(lastbilldate, spCode) {
   return new Promise((resolve, reject) => {
     global.db.update("Entity", {
       "spCode": spCode
-    }, {lastbilldate: lastbilldate}, function (err) {
+    }, { lastbilldate: lastbilldate }, function (err) {
       if (err) {
         logger.error(" [ Entity Update ] Entity is not updated : " + err);
         return reject(err);

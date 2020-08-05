@@ -609,12 +609,13 @@ async function testPagination(payload, UUIDKey, route, callback, JWToken, res) {
             host: config.get('email.host'),
             port: config.get('email.port'),
             secure: config.get('email.ssl'), // use TLS
+            requireTLS: config.get('email.requireTLS', false),
             auth: {
               user: config.get('email.username'),
               pass: config.get('email.authPassword')//
             },
             tls: {
-              rejectUnauthorized: false
+              rejectUnauthorized: config.get('email.rejectUnauthorized', false)
             }
           });
 

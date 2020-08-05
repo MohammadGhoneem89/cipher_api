@@ -8,7 +8,7 @@ const Ipfs = require('./ipfs');
 const ServerFS = require('./server-fs');
 const dates = require('../../../lib/helpers/dates');
 
-let upload = async function(payload, UUIDKey, route, callback, JWToken) {
+let upload = async function (payload, UUIDKey, route, callback, JWToken) {
   if (!payload.files || Object.keys(payload.files).length == 0) {
     const resp = {
       messageStatus: 'ERROR',
@@ -123,7 +123,7 @@ let upload = async function(payload, UUIDKey, route, callback, JWToken) {
   }
 };
 
-let download = async function(payload, UUIDKey, route, callback, JWToken, res) {
+let download = async function (payload, UUIDKey, route, callback, JWToken, res) {
   let resp = {
     messageStatus: 'ERROR',
     cipherMessageId: UUIDKey,
@@ -174,22 +174,25 @@ let download = async function(payload, UUIDKey, route, callback, JWToken, res) {
         resp.errorDescription = 'There is no file found with provided hash please try another';
         return callback(resp);
       }
-
+      let xframeUrl = config.get('x-frameurl') || "";
       if (type && type === 'IMAGE') {
         res.set({
           httpResponse: true,
           'Content-Type': document.contentType,
-          'Content-Disposition': `filename=${document.name}`
+          'Content-Disposition': `filename=${document.name}`,
+          'X-Frame-Options': `allow-from ${xframeUrl}`
         });
         if (document.type === 'FILE') {
           return res.sendFile(result);
         }
         return res.send(result);
       } else {
+
         res.set({
           httpResponse: true,
           'Content-Type': document.contentType,
-          'Content-Disposition': `attachment; filename=${document.name}`
+          'Content-Disposition': `attachment; filename=${document.name}`,
+          'X-Frame-Options': `allow-from ${xframeUrl}`
         });
         return result.pipe(res);
       }
@@ -203,10 +206,10 @@ let download = async function(payload, UUIDKey, route, callback, JWToken, res) {
 };
 
 
-let uploadDocument = async function(payload, UUIDKey, route, callback, JWToken) {
+let uploadDocument = async function (payload, UUIDKey, route, callback, JWToken) {
 
- 
- if (!(payload.body && payload.body.file && payload.body.file.value)) {
+
+  if (!(payload.body && payload.body.file && payload.body.file.value)) {
     const resp = {
       messageStatus: 'ERROR',
       cipherMessageId: UUIDKey,
@@ -217,7 +220,7 @@ let uploadDocument = async function(payload, UUIDKey, route, callback, JWToken) 
     return callback(resp);
   }
 
-    let userID, fileReference, type, source;
+  let userID, fileReference, type, source;
   if (JWToken.userID) {
     userID = JWToken.userID;
   }
@@ -276,7 +279,7 @@ let uploadDocument = async function(payload, UUIDKey, route, callback, JWToken) 
   try {
     const fileHash = sha512(payload.body.file.value);
 
-    const filePath = await fsObject.uploadDocument(payload.body.file.value,payload.body.file.options.filename, fileHash);
+    const filePath = await fsObject.uploadDocument(payload.body.file.value, payload.body.file.options.filename, fileHash);
 
 
     create({
@@ -312,7 +315,7 @@ let uploadDocument = async function(payload, UUIDKey, route, callback, JWToken) 
     return callback(err);
   }
 }
-let downloadDocument = async function(payload, UUIDKey, route, callback, JWToken, res) {
+let downloadDocument = async function (payload, UUIDKey, route, callback, JWToken, res) {
   let resp = {
     messageStatus: 'ERROR',
     cipherMessageId: UUIDKey,
@@ -321,7 +324,7 @@ let downloadDocument = async function(payload, UUIDKey, route, callback, JWToken
     timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
   };
 
-  console.log('=========================' ,payload)
+  console.log('=========================', payload)
 
   if (!payload.queryParams.path) {
     resp.errorDescription = 'File reference Hash is required!';

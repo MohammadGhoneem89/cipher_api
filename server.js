@@ -35,6 +35,10 @@ const getDocUpload = require('./core/validation/getDocUpload.js');
 const tokenLookup = require('./lib/repositories/tokenLookup');
 const commonConst = require('./lib/constants/common');
 const xssFilter = require('x-xss-protection');
+const moment = require("moment");
+
+
+
 const baseExclusion = ['setPassword', 'permission', 'user', 'notificationList']
 
 
@@ -152,7 +156,7 @@ app.post('/login', async (req, res) => {
       errorCode: 200,
       errorDescription: "logged in successfully !!!",
       token: "",
-      timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+      timestamp: moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
     };
 
     if (checkbadinput(req)) {
@@ -231,7 +235,7 @@ app.post('/login', async (req, res) => {
       "cipherMessageId": uuid(),
       "errorDescription": 'some error occurred while processing',
       "errorCode": 201,
-      "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
+      "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
     });
   }
 });
@@ -694,7 +698,7 @@ const timeoutResponse = {
   "messageStatus": "ERROR",
   "errorCode": 201,
   "errorDescription": "Token Not Valid!",
-  "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
+  "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
 };
 
 app.use(function (req, res, next) {
@@ -705,7 +709,7 @@ app.use(function (req, res, next) {
     "cipherMessageId": uuid(),
     "errorDescription": 'not found!',
     "errorCode": 201,
-    "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
+    "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
   });
 });
 
@@ -716,7 +720,7 @@ app.use(function (err, req, res, next) {
     "cipherMessageId": uuid(),
     "errorDescription": 'some error occured!!!!',
     "errorCode": 201,
-    "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
+    "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
   });
 });
 

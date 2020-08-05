@@ -26,12 +26,13 @@ function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
           host: config.get('email.host'),
           port: config.get('email.port'),
           secure: config.get('email.ssl'), // use TLS
+          requireTLS: config.get('email.requireTLS', false),
           auth: {
             user: config.get('email.username'),
             pass: config.get('email.authPassword')//
           },
           tls: {
-            rejectUnauthorized: false
+            rejectUnauthorized: config.get('email.rejectUnauthorized', false)
           }
         });
         let mailList = [];
@@ -40,7 +41,7 @@ function dispatchEmail(payload, UUIDKey, route, callback, JWToken) {
         });
         let flag = true;
         let mailOptions = {
-          from: config.get('email.address'), // sender address
+          from: config.get('email.emailAddress'), // sender address
           to: mailList.toString(), // list of receivers
           subject: format.subjectEng, // Subject line
           html: `<p>${format.templateTextEng}</p>`// plain text body
