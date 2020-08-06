@@ -1446,5 +1446,20 @@
       "CustomMappingFile": "application/index.js",
       "mappingConfigFile": "ePayMapping"
     }
+  },
+  "utility" : {
+    "syncMongoDB": {
+      "customMapping": true,
+      "MappingfunctionName": "syncData",
+      "CustomMappingFile": "utility/mongoDB.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getMongoDBChanges": {
+      "customMapping": true,
+      "MappingfunctionName": "getChanges",
+      "CustomMappingFile": "utility/mongoDB.js",
+      "mappingConfigFile": "ePayMapping"
+    }
   }
+
 }

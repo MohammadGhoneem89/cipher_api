@@ -69,7 +69,7 @@
     "node-fetch": "^2.6.0",
     "node-zip": "^1.1.1",
     "nodemailer": "^4.7.0",
-    "nodemon": "^1.18.9",
+    "nodemon": "^1.19.4",
     "pg": "^7.4.3",
     "pg-promise": "^8.5.1",
     "promised-handlebars": "^2.0.1",
@@ -105,6 +105,7 @@
   "scripts": {
     "lint": "eslint lib/ config/ api/ background/ soap/ scripts/ reports/ exports/ Common/",
     "fix": "eslint lib/ config/ api/ background/ soap/ scripts/ reports/ exports/ Common/ --fix",
-    "start": "node app.js"
+    "start": "node app.js",
+    "start:dev": "nodemon app.js"
   }
 }

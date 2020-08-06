@@ -3,8 +3,17 @@ const crypto = require('crypto');
 var MGExistingList = {};
 
 module.exports = async function (connectionURL) {
+    const clientOption = {
+        socketTimeoutMS: 30000,
+        keepAlive: true,
+        reconnectTries: 10,
+        poolSize: 50,
+        useNewUrlParser: true,
+        connectWithNoPrimary: true
+    };
+
     const createConnection = async () => {
-        await mongoose.connect(connectionURL, { useNewUrlParser: true, reconnectTries: 10 });
+        await mongoose.connect(connectionURL,clientOption);
         mongoose.connection.on('disconnected', () => {
             console.log('-> mongoose lost connection');
             createConnection();
