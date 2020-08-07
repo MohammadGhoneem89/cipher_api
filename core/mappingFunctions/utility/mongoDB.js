@@ -47,6 +47,25 @@ async function syncData(payload, UUIDKey, route, callback, JWToken) {
 
 }
 
+async function source_collection(source_connection) {
+
+    return source_connection.db.listCollections().toArray();
+
+}
+async function destination_collection(destination_connection) {
+
+
+    return destination_connection.db.listCollections().toArray();
+}
+
+function comparer(otherArray) {
+    return function (current) {
+        return otherArray.filter(function (other) {
+            return other.name == current.name
+        }).length == 0;
+    }
+}
+
 async function getChanges(payload, UUIDKey, route, callback, JWToken) {
     let response = {
         "message": "API declared"
@@ -107,35 +126,30 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
         // Find missing tables 
         let collections = [];
 
-        source_connection.db.listCollections().toArray(function (err, source_items) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log(source_items);
-            }
-            destination_connection.db.listCollections().toArray(function (err, dest_items) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    console.log(dest_items);
-                }
-                function comparer(otherArray) {
-                    return function (current) {
-                        return otherArray.filter(function (other) {
-                            return other.name == current.name 
-                        }).length == 0;
-                    }
-                }
-                console.log("source:", source_items.length)
-                console.log("destination:", dest_items.length)
-                if (source_items.length != dest_items.length && source_items.length > dest_items.length) {
-                    console.log("Some tables are missing in destination DB")
-                    // Find missing tables & add their objects in response
-                    var onlyInA = source_items.filter(comparer(dest_items));
-                    console.log("Missing collections:", onlyInA)
-                }
-            })
-        })
+        let source_data = await source_collection(source_connection);
+        let dest_data = await destination_collection(destination_connection);
+
+        console.log("collections in source:", source_data.length);
+        console.log("collections in destination:", dest_data.length);
+
+        if (source_data.length != dest_data.length && source_data.length > dest_data.length) {
+            response.message = "Missing collections are found in destination";
+            let missing_tables = await source_data.filter(comparer(dest_data));
+            response.missing_tables = missing_tables;
+
+        } else if (source_data.length != dest_data.length && source_data.length < dest_data.length) {
+            response.message = "Collections to be deleted are found from source";
+            // No need of this case of as now
+        }
+        source_data.forEach(source => {
+
+            source_connection.db.collection(source.name, function (err, collection) {
+                collection.find({}).toArray().then((data)=> {
+                    console.log(data)
+                })
+            });
+
+        });
 
         callback(response);
         return;
