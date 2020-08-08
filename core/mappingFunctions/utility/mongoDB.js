@@ -2,8 +2,11 @@
 const _ = require('lodash');
 var mongoose = require('mongoose')
 const mongoDB = require('../../api/connectors/mongoDB');
-const crypto = require('../../../lib/helpers/crypto');
+const crypto = require("crypto");
 const { result } = require('lodash');
+const sha512 = require('../../../lib/hash/sha512');
+var hash = require('object-hash');
+let source_connection, destination_connection;
 
 //mongoDB.connection(config.get('mongodb.url'));
 
@@ -47,18 +50,26 @@ async function syncData(payload, UUIDKey, route, callback, JWToken) {
 
 }
 
-async function source_collection(source_connection) {
+async function get_db_collections(db_conn) {
 
-    return source_connection.db.listCollections().toArray();
+    return db_conn.db.listCollections().toArray();
+
+    // let docs = await db_conn.listCollections().toArray();
+    // docs = docs.map(async doc => {
+    //     doc.count = await db.collection(doc.name).count();
+    //     return doc;
+    // });
+    // return Promise.all(docs);
 
 }
-async function destination_collection(destination_connection) {
 
+async function get_db_collection(db_conn, collection_name) {
 
-    return destination_connection.db.listCollections().toArray();
+    let collection = await db_conn.db.collection(collection_name);
+    return await collection.find({}).toArray();
 }
 
-function comparer(otherArray) {
+function comparer_byName(otherArray) {
     return function (current) {
         return otherArray.filter(function (other) {
             return other.name == current.name
@@ -66,33 +77,99 @@ function comparer(otherArray) {
     }
 }
 
+function comparer_byID(otherArray) {
+    return function (current) {
+        return JSON.stringify(otherArray._id) == JSON.stringify(current._id)
+    }
+}
+
+async function get_resultant(db_conn, result) {
+    result = result.map(async doc => {
+        let new_doc = {
+            type: "",
+            new_documents: [],
+            updated_documents: [],
+            deleted_documents: []
+        }
+        new_doc.count = await db_conn.db.collection(doc.name).count();
+        new_doc.modelName = doc.name;
+
+        return new_doc;
+    });
+    return Promise.all(result);
+}
+
+async function find_updated_records(s_collection_data, d_collection_data, result, modelName) {
+    const secret = 'sagp';
+    console.log(modelName)
+    let s_data = s_collection_data.map(async s_document => {
+
+        let d_document = await d_collection_data.filter(comparer_byID(s_document));
+        if (d_document.length > 0) {
+
+            let s = JSON.stringify(s_document), d = JSON.stringify(d_document[0])
+            // take hash of both and confirm if same otherwise report for change
+            let s_hash = crypto.createHmac("sha512", secret).update(s).digest("hex"),
+                d_hash = crypto.createHmac("sha512", secret).update(d).digest("hex");
+            if (s_hash != d_hash) {
+                // updated document
+                console.log(s_document)
+                result.map(function (other) {
+                    if (other.modelName == modelName) {
+                        other.type = "updated"
+                        let update_doc = {
+                            source: s_document,
+                            destination: d_document
+                        }
+                        other.updated_documents.push(update_doc)
+                    }
+                })
+            }
+        } else {
+            // deleted in destination
+            result.map(function (other) {
+                
+                if (other.modelName == modelName) {
+                    other.type = "updated"
+                    other.new_documents.push(s_document)
+                }
+            })
+        }
+
+    })
+
+    return Promise.all(s_data);
+}
+
 async function getChanges(payload, UUIDKey, route, callback, JWToken) {
-    let response = {
-        "message": "API declared"
-    }
-
-    let errors = {}, is_missing = false;
-    if (!payload.body.hasOwnProperty('source_db_url')) {
-        errors.source_db_url = "Missing required field."
-        is_missing = true;
-    }
-    if (!payload.body.hasOwnProperty('destination_db_url')) {
-        is_missing = true;
-        errors.destination_db_url = "Missing required field."
-    }
-
-    if (is_missing) {
-        callback(errorResponse(errors));
-        return;
-    }
-
-    // let source = crypto.decrypt(_.trim(payload.body.source_db_url)),
-    //     destination = crypto.decrypt(_.trim(payload.body.destination_db_url));
-
-    let source = _.trim(payload.body.source_db_url),
-        destination = _.trim(payload.body.destination_db_url);
-
     try {
+
+        let response = {
+            "message": "API declared"
+        }
+
+        let errors = {}, is_missing = false;
+        if (!payload.body.hasOwnProperty('source_db_url')) {
+            errors.source_db_url = "Missing required field."
+            is_missing = true;
+        }
+        if (!payload.body.hasOwnProperty('destination_db_url')) {
+            is_missing = true;
+            errors.destination_db_url = "Missing required field."
+        }
+
+        if (is_missing) {
+            callback(errorResponse(errors));
+            return;
+        }
+
+        // let source = crypto.decrypt(_.trim(payload.body.source_db_url)),
+        //     destination = crypto.decrypt(_.trim(payload.body.destination_db_url));
+
+        let source = _.trim(payload.body.source_db_url),
+            destination = _.trim(payload.body.destination_db_url);
+
+
 
         // let source_connection = await mongoDB.connection(source);
         // let destination_connection = await mongoDB.connection(destination);
@@ -108,8 +185,8 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
         };
         const instances = [];
 
-        let source_connection = mongoose.createConnection(source, clientOption);
-        let destination_connection = mongoose.createConnection(destination, clientOption);
+        source_connection = mongoose.createConnection(source, clientOption);
+        destination_connection = mongoose.createConnection(destination, clientOption);
 
         instances.push(new Promise((resolve) => {
             source_connection.on('open', () => { resolve(source_connection); });
@@ -126,40 +203,56 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
         // Find missing tables 
         let collections = [];
 
-        let source_data = await source_collection(source_connection);
-        let dest_data = await destination_collection(destination_connection);
+        let source_data = await get_db_collections(source_connection);
+        let dest_data = await get_db_collections(destination_connection);
+
+        // Compose resultant array
+        let result = await get_resultant(source_connection, source_data);
 
         console.log("collections in source:", source_data.length);
         console.log("collections in destination:", dest_data.length);
 
         if (source_data.length != dest_data.length && source_data.length > dest_data.length) {
             response.message = "Missing collections are found in destination";
-            let missing_tables = await source_data.filter(comparer(dest_data));
-            response.missing_tables = missing_tables;
+            let missing_tables = await source_data.filter(comparer_byName(dest_data));
+            missing_tables.forEach(table => {
+                result.map(row => {
+                    if (row.modelName == table.name) {
+                        row.type = "new" // New collection to be added in destination
+                        return row;
+                    }
+                });
+            });
 
         } else if (source_data.length != dest_data.length && source_data.length < dest_data.length) {
             response.message = "Collections to be deleted are found from source";
             // No need of this case of as now
         }
-        source_data.forEach(source => {
 
-            source_connection.db.collection(source.name, function (err, collection) {
-                collection.find({}).toArray().then((data)=> {
-                    console.log(data)
-                })
-            });
+        // Filter out collections which have either updated/new/deleted records 
+        let s_data = source_data.map(async s_collection => {
+
+            let s_collection_data = await get_db_collection(source_connection, s_collection.name),
+                d_collection_data = await get_db_collection(destination_connection, s_collection.name);
+
+            find_updated_records(s_collection_data, d_collection_data, result, s_collection.name);
 
         });
 
+        await Promise.all(s_data);
+
+        response.data = result.filter(function (element) {
+            return element.type != ""
+        });
+        
         callback(response);
         return;
-
 
     } catch (err) {
         console.log(err)
         callback(errorResponse(err));
+        return;
     }
-
 }
 
 exports.syncData = syncData;
