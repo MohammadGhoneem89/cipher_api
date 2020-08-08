@@ -213,7 +213,6 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
         console.log("collections in destination:", dest_data.length);
 
         if (source_data.length != dest_data.length && source_data.length > dest_data.length) {
-            response.message = "Missing collections are found in destination";
             let missing_tables = await source_data.filter(comparer_byName(dest_data));
             missing_tables.forEach(table => {
                 result.map(row => {
@@ -244,7 +243,9 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
         response.data = result.filter(function (element) {
             return element.type != ""
         });
-        
+
+        response.count = response.data.length;
+        response.message = "Success";
         callback(response);
         return;
 
