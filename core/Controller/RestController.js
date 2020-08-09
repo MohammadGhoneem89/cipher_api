@@ -21,8 +21,8 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     fs: 'RestController.js',
     func: 'handleExternalRequest'
   }, "===========Got Message [" + UUIDKey + "]!!!============");
-  logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, JSON.stringify(payload, null, 2));
-  logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, incommingRoute);
+  logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, JSON.stringify(payload, null, 2));
+  logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, incommingRoute);
 
   let configdata = _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
   let username = _.get(JWToken, `userID`, 'No User');
@@ -46,13 +46,13 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         "errorCode": 201,
         "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
       };
-      // console.log(data.stack)
+      console.log(data.stack)
       txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack, eRRTBasic, username, orgcode);
       responseCallback.status(500);
       responseCallback.json(error);
       return responseCallback.end();
     }
-    logger.debug({fs: 'RestController.js', func: 'ResponseCaller'}, "=========== [" + UUIDKey + "]!!! ============");
+    logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, "=========== [" + UUIDKey + "]!!! ============");
     let apiSample = _.cloneDeep(payload);
     if (_.get(apiSample, '_apiRecorder', false) === true) {
       apiSample = _.omit(apiSample, 'token', 'action', 'channel', 'ipAddress', '_apiRecorder', 'JWToken', 'header', 'CipherJWT');
@@ -136,7 +136,7 @@ function enrichError(response, successStatus = true) {
   if (!errCode) {
     errCode = _.get(response, 'errorCode', undefined);
   }
-  
+
   let options = _.get(response, 'result.options', undefined);
   if (!options) {
     options = _.get(response, 'options', undefined);
