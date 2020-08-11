@@ -149,9 +149,9 @@ app.post('/login', async (req, res) => {
         }
       }
     };
-
+    let sessionUUID = uuid();
     const apiResponse = {
-      cipherMessageId: uuid(),
+      cipherMessageId: sessionUUID,
       messageStatus: 'OK',
       errorCode: 200,
       errorDescription: "logged in successfully !!!",
@@ -171,13 +171,13 @@ app.post('/login', async (req, res) => {
     }
 
 
-    authUser(payload)
+    authUser(payload, sessionUUID)
       .then(async (user) => {
-        console.log(JSON.stringify(user));
         if (user.userType == "API") {
           apiResponse.token = user.token;
           res.send(apiResponse);
         } else {
+          console.log(">>>>>>>>>>>>>>>>>>>>}}}", JSON.stringify(user))
           response.loginResponse.data.token = user.token;
           let cookieAttributes = {};
           if (config.get("disableSameSiteCookie")) {
@@ -186,9 +186,10 @@ app.post('/login', async (req, res) => {
           res.cookie('token', user.token, cookieAttributes);
 
 
-          await tokenLookup.removeAndCreate({
+          await tokenLookup.removeAndCreateWithSession({
             token: user.token,
             userId: user._id,
+            sessionId: sessionUUID,
             createdAt: dates.newDate()
           });
 
@@ -216,6 +217,7 @@ app.post('/login', async (req, res) => {
             response.loginResponse.data.message.status = 'ERROR';
             response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
             response.loginResponse.data.success = false;
+            response.loginResponse.data.sessionId = sessionUUID
             res.status(401).send(response);
           }
         } else {
@@ -499,13 +501,15 @@ function apiCallsHandler(req, res) {
       return res.status(403).send(timeoutResponse);
     }
 
-    tokenValid(decoded._id, JWToken).then(async valid => {
+    tokenValid(decoded._id, JWToken, decoded).then(async valid => {
       let byPassValidation = commonConst.permissionExcludeList.includes(action);
       if (valid || _.get(payload, "header", null) != null || byPassValidation) {
         RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
+
         await tokenLookup.update({
           token: JWToken,
-          userId: decoded._id
+          userId: decoded._id,
+          sessionId: decoded.sessionId
         }, {
           createdAt: dates.newDate()
         });
@@ -524,24 +528,30 @@ function apiCallsHandler(req, res) {
   }
 }
 
-async function tokenValid(userIdz, tkn) {
+async function tokenValid(userIdz, tkn, data) {
   try {
+    console.log({
+      userId: userIdz,
+      token: tkn,
+      sessionId: data.sessionId
+    })
     let existingToken = await tokenLookup.findOne({
       userId: userIdz,
-      token: tkn
+      token: tkn,
+      sessionId: data.sessionId
     });
     if (existingToken == null) {
       return false;
     }
     let timestamp = dates.diffFromNow(existingToken.createdAt, "seconds");
-    console.log("existing token ", JSON.stringify(existingToken));
     console.log("generated at ", config.get('tokenExp'));
     console.log("timestamp at ", timestamp);
     if (config.get('tokenExp') < timestamp) {
       console.log("removing>>>", userIdz);
       await tokenLookup.remove({
         token: tkn,
-        userId: userIdz
+        userId: userIdz,
+        sessionId: data.sessionId
       });
       return false;
     } else {
@@ -571,14 +581,30 @@ const logout = async (req, res) => {
       const decoded = crypto.decrypt(JWToken);
       console.log("decoded", decoded);
       await tokenLookup.remove({
-        userId: decoded._id
+        userId: decoded._id,
+        sessionId: decoded.sessionId
       });
       // req.session.destroy(( err ) => {
       //     console.error(err)
       // })
       res.clearCookie("token");
     }
-    res.send({})
+    res.send({
+      loginResponse: {
+        action: 'login',
+        data: {
+          message: {
+            status: 'OK',
+            errorDescription: 'logged Out in successfully !!!',
+            routeTo: '',
+            displayToUser: true
+          },
+          success: true,
+          token: '',
+          firstScreen: ''
+        }
+      }
+    })
   } catch (error) {
     console.error("error", error.stack);
     logger.debug({

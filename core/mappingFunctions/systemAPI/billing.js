@@ -56,8 +56,8 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
             data = await conn.request().query(qry);
             conn.close();
           } else {
-            let conn = await pg.connection(qry);
-            data = await conn.query();
+            let conn = await pg.connection();
+            data = await conn.query(qry);
           }
           let hits = 0;
           for (let elem of data.rows) {
@@ -86,7 +86,7 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
               }
               lastPolicy = elem;
             });
-            if (hits > 0 && isApplied === false) {
+            if (hits > 0 && isApplied === false && lastPolicy) {
               let factor = (hits / lastPolicy.to) * hits
               result += factor * lastPolicy.billVal;
             }
@@ -120,20 +120,14 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
               amount = billingreport.amount +${result}`);
         }
 
-
-
       }
-      entity.updateLastBilling(endEpoch, org.spCode).then(() => {
-        callback({ success: true });
-      }).catch((ex) => {
+      await entity.updateLastBilling(endEpoch, org.spCode).catch((ex) => {
         console.log(ex);
-        callback({ success: false });
       })
-
     }
+    callback({ success: true });
   } catch (error) {
     console.log(error.stack)
-    callback({ success: false })
   }
 }
 
