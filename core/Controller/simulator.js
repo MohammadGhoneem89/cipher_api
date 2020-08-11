@@ -16,9 +16,8 @@ module.exports = class Simulator {
       this.sumudata.forEach((obj) => {
         let value = _.get(this.request, obj.SimuField, null);
         if (!value && obj.SimuField.trim() === '*') {
-          generalResponse = JSON.parse(obj.SimulatorResponse);
-        }
-        else if (String(value) === String(obj.SimuValue)) {
+          CaseResponse = JSON.parse(obj.SimulatorResponse);
+        } else if (String(value) === String(obj.SimuValue)) {
           CaseResponse = JSON.parse(obj.SimulatorResponse);
         }
       });
@@ -26,7 +25,7 @@ module.exports = class Simulator {
         resolve(CaseResponse);
       }
       else {
-        resolve(generalResponse);
+        resolve(CaseResponse);
       }
     });
   }
