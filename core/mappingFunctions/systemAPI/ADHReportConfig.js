@@ -75,20 +75,25 @@ function getADHReportListProtected(payload, UUIDKey, route, callback, JWToken, r
           "/ReportRender/"
         ]
       }];
-    console.log(">>>>>>>>>}}}}", JSON.stringify(data[0]))
+    console.log(">>>>>>>>>}}}}", JSON.stringify(data))
     let outVal = []
     data[1].forEach((element) => {
       let isFound = false;
       element.group.forEach((gp) => {
-        if (data[0].groups.indexOf(gp) > -1) {
-          isFound = true;
-        }
+
+        data[0].groups.forEach((gpu) => {
+          if (String(gpu) == String(gp)) {
+            isFound = true;
+          }
+        });
       });
 
       element.actions = actions;
       element.createdBy = element.createdBy ? element.createdBy.userID : '';
-      if (isFound)
+      if (isFound) {
+        console.log("FOUND IT 2")
         outVal.push(element);
+      }
     });
     let response = {
       "ADHReportList": {

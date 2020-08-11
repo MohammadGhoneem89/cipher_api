@@ -8,7 +8,7 @@
     }
   },
   "core": {
-    "logErrors":{
+    "logErrors": {
       "customMapping": true,
       "MappingfunctionName": "logErrors",
       "CustomMappingFile": "systemAPI/logErrorsUI.js",
@@ -625,6 +625,12 @@
     "userUpdate": {
       "customMapping": true,
       "MappingfunctionName": "userUpdate",
+      "CustomMappingFile": "user/update.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "userApproveReject": {
+      "customMapping": true,
+      "MappingfunctionName": "userApproveReject",
       "CustomMappingFile": "user/update.js",
       "mappingConfigFile": "ePayMapping"
     },
