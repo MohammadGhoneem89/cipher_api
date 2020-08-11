@@ -5,7 +5,6 @@ const mongoDB = require('../../api/connectors/mongoDB');
 const crypto = require("crypto");
 const { result } = require('lodash');
 const sha512 = require('../../../lib/hash/sha512');
-var hash = require('object-hash');
 let source_connection, destination_connection;
 
 //mongoDB.connection(config.get('mongodb.url'));
@@ -86,10 +85,19 @@ function comparer_byID(otherArray) {
 async function get_resultant(db_conn, result) {
     result = result.map(async doc => {
         let new_doc = {
-            type: "",
-            new_documents: [],
-            updated_documents: [],
-            deleted_documents: []
+            type: "", // new updated
+            new_documents: {
+                count: 0,
+                data: []
+            },
+            updated_documents: {
+                count: 0,
+                data: []
+            },
+            deleted_documents: {
+                count: 0,
+                data: []
+            }
         }
         new_doc.count = await db_conn.db.collection(doc.name).count();
         new_doc.modelName = doc.name;
@@ -121,17 +129,19 @@ async function find_updated_records(s_collection_data, d_collection_data, result
                             source: s_document,
                             destination: d_document
                         }
-                        other.updated_documents.push(update_doc)
+                        other.updated_documents.count += 1
+                        other.updated_documents.data.push(update_doc)
                     }
                 })
             }
         } else {
             // deleted in destination
             result.map(function (other) {
-                
+
                 if (other.modelName == modelName) {
                     other.type = "updated"
-                    other.new_documents.push(s_document)
+                    other.new_documents.count += 1
+                    other.new_documents.data.push(s_document)
                 }
             })
         }
@@ -228,13 +238,27 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
             // No need of this case of as now
         }
 
+        let exempted_collections = ["TokenLookup",
+            "User_Interm",
+            "Notifications",
+            "PasswordHistory",
+            "ErrorCodes",
+            "Document",
+            "DocumentType",
+            "AuditLog",
+            "Audit",
+            "ImageUpload",
+            "SharedDocument",
+            "Documents"]
         // Filter out collections which have either updated/new/deleted records 
         let s_data = source_data.map(async s_collection => {
 
             let s_collection_data = await get_db_collection(source_connection, s_collection.name),
                 d_collection_data = await get_db_collection(destination_connection, s_collection.name);
 
-            find_updated_records(s_collection_data, d_collection_data, result, s_collection.name);
+            if (exempted_collections.indexOf(s_collection.name) < 0) {
+                find_updated_records(s_collection_data, d_collection_data, result, s_collection.name);
+            }
 
         });
 
@@ -243,6 +267,7 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
         response.data = result.filter(function (element) {
             return element.type != ""
         });
+        // maybe in future will add source & destination URL as well in response. As per frontend need.
 
         response.count = response.data.length;
         response.message = "Success";
