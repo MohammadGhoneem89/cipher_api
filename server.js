@@ -601,7 +601,7 @@ const logout = async (req, res) => {
         data: {
           message: {
             status: 'OK',
-            errorDescription: 'logged Out in successfully !!!',
+            errorDescription: 'logged Out successfully !!!',
             routeTo: '',
             displayToUser: true
           },
