@@ -177,6 +177,12 @@ app.post('/login', async (req, res) => {
       .then(async (user) => {
         if (user.userType == "API") {
           apiResponse.token = user.token;
+          await tokenLookup.removeAndCreateWithSession({
+            token: user.token,
+            userId: user._id,
+            sessionId: sessionUUID,
+            createdAt: dates.newDate()
+          });
           res.send(apiResponse);
         } else {
           console.log(">>>>>>>>>>>>>>>>>>>>}}}", JSON.stringify(user))
@@ -601,7 +607,7 @@ const logout = async (req, res) => {
         data: {
           message: {
             status: 'OK',
-            errorDescription: 'logged Out in successfully !!!',
+            errorDescription: 'logged Out successfully !!!',
             routeTo: '',
             displayToUser: true
           },

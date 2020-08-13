@@ -98,7 +98,10 @@ function orgList(body, entityList_CB, JWToken) {
         "orgType": 1,
         "status": 1,
         "dateCreated": 1,
-        "dateUpdated": 1
+        "dateUpdated": 1,
+        "lastbilldate": 1,
+        currency: 1,
+        cycle: 1
       }, options, function (err, entityData) {
         if (err) {
           logger.debug(" [ Entity List ] ERROR : " + err);

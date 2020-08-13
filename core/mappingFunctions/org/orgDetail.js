@@ -97,7 +97,7 @@ var orgDetail = function (payload, entityGetCB, JWToken) {
           entityGetCB(response);
         } else {
           let conn = await pg.connection();
-          let reslt = await conn.query(`select * from billingreport where orgcode='${data.spCode}'`);
+          let reslt = await conn.query(`select TO_CHAR(startdate, 'DD/MM/YYYY hh:mm') as startdate,TO_CHAR(enddate, 'DD/MM/YYYY hh:mm') as enddate,amount,status,billingcycle  from billingreport where orgcode='${data.spCode}'`);
           response["entityDetail"]["data"] = data;
           _.set(response, 'entityDetail.data.billing', reslt.rows);
           entityGetCB(response);

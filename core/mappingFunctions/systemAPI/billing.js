@@ -14,42 +14,44 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
 
     let apiList = await APIDefinitation.find({ isBilled: true })
     let entityList = await entity.orgCodeList();
-    console.log(JSON.stringify(apiList), '\n', JSON.stringify(entityList));
     for (const org of entityList) {
       let result = 0;
       let endEpoch = 0;
-      let start = moment().startOf('month').format('YYYY-MM-DD hh:mm:ss'),
-        end = moment().startOf('day').format('YYYY-MM-DD hh:mm:ss');
-
+      let start = moment().startOf('month'),
+        end = moment().startOf('day')
+      if (_.isEmpty(org.cycle)) {
+        console.log("Skipping ORG ", org.spCode)
+        continue;
+      }
       if (org.cycle && org.cycle == "Monthly") {
         if (org.lastbilldate)
-          start = moment(org.lastbilldate).format('YYYY-MM-DD 00:00:00');
+          start = moment(org.lastbilldate);
         else
-          start = moment().subtract(1, 'month').startOf('month').format('YYYY-MM-DD 00:00:00');
-        end = moment().subtract(1, 'month').endOf('month').format('YYYY-MM-DD hh:mm:ss');
-        endEpoch = moment().subtract(1, 'month').endOf('month').unix();
-      } else if (org.cycle == "Daily") {
-        if (org.lastbilldate)
-          start = moment(org.lastbilldate).format('YYYY-MM-DD 00:00:00');
-        else
-          start = moment().subtract(1, 'days').startOf('day').format('YYYY-MM-DD 00:00:00');
-        end = moment().subtract(1, 'days').endOf('day').format('YYYY-MM-DD hh:mm:ss');
-        endEpoch = moment().subtract(1, 'days').endOf('day').unix();
-      }
-      console.log(endEpoch, moment().unix())
-      if (endEpoch > moment().unix()) {
-        console.log("billing cycle not started yet!!");
-        break;
+          start = moment().startOf('month');
       } else {
-        console.log("billing cycle started!!");
+        if (org.lastbilldate)
+          start = moment(org.lastbilldate);
+        else
+          start = moment().subtract(1, 'days').endOf('day');
       }
+      end = moment().subtract(1, 'days').endOf('day');
+      console.log("*********TEST**********1", org.lastbilldate, org.cycle, end.diff(start, 'days') + 1, org.spCode)
       for (let api of apiList) {
-
+        if (!api.isActive || !api.isBilled) {
+          console.log("Skipping API api.route ", api.route)
+          continue;
+        } else {
+          console.log("Calculating API api.route ", api.route)
+        }
         console.log(start, end)
         console.log(JSON.stringify(org), JSON.stringify(api));
         if (api.BillingPolicy) {
           // get total number of hits of this org
-          let qry = `select id,"hits" as totalhits from billing where isbilled=false and apiaction='${api.route}' and orgcode='${org.spCode}' and txdate between '${start}' and '${end}' `;
+          // let qry = `select id,"hits" as totalhits from billing apiaction='${api.route}' and orgcode='${org.spCode}' and txdate between '${start.format('YYYY-MM-DD 00:00:00')}' and '${end.format('YYYY-MM-DD hh:mm:ss')}' `;
+          let qry = `select sum("hits") as totalhits,extract(epoch from txdate) * 1000 as "date", txdate from billing 
+          where orgcode='${org.spCode}' and apiaction='${api.route}' and txdate>= '${start.format('YYYY-MM-DD 00:00:00')}' and 
+          txdate<='${end.format('YYYY-MM-DD hh:mm:ss')}' group by txdate `;
+
           let data;
           if (config.get('database', 'postgres') == 'mssql') {
             let conn = await sqlserver.connection()
@@ -59,71 +61,148 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
             let conn = await pg.connection();
             data = await conn.query(qry);
           }
-          let hits = 0;
+          let globalhits = 0; // helps determine slab in monthly case
+          let slabsToApplyMonthly = []
           for (let elem of data.rows) {
+
             if (config.get('database', 'postgres') == 'mssql') {
               let conn = await sqlserver.connection()
-              await conn.request().query(`update billing set isbilled=true where id='${elem.id}'`);
+              await conn.request().query(`update billing set isbilled=true where  apiaction='${api.route}' and txdate='${moment(elem.date).format('YYYY-MM-DD')}'`);
               hits += elem.totalhits;
               conn.close();
             } else {
               let connBill = await pg.connection();
-              hits += elem.totalhits;
-              await connBill.query(`update billing set isbilled=true where id='${elem.id}'`);
-            }
-          }
-          // let hits = _.get(data, 'rows[0].totalhits', 0)
-          console.log('>>>>>>>>>', JSON.stringify(hits));
-          console.log(JSON.stringify(api.BillingPolicy));
-          let lastPolicy = undefined;
-          let isApplied = false;
-          if (hits > 0) {
-            api.BillingPolicy.forEach((elem) => {
-              // apply policy on max
-              if (hits >= parseInt(elem.from, 10) && hits <= parseInt(elem.to, 10)) {
-                result += elem.billVal * hits;
-                isApplied = true;
-              }
-              lastPolicy = elem;
-            });
-            if (hits > 0 && isApplied === false && lastPolicy) {
-              let factor = (hits / lastPolicy.to) * hits
-              result += factor * lastPolicy.billVal;
-            }
-          }
-        }
-      }
-      if (result > 0) {
+              await connBill.query(`update billing set isbilled=true where  apiaction='${api.route}' and txdate='${moment(elem.date).format('YYYY-MM-DD')}'`);
 
-        if (config.get('database', 'postgres') == 'mssql') {
-          let conn = await sqlserver.connection()
-          await conn.request().query(`
+              console.log(JSON.stringify(api.BillingPolicy));
+
+              let totalhits = 0;
+              let hits = parseInt(elem.totalhits);;
+
+              if (hits > 0) {
+                if (org.cycle && org.cycle == "Monthly") {
+                  totalhits = hits;
+                  globalhits += hits;
+                  let slabsToApply = []
+                  // api.BillingPolicy.forEach((, ) => {
+                  for(const [index, policy] of api.BillingPolicy.entries()) {
+
+                    let applied = false;
+                    slabsToApplyMonthly.forEach((slab) => {
+                      if (slab.from == policy.from && slab.to == policy.to) {
+                        applied = true;
+                      }
+                    })
+
+                    if (applied && index + 1 == api.BillingPolicy.length) {
+                      slabsToApply.push(policy);
+                      break;
+                    }
+
+                    if (applied) {
+                      continue;
+                    }
+
+                    if (globalhits >= parseInt(policy.from, 10) && globalhits <= parseInt(policy.to, 10)) {
+                      slabsToApply.push(policy);
+                      slabsToApplyMonthly.push(policy);
+                      break; // applied hurray
+                    } else if (globalhits >= parseInt(policy.from, 10) && globalhits >= parseInt(policy.to, 10)) {
+                      slabsToApply.push(policy);
+                      slabsToApplyMonthly.push(policy);
+                      continue;
+                    }
+
+                  }
+
+                  let remhits = totalhits;
+                  slabsToApply.forEach((policy, index) => {
+                    let difference = parseInt(policy.to, 10) - parseInt(policy.from, 10);
+                    if (difference >= hits || index + 1 == slabsToApply.length) {
+                      result += remhits * policy.billVal;
+                    } else {
+                      result += difference * policy.billVal;
+                      remhits = remhits - difference
+                    }
+                  })
+
+                } else {
+                  // apply simple
+                  totalhits = hits;
+                  let slabsToApply = []
+                  // api.BillingPolicy.forEach((, ) => {
+                  for (const [index, policy] of api.BillingPolicy.entries()) {
+                    if (hits >= parseInt(policy.from, 10) && hits <= parseInt(policy.to, 10)) {
+                      slabsToApply.push(policy);
+                      break; // applied hurray
+                    } else if (hits >= parseInt(policy.from, 10) && hits >= parseInt(policy.to, 10)) {
+                      slabsToApply.push(policy);
+                      let difference = parseInt(policy.to, 10) - parseInt(elem.from, 10);
+                      hits = hits - difference;
+                      continue;
+                    }
+                  }
+
+                  let remhits = totalhits;
+                  slabsToApply.forEach((policy, index) => {
+                    let difference = parseInt(policy.to, 10) - parseInt(policy.from, 10);
+                    if (difference >= hits || index + 1 == slabsToApply.length) {
+                      result += remhits * policy.billVal;
+                    } else {
+                      result += difference * policy.billVal;
+                      remhits = remhits - difference
+                    }
+                  })
+
+                }
+
+                console.log("*********totalhits**********", org.cycle, end.diff(start, 'days') + 1, org.spCode, hits)
+                //determine which slabs to be applied in order
+
+
+
+
+
+
+                let litmus = false;
+                if (result > 0) {
+                  if (config.get('database', 'postgres') == 'mssql') {
+                    let conn = await sqlserver.connection();
+                    await conn.request().query(`
+          delete from
+          billingreport where startdate='${moment(elem.date).format('YYYY-MM-DD 00:00:00')}' and enddate='${moment(elem.date).format('YYYY-MM-DD hh:mm:ss')}'`);
+                    await conn.request().query(`
           insert
           into
           billingreport(startdate, enddate, amount, currency, status, billingcycle, orgcode)
-          values('${start}', '${end}',${result}, '${org.currency}', 'Pending', '${org.cycle}', '${org.spCode}')
-          on
-          conflict(startdate, enddate, status, billingcycle, orgcode)
-          do update set
-          amount = billingreport.amount +${result}`);
-          conn.close();
-        } else {
-          let connUpdate = await pg.connection();
-          await connUpdate.query(`
-              insert
-              into
-              billingreport(startdate, enddate, amount, currency, status, billingcycle, orgcode)
-              values('${start}', '${end}',${result}, '${org.currency}', 'Pending', '${org.cycle}', '${org.spCode}')
-              on
-              conflict(startdate, enddate, status, billingcycle, orgcode)
-              do update set
-              amount = billingreport.amount +${result}`);
-        }
+          values('${moment(elem.date).format('YYYY-MM-DD 00:00:00')}', '${moment(elem.date).format('YYYY-MM-DD hh:mm:ss')}',${result}, '${org.currency}', 'Pending', '${org.cycle}', '${org.spCode}')`);
+                    conn.close();
+                    litmus = true;
+                  } else {
+                    let connUpdate = await pg.connection();
 
+                    await connUpdate.query(`
+          delete from
+          billingreport where startdate='${moment(elem.date).format('YYYY-MM-DD 00:00:00')}' and enddate='${moment(elem.date).format('YYYY-MM-DD 11:59:00')}' and orgcode='${org.spCode}'`);
+
+                    await connUpdate.query(`
+          insert
+          into
+          billingreport(startdate, enddate, amount, currency, status, billingcycle, orgcode, route)
+          values('${moment(elem.date).format('YYYY-MM-DD 00:00:00')}', '${moment(elem.date).format('YYYY-MM-DD 11:59:00')}',${result}, '${org.currency}', 'Pending', '${org.cycle}', '${org.spCode}','${api.route}')`);
+                    litmus = true;
+                  }
+                  if (litmus) {
+                    await entity.updateLastBilling(endEpoch, org.spCode).catch((ex) => {
+                      console.log(ex);
+                    })
+                  }
+                }
+              }
+            }
+          }
+        }
       }
-      await entity.updateLastBilling(endEpoch, org.spCode).catch((ex) => {
-        console.log(ex);
-      })
     }
     callback({ success: true });
   } catch (error) {

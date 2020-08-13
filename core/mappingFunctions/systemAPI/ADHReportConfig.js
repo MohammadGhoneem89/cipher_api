@@ -560,7 +560,7 @@ async function testPagination(payload, UUIDKey, route, callback, JWToken, res) {
         [action]: {
           "pageData": {
             "pageSize": pageSise || 10,
-            "currentPageNo": payload.page.currentPageNo || 1,
+            "currentPageNo": _.get(payload, 'page.currentPageNo', 1),
             "totalRecords": _.get(resultSet, '[0][0].count', 0)
           },
           "data": {
