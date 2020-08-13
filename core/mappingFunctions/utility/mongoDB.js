@@ -6,6 +6,8 @@ const crypto = require("crypto");
 const { result } = require('lodash');
 const sha512 = require('../../../lib/hash/sha512');
 let source_connection, destination_connection;
+const mongodb = require('mongodb');
+const ObjectID = mongodb.ObjectID;
 
 //mongoDB.connection(config.get('mongodb.url'));
 
@@ -62,10 +64,14 @@ async function get_db_collections(db_conn) {
 
 }
 
-async function get_db_collection(db_conn, collection_name) {
+async function get_db_collection(db_conn, collection_name, profile_id = "") {
 
+    console.log(profile_id)
     let collection = await db_conn.db.collection(collection_name);
-    return await collection.find({}).toArray();
+    if (profile_id == "")
+        return await collection.find({}).toArray();
+    else
+        return await collection.find({ _id: new ObjectID(profile_id) }).toArray();
 }
 
 function comparer_byName(otherArray) {
@@ -158,14 +164,24 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
             "message": "API declared"
         }
 
+        console.log(payload.data)
         let errors = {}, is_missing = false;
-        if (!payload.body.hasOwnProperty('source_db_url')) {
-            errors.source_db_url = "Missing required field."
-            is_missing = true;
-        }
-        if (!payload.body.hasOwnProperty('destination_db_url')) {
+        // if (!payload.body.hasOwnProperty('source_db_url')) {
+        //     errors.source_db_url = "Missing required field."
+        //     is_missing = true;
+        // }
+        // if (!payload.body.hasOwnProperty('destination_db_url')) {
+        //     is_missing = true;
+        //     errors.destination_db_url = "Missing required field."
+        // }
+
+        if (!payload.data.data.hasOwnProperty('destination_url')) {
             is_missing = true;
             errors.destination_db_url = "Missing required field."
+        }
+        if (!payload.data.data.hasOwnProperty('db_profiles')) {
+            is_missing = true;
+            errors.db_profiles = "Missing required field."
         }
 
         if (is_missing) {
@@ -176,8 +192,9 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
         // let source = crypto.decrypt(_.trim(payload.body.source_db_url)),
         //     destination = crypto.decrypt(_.trim(payload.body.destination_db_url));
 
-        let source = _.trim(payload.body.source_db_url),
-            destination = _.trim(payload.body.destination_db_url);
+        let source = "mongodb://23.97.138.116:10050/master",// _.trim(payload.body.source_db_url),
+            destination = _.trim(payload.data.data.destination_url),
+            profile = _.trim(payload.data.data.db_profiles);
 
 
 
@@ -222,11 +239,14 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
         console.log("collections in source:", source_data.length);
         console.log("collections in destination:", dest_data.length);
 
+        let db_profile = await get_db_collection(source_connection, "schemaProfiles", profile)
+
+        console.log(db_profile)
         if (source_data.length != dest_data.length && source_data.length > dest_data.length) {
             let missing_tables = await source_data.filter(comparer_byName(dest_data));
-            missing_tables.forEach(table => {
+            db_profile[0].collections.forEach(table => {
                 result.map(row => {
-                    if (row.modelName == table.name) {
+                    if (row.modelName == table) {
                         row.type = "new" // New collection to be added in destination
                         return row;
                     }
@@ -271,7 +291,10 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
 
         response.count = response.data.length;
         response.message = "Success";
-        callback(response);
+        callback(
+            {
+                "mongodbSchemaChanges": response
+            });
         return;
 
     } catch (err) {
@@ -281,6 +304,44 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
     }
 }
 
+async function getSchemaProfiles(payload, UUIDKey, route, callback, JWToken) {
+
+    const clientOption = {
+        socketTimeoutMS: 30000,
+        keepAlive: true,
+        reconnectTries: 30000,
+        poolSize: 50,
+        useNewUrlParser: true,
+        autoIndex: false,
+        connectWithNoPrimary: true
+    },
+        url = "mongodb://23.97.138.116:10050/master"
+
+    let db_connection = mongoose.createConnection(url, clientOption);
+
+    await new Promise((resolve) => {
+        db_connection.on('open', () => { resolve(source_connection); });
+    });
+
+    let profiles = await get_db_collection(db_connection, "schemaProfiles")
+    // docs = profiles.map(doc => {
+    //     doc.value = doc._id;
+    //     doc.label = doc.name
+    //     return doc;
+    // });
+    console.log("profile are loading")
+    callback(
+        {
+            "getMongodbSchemaProfiles": {
+                "message": "success",
+                "data": profiles,
+                "count": profiles.length
+            }
+        });
+    return;
+}
+
 exports.syncData = syncData;
 exports.getChanges = getChanges;
+exports.getSchemaProfiles = getSchemaProfiles;
 
