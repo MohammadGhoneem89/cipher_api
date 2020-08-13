@@ -45,10 +45,11 @@ module.exports = {
   createResponseForError: function (UUIDKey, errorDescription, errorCode) {
     const response = {
       messageStatus: 'Error',
-      cipherMessageId: UUIDKey,
+     // cipherMessageId: UUIDKey,
       errorDescription: errorDescription,
       errorCode: errorCode
     };
+    _.set(response,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
     return response;
   }
 };

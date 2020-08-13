@@ -41,11 +41,14 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     if (data.stack) {
       let error = {
         "messageStatus": "ERROR",
-        "cipherMessageId": UUIDKey,
+        //"cipherMessageId": UUIDKey,
         "errorDescription": 'some error occured!!!!',
         "errorCode": 201,
         "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
       };
+
+      _.set(error,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
+
       console.log(data.stack)
       txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack, eRRTBasic, username, orgcode);
       responseCallback.status(500);

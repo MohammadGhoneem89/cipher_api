@@ -151,13 +151,15 @@ app.post('/login', async (req, res) => {
     };
     let sessionUUID = uuid();
     const apiResponse = {
-      cipherMessageId: sessionUUID,
+   //   cipherMessageId: sessionUUID,
       messageStatus: 'OK',
       errorCode: 200,
       errorDescription: "logged in successfully !!!",
       token: "",
       timestamp: moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
     };
+
+    _.set(apiResponse,config.get('responseMessageAttribute',"cipherMessageId"),sessionUUID)
 
     if (checkbadinput(req)) {
       let err = {
@@ -232,13 +234,17 @@ app.post('/login', async (req, res) => {
   } catch (err) {
 
     console.log("error while login" + err);
-    res.status(500).send({
+    let resp={
       "messageStatus": "ERROR",
-      "cipherMessageId": uuid(),
+ //     "cipherMessageId": uuid(),
       "errorDescription": 'some error occurred while processing',
       "errorCode": 201,
       "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
-    });
+    }
+
+    _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),uuid())
+
+    res.status(500).send(resp);
   }
 });
 
@@ -654,35 +660,45 @@ const timeoutResponse = {
   //   }
   // }
 
-  "cipherMessageId": uuid(),
+  //"cipherMessageId": uuid(),
   "messageStatus": "ERROR",
   "errorCode": 201,
   "errorDescription": "Token Not Valid!",
   "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
 };
 
+_.set(timeoutResponse,config.get('responseMessageAttribute',"cipherMessageId"), uuid())
+
+
 app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
-  res.status(404).send({
+  let resc={
     "messageStatus": "ERROR",
-    "cipherMessageId": uuid(),
+  //  "cipherMessageId": uuid(),
     "errorDescription": 'not found!',
     "errorCode": 201,
     "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
-  });
+  }
+  _.set(resc,config.get('responseMessageAttribute',"cipherMessageId"),uuid())
+
+
+  res.status(404).send(resc);
 });
 
 app.use(function (err, req, res, next) {
   console.log(err);
   res.status(err.status || 500);
-  res.status(500).send({
+  let resp={
     "messageStatus": "ERROR",
-    "cipherMessageId": uuid(),
+   // "cipherMessageId": uuid(),
     "errorDescription": 'some error occured!!!!',
     "errorCode": 201,
     "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
-  });
+  }
+  _.set(resc,config.get('responseMessageAttribute',"cipherMessageId"),uuid())
+
+  res.status(500).send();
 });
 
 
