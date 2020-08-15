@@ -45,7 +45,7 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
           console.log("Calculating API api.route ", api.route)
         }
         console.log(start, end)
-        console.log(JSON.stringify(org), JSON.stringify(api));
+        // console.log(JSON.stringify(org), JSON.stringify(api));
         let result = 0;
         if (api.BillingPolicy) {
           // get total number of hits of this org
@@ -63,10 +63,11 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
             let conn = await pg.connection();
             data = await conn.query(qry);
           }
+           
           let globalhits = 0; // helps determine slab in monthly case
           let slabsToApplyMonthly = []
           for (let elem of data.rows) {
-
+            let realhits=elem.totalhits
             if (config.get('database', 'postgres') == 'mssql') {
               let conn = await sqlserver.connection()
               await conn.request().query(`update billing set isbilled=true where  apiaction='${api.route}' and txdate='${moment(elem.date).format('YYYY-MM-DD')}'`);
@@ -191,13 +192,13 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
 
                     await connUpdate.query(`
           delete from
-          billingreport where startdate='${moment(elem.date).format('YYYY-MM-DD 00:00:00')}' and enddate='${moment(elem.date).format('YYYY-MM-DD 11:59:00')}' and orgcode='${org.spCode}'`);
+          billingreport where startdate='${moment(elem.date).format('YYYY-MM-DD 00:00:00')}' and enddate='${moment(elem.date).format('YYYY-MM-DD 11:59:00')}' and orgcode='${org.spCode}' and route='${api.route}'`);
 
-                    await connUpdate.query(`
+          await connUpdate.query(`
           insert
           into
           billingreport(startdate, enddate, amount, currency, status, billingcycle, orgcode, route, hits)
-          values('${moment(elem.date).format('YYYY-MM-DD 00:00:00')}', '${moment(elem.date).format('YYYY-MM-DD 11:59:00')}',${result}, '${org.currency}', 'Pending', '${org.cycle}', '${org.spCode}','${api.route}',${hits})`);
+          values('${moment(elem.date).format('YYYY-MM-DD 00:00:00')}', '${moment(elem.date).format('YYYY-MM-DD 11:59:00')}',${result}, '${org.currency}', 'Pending', '${org.cycle}', '${org.spCode}','${api.route}',${realhits})`);
                     litmus = true;
                   }
                   if (litmus) {
@@ -206,9 +207,11 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
                     })
                   }
                 }
+
+
               }
-            }
-          }
+            } // if is postgress
+          }// for each api
         }
       }
     }
