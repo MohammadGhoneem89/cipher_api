@@ -6,6 +6,7 @@ const _ = require('lodash');
 const pg = require('../../api/connectors/postgress');
 const sqlserver = require('../../api/connectors/mssql');
 const config = require('../../../config');
+const moment = require('moment');
 
 var entityDetailOut = function (payload, UUIDKey, route, callback, JWToken) {
 
@@ -76,6 +77,28 @@ var orgDetail = function (payload, entityGetCB, JWToken) {
         }
       ]);
     });
+    let start = moment().startOf('month'),
+      end = moment().startOf('day')
+    let cycle = data.cycle || "Monthly";
+    console.log("cycle>>>>>>>>", cycle)
+    if (cycle == "Monthly") {
+      if (payload.date) {
+        start = moment(payload.date).startOf('month');
+        end = moment(payload.date).endOf('month');
+      } else {
+        start = moment().startOf('month');
+        end = moment().endOf('month');
+      }
+    } else {
+      if (payload.date) {
+        start = moment(payload.date).startOf('day');
+        end = moment(payload.date).endOf('day');
+      } else {
+        start = moment().startOf('day');
+        end = moment().endOf('day');
+      }
+
+    }
 
     const params = {
       userId: payload.userId,
@@ -90,16 +113,23 @@ var orgDetail = function (payload, entityGetCB, JWToken) {
 
         if (config.get('database', 'postgres') == 'mssql') {
           let conn = await sqlserver.connection()
-          let { recordset } = await conn.request().query(`select * from billingreport where orgcode='${data.spCode}'`);
+          let { recordset } = await conn.request().query(`select sum(amount) as amount,sum(hits) as hits,route from billingreport where orgcode='${data.spCode}'
+          startdate>='${moment(start).format('YYYY-MM-DD 00:00:00')}' and enddate<= '${moment(end).format('YYYY-MM-DD 11:59:00')}'
+          group by route`);
           conn.close();
           response["entityDetail"]["data"] = data;
           _.set(response, 'entityDetail.data.billing', recordset);
           entityGetCB(response);
         } else {
           let conn = await pg.connection();
-          let reslt = await conn.query(`select TO_CHAR(startdate, 'DD/MM/YYYY hh:mm') as startdate,TO_CHAR(enddate, 'DD/MM/YYYY hh:mm') as enddate,amount,status,billingcycle  from billingreport where orgcode='${data.spCode}'`);
+
+          let reslt = await conn.query(`select sum(amount) as amount,sum(hits) as hits,route from billingreport where orgcode='${data.spCode}'
+          and startdate>='${moment(start).format('YYYY-MM-DD 00:00:00')}' and enddate<='${moment(end).format('YYYY-MM-DD 11:59:00')}'
+          group by route`);
           response["entityDetail"]["data"] = data;
           _.set(response, 'entityDetail.data.billing', reslt.rows);
+          _.set(response, 'entityDetail.data.from', moment(start).format('YYYY-MM-DD 00:00:00'));
+          _.set(response, 'entityDetail.data.to', moment(end).format('YYYY-MM-DD 11:59:00'));
           entityGetCB(response);
         }
 

@@ -15,7 +15,7 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
     let apiList = await APIDefinitation.find({ isBilled: true })
     let entityList = await entity.orgCodeList();
     for (const org of entityList) {
-      let result = 0;
+
       let endEpoch = 0;
       let start = moment().startOf('month'),
         end = moment().startOf('day')
@@ -34,7 +34,8 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
         else
           start = moment().subtract(1, 'days').endOf('day');
       }
-      end = moment().subtract(1, 'days').endOf('day');
+      // end = moment().subtract(1, 'days').endOf('day');
+      end = moment().endOf('day');
       console.log("*********TEST**********1", org.lastbilldate, org.cycle, end.diff(start, 'days') + 1, org.spCode)
       for (let api of apiList) {
         if (!api.isActive || !api.isBilled) {
@@ -45,6 +46,7 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
         }
         console.log(start, end)
         console.log(JSON.stringify(org), JSON.stringify(api));
+        let result = 0;
         if (api.BillingPolicy) {
           // get total number of hits of this org
           // let qry = `select id,"hits" as totalhits from billing apiaction='${api.route}' and orgcode='${org.spCode}' and txdate between '${start.format('YYYY-MM-DD 00:00:00')}' and '${end.format('YYYY-MM-DD hh:mm:ss')}' `;
@@ -74,18 +76,16 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
               let connBill = await pg.connection();
               await connBill.query(`update billing set isbilled=true where  apiaction='${api.route}' and txdate='${moment(elem.date).format('YYYY-MM-DD')}'`);
 
-              console.log(JSON.stringify(api.BillingPolicy));
-
               let totalhits = 0;
               let hits = parseInt(elem.totalhits);;
 
               if (hits > 0) {
                 if (org.cycle && org.cycle == "Monthly") {
-                  totalhits = hits;
+                  totalhits = _.cloneDeep(hits);
                   globalhits += hits;
                   let slabsToApply = []
                   // api.BillingPolicy.forEach((, ) => {
-                  for(const [index, policy] of api.BillingPolicy.entries()) {
+                  for (const [index, policy] of api.BillingPolicy.entries()) {
 
                     let applied = false;
                     slabsToApplyMonthly.forEach((slab) => {
@@ -102,12 +102,14 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
                     if (applied) {
                       continue;
                     }
-
+                    console.log(globalhits, parseInt(policy.from, 10), parseInt(policy.to, 10))
                     if (globalhits >= parseInt(policy.from, 10) && globalhits <= parseInt(policy.to, 10)) {
+                      console.log("met first")
                       slabsToApply.push(policy);
                       slabsToApplyMonthly.push(policy);
                       break; // applied hurray
                     } else if (globalhits >= parseInt(policy.from, 10) && globalhits >= parseInt(policy.to, 10)) {
+                      console.log("met second")
                       slabsToApply.push(policy);
                       slabsToApplyMonthly.push(policy);
                       continue;
@@ -115,15 +117,20 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
 
                   }
 
-                  let remhits = totalhits;
+                  let remhits = hits;
+                  result = 0
+                  console.log("PEV", JSON.stringify(result), hits, remhits)
                   slabsToApply.forEach((policy, index) => {
-                    let difference = parseInt(policy.to, 10) - parseInt(policy.from, 10);
+                    console.log("APPLYING", JSON.stringify(policy))
+                    let difference = parseInt(policy.to, 10) - parseInt(policy.from, 10) + 1;
+                    console.log("difference", JSON.stringify(difference))
                     if (difference >= hits || index + 1 == slabsToApply.length) {
                       result += remhits * policy.billVal;
                     } else {
                       result += difference * policy.billVal;
                       remhits = remhits - difference
                     }
+                    console.log("RESULT", JSON.stringify(result))
                   })
 
                 } else {
@@ -145,6 +152,7 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
 
                   let remhits = totalhits;
                   slabsToApply.forEach((policy, index) => {
+                    console.log(JSON.stringify(policy))
                     let difference = parseInt(policy.to, 10) - parseInt(policy.from, 10);
                     if (difference >= hits || index + 1 == slabsToApply.length) {
                       result += remhits * policy.billVal;
@@ -188,8 +196,8 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
                     await connUpdate.query(`
           insert
           into
-          billingreport(startdate, enddate, amount, currency, status, billingcycle, orgcode, route)
-          values('${moment(elem.date).format('YYYY-MM-DD 00:00:00')}', '${moment(elem.date).format('YYYY-MM-DD 11:59:00')}',${result}, '${org.currency}', 'Pending', '${org.cycle}', '${org.spCode}','${api.route}')`);
+          billingreport(startdate, enddate, amount, currency, status, billingcycle, orgcode, route, hits)
+          values('${moment(elem.date).format('YYYY-MM-DD 00:00:00')}', '${moment(elem.date).format('YYYY-MM-DD 11:59:00')}',${result}, '${org.currency}', 'Pending', '${org.cycle}', '${org.spCode}','${api.route}',${hits})`);
                     litmus = true;
                   }
                   if (litmus) {
