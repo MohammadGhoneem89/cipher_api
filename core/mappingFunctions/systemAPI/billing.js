@@ -63,11 +63,11 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
             let conn = await pg.connection();
             data = await conn.query(qry);
           }
-           
+
           let globalhits = 0; // helps determine slab in monthly case
           let slabsToApplyMonthly = []
           for (let elem of data.rows) {
-            let realhits=elem.totalhits
+            let realhits = elem.totalhits
             if (config.get('database', 'postgres') == 'mssql') {
               let conn = await sqlserver.connection()
               await conn.request().query(`update billing set isbilled=true where  apiaction='${api.route}' and txdate='${moment(elem.date).format('YYYY-MM-DD')}'`);
@@ -151,16 +151,20 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
                     }
                   }
 
-                  let remhits = totalhits;
+                  let remhits = hits;
+                  result = 0
+                  console.log("PEV", JSON.stringify(result), hits, remhits)
                   slabsToApply.forEach((policy, index) => {
-                    console.log(JSON.stringify(policy))
-                    let difference = parseInt(policy.to, 10) - parseInt(policy.from, 10);
+                    console.log("APPLYING", JSON.stringify(policy))
+                    let difference = parseInt(policy.to, 10) - parseInt(policy.from, 10) + 1;
+                    console.log("difference", JSON.stringify(difference))
                     if (difference >= hits || index + 1 == slabsToApply.length) {
                       result += remhits * policy.billVal;
                     } else {
                       result += difference * policy.billVal;
                       remhits = remhits - difference
                     }
+                    console.log("RESULT", JSON.stringify(result))
                   })
 
                 }
@@ -194,7 +198,7 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
           delete from
           billingreport where startdate='${moment(elem.date).format('YYYY-MM-DD 00:00:00')}' and enddate='${moment(elem.date).format('YYYY-MM-DD 11:59:00')}' and orgcode='${org.spCode}' and route='${api.route}'`);
 
-          await connUpdate.query(`
+                    await connUpdate.query(`
           insert
           into
           billingreport(startdate, enddate, amount, currency, status, billingcycle, orgcode, route, hits)
