@@ -156,7 +156,7 @@ app.post('/login', async (req, res) => {
       errorCode: 200,
       errorDescription: "logged in successfully !!!",
       token: "",
-      timestamp: moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
+      timestamp: moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
     };
 
     _.set(apiResponse,config.get('responseMessageAttribute',"cipherMessageId"),sessionUUID)
