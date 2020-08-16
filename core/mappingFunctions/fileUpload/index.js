@@ -3,7 +3,7 @@ const config = require('../../../config/index');
 const sha512 = require('../../../lib/hash/sha512');
 const mime = require('mime');
 const { create, findDocument } = require('../../../lib/services/documents');
-
+const _ = require('lodash');
 const Ipfs = require('./ipfs');
 const ServerFS = require('./server-fs');
 const dates = require('../../../lib/helpers/dates');
