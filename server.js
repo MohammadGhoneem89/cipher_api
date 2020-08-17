@@ -156,7 +156,7 @@ app.post('/login', async (req, res) => {
       errorCode: 200,
       errorDescription: "logged in successfully !!!",
       token: "",
-      timestamp: moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
+      timestamp: moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
     };
 
     _.set(apiResponse,config.get('responseMessageAttribute',"cipherMessageId"),sessionUUID)
@@ -245,7 +245,7 @@ app.post('/login', async (req, res) => {
  //     "cipherMessageId": uuid(),
       "errorDescription": 'some error occurred while processing',
       "errorCode": 201,
-      "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
+      "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
     }
 
     _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),uuid())
@@ -670,7 +670,7 @@ const timeoutResponse = {
   "messageStatus": "ERROR",
   "errorCode": 201,
   "errorDescription": "Token Not Valid!",
-  "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
+  "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
 };
 
 _.set(timeoutResponse,config.get('responseMessageAttribute',"cipherMessageId"), uuid())
@@ -684,7 +684,7 @@ app.use(function (req, res, next) {
   //  "cipherMessageId": uuid(),
     "errorDescription": 'not found!',
     "errorCode": 201,
-    "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
+    "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
   }
   _.set(resc,config.get('responseMessageAttribute',"cipherMessageId"),uuid())
 
@@ -700,7 +700,7 @@ app.use(function (err, req, res, next) {
    // "cipherMessageId": uuid(),
     "errorDescription": 'some error occured!!!!',
     "errorCode": 201,
-    "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
+    "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
   }
   _.set(resc,config.get('responseMessageAttribute',"cipherMessageId"),uuid())
 

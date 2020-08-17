@@ -3,7 +3,7 @@ const config = require('../../../config/index');
 const sha512 = require('../../../lib/hash/sha512');
 const mime = require('mime');
 const { create, findDocument } = require('../../../lib/services/documents');
-
+const _ = require('lodash');
 const Ipfs = require('./ipfs');
 const ServerFS = require('./server-fs');
 const dates = require('../../../lib/helpers/dates');
@@ -15,7 +15,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
      // cipherMessageId: UUIDKey,
       errorDescription: 'Please Attach a file.',
       errorCode: 201,
-      timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+      timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
     };
 
     _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
@@ -31,7 +31,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
      // cipherMessageId: UUIDKey,
       errorDescription: 'Please Attach only one file at a time.',
       errorCode: 201,
-      timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+      timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
     };
     _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
 
@@ -65,7 +65,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
    //   cipherMessageId: UUIDKey,
       errorDescription: 'Please upload only following file types ' + allowedExtensions,
       errorCode: 201,
-      timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+      timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
     };
     _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
     return callback(resp);
@@ -85,7 +85,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
       //  cipherMessageId: UUIDKey,
         errorDescription: '',
         errorCode: 201,
-        timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+        timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
       };
       _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
       resp.errorDescription = 'Invalid type kindly provide correct type';
@@ -118,7 +118,7 @@ let upload = async function (payload, UUIDKey, route, callback, JWToken) {
   //    cipherMessageId: UUIDKey,
       errorDescription: 'Processed OK!',
       errorCode: 200,
-      timestamp: dates.DDMMYYYYHHmmssSSS(new Date),
+      timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date),
       name: fileName,
       type: type,
       hash: fileHash,
@@ -139,7 +139,7 @@ let download = async function (payload, UUIDKey, route, callback, JWToken, res) 
   //  cipherMessageId: UUIDKey,
     errorDescription: '',
     errorCode: 201,
-    timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+    timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
   };
   _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
   if (!payload.queryParams.path) {
@@ -225,7 +225,7 @@ let uploadDocument = async function (payload, UUIDKey, route, callback, JWToken)
       //cipherMessageId: UUIDKey,
       errorDescription: 'Please Attach a file.',
       errorCode: 201,
-      timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+      timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
     };
     _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
     return callback(resp);
@@ -260,7 +260,7 @@ let uploadDocument = async function (payload, UUIDKey, route, callback, JWToken)
       //cipherMessageId: UUIDKey,
       errorDescription: 'Please upload only following file types ' + allowedExtensions,
       errorCode: 201,
-      timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+      timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
     };
     _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
     return callback(resp);
@@ -282,7 +282,7 @@ let uploadDocument = async function (payload, UUIDKey, route, callback, JWToken)
    //     cipherMessageId: UUIDKey,
         errorDescription: '',
         errorCode: 201,
-        timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+        timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
       };
       _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
       resp.errorDescription = 'Invalid type kindly provide correct type';
@@ -316,7 +316,7 @@ let uploadDocument = async function (payload, UUIDKey, route, callback, JWToken)
     //  cipherMessageId: UUIDKey,
       errorDescription: 'Processed OK!',
       errorCode: 200,
-      timestamp: dates.DDMMYYYYHHmmssSSS(new Date),
+      timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date),
       name: fileName,
       type: 'IPFS',
       hash: fileHash,
@@ -335,7 +335,7 @@ let downloadDocument = async function (payload, UUIDKey, route, callback, JWToke
     //cipherMessageId: UUIDKey,
     errorDescription: '',
     errorCode: 201,
-    timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+    timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
   };
   _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
 
