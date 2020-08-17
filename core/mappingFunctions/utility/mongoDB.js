@@ -157,7 +157,6 @@ async function find_updated_records(s_collection_data, d_collection_data, result
                 d_hash = crypto.createHmac("sha512", secret).update(d).digest("hex");
             if (s_hash != d_hash) {
                 // updated document
-                console.log(s_document)
                 result.map(function (other) {
                     if (other.modelName == modelName) {
                         other.type = "updated"
@@ -171,7 +170,7 @@ async function find_updated_records(s_collection_data, d_collection_data, result
                 })
             }
         } else {
-            // deleted in destination
+            // new in source
             result.map(function (other) {
 
                 if (other.modelName == modelName) {
@@ -190,9 +189,7 @@ async function find_updated_records(s_collection_data, d_collection_data, result
 async function getChanges(payload, UUIDKey, route, callback, JWToken) {
     try {
 
-        let response = {
-            "message": "API declared"
-        }
+
 
         console.log(payload.data)
         let errors = {}, is_missing = false;
@@ -226,6 +223,12 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
             destination = _.trim(payload.data.data.destination_url),
             profile = _.trim(payload.data.data.db_profiles);
 
+        let response = {
+            "message": "API declared",
+            "source": source,
+            "destination": destination,
+            "profile": profile
+        }
 
 
         // let source_connection = await mongoDB.connection(source);
@@ -262,12 +265,11 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
 
         let db_profile = await get_db_collection(source_connection, "schemaProfiles", profile)
 
-        console.log(db_profile)
         if (source_data.length != dest_data.length && source_data.length > dest_data.length) {
             let missing_tables = await source_data.filter(comparer_byName(dest_data));
-            db_profile[0].collections.forEach(table => {
+            missing_tables.forEach(table => {
                 result.map(row => {
-                    if (row.modelName == table) {
+                    if (row.modelName == table.name) {
                         row.type = "new" // New collection to be added in destination
                         return row;
                     }
@@ -290,21 +292,21 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
             "Audit",
             "ImageUpload",
             "SharedDocument",
-            "Documents"]
+            "Documents"];
         // Filter out collections which have either updated/new/deleted records 
         let s_data = source_data.map(async s_collection => {
 
             let s_collection_data = await get_db_collection(source_connection, s_collection.name),
                 d_collection_data = await get_db_collection(destination_connection, s_collection.name);
 
-            if (exempted_collections.indexOf(s_collection.name) < 0) {
+            if (db_profile[0].collections.indexOf(s_collection.name) > 0) {
+                console.log(s_collection.name)
                 find_updated_records(s_collection_data, d_collection_data, result, s_collection.name);
             }
 
         });
 
         await Promise.all(s_data);
-
         response.data = result.filter(function (element) {
             return element.type != ""
         });
