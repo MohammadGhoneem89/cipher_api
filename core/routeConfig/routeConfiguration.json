@@ -1477,6 +1477,12 @@
       "MappingfunctionName": "getSchemaProfiles",
       "CustomMappingFile": "utility/mongoDB.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "upsertMongodbChange": {
+      "customMapping": true,
+      "MappingfunctionName": "applyChangeInDB",
+      "CustomMappingFile": "utility/mongoDB.js",
+      "mappingConfigFile": "ePayMapping"
     }
   }
 

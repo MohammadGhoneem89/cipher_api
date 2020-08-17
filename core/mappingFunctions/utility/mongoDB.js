@@ -8,6 +8,15 @@ const sha512 = require('../../../lib/hash/sha512');
 let source_connection, destination_connection;
 const mongodb = require('mongodb');
 const ObjectID = mongodb.ObjectID;
+const clientOption = {
+    socketTimeoutMS: 30000,
+    keepAlive: true,
+    reconnectTries: 30000,
+    poolSize: 50,
+    useNewUrlParser: true,
+    autoIndex: false,
+    connectWithNoPrimary: true
+};
 
 //mongoDB.connection(config.get('mongodb.url'));
 
@@ -72,6 +81,27 @@ async function get_db_collection(db_conn, collection_name, profile_id = "") {
         return await collection.find({}).toArray();
     else
         return await collection.find({ _id: new ObjectID(profile_id) }).toArray();
+}
+
+async function upsert(db_conn, collection_name, document) {
+
+    let collection = await db_conn.db.collection(collection_name),
+        id = new ObjectID(document._id);
+
+    delete document._id;
+
+    return await collection.update({ _id: id }, document, { upsert: true })
+}
+
+async function copyCollection(source_conn, dest_conn, collection_name) {
+
+    let dest_collection = await dest_conn.db.collection(collection_name),
+        source_collection = await source_conn.db.collection(collection_name)
+
+    return await source_collection.find().forEach(function (doc) {
+        dest_collection.insert(doc); // start to replace
+    });
+
 }
 
 function comparer_byName(otherArray) {
@@ -201,15 +231,6 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
         // let source_connection = await mongoDB.connection(source);
         // let destination_connection = await mongoDB.connection(destination);
 
-        const clientOption = {
-            socketTimeoutMS: 30000,
-            keepAlive: true,
-            reconnectTries: 30000,
-            poolSize: 50,
-            useNewUrlParser: true,
-            autoIndex: false,
-            connectWithNoPrimary: true
-        };
         const instances = [];
 
         source_connection = mongoose.createConnection(source, clientOption);
@@ -306,42 +327,97 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
 
 async function getSchemaProfiles(payload, UUIDKey, route, callback, JWToken) {
 
-    const clientOption = {
-        socketTimeoutMS: 30000,
-        keepAlive: true,
-        reconnectTries: 30000,
-        poolSize: 50,
-        useNewUrlParser: true,
-        autoIndex: false,
-        connectWithNoPrimary: true
-    },
-        url = "mongodb://23.97.138.116:10050/master"
+    try {
+        const url = "mongodb://23.97.138.116:10050/master"
 
-    let db_connection = mongoose.createConnection(url, clientOption);
+        let db_connection = mongoose.createConnection(url, clientOption);
 
-    await new Promise((resolve) => {
-        db_connection.on('open', () => { resolve(source_connection); });
-    });
-
-    let profiles = await get_db_collection(db_connection, "schemaProfiles")
-    // docs = profiles.map(doc => {
-    //     doc.value = doc._id;
-    //     doc.label = doc.name
-    //     return doc;
-    // });
-    console.log("profile are loading")
-    callback(
-        {
-            "getMongodbSchemaProfiles": {
-                "message": "success",
-                "data": profiles,
-                "count": profiles.length
-            }
+        await new Promise((resolve) => {
+            db_connection.on('open', () => { resolve(db_connection); });
         });
-    return;
+
+        let profiles = await get_db_collection(db_connection, "schemaProfiles")
+        // docs = profiles.map(doc => {
+        //     doc.value = doc._id;
+        //     doc.label = doc.name
+        //     return doc;
+        // });
+        console.log("profile are loading")
+        callback(
+            {
+                "getMongodbSchemaProfiles": {
+                    "message": "success",
+                    "data": profiles,
+                    "count": profiles.length
+                }
+            });
+        return;
+    } catch (err) {
+        console.log(err)
+        callback(errorResponse(err));
+        return;
+    }
+}
+async function applyChangeInDB(payload, UUIDKey, route, callback, JWToken) {
+    //payload.data.source
+    //payload.data.destination
+    //payload.data.modelName
+    //payload.data.document
+    //payload.data.type
+    try {
+        let source = "mongodb://23.97.138.116:10050/master",// _.trim(payload.body.source_db_url),
+            destination = _.trim(payload.data.data.destination_url),
+            modelName = _.trim(payload.data.data.modelName),
+            type = _.trim(payload.data.data.type),
+            document = payload.data.data.document;
+
+
+        let source_connection, destination_connection;
+        if (type == "new" && Object.keys(document).length === 0) {
+            // when whole table from source is required to add in destination
+            const instances = [];
+
+            source_connection = mongoose.createConnection(source, clientOption);
+            destination_connection = mongoose.createConnection(destination, clientOption);
+
+            instances.push(new Promise((resolve) => {
+                source_connection.on('open', () => { resolve(source_connection); });
+            }));
+            instances.push(new Promise((resolve) => {
+                destination_connection.on('open', () => { resolve(destination_connection); });
+            }));
+
+            await Promise.all(instances);
+            await destination_connection.createCollection(modelName);
+
+            await copyCollection(source_connection, destination_connection, modelName)
+
+        } else {
+            destination_connection = mongoose.createConnection(destination, clientOption);
+
+            await new Promise((resolve) => {
+                destination_connection.on('open', () => { resolve(destination_connection); });
+            });
+            await upsert(destination_connection, modelName, document)
+        }
+        callback(
+            {
+                "upsertMongodbChange": {
+                    "message": "success",
+                    "isUpdate": true
+                }
+            });
+    } catch (err) {
+        console.log(err)
+        callback(errorResponse(err));
+        return;
+    }
+
+
 }
 
 exports.syncData = syncData;
 exports.getChanges = getChanges;
 exports.getSchemaProfiles = getSchemaProfiles;
+exports.applyChangeInDB = applyChangeInDB;
 
