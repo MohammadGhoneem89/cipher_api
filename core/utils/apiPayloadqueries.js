@@ -46,9 +46,9 @@ module.exports = {
     if (fromDate && toDate) {
       filtersToApply.push(`
             (
-            TO_CHAR(createdat :: DATE, 'dd/mm/yyyy') >= '${fromDate}'
+              createdat  >= TO_TIMESTAMP('${fromDate}', 'dd/mm/yyyy')
                 AND 
-                TO_CHAR(createdat :: DATE, 'dd/mm/yyyy') <  '${toDate}'
+                createdat  < TO_TIMESTAMP('${toDate}', 'dd/mm/yyyy')
             )`);
     } else if (fromDate && !toDate) {
       //let currentDateTime = Math.round(new Date().getTime() / 1000);
@@ -75,14 +75,14 @@ module.exports = {
               (
                   createdat >= now()
                   AND
-                  TO_CHAR(createdat :: DATE, 'dd/mm/yyyy') <  '${fromDate}'
+                  createdat  < TO_TIMESTAMP('${fromDate}', 'dd/mm/yyyy')
               )`);
         } else {
           filtersToApply.push(`
               (
-                  TO_CHAR(createdat :: DATE, 'dd/mm/yyyy') >= '${fromDate}'
+                  createdat  >= TO_TIMESTAMP('${fromDate}', 'dd/mm/yyyy')
                   AND
-                  TO_CHAR(createdat :: DATE, 'dd/mm/yyyy') <  '${currentDateTime}'
+                  createdat  <  '${currentDateTime}'
               )`);
         }
       }
@@ -112,12 +112,12 @@ module.exports = {
             (
                 createdat >= now()
                 AND
-                TO_CHAR(createdat :: DATE, 'dd/mm/yyyy') <  '${fromDate}'
+                createdat  <  TO_TIMESTAMP('${fromDate}', 'dd/mm/yyyy')
             )`);
         } else {
           filtersToApply.push(`
             (
-                TO_CHAR(createdat :: DATE, 'dd/mm/yyyy') >= '${toDate}'
+                createdat  >= TO_TIMESTAMP('${toDate}', 'dd/mm/yyyy')
                 AND
                 createdat <  now()
             )`);

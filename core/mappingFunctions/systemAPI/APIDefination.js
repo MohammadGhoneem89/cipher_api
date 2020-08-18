@@ -47,7 +47,7 @@ function getErrorCodeList(payload, UUIDKey, route, callback, JWToken) {
 function updateErrorCodeList(payload, UUIDKey, route, callback, JWToken) {
   ErrorCodes.update({ code: payload.code }, { $set: payload }, { upsert: true }).then((data) => {
     let newRec = {
-      code: payload.code, description: payload.description, actions: [
+      code: payload.code, description: payload.description, descriptionAr: payload.descriptionAr, actions: [
         { "label": "edit", "iconName": "fa fa-pen", "actionType": "COMPONENT_FUNCTION" }
       ]
     };
@@ -84,10 +84,13 @@ function LoadConfig() {
   };
   ErrorCodes.find({}).then((data) => {
     let codelist = {};
+    let codelistAr = {};
     data.forEach((elem) => {
       _.set(codelist, elem.code, elem.description)
+      _.set(codelistAr, elem.code, elem.descriptionAr)
     })
     global.codelist = codelist;
+    global.codelistAr = codelistAr;
     console.log("ErrorCodes Loaded Successfully!!")
   })
 
