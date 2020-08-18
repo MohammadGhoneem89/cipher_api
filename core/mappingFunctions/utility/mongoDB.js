@@ -268,11 +268,19 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
         if (source_data.length != dest_data.length && source_data.length > dest_data.length) {
             let missing_tables = await source_data.filter(comparer_byName(dest_data));
             missing_tables.forEach(table => {
+                let index = 0
                 result.map(row => {
                     if (row.modelName == table.name) {
                         row.type = "new" // New collection to be added in destination
+                        row.new_documents.count = row.count
+                        get_db_collection(source_connection, table.name, "").then((docs) => {
+                            row.new_documents.data = docs
+                        })
+                        source_data[index].collection_type = "new"
+                        console.log(source_data[index])
                         return row;
                     }
+                    index += 1
                 });
             });
 
@@ -296,12 +304,13 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
         // Filter out collections which have either updated/new/deleted records 
         let s_data = source_data.map(async s_collection => {
 
-            let s_collection_data = await get_db_collection(source_connection, s_collection.name),
-                d_collection_data = await get_db_collection(destination_connection, s_collection.name);
+            if (!s_collection.hasOwnProperty("collection_type")) {
+                let s_collection_data = await get_db_collection(source_connection, s_collection.name),
+                    d_collection_data = await get_db_collection(destination_connection, s_collection.name);
 
-            if (db_profile[0].collections.indexOf(s_collection.name) > 0) {
-                console.log(s_collection.name)
-                find_updated_records(s_collection_data, d_collection_data, result, s_collection.name);
+                if (db_profile[0].collections.indexOf(s_collection.name) > 0) {
+                    find_updated_records(s_collection_data, d_collection_data, result, s_collection.name);
+                }
             }
 
         });
