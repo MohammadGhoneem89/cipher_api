@@ -10,7 +10,7 @@ const config = require('../../../config');
 
 async function calculate(payload, UUIDKey, route, callback, JWToken) {
   try {
-    // input from date todate
+    // input from date todate 
 
     let apiList = await APIDefinitation.find({ isBilled: true })
     let entityList = await entity.orgCodeList();
@@ -219,7 +219,7 @@ async function calculate(payload, UUIDKey, route, callback, JWToken) {
         }
       }
     }
-    callback({ success: true });
+    callback({ success: true, errorCode: 200 });
   } catch (error) {
     console.log(error.stack)
   }

@@ -43,7 +43,7 @@
     "fast-json-parse": "^1.0.3",
     "flat": "^4.1.0",
     "frameguard": "^3.1.0",
-    "grpc": "^1.24.2",
+    "grpc": "^1.24.3",
     "handlebars": "^4.7.6",
     "ipfs-http-client": "33.1.1",
     "is-reachable": "^4.0.0",
