@@ -21,7 +21,7 @@ function _listPG(payload, callback, JWToken) {
     offset,
     payload.searchCriteria.channel,
     payload.searchCriteria.action,
-    payload.searchCriteria.msgid,
+    payload.searchCriteria.uuid,
     payload.searchCriteria.fromDate,
     payload.searchCriteria.toDate,
     payload.searchCriteria.payloadField,
