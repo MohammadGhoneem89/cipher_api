@@ -162,7 +162,7 @@ async function find_updated_records(s_collection_data, d_collection_data, result
                         other.type = "updated"
                         let update_doc = {
                             source: s_document,
-                            destination: d_document
+                            destination: d_document[0]
                         }
                         other.updated_documents.count += 1
                         other.updated_documents.data.push(update_doc)
