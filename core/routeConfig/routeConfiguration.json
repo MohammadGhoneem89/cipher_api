@@ -56,6 +56,12 @@
       "CustomMappingFile": "systemAPI/ADHReportConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "apiDocsContarct":{
+      "customMapping": true,
+      "MappingfunctionName": "apiDocsContarct",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "testADHReport": {
       "customMapping": true,
       "MappingfunctionName": "testADHReport",
