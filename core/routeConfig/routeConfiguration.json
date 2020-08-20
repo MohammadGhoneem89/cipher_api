@@ -146,6 +146,12 @@
       "CustomMappingFile": "systemAPI/billing.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "uploadDocument": {
+      "customMapping": true,
+      "MappingfunctionName": "uploadDocument",
+      "CustomMappingFile": "fileUpload/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "updateRelayNetworkConfig": {
       "customMapping": true,
       "MappingfunctionName": "updateRelayNetworkConfig",

@@ -218,18 +218,44 @@ let download = async function (payload, UUIDKey, route, callback, JWToken, res) 
 
 let uploadDocument = async function (payload, UUIDKey, route, callback, JWToken) {
 
+  // if (!(payload.body || payload.body.file || payload.body.file.value || payload.body.file.options || payload.body.file.options.filename)) {
 
-  if (!(payload.body && payload.body.file && payload.body.file.value)) {
-    const resp = {
-      messageStatus: 'ERROR',
-      //cipherMessageId: UUIDKey,
-      errorDescription: 'Please Attach a file.',
-      errorCode: 201,
-      timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
-    };
-    _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
-    return callback(resp);
+  let errorMessage = "";
+
+  const respErrMsg = {
+    messageStatus: 'ERROR',
+    UTCMessageId: UUIDKey,
+    errorDescription: errorMessage,
+    errorCode: 201,
+    timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
+  };
+  if (!payload.body) {
+    respErrMsg.errorMessage = "Please provide correct request parameters"
+    return callback(respErrMsg);
+
   }
+  if (!payload.body.file) {
+    respErrMsg.errorMessage = "Please provide valid values in file field"
+    return callback(respErrMsg);
+
+  }
+  if (!payload.body.file.value) {
+    respErrMsg.errorMessage = "Please provide base64 encoded string in value field"
+    return callback(respErrMsg);
+
+  }
+  if (!payload.body.file.options) {
+    respErrMsg.errorMessage = "Please provide valid options"
+    return callback(respErrMsg);
+
+  }
+  if (!payload.body.file.options.filename) {
+    respErrMsg.errorMessage = "Please provide valid filename with extension"
+    return callback(respErrMsg);
+
+  }
+
+  // }
 
   let userID, fileReference, type, source;
   if (JWToken.userID) {
@@ -257,12 +283,11 @@ let uploadDocument = async function (payload, UUIDKey, route, callback, JWToken)
   if (!allowedExtensions.includes(fileExtension.toUpperCase())) {
     const resp = {
       messageStatus: 'ERROR',
-      //cipherMessageId: UUIDKey,
+      UTCMessageId: UUIDKey,
       errorDescription: 'Please upload only following file types ' + allowedExtensions,
       errorCode: 201,
-      timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
+      timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
     };
-    _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
     return callback(resp);
   }
 
@@ -274,17 +299,17 @@ let uploadDocument = async function (payload, UUIDKey, route, callback, JWToken)
       fsObject = new ServerFS();
       break;
     case 'IPFS':
-      fsObject = new Ipfs();
+      // fsObject = new Ipfs();
+      fsObject = new ServerFS();
       break;
     default:
       const resp = {
         messageStatus: 'ERROR',
-   //     cipherMessageId: UUIDKey,
+        UTCMessageId: UUIDKey,
         errorDescription: '',
         errorCode: 201,
-        timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date)
+        timestamp: dates.DDMMYYYYHHmmssSSS(new Date)
       };
-      _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
       resp.errorDescription = 'Invalid type kindly provide correct type';
       return callback(resp);
   }
@@ -301,7 +326,7 @@ let uploadDocument = async function (payload, UUIDKey, route, callback, JWToken)
       name: fileName,
       type: type,
       userId: JWToken._id,
-      source: 'IPFS',
+      source: 'FILE',
       UUID: UUIDKey,
       hash: fileHash,
       context: '',
@@ -313,17 +338,16 @@ let uploadDocument = async function (payload, UUIDKey, route, callback, JWToken)
 
     const resp = {
       messageStatus: 'OK',
-    //  cipherMessageId: UUIDKey,
+      UTCMessageId: UUIDKey,
       errorDescription: 'Processed OK!',
       errorCode: 200,
-      timestamp: dates.NormalDDMMYYYYHHmmssSSS(new Date),
+      timestamp: dates.DDMMYYYYHHmmssSSS(new Date),
       name: fileName,
-      type: 'IPFS',
+      type: 'FILE',
       hash: fileHash,
-      path: filePath,
+      path: fileHash, //filePath,
       fileReference: fileReference
     };
-    _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),UUIDKey)
     return callback(resp);
   } catch (err) {
     return callback(err);
