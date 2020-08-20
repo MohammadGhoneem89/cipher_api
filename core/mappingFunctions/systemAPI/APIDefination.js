@@ -575,6 +575,42 @@ function getActiveAPIListForDocumentationNew() {
   });
 }
 
+function apiDocsContarct(payload, UUIDKey, route, callback, JWToken) {
+
+  let resp = {
+    "apiDocsContarct": {
+      "action": "apiDocsContarct",
+      "data": {
+        "message": {
+          "status": "ERROR",
+          "errorDescription": "smartcontract name must be provided!!",
+          "displayToUser": true,
+          "newPageURL": ""
+        }
+      }
+    }
+  };
+  if (!payload.smartcontract) {
+
+    return callback(resp);
+  }
+  // db.getCollection('APIDefination').find({"rules": {$elemMatch: {"smartcontract" : "typedata"}},isBlockchain:true})
+  APIDefinitation.getActiveAPIForSmartConract({
+    "rules": {
+      $elemMatch: { "smartcontract": payload.smartcontract }
+    }, isBlockchain: true
+  }).then((data) => {
+    if (data) {
+      resp.apiDocsContarct.data = data
+      callback(resp);
+    }
+
+  }).catch((err) => {
+    callback(err);
+  });
+
+}
+
 
 function getActiveAPIs(payload, UUIDKey, route, callback, JWToken) {
   let resp = {
@@ -1149,5 +1185,6 @@ exports.updateErrorCodeList = updateErrorCodeList;
 exports.getErrorCodeList = getErrorCodeList;
 exports.getActiveAPIListForDocumentationNew = getActiveAPIListForDocumentationNew;
 exports.generateHMAC = generateHMAC;
+exports.apiDocsContarct = apiDocsContarct;
 
 
