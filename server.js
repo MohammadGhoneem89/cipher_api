@@ -672,7 +672,7 @@ const timeoutResponse = {
   //"cipherMessageId": uuid(),
   "messageStatus": "ERROR",
   "errorCode": 201,
-  "errorDescription": "Token Not Valid!",
+  "errorDescription": "Token Expired",
   "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
 };
 
