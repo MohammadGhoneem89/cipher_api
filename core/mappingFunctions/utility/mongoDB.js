@@ -145,7 +145,7 @@ async function get_resultant(db_conn, result) {
 
 async function find_updated_records(s_collection_data, d_collection_data, result, modelName) {
     const secret = 'sagp';
-    console.log(modelName)
+
     let s_data = s_collection_data.map(async s_document => {
 
         let d_document = await d_collection_data.filter(comparer_byID(s_document));
@@ -156,10 +156,11 @@ async function find_updated_records(s_collection_data, d_collection_data, result
             let s_hash = crypto.createHmac("sha512", secret).update(s).digest("hex"),
                 d_hash = crypto.createHmac("sha512", secret).update(d).digest("hex");
             if (s_hash != d_hash) {
+                console.log(s_document)
                 // updated document
                 result.map(function (other) {
                     if (other.modelName == modelName) {
-                        other.type = "updated"
+                        other.type = "UPDATED"
                         let update_doc = {
                             source: s_document,
                             destination: d_document[0]
@@ -174,7 +175,7 @@ async function find_updated_records(s_collection_data, d_collection_data, result
             result.map(function (other) {
 
                 if (other.modelName == modelName) {
-                    other.type = "updated"
+                    other.type = "UPDATED"
                     other.new_documents.count += 1
                     other.new_documents.data.push(s_document)
                 }
@@ -271,7 +272,7 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
                 let index = 0
                 result.map(row => {
                     if (row.modelName == table.name) {
-                        row.type = "new" // New collection to be added in destination
+                        row.type = "NEW" // New collection to be added in destination
                         row.new_documents.count = row.count
                         get_db_collection(source_connection, table.name, "").then((docs) => {
                             row.new_documents.data = docs
@@ -307,7 +308,6 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
             if (!s_collection.hasOwnProperty("collection_type")) {
                 let s_collection_data = await get_db_collection(source_connection, s_collection.name),
                     d_collection_data = await get_db_collection(destination_connection, s_collection.name);
-
                 if (db_profile[0].collections.indexOf(s_collection.name) > 0) {
                     find_updated_records(s_collection_data, d_collection_data, result, s_collection.name);
                 }
