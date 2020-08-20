@@ -26,6 +26,12 @@
       "CustomMappingFile": "systemAPI/ADHReportConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "apiDocsContarct":{
+      "customMapping": true,
+      "MappingfunctionName": "apiDocsContarct",
+      "CustomMappingFile": "systemAPI/APIDefination.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "testADHReport": {
       "customMapping": true,
       "MappingfunctionName": "testADHReport",
@@ -144,6 +150,12 @@
       "customMapping": true,
       "MappingfunctionName": "calculate",
       "CustomMappingFile": "systemAPI/billing.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "uploadDocument": {
+      "customMapping": true,
+      "MappingfunctionName": "uploadDocument",
+      "CustomMappingFile": "fileUpload/index.js",
       "mappingConfigFile": "ePayMapping"
     },
     "updateRelayNetworkConfig": {
