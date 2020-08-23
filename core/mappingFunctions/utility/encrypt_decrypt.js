@@ -13,14 +13,14 @@ async function encrypt(payload, UUIDKey, route, callback, JWToken) {
             encrypted_value = crypto.encrypt(value);
 
         const response = {
-            responseMessage: {
+            encryptResponse: {
                 action: payload.action,
                 data: {
                     message: {
                         status: 'OK',
                         errorDescription: 'Encryption is done.',
                         displayToUser: true,
-                        newPageURL: '/cryptoUtillty',
+                        //newPageURL: '/cryptoUtillty',
                         encryptedValue: encrypted_value
                     }
                 }
@@ -31,7 +31,7 @@ async function encrypt(payload, UUIDKey, route, callback, JWToken) {
 
     } catch (err) {
         const response = {
-            responseMessage: {
+            encryptResponse: {
                 action: payload.action,
                 data: {
                     message: {
@@ -58,14 +58,14 @@ async function decrypt(payload, UUIDKey, route, callback, JWToken) {
         let decrypted_value = crypto.decrypt(value);
 
         const response = {
-            responseMessage: {
+            decryptResponse: {
                 action: payload.action,
                 data: {
                     message: {
                         status: 'OK',
                         errorDescription: 'Decryption is done.',
                         displayToUser: true,
-                        newPageURL: '/cryptoUtillty',
+                        //newPageURL: '/cryptoUtillty',
                         decryptedValue: decrypted_value
                     }
                 }
@@ -77,7 +77,7 @@ async function decrypt(payload, UUIDKey, route, callback, JWToken) {
     } catch (err) {
         console.log(err)
         const response = {
-            responseMessage: {
+            decryptResponse: {
                 action: payload.action,
                 data: {
                     message: {
