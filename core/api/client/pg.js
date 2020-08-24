@@ -10,7 +10,6 @@ module.exports = async function (connectionURL, issecure = false) {
   if (PGExistingList[hash]) {
     console.log('Returning an existing Pg instance');
   } else {
-
     let litmusSSL = connectionURL ? issecure : config.get('sslForDatabase', issecure)
     const createNewInstance = async () => {
       let pool = new Pool({
@@ -30,5 +29,4 @@ module.exports = async function (connectionURL, issecure = false) {
     await createNewInstance();
   }
   return PGExistingList[hash];
-
 };
