@@ -152,6 +152,12 @@
       "CustomMappingFile": "systemAPI/billing.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "uploadDocument": {
+      "customMapping": true,
+      "MappingfunctionName": "uploadDocument",
+      "CustomMappingFile": "fileUpload/index.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "updateRelayNetworkConfig": {
       "customMapping": true,
       "MappingfunctionName": "updateRelayNetworkConfig",
@@ -1465,7 +1471,7 @@
       "mappingConfigFile": "ePayMapping"
     }
   },
-  "utility" : {
+  "utility": {
     "syncMongoDB": {
       "customMapping": true,
       "MappingfunctionName": "syncData",
@@ -1489,7 +1495,18 @@
       "MappingfunctionName": "applyChangeInDB",
       "CustomMappingFile": "utility/mongoDB.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "encrypt": {
+      "customMapping": true,
+      "MappingfunctionName": "encrypt",
+      "CustomMappingFile": "utility/encrypt_decrypt.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "decrypt": {
+      "customMapping": true,
+      "MappingfunctionName": "decrypt",
+      "CustomMappingFile": "utility/encrypt_decrypt.js",
+      "mappingConfigFile": "ePayMapping"
     }
   }
-
 }

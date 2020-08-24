@@ -411,11 +411,17 @@ async function applyChangeInDB(payload, UUIDKey, route, callback, JWToken) {
             });
             await upsert(destination_connection, modelName, document)
         }
+        // "upsertMongodbChange": {
+        //     "message": "success",
+        //     "isUpdate": true
+        // }
         callback(
             {
-                "upsertMongodbChange": {
-                    "message": "success",
-                    "isUpdate": true
+                "responseMessage": {
+                    "data": {
+                        "message": "success",
+                        "isUpdate": true
+                    }
                 }
             });
     } catch (err) {

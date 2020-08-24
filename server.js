@@ -232,10 +232,14 @@ app.post('/login', async (req, res) => {
             res.status(401).send(response);
           }
         } else {
+          response.loginResponse.data.message.status = 'ERROR';
+          response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
+          response.loginResponse.data.success = false;
+          response.loginResponse.data.sessionId = sessionUUID;
           apiResponse.messageStatus = "ERROR";
           apiResponse.errorDescription = err.desc || err.stack || err;
           apiResponse.errorCode = 201;
-          res.status(401).send(apiResponse);
+          res.status(401).send({ ...response, ...apiResponse });
         }
 
       });
