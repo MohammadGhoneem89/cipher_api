@@ -30,7 +30,7 @@ module.exports = class ObjectMapper {
       }
       else if (value === false || value) {
         let isTypeMatch = this.DataTypeMatchCheck(element.IN_FIELDDT, value);
-        if (isTypeMatch === false) {
+        if (isTypeMatch === false && element.IN_ISREQUIRED == "Y") {
           reject(`${element.IN_FIELD} type should be ${element.IN_FIELDDT}!`);
         }
 
@@ -75,7 +75,9 @@ module.exports = class ObjectMapper {
           reject(`${element.IN_FIELD} unable to cast field to ${element.MAP_FIELDDT}!`);
         }
       }).then((data) => {
-        return this.CustomFunctionsExecution(data, this.request, element);
+        let rese= this.CustomFunctionsExecution(data, this.request, element);
+          _.set(this.request,"processedPayload."+_.get(element,"IN_FIELD",""),rese)
+           return rese;
       }).then((data) => {
         resolve(data);
       }).catch((exp) => {

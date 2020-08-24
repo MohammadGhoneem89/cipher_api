@@ -47,7 +47,7 @@ function getErrorCodeList(payload, UUIDKey, route, callback, JWToken) {
 function updateErrorCodeList(payload, UUIDKey, route, callback, JWToken) {
   ErrorCodes.update({ code: payload.code }, { $set: payload }, { upsert: true }).then((data) => {
     let newRec = {
-      code: payload.code, description: payload.description, actions: [
+      code: payload.code, description: payload.description, descriptionAr: payload.descriptionAr, actions: [
         { "label": "edit", "iconName": "fa fa-pen", "actionType": "COMPONENT_FUNCTION" }
       ]
     };
@@ -84,10 +84,13 @@ function LoadConfig() {
   };
   ErrorCodes.find({}).then((data) => {
     let codelist = {};
+    let codelistAr = {};
     data.forEach((elem) => {
       _.set(codelist, elem.code, elem.description)
+      _.set(codelistAr, elem.code, elem.descriptionAr)
     })
     global.codelist = codelist;
+    global.codelistAr = codelistAr;
     console.log("ErrorCodes Loaded Successfully!!")
   })
 
@@ -573,6 +576,42 @@ function getActiveAPIListForDocumentationNew() {
   ).catch((err) => {
     console.log(err);
   });
+}
+
+function apiDocsContarct(payload, UUIDKey, route, callback, JWToken) {
+
+  let resp = {
+    "apiDocsContarct": {
+      "action": "apiDocsContarct",
+      "data": {
+        "message": {
+          "status": "ERROR",
+          "errorDescription": "smartcontract name must be provided!!",
+          "displayToUser": true,
+          "newPageURL": ""
+        }
+      }
+    }
+  };
+  if (!payload.smartcontract) {
+
+    return callback(resp);
+  }
+  // db.getCollection('APIDefination').find({"rules": {$elemMatch: {"smartcontract" : "typedata"}},isBlockchain:true})
+  APIDefinitation.getActiveAPIForSmartConract({
+    "rules": {
+      $elemMatch: { "smartcontract": payload.smartcontract }
+    }, isBlockchain: true
+  }).then((data) => {
+    if (data) {
+      resp.apiDocsContarct.data = data
+      callback(resp);
+    }
+
+  }).catch((err) => {
+    callback(err);
+  });
+
 }
 
 
@@ -1169,5 +1208,6 @@ exports.updateErrorCodeList = updateErrorCodeList;
 exports.getErrorCodeList = getErrorCodeList;
 exports.getActiveAPIListForDocumentationNew = getActiveAPIListForDocumentationNew;
 exports.generateHMAC = generateHMAC;
+exports.apiDocsContarct = apiDocsContarct;
 
 

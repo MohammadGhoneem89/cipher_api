@@ -56,7 +56,7 @@ module.exports = class GeneralRequestProcessor {
         if (simuStatus) {
           _.set(responseObj, 'messageStatus', constants.cipherUIFailure);
           _.set(responseObj, 'errorDescription', ex.message || ex);
-          _.set(responseObj, 'cipherMessageId', this.UUID);
+          _.set(responseObj, config.get('responseMessageAttribute',"cipherMessageId"), this.UUID);
           _.set(responseObj, 'errorCode', constants.cipherExternalSuccess);
           _.set(responseObj, 'timestamp', new Date().toISOString());
         } else {

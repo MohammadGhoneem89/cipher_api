@@ -44,7 +44,7 @@
     "fast-json-parse": "^1.0.3",
     "flat": "^4.1.0",
     "frameguard": "^3.1.0",
-    "grpc": "^1.24.2",
+    "grpc": "^1.24.3",
     "handlebars": "^4.7.6",
     "ipfs-http-client": "33.1.1",
     "is-reachable": "^4.0.0",
@@ -70,7 +70,7 @@
     "node-fetch": "^2.6.0",
     "node-zip": "^1.1.1",
     "nodemailer": "^4.7.0",
-    "nodemon": "^1.18.9",
+    "nodemon": "^1.19.4",
     "pg": "^7.4.3",
     "pg-promise": "^8.5.1",
     "promised-handlebars": "^2.0.1",
@@ -106,6 +106,7 @@
   "scripts": {
     "lint": "eslint lib/ config/ api/ background/ soap/ scripts/ reports/ exports/ Common/",
     "fix": "eslint lib/ config/ api/ background/ soap/ scripts/ reports/ exports/ Common/ --fix",
-    "start": "node app.js"
+    "start": "node app.js",
+    "start:dev": "nodemon app.js"
   }
 }

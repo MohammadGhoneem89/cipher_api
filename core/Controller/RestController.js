@@ -21,16 +21,17 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     fs: 'RestController.js',
     func: 'handleExternalRequest'
   }, "===========Got Message [" + UUIDKey + "]!!!============");
-  logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, JSON.stringify(payload, null, 2));
-  logger.debug({fs: 'RestController.js', func: 'handleExternalRequest'}, incommingRoute);
+  logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, JSON.stringify(payload, null, 2));
+  logger.debug({ fs: 'RestController.js', func: 'handleExternalRequest' }, incommingRoute);
 
   let configdata = _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
   let username = _.get(JWToken, `userID`, 'No User');
+  let lang = _.get(JWToken, `lang`, 'EN');
   let orgcode = _.get(JWToken, `orgCode`, 'No Org');
   _.get(global.routeConfig, `${channel}.${incommingRoute}`, null);
   let eRRTBasic = _.get(configdata, 'estimatedRtt', 10000)
   let ResponseCaller = function (data) {
-    data = enrichError(data);
+    data = enrichError(data, lang);
     let delta = sw.read();
     sw.reset();
     logger.debug({
@@ -41,18 +42,20 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
     if (data.stack) {
       let error = {
         "messageStatus": "ERROR",
-        "cipherMessageId": UUIDKey,
+        //"cipherMessageId": UUIDKey,
         "errorDescription": 'some error occured!!!!',
         "errorCode": 201,
         "timestamp": dates.DDMMYYYYHHmmssSSS(new Date)
       };
-      // console.log(data.stack)
+
+      _.set(error, config.get('responseMessageAttribute', "cipherMessageId"), UUIDKey)
+      console.log(data.stack)
       txTracking.create(UUIDKey, channel, incommingRoute, payload, {}, delta, data.stack, eRRTBasic, username, orgcode);
       responseCallback.status(500);
       responseCallback.json(error);
       return responseCallback.end();
     }
-    logger.debug({fs: 'RestController.js', func: 'ResponseCaller'}, "=========== [" + UUIDKey + "]!!! ============");
+    logger.debug({ fs: 'RestController.js', func: 'ResponseCaller' }, "=========== [" + UUIDKey + "]!!! ============");
     let apiSample = _.cloneDeep(payload);
     if (_.get(apiSample, '_apiRecorder', false) === true) {
       apiSample = _.omit(apiSample, 'token', 'action', 'channel', 'ipAddress', '_apiRecorder', 'JWToken', 'header', 'CipherJWT');
@@ -79,7 +82,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
       func: 'handleExternalRequest'
     }, `Message Processed In:  ${delta} ms`);
 
-    // responseCallback.status(500);
+    //  responseCallback.status(500);
     return responseCallback.json(data);
     // responseCallback.end();
   };
@@ -100,7 +103,7 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
         _.set(response, '__cipherUIErrorStatus', constants.cipherUISuccess);
         _.set(response, '__cipherExternalErrorStatus', constants.cipherExternalSuccess);
       }
-
+      _.set(response, "request.body", _.get(payload, "processedPayload", {}))
       let objMapper = new ObjectMapper(response, configdata.ResponseMapping, global.enumInfo, UUIDKey, JWToken, 'Response', configdata.ResponseTransformations);
       return objMapper.start().then((mappedData) => {
         return mappedData;
@@ -131,17 +134,23 @@ let handleExternalRequest = function (payload, channel, incommingRoute, UUIDKey,
   });
 }
 
-function enrichError(response, successStatus = true) {
+function enrichError(response, lang) {
   let errCode = _.get(response, '__result.errorCode', undefined);
   if (!errCode) {
     errCode = _.get(response, 'errorCode', undefined);
   }
-  
-  let options = _.get(response, 'result.options', undefined);
+
+  let options = _.get(response, '__result.options', undefined);
   if (!options) {
     options = _.get(response, 'options', undefined);
   }
-  let errMsg = _.get(global.codelist, errCode, '');
+
+  let errMsg = '';
+  if (lang == "EN")
+    errMsg = _.get(global.codelist, errCode, '');
+  else
+    errMsg = _.get(global.codelistAr, errCode, '');
+
   if (errCode && errMsg) {
     _.set(response, 'errorCode', parseInt(errCode, 10));
     _.set(response, 'errorDescription', vsprintf(errMsg, options));

@@ -53,6 +53,9 @@ app.use(express.static('public'));
 app.use(express.static('exports'));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+
+
 app.use(requestLog);
 app.use(frameguard({ action: 'sameorigin' }));
 let appServer;
@@ -149,15 +152,17 @@ app.post('/login', async (req, res) => {
         }
       }
     };
-
+    let sessionUUID = uuid();
     const apiResponse = {
-      cipherMessageId: uuid(),
+   //   cipherMessageId: sessionUUID,
       messageStatus: 'OK',
       errorCode: 200,
       errorDescription: "logged in successfully !!!",
       token: "",
-      timestamp: moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
+      timestamp: moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
     };
+
+    _.set(apiResponse,config.get('responseMessageAttribute',"cipherMessageId"),sessionUUID)
 
     if (checkbadinput(req)) {
       let err = {
@@ -171,13 +176,19 @@ app.post('/login', async (req, res) => {
     }
 
 
-    authUser(payload)
+    authUser(payload, sessionUUID)
       .then(async (user) => {
-        console.log(JSON.stringify(user));
         if (user.userType == "API") {
           apiResponse.token = user.token;
+          await tokenLookup.removeAndCreateWithSession({
+            token: user.token,
+            userId: user._id,
+            sessionId: sessionUUID,
+            createdAt: dates.newDate()
+          });
           res.send(apiResponse);
         } else {
+          console.log(">>>>>>>>>>>>>>>>>>>>}}}", JSON.stringify(user))
           response.loginResponse.data.token = user.token;
           let cookieAttributes = {};
           if (config.get("disableSameSiteCookie")) {
@@ -186,9 +197,10 @@ app.post('/login', async (req, res) => {
           res.cookie('token', user.token, cookieAttributes);
 
 
-          await tokenLookup.removeAndCreate({
+          await tokenLookup.removeAndCreateWithSession({
             token: user.token,
             userId: user._id,
+            sessionId: sessionUUID,
             createdAt: dates.newDate()
           });
 
@@ -216,13 +228,18 @@ app.post('/login', async (req, res) => {
             response.loginResponse.data.message.status = 'ERROR';
             response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
             response.loginResponse.data.success = false;
+            response.loginResponse.data.sessionId = sessionUUID
             res.status(401).send(response);
           }
         } else {
+          response.loginResponse.data.message.status = 'ERROR';
+          response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
+          response.loginResponse.data.success = false;
+          response.loginResponse.data.sessionId = sessionUUID;
           apiResponse.messageStatus = "ERROR";
           apiResponse.errorDescription = err.desc || err.stack || err;
           apiResponse.errorCode = 201;
-          res.status(401).send(apiResponse);
+          res.status(401).send({ ...response, ...apiResponse });
         }
 
       });
@@ -230,13 +247,17 @@ app.post('/login', async (req, res) => {
   } catch (err) {
 
     console.log("error while login" + err);
-    res.status(500).send({
+    let resp={
       "messageStatus": "ERROR",
-      "cipherMessageId": uuid(),
+ //     "cipherMessageId": uuid(),
       "errorDescription": 'some error occurred while processing',
       "errorCode": 201,
-      "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
-    });
+      "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
+    }
+
+    _.set(resp,config.get('responseMessageAttribute',"cipherMessageId"),uuid())
+
+    res.status(500).send(resp);
   }
 });
 
@@ -565,13 +586,15 @@ function apiCallsHandler(req, res) {
       return res.status(403).send(timeoutResponse);
     }
 
-    tokenValid(decoded._id, JWToken).then(async valid => {
+    tokenValid(decoded._id, JWToken, decoded).then(async valid => {
       let byPassValidation = commonConst.permissionExcludeList.includes(action);
       if (valid || _.get(payload, "header", null) != null || byPassValidation) {
         RestController.handleExternalRequest(payload, channel, action, UUID, res, decoded);
+
         await tokenLookup.update({
           token: JWToken,
-          userId: decoded._id
+          userId: decoded._id,
+          sessionId: decoded.sessionId
         }, {
           createdAt: dates.newDate()
         });
@@ -590,24 +613,30 @@ function apiCallsHandler(req, res) {
   }
 }
 
-async function tokenValid(userIdz, tkn) {
+async function tokenValid(userIdz, tkn, data) {
   try {
+    console.log({
+      userId: userIdz,
+      token: tkn,
+      sessionId: data.sessionId
+    })
     let existingToken = await tokenLookup.findOne({
       userId: userIdz,
-      token: tkn
+      token: tkn,
+      sessionId: data.sessionId
     });
     if (existingToken == null) {
       return false;
     }
     let timestamp = dates.diffFromNow(existingToken.createdAt, "seconds");
-    console.log("existing token ", JSON.stringify(existingToken));
     console.log("generated at ", config.get('tokenExp'));
     console.log("timestamp at ", timestamp);
     if (config.get('tokenExp') < timestamp) {
       console.log("removing>>>", userIdz);
       await tokenLookup.remove({
         token: tkn,
-        userId: userIdz
+        userId: userIdz,
+        sessionId: data.sessionId
       });
       return false;
     } else {
@@ -637,14 +666,30 @@ const logout = async (req, res) => {
       const decoded = crypto.decrypt(JWToken);
       console.log("decoded", decoded);
       await tokenLookup.remove({
-        userId: decoded._id
+        userId: decoded._id,
+        sessionId: decoded.sessionId
       });
       // req.session.destroy(( err ) => {
       //     console.error(err)
       // })
       res.clearCookie("token");
     }
-    res.send({})
+    res.send({
+      loginResponse: {
+        action: 'login',
+        data: {
+          message: {
+            status: 'OK',
+            errorDescription: 'logged Out successfully !!!',
+            routeTo: '',
+            displayToUser: true
+          },
+          success: true,
+          token: '',
+          firstScreen: ''
+        }
+      }
+    })
   } catch (error) {
     console.error("error", error.stack);
     logger.debug({
@@ -694,34 +739,45 @@ const timeoutResponse = {
   //   }
   // }
 
-  "cipherMessageId": uuid(),
+  //"cipherMessageId": uuid(),
   "messageStatus": "ERROR",
   "errorCode": 201,
-  "errorDescription": "Token Not Valid!",
-  "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
+  "errorDescription": "Token Expired",
+  "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
 };
+
+_.set(timeoutResponse,config.get('responseMessageAttribute',"cipherMessageId"), uuid())
+
 
 app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
-  res.status(404).send({
+  let resc={
     "messageStatus": "ERROR",
-    "cipherMessageId": uuid(),
+  //  "cipherMessageId": uuid(),
     "errorDescription": 'not found!',
     "errorCode": 201,
-    "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
-  });
+    "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
+  }
+  _.set(resc,config.get('responseMessageAttribute',"cipherMessageId"),uuid())
+
+
+  res.status(404).send(resc);
 });
 
 app.use(function (err, req, res, next) {
+  console.log(err);
   res.status(err.status || 500);
-  res.status(500).send({
+  let resp={
     "messageStatus": "ERROR",
-    "cipherMessageId": uuid(),
+   // "cipherMessageId": uuid(),
     "errorDescription": 'some error occured!!!!',
     "errorCode": 201,
-    "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY hh:mm:ss.SSS")
-  });
+    "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
+  }
+  _.set(resc,config.get('responseMessageAttribute',"cipherMessageId"),uuid())
+
+  res.status(500).send();
 });
 
 
