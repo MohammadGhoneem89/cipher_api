@@ -2,15 +2,15 @@
 // const sqlserver = require('../../../../core/api/connectors/mssql');
 const {
     error
-} = require('../../lib/response');
+} = require('../../../lib/response');
 // const { getFeePaid, getStatus , getPaymentsTypesForLab} = require('../../lib/common');
 // const {
 //     labInsert, labUpdate
 // } = require('../../lib/queries');
 // const organizationType = require('../../../../lib/models/organizationType');
-const Letters = require('../../../../lib/models/letters');
+const Letters = require('../../../lib/models/letters');
 
-const {validateJsonLength} = require('../../lib/utils')
+const {validateJsonLength} = require('../../../lib/utils')
 
 async function getAllLetters(payload, UUIDKey, route, callback, JWToken) {
     try {
