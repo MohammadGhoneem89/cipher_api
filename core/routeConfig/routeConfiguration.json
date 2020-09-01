@@ -601,6 +601,36 @@
       "MappingfunctionName": "createDynamicStruct",
       "CustomMappingFile": "systemAPI/mappingConfig.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getAllLetters": {
+      "customMapping": true,
+      "MappingfunctionName": "getAllLetters",
+      "CustomMappingFile": "letter/getLetters.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getSampleLetters": {
+      "customMapping": true,
+      "MappingfunctionName": "getSampleLetters",
+      "CustomMappingFile": "letter/mappingConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "addUpdateSampleLetter": {
+      "customMapping": true,
+      "MappingfunctionName": "addUpdateSampleLetter",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "addUpdateLetter": {
+      "customMapping": true,
+      "MappingfunctionName": "addUpdateLetter",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "testLetter": {
+      "customMapping": true,
+      "MappingfunctionName": "testLetter",
+      "CustomMappingFile": "letter/testLetter.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "UI": {
@@ -1438,36 +1468,6 @@
       "customMapping": true,
       "MappingfunctionName": "couchQuery",
       "CustomMappingFile": "couchQuery.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getAllLetters": {
-      "customMapping": true,
-      "MappingfunctionName": "getAllLetters",
-      "CustomMappingFile": "application/index.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "getSampleLetters": {
-      "customMapping": true,
-      "MappingfunctionName": "getSampleLetters",
-      "CustomMappingFile": "application/index.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "addUpdateSampleLetter": {
-      "customMapping": true,
-      "MappingfunctionName": "addUpdateSampleLetter",
-      "CustomMappingFile": "application/index.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "addUpdateLetter": {
-      "customMapping": true,
-      "MappingfunctionName": "addUpdateLetter",
-      "CustomMappingFile": "application/index.js",
-      "mappingConfigFile": "ePayMapping"
-    },
-    "testLetter": {
-      "customMapping": true,
-      "MappingfunctionName": "testLetter",
-      "CustomMappingFile": "application/index.js",
       "mappingConfigFile": "ePayMapping"
     }
   },
