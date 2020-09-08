@@ -113,7 +113,7 @@ var orgDetail = function (payload, entityGetCB, JWToken) {
 
         if (config.get('database', 'postgres') == 'mssql') {
           let conn = await sqlserver.connection()
-          let { recordset } = await conn.request().query(`select sum(amount) as amount,sum(hits) as hits,route from billingreport where orgcode='${data.spCode}'
+          let { recordset } = await conn.request().query(`select sum(amount) as amount,sum(hits) as hits,route from billingreport where orgcode='${data.spCode}' and
           startdate>='${moment(start).format('YYYY-MM-DD 00:00:00')}' and enddate<= '${moment(end).format('YYYY-MM-DD 11:59:00')}'
           group by route`);
           conn.close();
