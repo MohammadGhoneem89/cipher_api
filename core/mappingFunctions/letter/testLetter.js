@@ -22,7 +22,7 @@ async function testLetter(payload, UUIDKey, route, callback, JWToken, res) {
 
 
 
-        const { templateId } = payload.templatePayload.template;
+        const { templateId } = payload.templatePayload;
         if (templateId) {
 
             let resp = await Letters.find({
@@ -30,8 +30,7 @@ async function testLetter(payload, UUIDKey, route, callback, JWToken, res) {
             });
 
 
-            console.log(resp[0].sampleJson);
-
+        
             const options = {
                 method: 'POST',
                 uri: 'http://localhost:8000/reportPdfSubmit',
@@ -46,9 +45,9 @@ async function testLetter(payload, UUIDKey, route, callback, JWToken, res) {
                     templateName: resp[0].templateName,
                     templatePath: resp[0].templatePath,
                     templateMarkup: resp[0].templateMarkup,
-                    filePath: payload.templatePayload.template.filePath,
+                    filePath: payload.templatePayload.filePath,
                     templateType: resp[0].templateType,
-                    outputFileName: payload.templatePayload.template.outputFileName,
+                    outputFileName: payload.templatePayload.outputFileName,
                     // data: payload.templatePayload.data
                     data: JSON.parse(resp[0].sampleJson)
                 },
@@ -64,8 +63,14 @@ async function testLetter(payload, UUIDKey, route, callback, JWToken, res) {
             };
             let document = await rp(options);
 
-            // console.log(document, 'DOCUMENTTTTTTTTTTTTTT');
-            let fileName = payload.templatePayload.template.filePath+'/'+payload.templatePayload.template.outputFileName+'.pdf';
+            
+            let fileName;
+            console.log(payload, 'PAYLOAD');
+            if (resp[0].templatePath) {
+                fileName = payload.templatePayload.template.filePath+'/'+payload.templatePayload.template.outputFileName+'.pdf';
+            } else {
+                fileName = payload.templatePayload.filePath+'/'+payload.templatePayload.outputFileName+'.pdf';
+            }
             async function downloadDoc(document) {
                 const file = path.normalize(document);
                 return path.resolve(file);

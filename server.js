@@ -709,7 +709,7 @@ app.use(function (err, req, res, next) {
     "errorCode": 201,
     "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
   }
-  _.set(resp.config.get('responseMessageAttribute',"cipherMessageId"),uuid())
+  _.set(resp, config.get('responseMessageAttribute',"cipherMessageId"),uuid())
 
   res.status(500).send();
 });

@@ -611,19 +611,19 @@
     "getSampleLetters": {
       "customMapping": true,
       "MappingfunctionName": "getSampleLetters",
-      "CustomMappingFile": "letter/mappingConfig.js",
+      "CustomMappingFile": "letter/getSampleLetter.js",
       "mappingConfigFile": "ePayMapping"
     },
     "addUpdateSampleLetter": {
       "customMapping": true,
       "MappingfunctionName": "addUpdateSampleLetter",
-      "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "CustomMappingFile": "letter/addUpdateSampleLetter.js",
       "mappingConfigFile": "ePayMapping"
     },
     "addUpdateLetter": {
       "customMapping": true,
       "MappingfunctionName": "addUpdateLetter",
-      "CustomMappingFile": "systemAPI/mappingConfig.js",
+      "CustomMappingFile": "letter/addUpdateLetter.js",
       "mappingConfigFile": "ePayMapping"
     },
     "testLetter": {
