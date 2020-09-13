@@ -180,7 +180,7 @@ const getDocumentRevesions = async (payload, UUIDKey, route, callback, JWToken) 
     json: true
   };
 
-  console.log("----------------------------------------------->>>>>>>>> externalApi:  ", JSON.stringify(externalApi, null, 2));
+  console.log("---------------------------------------------->>>>>>>>> externalApi:  ", JSON.stringify(externalApi, null, 2));
 
   try {
     let response = await rp(externalApi)
