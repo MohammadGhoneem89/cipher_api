@@ -8,6 +8,13 @@ module.exports = async function (connection, issecure = false) {
   let connectionURL = connection || cryptoDec.decrypt(config.get('postgres.url')) || cryptoDec.decrypt(config.get('mssqlConfig'));
   let litmusSSL = connection ? issecure : config.get('sslForDatabase', issecure)
   const hash = crypto.createHash('md5').update(connectionURL).digest("hex");
+  // console.log(parsedObj.port);
+
+  // let parsedObj = url2obj(connectionURL);
+
+  // console.log(parsedObj.port);
+  // if (parsedObj.port)
+  //   parsedObj.port = parseInt(parsedObj.port)
   const createNewInstance = async () => {
     const sequelize = new Sequelize(connectionURL, {
       define: {
@@ -22,7 +29,9 @@ module.exports = async function (connection, issecure = false) {
       logging: true,
       ssl: litmusSSL,
       dialectOptions: {
-        encrypt: true,
+        options: {
+          encrypt: true,
+        },
         ssl: litmusSSL ? {
           rejectUnauthorized: false
         } : undefined,
@@ -41,6 +50,28 @@ module.exports = async function (connection, issecure = false) {
   return SQExistingList[hash];
 };
 
+function url2obj(url) {
+  var pattern = /^(?:([^:\/?#\s]+):\/{2})?(?:([^@\/?#\s]+)@)?([^\/?#\s]+)?(?:\/([^?#\s]*))?(?:[?]([^#\s]+))?\S*$/;
+  var matches = url.match(pattern);
+  var params = {};
+  if (matches[5] != undefined) {
+    matches[5].split('&').map(function (x) {
+      var a = x.split('=');
+      params[a[0]] = a[1];
+    });
+  }
+
+  return {
+    protocol: matches[1],
+    user: matches[2] != undefined ? matches[2].split(':')[0] : undefined,
+    password: matches[2] != undefined ? matches[2].split(':')[1] : undefined,
+    host: matches[3],
+    hostname: matches[3] != undefined ? matches[3].split(/:(?=\d+$)/)[0] : undefined,
+    port: matches[3] != undefined ? matches[3].split(/:(?=\d+$)/)[1] : undefined,
+    segments: matches[4] != undefined ? matches[4].split('/') : undefined,
+    params: params
+  };
+}
 /*'use strict';
 
 const _ = require('lodash');

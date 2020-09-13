@@ -83,8 +83,6 @@ let getFileDataPG = function (payload, UUIDKey, route, callback, JWToken) {
   });
 }
 
-
-
 let getFileDataMSSQL = function (payload, UUIDKey, route, callback, JWToken) {
 
   let params = []
@@ -165,7 +163,7 @@ let getFileDataMSSQL = function (payload, UUIDKey, route, callback, JWToken) {
 
 
 if (config.get('database') == 'mssql') {
-  exports.getFileData = getFileDataPG;
+  exports.getFileData = getFileDataMSSQL;
 } else {
-  exports.getFileData = getFileDataMSSQL
+  exports.getFileData = getFileDataPG;
 }
