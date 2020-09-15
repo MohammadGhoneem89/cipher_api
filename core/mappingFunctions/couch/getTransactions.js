@@ -180,22 +180,38 @@ const getDocumentRevesions = async (payload, UUIDKey, route, callback, JWToken) 
     json: true
   };
 
-  console.log("---------------------------------------------->>>>>>>>> externalApi:  ", JSON.stringify(externalApi, null, 2));
+  console.log("----------------------------------------------->>>>>>>>> externalApi:  ", JSON.stringify(externalApi, null, 2));
 
   try {
     let response = await rp(externalApi)
     console.log("------------------------------------------------>>>>>>>>>11111111111 respons :   ", JSON.stringify(response, null, 2))
 
     let preparedResponse = [];
-
+    let result = {};
 
     if (response && response.results && response.results[0].docs && response.results[0].docs[0].ok && response.results[0].docs && response.results[0].docs[0].ok._revisions.start) {
       console.log("=================>>>>>>>>>>>>>>>>>>>>  response.results[0].docs[0].ok._revisions.start : " , response.results[0].docs[0].ok._revisions.start)
-      let result = {};
+      let start = 0
+      start =  response.results[0].docs[0].ok._revisions.start
+      
       let i;
       for (i = 0 ; i < response.results[0].docs[0].ok._revisions.start; i++) {
-        externalApi.body.docs[0].rev  = response.results[0].docs[0].ok._revisions.ids[i]
+        externalApi.body.docs[0].rev  = start + "-" + response.results[0].docs[0].ok._revisions.ids[i]
         console.log("=================>>>>>>>>>>>>>>>>>>>>  response.results[0].docs[0].ok._revisions.IDs -->>"+ i + ": " , response.results[0].docs[0].ok._revisions.ids[i])
+        let revResponse = await rp(externalApi)
+        console.log("=================>>>>>>>>>>>>>>>>>>>>  revResponse -->>"+ start + ": " , JSON.stringify(externalApi, null, 2))
+        if(i == 0){
+          result["latest"] = revResponse.results[0].docs[0].ok
+        }else{
+          if(revResponse.results[0].docs[0].error){
+
+          }else {
+            result["rev-" + start] = revResponse.results[0].docs[0].ok
+          }
+          
+        }
+        
+        start--;
       }
     }
 
@@ -206,7 +222,7 @@ const getDocumentRevesions = async (payload, UUIDKey, route, callback, JWToken) 
       "errorDescription": "Processed OK!",
       "errorCode": 200,
       "timestamp": moment().format("DD/MM/YYY hh:mm:ss.SSS"),
-      ...response
+      result
     };
     return callback(finalResponse)
 
@@ -229,3 +245,7 @@ const getDocumentRevesions = async (payload, UUIDKey, route, callback, JWToken) 
 //exports.getTransactions = getTransactions;
 exports.getCollectionsList = getCollectionsList;
 exports.getDocumentRevesions = getDocumentRevesions;
+
+
+
+

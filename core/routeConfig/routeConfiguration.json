@@ -611,19 +611,19 @@
     "getSampleLetters": {
       "customMapping": true,
       "MappingfunctionName": "getSampleLetters",
-      "CustomMappingFile": "letter/getSampleLetter.js",
+      "CustomMappingFile": "letter/mappingConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
     "addUpdateSampleLetter": {
       "customMapping": true,
       "MappingfunctionName": "addUpdateSampleLetter",
-      "CustomMappingFile": "letter/addUpdateSampleLetter.js",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
     "addUpdateLetter": {
       "customMapping": true,
       "MappingfunctionName": "addUpdateLetter",
-      "CustomMappingFile": "letter/addUpdateLetter.js",
+      "CustomMappingFile": "systemAPI/mappingConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
     "testLetter": {
@@ -1461,6 +1461,18 @@
     "getTransactions": {
       "customMapping": true,
       "MappingfunctionName": "getTransactions",
+      "CustomMappingFile": "couch/getTransactions.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getCollectionsList": {
+      "customMapping": true,
+      "MappingfunctionName": "getCollectionsList",
+      "CustomMappingFile": "couch/getTransactions.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getDocumentRevesions": {
+      "customMapping": true,
+      "MappingfunctionName": "getDocumentRevesions",
       "CustomMappingFile": "couch/getTransactions.js",
       "mappingConfigFile": "ePayMapping"
     },
