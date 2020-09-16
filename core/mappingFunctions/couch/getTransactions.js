@@ -94,7 +94,11 @@ const getCollectionsList = async (payload, UUIDKey, route, callback, JWToken) =>
             "label": readableName,
             "value": response[key]
           }
-          preparedResponse.push(collectionOject)
+          if (collectionOject.label.charAt(0) != 'h'){
+            collectionOject.label = collectionOject.label.substring(1)
+            preparedResponse.push(collectionOject)
+          }
+          
         }
       }
     }
