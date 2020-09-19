@@ -60,7 +60,7 @@ function dbCompare(destination, source, destinationColumns, sourceColumns) {
           newTable[i].column.push({
             name: sourceColumns[j].name,
             type: sourceColumns[j].TypeName,
-            length: sourceColumns[j].TypeName == 'int' || sourceColumns[j].TypeName == 'text' || sourceColumns[j].TypeName == 'date' ? '' : sourceColumns[j].max_length == 0 || sourceColumns[j].max_length == -1 ? 'max' : sourceColumns[j].TypeName == 'nvarchar' ? Math.round((sourceColumns[j].max_length) / 2) : sourceColumns[j].max_length,
+            length: sourceColumns[j].TypeName == 'int' || sourceColumns[j].TypeName == 'text' || sourceColumns[j].TypeName == 'date' || sourceColumns[j].TypeName == 'smallint' || sourceColumns[j].TypeName == 'datetime' || sourceColumns[j].TypeName == 'bigint' || sourceColumns[j].TypeName == 'datetimeoffset' ? '' : sourceColumns[j].max_length == 0 || sourceColumns[j].max_length == -1 ? 'max' : sourceColumns[j].TypeName == 'nvarchar' ? Math.round((sourceColumns[j].max_length) / 2) : sourceColumns[j].max_length,
             isNullable: sourceColumns[j].isNullable,
             isIdentity: sourceColumns[j].isIdentity
           });
@@ -87,7 +87,7 @@ function dbCompare(destination, source, destinationColumns, sourceColumns) {
       val[i].column.push({
         name: differentColumn[i].name,
         type: differentColumn[i].TypeName,
-        length: differentColumn[i].TypeName == 'int' || differentColumn[i].TypeName == 'text' || sourceColumns[i].TypeName == 'date' ? '' : differentColumn[i].max_length == 0 || differentColumn[i].max_length == -1 ? 'max' : differentColumn[i].TypeName == 'nvarchar' ? Math.round((differentColumn[i].max_length) / 2) : differentColumn[i].max_length,
+        length: differentColumn[i].TypeName == 'int' || differentColumn[i].TypeName == 'text' || differentColumn[i].TypeName == 'date' || differentColumn[i].TypeName == 'smallint' || differentColumn[i].TypeName == 'datetime' || differentColumn[i].TypeName == 'bigint' || differentColumn[i].TypeName == 'datetimeoffset' ? '' : differentColumn[i].max_length == 0 || differentColumn[i].max_length == -1 ? 'max' : differentColumn[i].TypeName == 'nvarchar' ? Math.round((differentColumn[i].max_length) / 2) : differentColumn[i].max_length,
         isNullable: differentColumn[i].isNullable,
         isIdentity: differentColumn[i].isIdentity
       });
@@ -112,7 +112,7 @@ function dbCompare(destination, source, destinationColumns, sourceColumns) {
       diffCol[i].column.push({
         name: differentColumn3[i].name,
         type: differentColumn3[i].TypeName,
-        length: differentColumn3[i].TypeName == 'int' || differentColumn3[i].TypeName == 'text' || sourceColumns[i].TypeName == 'date' ? '' : differentColumn3[i].max_length == 0 || differentColumn3[i].max_length == -1 ? 'max' : differentColumn3[i].TypeName == 'nvarchar' ? Math.round((differentColumn3[i].max_length) / 2) : differentColumn3[i].max_length,
+        length: differentColumn3[i].TypeName == 'int' || differentColumn3[i].TypeName == 'text' || differentColumn3[i].TypeName == 'date' || differentColumn3[i].TypeName == 'smallint' || differentColumn3[i].TypeName == 'datetime' || differentColumn3[i].TypeName == 'bigint' || differentColumn3[i].TypeName == 'datetimeoffset' ? '' : differentColumn3[i].max_length == 0 || differentColumn3[i].max_length == -1 ? 'max' : differentColumn3[i].TypeName == 'nvarchar' ? Math.round((differentColumn3[i].max_length) / 2) : differentColumn3[i].max_length,
         isNullable: differentColumn3[i].isNullable,
         isIdentity: differentColumn3[i].isIdentity
       });
@@ -180,9 +180,9 @@ function dbCompare(destination, source, destinationColumns, sourceColumns) {
           newTable[i].column.push({
             name: sourceColumns[j].name,
             type: sourceColumns[j].TypeName,
-            length: sourceColumns[j].TypeName == 'int' || sourceColumns[j].TypeName == 'text' || sourceColumns[j].TypeName == 'date' ? '' : sourceColumns[j].max_length == 0 || sourceColumns[j].max_length == -1 ? 'max' : sourceColumns[j].TypeName == 'nvarchar' ? Math.round((sourceColumns[j].max_length) / 2) : sourceColumns[j].max_length,
-            isNullable: sourceColumns[i].isNullable,
-            isIdentity: sourceColumns[i].isIdentity
+            length: sourceColumns[j].TypeName == 'int' || sourceColumns[j].TypeName == 'text' || sourceColumns[j].TypeName == 'date' || sourceColumns[j].TypeName == 'smallint' || sourceColumns[j].TypeName == 'datetime' || sourceColumns[j].TypeName == 'bigint' || sourceColumns[j].TypeName == 'datetimeoffset' ? '' : sourceColumns[j].max_length == 0 || sourceColumns[j].max_length == -1 ? 'max' : sourceColumns[j].TypeName == 'nvarchar' ? Math.round((sourceColumns[j].max_length) / 2) : sourceColumns[j].max_length,
+            isNullable: sourceColumns[j].isNullable,
+            isIdentity: sourceColumns[j].isIdentity
           });
         }
       }
@@ -202,76 +202,68 @@ async function ApplyScriptSQL(payload, UUIDKey, route, callback, JWToken) {
     } catch (err) {
       return callback(err);
     }
-    let mainQuery = payload.body.script.mainQuery
-    try {
-      let destination = await connection2.query(mainQuery)
-    } catch (err) {
-      return callback(err);
+
+    if (payload.body.script) {
+      for (let i = 0; i < payload.body.script.length; i++) {
+        try {
+          let destination = await connection2.query(`${payload.body.script[i].data}`)
+        } catch (err) {
+          return callback(err);
+        }
+      }
     }
   }
 }
 async function WriteScriptSQL(payload, UUIDKey, route, callback, JWToken) {
   if (payload.body && payload.body.tables) {
     let table = payload.body.tables
+    let response = []
     let DestinationDB = payload.body.Destination
     try {
       for (let i = 0; i < table.length; i++) {
         if (table[i].type == 'new') {
           let query = ''
           for (let j = 0; j < table[i].column.length; j++) {
-            query += `${table[i].column[j].name} ${table[i].column[j].type}${table[i].column[j].type == 'int' || table[i].column[j].type == 'text'||table[i].column[j].type == 'date'?`${table[i].column[j].length}`:`(${table[i].column[j].length})`} ${table[i].column[j].isNullable==false?'NOT NULL':'NULL'} ${table[i].column[j].isIdentity==false?'':'IDENTITY'}, `
+            query += `${table[i].column[j].name} ${table[i].column[j].type}${table[i].column[j].type == 'int' || table[i].column[j].type == 'text'||table[i].column[j].type == 'date'||table[i].column[j].type == 'smallint'||table[i].column[j].type == 'datetime'||table[i].column[j].type == 'bigint'||table[i].column[j].type == 'datetimeoffset'?`${table[i].column[j].length}`:`(${table[i].column[j].length})`} ${table[i].column[j].isNullable==false?'NOT NULL':'NULL'} ${table[i].column[j].isIdentity==false?'':'IDENTITY'}, `
           }
           let mainQuery = `CREATE TABLE ${DestinationDB}.dbo.${table[i].tableName} (${query})`
-          let response = {
-            data: {
-              mainQuery
-            },
-          };
-          callback({
-            response
+          response.push({
+            data: mainQuery
           });
         } else if (table[i].type == 'updated-col-type') {
           let query = ''
           for (let j = 0; j < table[i].column.length; j++) {
-            query += `${table[i].column[j].name} ${table[i].column[j].type}${table[i].column[j].type == 'int' || table[i].column[j].type == 'text'||table[i].column[j].type == 'date'?`${table[i].column[j].length}`:`${table[i].column[j].length}`?`(${table[i].column[j].length})`:''} ${table[i].column[j].isNullable==false?'NOT NULL':'NULL'} ${table[i].column[j].isIdentity==false?'':'IDENTITY'}, `
+            query += `${table[i].column[j].name} ${table[i].column[j].type}${table[i].column[j].type == 'int' || table[i].column[j].type == 'text'||table[i].column[j].type == 'date'||table[i].column[j].type == 'smallint'||table[i].column[j].type == 'datetime'?`${table[i].column[j].length}`:`${table[i].column[j].length}`?`(${table[i].column[j].length})`:''} ${table[i].column[j].isNullable==false?'NOT NULL':'NULL'} ${table[i].column[j].isIdentity==false?'':'IDENTITY'}, `
           }
           query = query.slice(0, query.length - 2)
           let mainQuery = `ALTER TABLE ${DestinationDB}.dbo.${table[i].tableName} ALTER COLUMN ${query}`
-          let response = {
-            data: {
-              mainQuery
-            },
-          };
-          callback({
-            response
+          response.push({
+            data: mainQuery
           });
         } else {
           let query = ''
           for (let j = 0; j < table[i].column.length; j++) {
-            query += `${table[i].column[j].name} ${table[i].column[j].type}${table[i].column[j].type == 'int' || table[i].column[j].type == 'text' || table[i].column[j].type == 'date'?`${table[i].column[j].length}`:`${table[i].column[j].length}`?`(${table[i].column[j].length})`:''} ${table[i].column[j].isNullable==false?'NOT NULL':'NULL'} ${table[i].column[j].isIdentity==false?'':'IDENTITY'}, `
+            query += `${table[i].column[j].name} ${table[i].column[j].type}${table[i].column[j].type == 'int' || table[i].column[j].type == 'text' || table[i].column[j].type == 'date' || table[i].column[j].type == 'smallint' || table[i].column[j].type == 'datetime'?`${table[i].column[j].length}`:`${table[i].column[j].length}`?`(${table[i].column[j].length})`:''} ${table[i].column[j].isNullable==false?'NOT NULL':'NULL'} ${table[i].column[j].isIdentity==false?'':'IDENTITY'}, `
           }
           query = query.slice(0, query.length - 2)
           let mainQuery = `ALTER TABLE ${DestinationDB}.dbo.${table[i].tableName} ADD ${query}`
-          let response = {
-            data: {
-              mainQuery
-            },
-          };
-          callback({
-            response
+          response.push({
+            data: mainQuery
           });
         }
       }
     } catch (err) {
       return callback(err);
     }
+    callback({
+      response
+    });
   }
 }
 async function CompareDBSql(payload, UUIDKey, route, callback, JWToken) {
   try {
     let connection1 = undefined;
     try {
-      console.log("payload.body.Destination", payload.body.Destination);
       let endpoint = await endpointDefination.findOne({
         id: payload.body.Source
       });
@@ -279,7 +271,6 @@ async function CompareDBSql(payload, UUIDKey, route, callback, JWToken) {
     } catch (err) {
       return callback(err);
     }
-    console.log("connection1", connection1);
     let connection2 = undefined;
     try {
       let endpoint = await endpointDefination.findOne({

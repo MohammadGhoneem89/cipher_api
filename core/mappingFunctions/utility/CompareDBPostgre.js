@@ -222,8 +222,6 @@ function dbCompare(source, destination, sourceColumns, destinationColumns) {
 
 async function ApplyScriptPostgreSql(payload, UUIDKey, route, callback, JWToken) {
   let DestinationDB = payload.body.Destination
-  // let pg2 = await factory.createClient('pg', `postgresql://Admin:avanza123@23.97.138.116:5432/${DestinationDB}?idleTimeoutMillis=3000000`);
-
   let pg2 = undefined;
 
   try {
@@ -236,20 +234,24 @@ async function ApplyScriptPostgreSql(payload, UUIDKey, route, callback, JWToken)
   }
 
 
-  if (payload) {
+  if (payload.body.script) {
 
-    let mainQuery = payload.body.script.mainQuery
-    try {
-      let results2 = await pg2.query(`${mainQuery}`)
-    } catch (err) {
-      return callback(err);
+
+    for (let i = 0; i < payload.body.script.length; i++) {
+      try {
+        let results2 = await pg2.query(`${payload.body.script[i].data}`)
+      } catch (err) {
+        return callback(err);
+      }
     }
+
   }
 }
 
 async function WriteScriptPostgreSql(payload, UUIDKey, route, callback, JWToken) {
   if (payload.body && payload.body.tables) {
     let table = payload.body.tables
+    let response = []
     for (let i = 0; i < table.length; i++) {
       if (table[i].type == 'new') {
         let query = ''
@@ -259,13 +261,8 @@ async function WriteScriptPostgreSql(payload, UUIDKey, route, callback, JWToken)
         let mainQuery = `CREATE TABLE public.${table[i].tableName} (${query})`
         mainQuery = mainQuery.slice(0, mainQuery.length - 3)
         mainQuery = `${mainQuery})`
-        let response = {
-          data: {
-            mainQuery
-          },
-        };
-        callback({
-          response
+        response.push({
+          data: mainQuery
         });
       } else if (table[i].type == 'updated-col-type') {
         let query = ''
@@ -275,15 +272,9 @@ async function WriteScriptPostgreSql(payload, UUIDKey, route, callback, JWToken)
         let mainQuery = `ALTER TABLE public.${table[i].tableName} ${query}`
         mainQuery = mainQuery.slice(0, mainQuery.length - 2)
         mainQuery = `${mainQuery}`
-        let response = {
-          data: {
-            mainQuery
-          },
-        };
-        callback({
-          response
+        response.push({
+          data: mainQuery
         });
-
       } else {
         let query = ''
         for (let j = 0; j < table[i].columns.length; j++) {
@@ -292,16 +283,14 @@ async function WriteScriptPostgreSql(payload, UUIDKey, route, callback, JWToken)
         let mainQuery = `ALTER TABLE public.${table[i].tableName} ${query}`
         mainQuery = mainQuery.slice(0, mainQuery.length - 2)
         mainQuery = `${mainQuery}`
-        let response = {
-          data: {
-            mainQuery
-          },
-        };
-        callback({
-          response
+        response.push({
+          data: mainQuery
         });
       }
     }
+    callback({
+      response
+    });
   }
 }
 
