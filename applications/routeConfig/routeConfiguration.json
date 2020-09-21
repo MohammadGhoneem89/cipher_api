@@ -40,10 +40,10 @@
       "CustomMappingFile": "search.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "uploadTask":{
+    "couch":{
       "customMapping": true,
-      "MappingfunctionName": "uploadTask",
-      "CustomMappingFile": "uploadTask.js",
+      "MappingfunctionName": "couch",
+      "CustomMappingFile": "couch/couch.js",
       "mappingConfigFile": "ePayMapping"
     }
   }
