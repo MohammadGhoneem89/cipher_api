@@ -39,6 +39,12 @@
       "MappingfunctionName": "search",
       "CustomMappingFile": "search.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "uploadTask":{
+      "customMapping": true,
+      "MappingfunctionName": "uploadTask",
+      "CustomMappingFile": "uploadTask.js",
+      "mappingConfigFile": "ePayMapping"
     }
   }
  
