@@ -1556,5 +1556,13 @@
       "CustomMappingFile": "utility/CompareDBPostgre.js",
       "mappingConfigFile": "ePayMapping"
     }
+  },
+  "Consent":{
+    "getDocumentTypeList":{
+      "customMapping": true,
+      "MappingfunctionName": "getDocumentTypeList",
+      "CustomMappingFile": "consentManagement/documentTypeList.js",
+      "mappingConfigFile": "ePayMapping"
+    }
   }
 }
