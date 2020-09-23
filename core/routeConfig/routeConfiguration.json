@@ -631,6 +631,12 @@
       "MappingfunctionName": "testLetter",
       "CustomMappingFile": "letter/testLetter.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "apiDocumentationLetter": {
+      "customMapping": true,
+      "MappingfunctionName": "apiDocumentationLetter",
+      "CustomMappingFile": "letter/testLetter.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "UI": {
