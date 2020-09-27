@@ -9,7 +9,7 @@ const Letters = require('../../../lib/models/letters');
 
 async function getAllLetters(payload, UUIDKey, route, callback, JWToken) {
     try {
-        console.log(Letters, 'LETTERSSSS');
+        // console.log(Letters, 'LETTERSSSS');
         // if(!validateJsonLength(payload.body)){
         //     return callback(error('JSON in request is not valid'));
         // }
@@ -22,7 +22,7 @@ async function getAllLetters(payload, UUIDKey, route, callback, JWToken) {
             // })
             try {
                 let res = await Letters.find({})
-                console.log(res, '================');
+                // console.log(res, '================');
 
                 let response = {
                     getAllLetters: res,

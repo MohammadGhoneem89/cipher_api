@@ -1,16 +1,9 @@
 
-// const sqlserver = require('../../../../core/api/connectors/mssql');
-// const {
-//     error
-// } = require('../../lib/response');
 const uuid = require('uuid/v1');
-// const organizationType = require('../../../../lib/models/organizationType');
 const Letters = require('../../../lib/models/letters.js');
 
 const rp = require('request-promise');
 const path = require('path');
-
-// const { validateJsonLength } = require('../../lib/utils')
 
 async function testLetter(payload, UUIDKey, route, callback, JWToken, res) {
     try {
@@ -22,7 +15,7 @@ async function testLetter(payload, UUIDKey, route, callback, JWToken, res) {
 
 
 
-        const { templateId } = payload.templatePayload.template;
+        const { templateId } = payload.templatePayload;
         if (templateId) {
 
             let resp = await Letters.find({
@@ -30,7 +23,6 @@ async function testLetter(payload, UUIDKey, route, callback, JWToken, res) {
             });
 
 
-            console.log(resp[0].sampleJson);
 
             const options = {
                 method: 'POST',
@@ -46,9 +38,9 @@ async function testLetter(payload, UUIDKey, route, callback, JWToken, res) {
                     templateName: resp[0].templateName,
                     templatePath: resp[0].templatePath,
                     templateMarkup: resp[0].templateMarkup,
-                    filePath: payload.templatePayload.template.filePath,
+                    filePath: payload.templatePayload.filePath,
                     templateType: resp[0].templateType,
-                    outputFileName: payload.templatePayload.template.outputFileName,
+                    outputFileName: payload.templatePayload.outputFileName,
                     // data: payload.templatePayload.data
                     data: JSON.parse(resp[0].sampleJson)
                 },
@@ -64,14 +56,20 @@ async function testLetter(payload, UUIDKey, route, callback, JWToken, res) {
             };
             let document = await rp(options);
 
-            // console.log(document, 'DOCUMENTTTTTTTTTTTTTT');
-            let fileName = payload.templatePayload.template.filePath+'/'+payload.templatePayload.template.outputFileName+'.pdf';
+            
+            let fileName;
+            console.log(payload, 'PAYLOAD');
+            if (resp[0].templatePath) {
+                fileName = payload.templatePayload.template.filePath+'/'+payload.templatePayload.template.outputFileName+'.pdf';
+            } else {
+                fileName = payload.templatePayload.filePath+'/'+payload.templatePayload.outputFileName+'.pdf';
+            }
             async function downloadDoc(document) {
                 const file = path.normalize(document);
                 return path.resolve(file);
             }
             let result = await downloadDoc(fileName);
-    
+
             return res.sendFile(result);
 
             // const resp = {
@@ -130,6 +128,62 @@ async function testLetter(payload, UUIDKey, route, callback, JWToken, res) {
     }
 }
 
+async function apiDocumentationLetter(payload, UUIDKey, route, callback, JWToken, res) {
+    try {
+        const { templateId } = payload.templatePayload;
+        if (templateId) {
+
+            let resp = await Letters.find({
+                "templateId": templateId
+            });
+
+            const options = {
+                method: 'POST',
+                uri: 'http://localhost:8000/reportPdfSubmit',
+                headers: {
+                    'User-Agent': 'Request-Promise',
+                    'Content-Type': 'application/json',
+                    'Accept': '*/*',
+                    'Accept-Encoding': 'gzip, deflate, br',
+                    'Connection': 'keep-alive'
+                },
+                body: {
+                    templateName: resp[0].templateName,
+                    templatePath: resp[0].templatePath,
+                    templateMarkup: resp[0].templateMarkup,
+                    filePath: payload.templatePayload.filePath,
+                    templateType: resp[0].templateType,
+                    outputFileName: payload.templatePayload.outputFileName,
+                    data: JSON.parse(resp[0].sampleJson)
+                },
+                json: true
+            };
+
+            options.body.data.data = {
+                apiList: payload.templatePayload.data
+            }
+            //calling letter services
+            await rp(options);
+
+            let fileName;
+            fileName = payload.templatePayload.template.filePath + '/' + payload.templatePayload.template.outputFileName + '.pdf';
+
+            async function downloadDoc(document) {
+                const file = path.normalize(document);
+                return path.resolve(file);
+            }
+            console.log("fileName", fileName)
+            let result = await downloadDoc(fileName);
+            return res.sendFile(result);
+        }
+
+    } catch (err) {
+        return callback(err);
+    }
+}
+
+
 module.exports = {
-    testLetter
+    testLetter,
+    apiDocumentationLetter
 }

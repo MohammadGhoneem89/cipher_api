@@ -75,7 +75,6 @@ async function get_db_collections(db_conn) {
 
 async function get_db_collection(db_conn, collection_name, profile_id = "") {
 
-    console.log(profile_id)
     let collection = await db_conn.db.collection(collection_name);
     if (profile_id == "")
         return await collection.find({}).toArray();
@@ -190,19 +189,12 @@ async function find_updated_records(s_collection_data, d_collection_data, result
 async function getChanges(payload, UUIDKey, route, callback, JWToken) {
     try {
 
-
-
-        console.log(payload.data)
         let errors = {}, is_missing = false;
-        // if (!payload.body.hasOwnProperty('source_db_url')) {
-        //     errors.source_db_url = "Missing required field."
-        //     is_missing = true;
-        // }
-        // if (!payload.body.hasOwnProperty('destination_db_url')) {
-        //     is_missing = true;
-        //     errors.destination_db_url = "Missing required field."
-        // }
 
+        // if (!payload.data.data.hasOwnProperty('source_url')) {
+        //     is_missing = true;
+        //     errors.source_db_url = "Missing required field."
+        // }
         if (!payload.data.data.hasOwnProperty('destination_url')) {
             is_missing = true;
             errors.destination_db_url = "Missing required field."
@@ -217,12 +209,21 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
             return;
         }
 
-        // let source = crypto.decrypt(_.trim(payload.body.source_db_url)),
-        //     destination = crypto.decrypt(_.trim(payload.body.destination_db_url));
-
         let source = "mongodb://23.97.138.116:10050/master",// _.trim(payload.body.source_db_url),
-            destination = _.trim(payload.data.data.destination_url),
+            destination_url = _.trim(payload.data.data.destination_url),
             profile = _.trim(payload.data.data.db_profiles);
+
+        let source_connection = mongoose.createConnection(source, clientOption);
+        let resolve_source = new Promise((resolve) => {
+            source_connection.on('open', () => {
+                console.log("yeayy")
+                resolve(source_connection);
+            });
+        })
+        await resolve_source;
+
+        let destination_db = await get_db_collection(source_connection, "EndpointDefination", destination_url),
+            destination = destination_db[0].address
 
         let response = {
             "message": "API declared",
@@ -230,39 +231,21 @@ async function getChanges(payload, UUIDKey, route, callback, JWToken) {
             "destination": destination,
             "profile": profile
         }
+        let destination_connection = mongoose.createConnection(destination, clientOption);
 
-
-        // let source_connection = await mongoDB.connection(source);
-        // let destination_connection = await mongoDB.connection(destination);
-
-        const instances = [];
-
-        source_connection = mongoose.createConnection(source, clientOption);
-        destination_connection = mongoose.createConnection(destination, clientOption);
-
-        instances.push(new Promise((resolve) => {
-            source_connection.on('open', () => { resolve(source_connection); });
-        }));
-        instances.push(new Promise((resolve) => {
+        let resolve_destination = new Promise((resolve) => {
             destination_connection.on('open', () => { resolve(destination_connection); });
-        }));
-
-        await Promise.all(instances);
+        })
+        await resolve_destination;
 
         console.log("source:", source_connection.name)
         console.log("destination:", destination_connection.name)
 
-        // Find missing tables 
-        let collections = [];
-
-        let source_data = await get_db_collections(source_connection);
         let dest_data = await get_db_collections(destination_connection);
+        let source_data = await get_db_collections(source_connection);
 
         // Compose resultant array
         let result = await get_resultant(source_connection, source_data);
-
-        console.log("collections in source:", source_data.length);
-        console.log("collections in destination:", dest_data.length);
 
         let db_profile = await get_db_collection(source_connection, "schemaProfiles", profile)
 

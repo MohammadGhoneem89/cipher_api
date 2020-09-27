@@ -26,7 +26,7 @@
       "CustomMappingFile": "systemAPI/ADHReportConfig.js",
       "mappingConfigFile": "ePayMapping"
     },
-    "apiDocsContarct":{
+    "apiDocsContarct": {
       "customMapping": true,
       "MappingfunctionName": "apiDocsContarct",
       "CustomMappingFile": "systemAPI/APIDefination.js",
@@ -629,6 +629,12 @@
     "testLetter": {
       "customMapping": true,
       "MappingfunctionName": "testLetter",
+      "CustomMappingFile": "letter/testLetter.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "apiDocumentationLetter": {
+      "customMapping": true,
+      "MappingfunctionName": "apiDocumentationLetter",
       "CustomMappingFile": "letter/testLetter.js",
       "mappingConfigFile": "ePayMapping"
     }
@@ -1464,6 +1470,18 @@
       "CustomMappingFile": "couch/getTransactions.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getCollectionsList": {
+      "customMapping": true,
+      "MappingfunctionName": "getCollectionsList",
+      "CustomMappingFile": "couch/getTransactions.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getDocumentRevesions": {
+      "customMapping": true,
+      "MappingfunctionName": "getDocumentRevesions",
+      "CustomMappingFile": "couch/getTransactions.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "couchQuery": {
       "customMapping": true,
       "MappingfunctionName": "couchQuery",
@@ -1506,6 +1524,50 @@
       "customMapping": true,
       "MappingfunctionName": "decrypt",
       "CustomMappingFile": "utility/encrypt_decrypt.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "CompareDBSql": {
+      "customMapping": true,
+      "MappingfunctionName": "CompareDBSql",
+      "CustomMappingFile": "utility/CompareDBSql.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "WriteScriptSQL": {
+      "customMapping": true,
+      "MappingfunctionName": "WriteScriptSQL",
+      "CustomMappingFile": "utility/CompareDBSql.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "ApplyScriptSQL": {
+      "customMapping": true,
+      "MappingfunctionName": "ApplyScriptSQL",
+      "CustomMappingFile": "utility/CompareDBSql.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "CompareDBPostgre": {
+      "customMapping": true,
+      "MappingfunctionName": "CompareDBPostgre",
+      "CustomMappingFile": "utility/CompareDBPostgre.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "WriteScriptPostgreSql": {
+      "customMapping": true,
+      "MappingfunctionName": "WriteScriptPostgreSql",
+      "CustomMappingFile": "utility/CompareDBPostgre.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "ApplyScriptPostgreSql": {
+      "customMapping": true,
+      "MappingfunctionName": "ApplyScriptPostgreSql",
+      "CustomMappingFile": "utility/CompareDBPostgre.js",
+      "mappingConfigFile": "ePayMapping"
+    }
+  },
+  "Consent":{
+    "getDocumentTypeList":{
+      "customMapping": true,
+      "MappingfunctionName": "getDocumentTypeList",
+      "CustomMappingFile": "consentManagement/documentTypeList.js",
       "mappingConfigFile": "ePayMapping"
     }
   }
