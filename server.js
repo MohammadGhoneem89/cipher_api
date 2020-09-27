@@ -252,7 +252,7 @@ app.post('/login', async (req, res) => {
       "messageStatus": "ERROR",
       //     "cipherMessageId": uuid(),
       "errorDescription": 'some error occurred while processing',
-      "errorCode": 201,
+      "errorCode": 500,
       "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
     }
 
@@ -676,7 +676,7 @@ const timeoutResponse = {
 
   //"cipherMessageId": uuid(),
   "messageStatus": "ERROR",
-  "errorCode": 201,
+  "errorCode": 406,
   "errorDescription": "Token Expired",
   "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
 };
@@ -691,7 +691,7 @@ app.use(function (req, res, next) {
     "messageStatus": "ERROR",
     //  "cipherMessageId": uuid(),
     "errorDescription": 'not found!',
-    "errorCode": 201,
+    "errorCode": 404,
     "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
   }
   _.set(resc, config.get('responseMessageAttribute', "cipherMessageId"), uuid())
