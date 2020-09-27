@@ -16,6 +16,9 @@ WORKDIR /opt/app-root
 COPY package.json .
 COPY . .
 RUN bash -c "npm install"
+RUN bash -c "npm install yarn -g"
+RUN bash -c "yarn install --ignore-engines"
+HEALTHCHECK CMD node /opt/app-root/healthcheck.js localhost 9580 5000 /health
 USER 1001
 EXPOSE 9080
 CMD ["node","app"]
