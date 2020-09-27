@@ -23,7 +23,7 @@ COPY . .
 #RUN npm install
 RUN npm install yarn -g
 RUN yarn install --ignore-engines
-HEALTHCHECK CMD node /opt/app-root/healthcheck.js localhost 9580 5000 /health --interval=5s --timeout=30s --retries=5
+HEALTHCHECK CMD node /opt/app-root/healthcheck.js localhost 10001 5000 /health --interval=5s --timeout=30s --retries=5
 USER 1001
 
 EXPOSE 3000
