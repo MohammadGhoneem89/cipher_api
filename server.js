@@ -116,7 +116,6 @@ function checkbadinput(req) {
   const payload = req.body;
   const requestString = JSON.stringify(payload);
   if (contains(requestString, "$")) {
-    logger.error({ fs: 'app.js', func: 'login', error: err.stack || err }, 'illeagal characters Found Sending Error!!');
     return true;
   }
   return false;
@@ -170,7 +169,7 @@ app.post('/login', async (req, res) => {
         desc: 'The username or password contains illegal characters.'
       };
       response.loginResponse.data.message.status = 'ERROR';
-      // response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
+      response.loginResponse.data.message.errorDescription = err.desc || err.stack || err;
       response.loginResponse.data.success = false;
       res.status(400).send(response);
       return;
@@ -189,15 +188,12 @@ app.post('/login', async (req, res) => {
           });
           res.send(apiResponse);
         } else {
-          console.log(">>>>>>>>>>>>>>>>>>>>}}}", JSON.stringify(user))
           response.loginResponse.data.token = user.token;
           let cookieAttributes = {};
           if (config.get("disableSameSiteCookie")) {
             delete cookieAttributes.sameSite;
           }
           res.cookie('token', user.token, cookieAttributes);
-
-
           await tokenLookup.removeAndCreateWithSession({
             token: user.token,
             userId: user._id,
@@ -250,12 +246,10 @@ app.post('/login', async (req, res) => {
     console.log("error while login" + err);
     let resp = {
       "messageStatus": "ERROR",
-      //     "cipherMessageId": uuid(),
       "errorDescription": 'some error occurred while processing',
       "errorCode": 201,
       "timestamp": moment().tz(config.get('timeZone', 'Asia/Dubai')).format("DD/MM/YYYY HH:mm:ss.SSS")
     }
-
     _.set(resp, config.get('responseMessageAttribute', "cipherMessageId"), uuid())
 
     res.status(500).send(resp);
