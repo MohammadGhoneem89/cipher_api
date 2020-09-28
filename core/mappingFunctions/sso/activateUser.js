@@ -18,7 +18,7 @@ async function activate(payload, UUIDKey, route, callback, JWToken) {
     };
 
     try {
-        let userResult = await userRepo.getGroups({ userID: payload.body.id })
+        let userResult = await userRepo.find({ userID: payload.body.id })
         if (userResult) {
             await userRepo.update({ _id: userResult._id }, { passwordRetries: 0 })
             response.responseMessage.data.message.status = "OK"
