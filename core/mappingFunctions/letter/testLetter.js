@@ -56,13 +56,13 @@ async function testLetter(payload, UUIDKey, route, callback, JWToken, res) {
             };
             let document = await rp(options);
 
-            
+
             let fileName;
             console.log(payload, 'PAYLOAD');
             if (resp[0].templatePath) {
-                fileName = payload.templatePayload.template.filePath+'/'+payload.templatePayload.template.outputFileName+'.pdf';
+                fileName = payload.templatePayload.template.filePath + '/' + payload.templatePayload.template.outputFileName + '.pdf';
             } else {
-                fileName = payload.templatePayload.filePath+'/'+payload.templatePayload.outputFileName+'.pdf';
+                fileName = payload.templatePayload.filePath + '/' + payload.templatePayload.outputFileName + '.pdf';
             }
             async function downloadDoc(document) {
                 const file = path.normalize(document);
@@ -148,6 +148,7 @@ async function apiDocumentationLetter(payload, UUIDKey, route, callback, JWToken
                     'Connection': 'keep-alive'
                 },
                 body: {
+                    letterType: "api_documentation",
                     templateName: resp[0].templateName,
                     templatePath: resp[0].templatePath,
                     templateMarkup: resp[0].templateMarkup,
@@ -160,6 +161,8 @@ async function apiDocumentationLetter(payload, UUIDKey, route, callback, JWToken
             };
 
             options.body.data.data = {
+                useCase: payload.useCase,
+                group: payload.group,
                 apiList: payload.templatePayload.data
             }
             //calling letter services
