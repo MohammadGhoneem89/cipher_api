@@ -826,6 +826,12 @@
       "CustomMappingFile": "workingCalendar/update.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "workingDays": {
+      "customMapping": true,
+      "MappingfunctionName": "workingDays",
+      "CustomMappingFile": "workingCalendar/workingDays.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "auditLogList": {
       "customMapping": true,
       "MappingfunctionName": "list",
