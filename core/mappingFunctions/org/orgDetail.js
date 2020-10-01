@@ -112,6 +112,7 @@ var orgDetail = function (payload, entityGetCB, JWToken) {
         pointer.set(data, '/actions', res.pageActions);
 
         if (config.get('database', 'postgres') == 'mssql') {
+          console.log("<here>")
           let conn = await sqlserver.connection()
           let { recordset } = await conn.request().query(`select sum(amount) as amount,sum(hits) as hits,route from billingreport where orgcode='${data.spCode}' and
           startdate>='${moment(start).format('YYYY-MM-DD 00:00:00')}' and enddate<= '${moment(end).format('YYYY-MM-DD 11:59:00')}'
@@ -121,11 +122,13 @@ var orgDetail = function (payload, entityGetCB, JWToken) {
           _.set(response, 'entityDetail.data.billing', recordset);
           entityGetCB(response);
         } else {
+          console.log("<herepg>")
           let conn = await pg.connection();
-
+          
           let reslt = await conn.query(`select sum(amount) as amount,sum(hits) as hits,route from billingreport where orgcode='${data.spCode}'
           and startdate>='${moment(start).format('YYYY-MM-DD 00:00:00')}' and enddate<='${moment(end).format('YYYY-MM-DD 11:59:00')}'
           group by route`);
+          console.log("<ready>")
           response["entityDetail"]["data"] = data;
           _.set(response, 'entityDetail.data.billing', reslt.rows);
           _.set(response, 'entityDetail.data.from', moment(start).format('YYYY-MM-DD 00:00:00'));
