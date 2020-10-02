@@ -1563,6 +1563,24 @@
       "MappingfunctionName": "getDocumentTypeList",
       "CustomMappingFile": "consentManagement/documentTypeList.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "getConsentProfileList":{
+      "customMapping": true,
+      "MappingfunctionName": "getConsentProfileList",
+      "CustomMappingFile": "consentManagement/consentProfileList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getProvidedConsentList":{
+      "customMapping": true,
+      "MappingfunctionName": "getProvidedConsentList",
+      "CustomMappingFile": "consentManagement/providedConsentList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "getOrgList":{
+      "customMapping": true,
+      "MappingfunctionName": "getOrgList",
+      "CustomMappingFile": "consentManagement/getOrgList.js",
+      "mappingConfigFile": "ePayMapping"
     }
   }
 }
