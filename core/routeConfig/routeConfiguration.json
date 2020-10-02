@@ -631,6 +631,12 @@
       "MappingfunctionName": "testLetter",
       "CustomMappingFile": "letter/testLetter.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "apiDocumentationLetter": {
+      "customMapping": true,
+      "MappingfunctionName": "apiDocumentationLetter",
+      "CustomMappingFile": "letter/testLetter.js",
+      "mappingConfigFile": "ePayMapping"
     }
   },
   "UI": {
@@ -824,6 +830,12 @@
       "customMapping": true,
       "MappingfunctionName": "workingCalendarUpdateOut",
       "CustomMappingFile": "workingCalendar/update.js",
+      "mappingConfigFile": "ePayMapping"
+    },
+    "workingDays": {
+      "customMapping": true,
+      "MappingfunctionName": "workingDays",
+      "CustomMappingFile": "workingCalendar/workingDays.js",
       "mappingConfigFile": "ePayMapping"
     },
     "auditLogList": {

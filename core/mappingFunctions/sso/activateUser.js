@@ -1,7 +1,8 @@
 'use strict';
 
 const userRepo = require('../../../lib/repositories/user');
-
+const models = require('../../../lib/models');
+const User = models.User;
 async function activate(payload, UUIDKey, route, callback, JWToken) {
     const response = {
         responseMessage: {
@@ -18,9 +19,13 @@ async function activate(payload, UUIDKey, route, callback, JWToken) {
     };
 
     try {
-        let userResult = await userRepo.getGroups({ userID: payload.body.id })
+        let userResult = await User.findOne({ userID: payload.body.id })
+        
         if (userResult) {
-            await userRepo.update({ _id: userResult._id }, { passwordRetries: 0 })
+           
+            userResult.passwordRetries=0;
+            console.log(JSON.stringify(userResult))
+            await userRepo.update({ userID: payload.body.id },userResult)
             response.responseMessage.data.message.status = "OK"
             response.responseMessage.data.message.errorDescription = "Success user activated"
             response.responseMessage.data.message.newPageURL = "/userList"

@@ -87,6 +87,7 @@ function _userApproveReject(payload, callback) {
       }
       callback(response);
     }).catch((err) => {
+      console.log(err);
       const response = {
         responseMessage: {
           action: payload.action,

@@ -99,36 +99,36 @@ function checkRules() {
 
   health({}, '', '', function (dataHealth) {
 
-    Health.findOne({name: 'general'}).then((data) => {
+    Health.findOne({ name: 'general' }).then((data) => {
       if (data && data.ruleList) {
         data.ruleList.forEach((elem) => {
-            console.log(JSON.stringify(elem));
-            let wildcardLoc = elem.field.indexOf('*')
-            if (elem.field.indexOf('*') > 0) {
-              let rawArr = _.get(dataHealth, elem.field.substring(0, wildcardLoc - 1), [])
-              rawArr.forEach((element) => {
-                let val = _.get(element, elem.field.substring(wildcardLoc + 2, elem.field.length), '');
-                if (elem.option == '==' && val == elem.value) {
-                  dispatch(elem, element)
-                } else if (elem.option == '!=' && val != elem.value) {
-                  dispatch(elem, element)
-                }
-              })
-            } else {
-              let val = _.get(dataHealth, elem.field, '')
+          console.log(JSON.stringify(elem));
+          let wildcardLoc = elem.field.indexOf('*')
+          if (elem.field.indexOf('*') > 0) {
+            let rawArr = _.get(dataHealth, elem.field.substring(0, wildcardLoc - 1), [])
+            rawArr.forEach((element) => {
+              let val = _.get(element, elem.field.substring(wildcardLoc + 2, elem.field.length), '');
               if (elem.option == '==' && val == elem.value) {
-                dispatch(elem, dataHealth)
+                dispatch(elem, element)
               } else if (elem.option == '!=' && val != elem.value) {
-                dispatch(elem, dataHealth)
+                dispatch(elem, element)
               }
+            })
+          } else {
+            let val = _.get(dataHealth, elem.field, '')
+            if (elem.option == '==' && val == elem.value) {
+              dispatch(elem, dataHealth)
+            } else if (elem.option == '!=' && val != elem.value) {
+              dispatch(elem, dataHealth)
             }
           }
+        }
         )
       }
     })
   }, {});
 
-  
+
   setTimeout(checkRules, configGlobal.get('healthCheckInterval', 300000));
 }
 
@@ -150,22 +150,26 @@ function dispatch(elem, data) {
 
 async function health(payload, UUIDKey, route, callback, JWToken) {
   // networkConfig
-  let networks = await networkConfig.getList({type: 'Hyperledger'})
+  let networks = await networkConfig.getList({ type: 'Hyperledger' })
   let peerList = [];
   let epList = await endpoint.findAll();
   let endpointList = [];
   for (let epnt of epList) {
-    let ep = _.get(epnt, 'address', undefined);
-    let epURL = url.parse(ep);
-    let status = await isReachable(epURL.host);
-    let fStatus = status ? "Reachable" : "Down";
-    if (status) {
-      endpointList.push({
-        name: epnt.name,
-        host: epURL.host,
-        lastUpdateTime: Date.now(),
-        status: fStatus
-      });
+    try {
+      let ep = _.get(epnt, 'address', undefined);
+      let epURL = url.parse(ep);
+      let status = await isReachable(epURL.host);
+      let fStatus = status ? "Reachable" : "Down";
+      if (status) {
+        endpointList.push({
+          name: epnt.name,
+          host: epURL.host,
+          lastUpdateTime: Date.now(),
+          status: fStatus
+        });
+      }
+    } catch (ex) {
+      console.log(ex)
     }
   }
 
