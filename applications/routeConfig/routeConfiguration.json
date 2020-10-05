@@ -30,6 +30,12 @@
       "MappingfunctionName": "getFileData",
       "CustomMappingFile": "general/getFileData.js",
       "mappingConfigFile": "ePayMapping"
+    },
+    "couch":{
+      "customMapping": true,
+      "MappingfunctionName": "couch",
+      "CustomMappingFile": "couch/couch.js",
+      "mappingConfigFile": "ePayMapping"
     }
   }
 }

@@ -123,7 +123,7 @@ function orgUpdate(payload, userID, entityUpdateCB) {
           format.lastReconDate = data.lastReconDate ? data.lastReconDate : "";
           format.contactType = data.contactType ? data.contactType : "";
 
-
+          console.log(JSON.stringify(format, null, 2))
           global.db.select("Entity", {
             "id": id
           }, "", function (err, entityData) {

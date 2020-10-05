@@ -9,6 +9,7 @@ function getEntityTypeData(getEntityTypeData_CB, tdList, ownerFlag) {
       label: "$entityName",
       value: "$spCode",
       orgType: "$orgType",
+      img: "$entityLogo.sizeSmall",
       _id: "$_id"
     }, function (err, data) {
       if (err) {

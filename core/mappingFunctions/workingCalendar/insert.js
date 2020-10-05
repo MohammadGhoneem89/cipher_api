@@ -10,20 +10,33 @@ function workingCalendarInsertOut(payload, UUIDKey, route, callback, JWToken) {
 function create(payload, callback) {
   workingCalendar.create(payload)
     .then((calendarData) => {
-      const response = {
-        responseMessage: {
-          action: payload.action,
-          data: {
-            message: {
-              status: 'OK',
-              errorDescription: 'Working Calendar inserted successfully',
-              displayToUser: true,
-              newPageURL: '/workingCalendarList'
+      if (calendarData == null) {
+        const response = {
+          responseMessage: {
+            action: payload.action,
+            data: {
+              isAlreadyExists: true
             }
           }
-        }
-      };
-      callback(response);
+        };
+        callback(response);
+      } else {
+        const response = {
+          responseMessage: {
+            action: payload.action,
+            data: {
+              message: {
+                status: 'OK',
+                errorDescription: 'Working Calendar inserted successfully',
+                displayToUser: true,
+                newPageURL: '/workingCalendarList'
+              }
+            }
+          }
+        };
+        callback(response);
+      }
+
     })
     .catch((err) => {
       const response = {
