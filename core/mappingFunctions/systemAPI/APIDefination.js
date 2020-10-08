@@ -750,9 +750,9 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
         return unique;
       }
 
-      let uniqueMSP = removeDuplicatesBy(function (a, b) {
-        return a.MSP === b.MSP;
-      }, responses[0].ApiListData.APIdata);
+      // let uniqueMSP = removeDuplicatesBy(function (a, b) {
+      //   return a.MSP === b.MSP;
+      // }, responses[0].ApiListData.APIdata);
       for (let i = 0; i < DupIndex.length; i++) {
         storeDuplicate.push(responses[0].ApiListData.APIdata[DupIndex[i]]);
 

@@ -145,6 +145,15 @@ function orgList(body, entityList_CB, JWToken) {
                     "iconName": "fa fa-plus",
                     "URI": "/orgSetup",
                     "children": []
+                  },{
+                    "value": "1003",
+                    "type": "pageAction",
+                    "label": "ADD",
+                    "labelName": "Onboard_Add",
+                    "actionType": "PORTLET_LINK",
+                    "iconName": "fa fa-plus",
+                    "URI": "/BusinessOrgSetup",
+                    "children": []
                   }];
                 }
                 response["entityList"]["data"]["searchResult"] = res.documents;
