@@ -21,12 +21,12 @@ async function addWidgets(payload, UUIDKey, route, callback, JWToken, res) {
 
 
     let object = await Widgets.create({
-            "templateId": 'graph_' + uuid(),
+            "widgetId": 'graph_' + uuid(),
             "widgetName": widgetName,
             "widgetType": widgetType,
             "widgetCaption": widgetCaption,
             "status": status,
-            "widgetEndPoint": widgetEndpoint,
+            "widgetEndpoint": widgetEndpoint,
         });
 
 
