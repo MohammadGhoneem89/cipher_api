@@ -25,6 +25,12 @@
       "CustomMappingFile": "general/addWidgets.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "getWidgetList": {
+      "customMapping": true,
+      "MappingfunctionName": "getWidgetList",
+      "CustomMappingFile": "general/getWidgetList.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getFileList": {
       "customMapping": true,
       "MappingfunctionName": "getFileList",
