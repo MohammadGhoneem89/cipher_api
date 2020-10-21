@@ -770,7 +770,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
       }
       responses[0].ApiListData.APIdata = uniqueMSP;
 
-      let uniqueMSP = removeDuplicatesBy(function (a, b) {
+      let uniqueMSP_ = removeDuplicatesBy(function (a, b) {
         return a.MSP === b.MSP;
       }, responses[0].ApiListData.APIdata);
       for (let i = 0; i < DupIndex.length; i++) {
@@ -786,7 +786,7 @@ function downloadChainCode(payload, UUIDKey, route, callback, JWToken) {
           }
         }
       }
-      responses[0].ApiListData.APIdata = uniqueMSP;
+      responses[0].ApiListData.APIdata = uniqueMSP_;
 
       function replaceM(fileData) {
         let getData = getFileIndex(fileData);
