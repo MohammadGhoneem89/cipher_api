@@ -31,6 +31,12 @@
       "CustomMappingFile": "general/getWidgetList.js",
       "mappingConfigFile": "ePayMapping"
     },
+    "sendChartEmail": {
+      "customMapping": true,
+      "MappingfunctionName": "sendChartEmail",
+      "CustomMappingFile": "general/sendChartEmail.js",
+      "mappingConfigFile": "ePayMapping"
+    },
     "getFileList": {
       "customMapping": true,
       "MappingfunctionName": "getFileList",
